@@ -1,0 +1,139 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model PairingManualBaseline {
+  id          String   @id @default(cuid())
+  pairingKey  String   @unique @map("pairing_key")
+  extraWinsA  Int      @default(0) @map("extra_wins_a")
+  extraWinsB  Int      @default(0) @map("extra_wins_b")
+  extraBonusA Int      @default(0) @map("extra_bonus_a")
+  extraBonusB Int      @default(0) @map("extra_bonus_b")
+  note        String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("pairing_manual_baselines")
+}
+
+model PlayerNameAlias {
+  id            String   @id @default(cuid())
+  aliasName     String   @unique @map("alias_name")
+  canonicalName String   @map("canonical_name")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("player_name_aliases")
+}
+
+model League {
+  id         String           @id @default(cuid())
+  leagueCode String           @unique @map("league_code")
+  createdAt  DateTime         @default(now()) @map("created_at")
+  sessions   GameSession[]
+  standings  LeagueStanding[]
+
+  @@map("leagues")
+}
+
+model LeagueStanding {
+  id          String @id @default(cuid())
+  leagueId    String @map("league_id")
+  league      League @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  playerName  String @map("player_name")
+  winPoints   Int    @default(0) @map("win_points")
+  bonusPoints Int    @default(0) @map("bonus_points")
+
+  @@unique([leagueId, playerName])
+  @@map("league_standings")
+}
+
+model GameSession {
+  id                String   @id @default(cuid())
+  inviteCode        String   @unique @map("invite_code")
+  gameCount         Int      @map("game_count")
+  maxPlayers        Int      @map("max_players")
+  useStrategyRules  Boolean  @default(true) @map("use_strategy_rules")
+  status            String   @default("OPEN")
+  leagueId          String   @map("league_id")
+  league            League   @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  roundNumber       Int      @default(1) @map("round_number")
+  pointsAwarded     Boolean  @default(false) @map("points_awarded")
+  createdAt         DateTime @default(now()) @map("created_at")
+  players           Player[]
+
+  @@map("game_sessions")
+}
+
+model Player {
+  id          String      @id @default(cuid())
+  sessionId   String      @map("session_id")
+  session     GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  name        String
+  orderIndex  Int         @map("order_index")
+  secretToken String      @unique @map("secret_token")
+  runId       String      @unique @map("run_id")
+  run         Run         @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, orderIndex])
+  @@map("players")
+}
+
+model Run {
+  id                String   @id @default(cuid())
+  gameCount         Int      @map("game_count")
+  useStrategyRules  Boolean  @default(true) @map("use_strategy_rules")
+  totalScore        Int      @default(0) @map("total_score")
+  totalRollsUsed    Int      @default(0) @map("total_rolls_used")
+  rollsInPool       Int      @default(0) @map("rolls_in_pool")
+  extraYatzyCount   Int      @default(0) @map("extra_yatzy_count")
+  nextScoredSequence Int     @default(1) @map("next_scored_sequence")
+  status            String   @default("ACTIVE")
+  createdAt      DateTime @default(now()) @map("created_at")
+  finishedAt     DateTime? @map("finished_at")
+  games          Game[]
+  player         Player?
+
+  @@map("runs")
+}
+
+model Game {
+  id     String  @id @default(cuid())
+  runId  String  @map("run_id")
+  index  Int
+  score             Int @default(0)
+  extraYatzyBonus   Int @default(0) @map("extra_yatzy_bonus")
+  run               Run @relation(fields: [runId], references: [id], onDelete: Cascade)
+  fields Field[]
+
+  @@unique([runId, index])
+  @@map("games")
+}
+
+model Field {
+  id         String  @id @default(cuid())
+  gameId     String  @map("game_id")
+  fieldType  String  @map("field_type")
+  score      Int?
+  rollsUsed  Int     @default(0) @map("rolls_used")
+  scoredSequence Int? @map("scored_sequence")
+  game       Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  rolls      Roll[]
+
+  @@unique([gameId, fieldType])
+  @@map("fields")
+}
+
+model Roll {
+  id          String @id @default(cuid())
+  fieldId     String @map("field_id")
+  rollNumber  Int    @map("roll_number")
+  diceValues  String @map("dice_values")
+  field       Field  @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@unique([fieldId, rollNumber])
+  @@map("rolls")
+}

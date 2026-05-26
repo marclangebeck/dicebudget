@@ -1,0 +1,16 @@
+[Unit]
+Description=Kniffel Strategy Edition – API (Express)
+After=network.target
+
+[Service]
+Type=simple
+User=bottleadmin
+WorkingDirectory=/home/bottleadmin/projects/kniffel/backend
+Environment=NODE_ENV=production
+Environment=PORT=3020
+ExecStart=/usr/bin/node dist/index.js
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,33 @@
+{
+  "name": "kniffel-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DiceBudget Strategy Edition – API",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "prisma generate && tsc",
+    "start": "node dist/index.js",
+    "typecheck": "prisma generate && tsc --noEmit",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:create-run": "tsx scripts/create-run.ts",
+    "pretest": "DATABASE_URL=file:./prisma/test.db npx prisma migrate deploy",
+    "test": "DATABASE_URL=file:./prisma/test.db node --import tsx --test src/**/*.test.ts"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.8.0",
+    "prisma": "^5.22.0",
+    "tsx": "^4.22.0",
+    "typescript": "^6.0.3"
+  }
+}

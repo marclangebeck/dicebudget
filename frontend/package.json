@@ -1,0 +1,35 @@
+{
+  "name": "dicebudget-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3021",
+    "build": "next build",
+    "build:ios": "npm run build && npx cap sync ios",
+    "cap:sync": "npx cap sync ios",
+    "cap:open:ios": "npx cap open ios",
+    "icons": "node --input-type=module -e \"import sharp from 'sharp'; await sharp('public/logo-source.png').resize(512,512,{fit:'cover',position:'centre'}).png().toFile('public/icon-512.png'); await sharp('public/icon-512.png').resize(180,180).toFile('public/apple-touch-icon.png'); await sharp('public/icon-512.png').resize(32,32).toFile('app/icon.png');\"",
+    "start": "next start -p 3021",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.4.2",
+    "@capacitor/ios": "^7.4.2",
+    "next": "15.5.4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.2",
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.4",
+    "sharp": "^0.34.2",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

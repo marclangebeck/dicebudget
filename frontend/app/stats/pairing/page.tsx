@@ -1,0 +1,204 @@
+"use client";
+
+import Link from "next/link";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { getPairingDetail } from "@/lib/api";
+import type { PairingDetailDto } from "@/lib/pairingTypes";
+import { AppScreenHeader } from "@/components/AppScreenHeader";
+
+function formatDateTime(iso: string | null): string {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleString("de-DE", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
+function winnerLabel(
+  round: PairingDetailDto["rounds"][number],
+  pairing: PairingDetailDto,
+): string {
+  if (round.winner === "tie") return "Remis";
+  if (round.winner === "A") return pairing.playerA;
+  return pairing.playerB;
+}
+
+function PairingDetailInner() {
+  const searchParams = useSearchParams();
+  const key = (searchParams.get("key") ?? "").trim();
+
+  const [pairing, setPairing] = useState<PairingDetailDto | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!key) {
+      setLoading(false);
+      setError("Keine Paarung ausgewählt.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    void getPairingDetail(key)
+      .then(({ pairing: data }) => setPairing(data))
+      .catch((e) =>
+        setError(e instanceof Error ? e.message : "Paarung nicht geladen"),
+      )
+      .finally(() => setLoading(false));
+  }, [key]);
+
+  if (!key) {
+    return (
+      <div className="stats-screen flex flex-col gap-3">
+        <AppScreenHeader
+          section="Statistik"
+          title="Paarung"
+          backHref="/stats"
+          backLabel="← Alle Paarungen"
+        />
+        <p className="stats-empty-state">
+          Keine Paarung ausgewählt.{" "}
+          <Link href="/stats" className="text-link">
+            Zur Übersicht
+          </Link>
+        </p>
+      </div>
+    );
+  }
+
+  const headerTitle =
+    pairing != null
+      ? `${pairing.playerA} vs. ${pairing.playerB}`
+      : "Paarung";
+
+  const headerSubtitle =
+    pairing != null
+      ? [
+          `Siege ${pairing.playerAWins}:${pairing.playerBWins}`,
+          pairing.ties > 0 ? `${pairing.ties} Remis` : null,
+          pairing.appRoundsPlayed > 0
+            ? `${pairing.appRoundsPlayed} ${pairing.appRoundsPlayed === 1 ? "Runde" : "Runden"} in der App`
+            : null,
+        ]
+          .filter(Boolean)
+          .join(" · ")
+      : undefined;
+
+  return (
+    <div className="stats-screen flex flex-col gap-3 pb-2">
+      <AppScreenHeader
+        section="Statistik"
+        title={headerTitle}
+        subtitle={headerSubtitle}
+        backHref="/stats"
+        backLabel="← Alle Paarungen"
+      />
+
+      {pairing?.manualBaselineNote && (
+        <p className="stats-baseline-note">{pairing.manualBaselineNote}</p>
+      )}
+
+      {error && <p className="glass-alert-error px-3 py-2 text-sm">{error}</p>}
+      {loading && !error && <p className="stats-empty-state">Lade …</p>}
+
+      {pairing && (
+        <>
+          <section className="stats-detail-scores">
+            <div className="stats-detail-player-card">
+              <p className="stats-detail-player-name">{pairing.playerA}</p>
+              <p className="stats-detail-wins tabular-nums">{pairing.playerAWins}</p>
+              <p className="stats-detail-metric-label">Siege</p>
+              <p className="stats-detail-diff tabular-nums">
+                +{pairing.playerABonusPoints} Differenz
+              </p>
+              {pairing.playerAAppWins > 0 && (
+                <p className="stats-detail-app-wins">
+                  davon {pairing.playerAAppWins} in der App
+                </p>
+              )}
+            </div>
+            <div className="stats-detail-player-card stats-detail-player-card--b">
+              <p className="stats-detail-player-name">{pairing.playerB}</p>
+              <p className="stats-detail-wins tabular-nums">{pairing.playerBWins}</p>
+              <p className="stats-detail-metric-label">Siege</p>
+              <p className="stats-detail-diff tabular-nums">
+                +{pairing.playerBBonusPoints} Differenz
+              </p>
+              {pairing.playerBAppWins > 0 && (
+                <p className="stats-detail-app-wins">
+                  davon {pairing.playerBAppWins} in der App
+                </p>
+              )}
+            </div>
+          </section>
+
+          <section>
+            <h2 className="stats-section-title">
+              Runden in der App
+              <span className="text-muted font-normal"> ({pairing.appRoundsPlayed})</span>
+            </h2>
+            {pairing.appRoundsPlayed === 0 ? (
+              <p className="stats-empty-state stats-empty-state--inline">
+                Noch keine App-Runden – nur historische Werte.
+              </p>
+            ) : (
+              <ul className="stats-round-list">
+                {pairing.rounds.map((round, index) => (
+                  <li
+                    key={`${round.inviteCode}-${round.roundNumber}-${round.finishedAt ?? index}`}
+                    className="stats-round-card"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-strong text-sm font-semibold">
+                          Serie {round.leagueCode} · Runde {round.roundNumber}
+                        </p>
+                        <p className="text-muted mt-0.5 text-xs">
+                          {formatDateTime(round.finishedAt)}
+                        </p>
+                      </div>
+                      <p className="text-accent shrink-0 text-right text-xs font-semibold">
+                        {winnerLabel(round, pairing)}
+                        {round.winner !== "tie" && (
+                          <span className="text-muted block font-normal tabular-nums">
+                            +{round.scoreDiff}
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                    <div className="stats-round-scores tabular-nums">
+                      <span
+                        className={
+                          round.winner === "A" ? "text-strong font-semibold" : "text-muted"
+                        }
+                      >
+                        {pairing.playerA}: {round.playerAScore}
+                      </span>
+                      <span
+                        className={
+                          round.winner === "B" ? "text-strong font-semibold" : "text-muted"
+                        }
+                      >
+                        {pairing.playerB}: {round.playerBScore}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </>
+      )}
+    </div>
+  );
+}
+
+export default function PairingDetailPage() {
+  return (
+    <Suspense fallback={<p className="stats-empty-state">Lade …</p>}>
+      <PairingDetailInner />
+    </Suspense>
+  );
+}
