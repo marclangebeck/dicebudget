@@ -28,6 +28,8 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Lokales Scoring-Modul:** `frontend/lib/gameScoring.ts` (Bonus-/Totalsummen und Extra-Yatzy-Verteilung)
 - **Lokale Gegner-Aliase:** `frontend/lib/playerAliases.ts` + Overlay `frontend/components/PlayerAliasOverlay.tsx` (Alias nur lokal auf Gerät)
 - **Intro-Splash (M24 A):** schwarzer Eröffnungsscreen mit Branding, Würfeln und Progress 0–100 vor `/app`
+- **Impressum:** `/impressum` mit Platzhalter-Anbieterangaben
+- **LegalScrollShell:** scrollbarer Container für Datenschutz/Impressum (Capacitor iOS)
 
 ### Changed
 - Health-Endpoint: `service: dicebudget-backend`
@@ -46,12 +48,17 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Stats/Lobby Alias-UX:** Stift-Button öffnet Overlay; Anzeigenamen werden lokal pro `playerId` aufgelöst
 - **Kachel-Visuals (M26):** Icons bleiben primär; Bento-Kacheln mit subtilen Hintergrund-Akzenten und besserer visueller Tiefe
 - **Datenschutz (M27):** Text auf app-zentrierte Nutzung umgestellt; Website als begleitende Info-/Support-Seite beschrieben
-- **Statuskorrektur M23/M26/M27:** iOS-Abnahme zeigte offene UI-Punkte (Startseite-Button, Sichtbarkeit Legal-Links, Icon-Optik auf `/app`); finale Abnahme ausstehend
+- **App-Hintergrund:** dunkler Slate-Verlauf app-weit (`#3d4f63` → `#243447` → `#1a2332`); helle Kacheln behalten dunkle Schrift via CSS-Variablen-Reset
+- **Navigation (M23):** `app-nav-btn` mit Icon-Pill; kein doppelter Startseite-Button mehr (`SetupScreenLayout` vs. `AppScreenHeader`)
 
 ### Fixed
+- **iOS Auswahlscreen `/app`:** Legal-Links im Footer außerhalb des Bento-Grids (nicht abgeschnitten)
+- **iOS Navigation:** doppelter `← Startseite`-Button auf Solo/Multi/Statistik entfernt
+- **Datenschutz/Impressum iOS:** Scrollen via `LegalScrollShell`; Safe-Area unter Statusleiste
+- **Capacitor iOS-Deploy:** `npm run build:ios` vor Xcode zwingend nötig (stale Bundle in `ios/App/App/public/`)
 - **Produktions-API-URL:** Build nutzt `NEXT_PUBLIC_API_URL` aus `.env.production` (nicht mehr Fallback `127.0.0.1:3020` auf der Live-Domain)
 - **Paarungsnavigation:** Statischer Export — Links zur Detailseite als normales `<a>` (voller Seitenload)
-- **iOS-Upload auf Mac:** `Copy failed`/`rsync`-Fehler im Xcode-Distribute-Flow umgangen, indem Xcode mit System-PATH (`/usr/bin/rsync`) statt Homebrew-`rsync` gestartet wurde
+- **iOS-Upload auf Mac (`Copy failed`):** Homebrew-`rsync` deaktivieren (`brew unlink rsync`) → `/usr/bin/rsync`; Xcode mit System-PATH starten
 
 ### Removed
 - `HomeModeButtons.tsx` (ersetzt durch `HomeBentoGrid`)

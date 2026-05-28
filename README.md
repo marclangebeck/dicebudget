@@ -36,6 +36,7 @@ Lokal zeigt das Frontend auf `http://127.0.0.1:3020` (ohne `/api`-Prefix). Produ
 | `/` | Landingpage **dice.budget** |
 | `/app` | Spiel-Start (Bento) |
 | `/datenschutz` | Datenschutzerklärung (App Store) |
+| `/impressum` | Impressum |
 
 ## API (Kurzüberblick)
 
@@ -52,14 +53,11 @@ Backend muss laufen (`npm run dev` in `backend/` — danach `Ctrl+C`).
 | `POST` | `/runs/:runId/finish` | Alle Felder bewertet |
 | `POST` | `/runs/:runId/abandon` | Vorzeitig beenden |
 | `GET` | `/stats` | Persönliche Rekorde (abgeschlossene Runs) |
-| `GET` | `/stats/pairings` | Alle Zweier-Paarungen (Multiplayer) |
+| `GET` | `/stats/pairings` | Alle Zweier-Paarungen (Multiplayer, pseudonym) |
 | `GET` | `/stats/pairing?key=…` | Paarungsdetail inkl. App-Runden |
-| `GET` | `/stats/names` | Bekannte Namen + Aliase |
-| `POST` | `/stats/names/merge` | `{ "aliasName", "canonicalName" }` |
-| `DELETE` | `/stats/names/merge` | `{ "aliasName" }` |
 | `POST` | `/sessions` | `{ "gameCount", "maxPlayers", "useStrategyRules", "leagueCode"? }` |
 | `GET` | `/sessions/invite/:code` | Lobby inkl. Serie |
-| `POST` | `/sessions/invite/:code/join` | `{ "name" }` → `secretToken`, `runId` |
+| `POST` | `/sessions/invite/:code/join` | `{ "playerId" }` → `secretToken`, `runId` |
 | `GET` | `/sessions/invite/:code/ranking` | Rangliste Runde + **Serienpunkte** |
 
 Details: [projektbeschreibung.md](./projektbeschreibung.md)
@@ -74,8 +72,10 @@ Details: [projektbeschreibung.md](./projektbeschreibung.md)
 | `/play` | Spielzettel (Vollbild, kein Seiten-Scroll im aktiven Spiel) |
 | `/multi` | Raum erstellen (Host, modernisiertes Setup) |
 | `/multi/join?code=…` | Lobby, Rangliste, neue Serie-Runde |
-| `/stats` | Paarungsübersicht, Namen zusammenführen |
+| `/stats` | Paarungen, lokale Gegner-Aliase |
 | `/stats/pairing?key=…` | Paarungsdetail |
+| `/datenschutz` | Datenschutzerklärung |
+| `/impressum` | Impressum |
 
 Statischer Export: Join- und Paarungs-URLs nutzen Query-Parameter (keine dynamischen `[param]`-Segmente).
 
@@ -156,6 +156,8 @@ Nach Deploy: Hard-Refresh im Browser, falls alte JS-Chunks gecacht sind.
 | 11–14 | UX, Modi, Validierung, Tests | erledigt |
 | 15–19 | Liga, Paarungsstatistik, Namen, Feld löschen, Zusatz-Yatzy | erledigt |
 | 20 | UI-Modernisierung (Bento, Statistik, Setup, Spielzettel) | erledigt |
-| 21 | iOS-App (Capacitor) | in Arbeit — **[GOiOS.md](./GOiOS.md)** (Prozess + Agent-Prompt) |
+| 21 | iOS-App (Capacitor), TestFlight Build 10 | in Arbeit — **[GOiOS.md](./GOiOS.md)** |
+| 22 | Datenschutz-Umbau (pseudonym, lokales Solo) | erledigt |
+| 23–27 | UI/Branding iOS (Navigation, Icons, Hintergrund, Legal) | erledigt |
 
 Siehe [milestones.md](./milestones.md) für Details.

@@ -265,6 +265,7 @@ Die **Web-Seite** https://dicebudget.bottle-trade.de deployest du weiter separat
 
 | Problem | Lösung |
 |---------|--------|
+| `Copy failed` / rsync beim Upload | `brew unlink rsync` → `/usr/bin/rsync`; Xcode beenden; `env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open …/App.xcworkspace` |
 | `pod: command not found` | `sudo gem install cocoapods`, dann `cd ios/App && pod install` |
 | Build-Fehler nach `npm install` | `cd ios/App && pod install && cd ../.. && npx cap sync ios` |
 | Nur `.xcodeproj` geöffnet | Schließen, **`App.xcworkspace`** öffnen |

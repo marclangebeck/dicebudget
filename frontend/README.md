@@ -6,13 +6,14 @@ Next.js 15 (App Router), **statischer Export** (`output: "export"` in `next.conf
 
 - **Keine dynamischen Routen** für Join-Codes oder Paarungen → Query-Parameter:
   - Gast: `/multi/join?code=ABCD1234`
-  - Paarung: `/stats/pairing?key=Marc%3A%3ANicole%20Langebeck`
+  - Paarung: `/stats/pairing?key=…`
 - **API-Basis** (`NEXT_PUBLIC_API_URL`):
-  - Lokal (Dev): `http://127.0.0.1:3020` (Default in `lib/api.ts`)
+  - Lokal (Dev): `http://127.0.0.1:3020`
   - Produktion: `https://dicebudget.bottle-trade.de/api` in **`.env.production`**
-- Produktion: `npm run build` → Ausgabe in `out/`
-- Paarungslinks auf `/stats` nutzen `<a href>` (voller Seitenload — zuverlässig beim static export)
-- **Vollbild ohne Seiten-Scroll:** `/play` nutzt `PlayScreenShell` + `FitScoreSheet`; Eintrags-Panel fix unten (Panel scrollt intern nur bei vielen Punkte-Buttons)
+- **Capacitor iOS:** nach jeder UI-Änderung `npm run build:ios` (sync nach `ios/App/App/public/`)
+- Paarungslinks auf `/stats` nutzen `<a href>` (voller Seitenload — static export)
+- **Vollbild ohne Seiten-Scroll:** `/play` nutzt `PlayScreenShell` + `FitScoreSheet`
+- **Legal-Seiten:** `LegalScrollShell` — eigener Scroll-Container + Safe-Area (Capacitor `scrollEnabled: false`)
 
 ## Entwicklung
 
@@ -33,60 +34,39 @@ npm run icons   # aus public/logo-source.png
 
 | Pfad | Shell | Inhalt |
 |------|-------|--------|
-| `/` | — | Landingpage `MarketingLanding` |
-| `/app` | `HomeScreenShell` | `HomeBentoGrid`, `ResumeActiveGame` |
-| `/datenschutz` | — | Datenschutzerklärung (App Store) |
-| `/solo` | `SetupScreenLayout` | `GameSetup`, Modus-Toggle |
+| `/` | `landing-shell` | `MarketingLanding` |
+| `/app` | `HomeScreenShell` | `HomeBentoGrid`, Legal-Footer, Intro-Splash |
+| `/datenschutz` | `LegalScrollShell` | Datenschutzerklärung |
+| `/impressum` | `LegalScrollShell` | Impressum |
+| `/solo` | `SetupScreenLayout` | `GameSetup`, `AppScreenHeader` |
 | `/multi` | `SetupScreenLayout` | Raum erstellen (Host) |
-| `/multi/join?code=…` | — | Lobby, Liga-Rangliste |
-| `/play` | `PlayScreenShell` | `PlayBoard`, skalierter Zettel |
-| `/stats` | — | Paarungen, `NameMergePanel` |
-| `/stats/pairing?key=…` | — | Paarungsdetail |
+| `/multi/join?code=…` | `SetupScreenLayout` | Lobby, `BackToHome` |
+| `/play` | `PlayScreenShell` | `PlayBoard` |
+| `/stats` | `SetupScreenLayout` | Paarungen, lokale Aliase |
+| `/stats/pairing?key=…` | `SetupScreenLayout` | Paarungsdetail |
 
 ## Struktur (Auszug)
 
 | Pfad | Inhalt |
 |------|--------|
-| `app/(home)/page.tsx` | Bento-Startscreen |
-| `app/solo/page.tsx` | Solo-Setup |
-| `app/play/page.tsx` | Spiel (Vollbild, `play-screen-inner`) |
-| `app/multi/page.tsx` | Raum erstellen |
-| `app/multi/join/page.tsx` | Lobby, Liga, neue Runde |
-| `app/stats/page.tsx` | Paarungen, Namen zusammenführen |
-| `app/stats/pairing/page.tsx` | Paarungsdetail |
-| `app/stats/pairing/error.tsx` | Fehler-Fallback |
-| `app/globals.css` | Glass-UI: `.home-bento-*`, `.stats-*`, `.setup-host-*`, `.play-*` |
-| `components/HomeBentoGrid.tsx` | Start: Bento-Kacheln + Code-Zeile |
-| `components/AppScreenHeader.tsx` | Kopf für Setup & Statistik |
-| `components/SetupScreenLayout.tsx` | Layout Solo/Multi-Setup |
-| `components/HomeScreenShell.tsx` | Start-Vollbild-Shell |
-| `components/PlayScreenShell.tsx` | Spiel-Vollbild (`play-route`) |
-| `components/FixedScreenShell.tsx` | Basis: kein Dokument-Scroll |
-| `components/PlayBoard.tsx` | Spielkern, Overlay, Abandon |
-| `components/PlayTopBar.tsx` | Zurück, Pool/Rest-Chips |
-| `components/FitScoreSheet.tsx` | Zettel-Skalierung auf Screen-Höhe |
-| `components/ScoreSheetTable.tsx` | Zettel, Zusatz-Yatzy |
-| `components/ScoreEntryPanel.tsx` | Fixiertes Eintrags-Panel unten |
-| `components/RunCompleteOverlay.tsx` | Nach letztem Feld |
-| `components/RunFinishScreen.tsx` | Ergebnis nach `finish` |
-| `components/StrategyModeToggle.tsx` | Strategy / Klassisch |
-| `components/GameSetup.tsx` | Solo-Start |
-| `components/PairingSummaryCard.tsx` | Paarungskarte |
-| `components/NameMergePanel.tsx` | Namens-Aliase |
-| `components/JoinByCodeForm.tsx` | (Legacy; Code primär in Bento) |
-| `lib/api.ts` | API-Client |
-| `lib/normalizePairing.ts` | Defensive DTO-Normalisierung |
-| `lib/activeGame.ts` | Resume in `sessionStorage` |
-
-Entfernt: `HomeModeButtons.tsx` (ersetzt durch `HomeBentoGrid`).
+| `app/app/page.tsx` | iOS-Start, Intro-Splash |
+| `app/globals.css` | Dunkler Verlauf, `.app-nav-btn`, Bento/Play/Stats |
+| `components/HomeBentoGrid.tsx` | Bento + Legal-Footer |
+| `components/AppScreenHeader.tsx` | `← Startseite` auf Unterseiten |
+| `components/BackToHome.tsx` | Wiederverwendbarer Nav-Button |
+| `components/LegalScrollShell.tsx` | Scroll + Safe-Area Legal |
+| `components/SetupScreenLayout.tsx` | Solo/Multi/Stats-Layout |
+| `lib/localSoloRun.ts` | Solo lokal (LocalStorage) |
+| `lib/playerIdentity.ts` | Lokale `playerId` |
+| `lib/branding.ts` | Pfade, URLs |
 
 ## iOS (Capacitor)
 
 ```bash
 npm run build:ios    # Build + cap sync
-npx cap open ios     # Xcode (nur auf macOS)
+env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
 ```
 
-Anleitung App Store: [../docs/ios-app-store.md](../docs/ios-app-store.md)
+Doku: [../GOiOS.md](../GOiOS.md), [../docs/testflight-app-store.md](../docs/testflight-app-store.md)
 
-Dokumentation Gesamtprojekt: [../README.md](../README.md)
+Gesamtprojekt: [../README.md](../README.md), Übergabe: [../HANDOVER.md](../HANDOVER.md)

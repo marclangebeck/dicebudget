@@ -8,8 +8,10 @@ Auf dem produktiven Debian-Server (Netcup) laufen mehrere Anwendungen (u. a. bot
 
 Diese Regeln haben **immer Vorrang** vor Geschwindigkeit, Komfort und Automatisierung.
 
-Neue Agents lesen zuerst diese Datei, dann **`HANDOVER.md`** (aktueller Stand), danach `projektbeschreibung.md` und `milestones.md`.  
+Neue Agents lesen zuerst diese Datei, dann **`HANDOVER.md`** und **`GOiOS.md`** (iOS/TestFlight), danach `projektbeschreibung.md` und `milestones.md`.  
 Frontend-Details: `frontend/README.md`. Bei Widersprüchen gilt **`AGENT_RULES.md`**.
+
+**Aktiver Git-Branch (Mai 2026):** `milestone-22-prep` auf `github.com/marclangebeck/dicebudget`
 
 ---
 

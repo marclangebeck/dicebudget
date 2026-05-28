@@ -33,27 +33,38 @@ git push -u origin main
 
 ## 3. Auf dem Mac (für Xcode)
 
+Aktiver Branch: **`milestone-22-prep`**
+
 ```bash
 mkdir -p ~/projects
 cd ~/projects
-git clone git@github.com:DEIN_USER/REPO.git kniffel
-cd kniffel/frontend
+git clone git@github.com:marclangebeck/dicebudget.git kniffel
+cd kniffel
+git checkout milestone-22-prep
+cd frontend
 npm install
 npm run build:ios
-npx cap open ios
+env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
 ```
 
 ## 4. Nach Änderungen
 
-**Server oder Mac:**
+**Server:**
 
 ```bash
-git add -A
-git commit -m "Beschreibung der Änderung"
-git push
+cd /home/bottleadmin/projects/kniffel
+git add … && git commit -m "…" && git push origin milestone-22-prep
+sudo bash infra/scripts/deploy-frontend-prod.sh   # Web
 ```
 
-**Auf dem Mac vor Xcode:** `git pull` → `npm run build:ios`
+**Mac vor Xcode:**
+
+```bash
+cd ~/projects/kniffel && git pull origin milestone-22-prep
+cd frontend && npm run build:ios
+# Build-Nummer in Xcode erhöhen → Archive → Upload
+# Bei Copy failed: brew unlink rsync
+```
 
 ## Nicht im Repo
 

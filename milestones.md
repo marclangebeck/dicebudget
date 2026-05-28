@@ -10,7 +10,7 @@
 | UI-Modernisierung | 20 | erledigt |
 | iOS (Capacitor) | 21 | in Arbeit |
 | Datenschutz-Umbau | 22 | erledigt |
-| UI/Branding-Folgepaket | 23–27 | in Arbeit |
+| UI/Branding-Folgepaket | 23–27 | erledigt |
 
 *(Variante D „echtes Online-Spiel“ / Live-Sync bewusst nicht Teil dieser Milestones.)*
 
@@ -505,11 +505,11 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 
 | Thema | Status |
 |--------|--------|
-| Einheitliche Back/Home-Button-Komponente (Form, Größe, Kontrast, Fokuszustand) | in Arbeit |
-| Verwendung in `AppScreenHeader`, `PlayTopBar` und relevanten Detailseiten | in Arbeit |
-| Touch-optimierte Hit-Targets (iOS) | in Arbeit |
+| Einheitliche Back/Home-Button-Komponente (Form, Größe, Kontrast, Fokuszustand) | erledigt |
+| Verwendung in `AppScreenHeader`, `PlayTopBar` und relevanten Detailseiten | erledigt |
+| Touch-optimierte Hit-Targets (iOS) | erledigt |
 
-**Status:** in Arbeit
+**Status:** erledigt (Mai 2026, TestFlight Build 10)
 
 ---
 
@@ -557,11 +557,11 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 
 | Thema | Status |
 |--------|--------|
-| Bestehende Icons beibehalten (Solo/Multi/Stats) | in Arbeit |
-| Optionale Hintergrund-Illustrationsakzente je Kachel | in Arbeit |
-| Kontrast/Lesbarkeit im Bento-Grid sichern | in Arbeit |
+| Bestehende Icons beibehalten (Solo/Multi/Stats) | erledigt |
+| Optionale Hintergrund-Illustrationsakzente je Kachel | erledigt |
+| Kontrast/Lesbarkeit im Bento-Grid sichern | erledigt |
 
-**Status:** in Arbeit
+**Status:** erledigt (Mai 2026)
 
 ---
 
@@ -577,19 +577,21 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 | Technische Speicherung korrekt und verständlich beschreiben | erledigt |
 | Konsistenz mit App Store Angaben prüfen | in Arbeit |
 
-**Status:** in Arbeit
+**Status:** in Arbeit (Impressum-Platzhaltertexte vom Nutzer ergänzen)
 
 ---
 
-## Aktueller Arbeitsstand (UI-Fixrunde, 2026-05-28)
+## Aktueller Arbeitsstand (2026-05-28)
 
-**Offene Punkte laut iOS-Simulator-Abnahme (Nutzerfeedback):**
+**Erledigt (iOS-Abnahme TestFlight Build 10):**
 
-- Auf dem Auswahlscreen (`/app`) fehlen weiterhin sichtbare Links zu `Datenschutz` und `Impressum`.
-- Der obere `Startseite`-Button wirkt weiterhin nicht wie gewuenscht (Design/Konsistenz).
-- Icon-Darstellung auf dem Auswahlscreen entspricht nicht der erwarteten Zieloptik.
+- Legal-Links `Datenschutz` / `Impressum` auf `/app`
+- Einheitlicher `← Startseite`-Button (`app-nav-btn`)
+- Größere SVG-Kachel-Icons, dunkler Slate-Verlauf app-weit
+- Datenschutz/Impressum: Scroll + Safe-Area unter Statusleiste
+- Web-Frontend auf Produktion deployed
 
-**Bewertung:**
+**Offen (App Store, Milestone 21):**
 
-- Milestones 24 und 25 bleiben abgeschlossen.
-- Milestones 23, 26 und 27 bleiben bis zur erfolgreichen iOS-Abnahme in Arbeit.
+- Paid-Vertrag, Preis 1,19 €, Screenshots, öffentliches Review
+- Impressum: Anbieterangaben vom Nutzer vervollständigen

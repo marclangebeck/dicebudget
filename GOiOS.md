@@ -9,15 +9,12 @@ Leitfaden für **iOS (Capacitor)**, **TestFlight** und **App Store** — ergänz
 
 ## 0. Aktueller Stand (2026-05-28, verbindlich)
 
-- TestFlight-Uploads laufen bis Build `1.0 (9)` erfolgreich.
-- Frueherer Xcode-Uploadfehler (`Copy failed`/`rsync`) war ein lokaler Mac-PATH-Konflikt (Homebrew-`rsync` statt `/usr/bin/rsync`).
-- Datenschutz-Umbau (Milestone 22) ist ausgerollt.
-- Aktueller Blocker liegt in der iOS-UI-Abnahme (nicht im Upload):
-  - Legal-Links (`Datenschutz`/`Impressum`) auf dem Auswahlscreen `/app` laut Nutzer nicht sichtbar.
-  - `Startseite`-Button oben entspricht laut Nutzer nicht der Zieloptik/-konsistenz.
-  - Icon-Optik auf dem Auswahlscreen entspricht laut Nutzer nicht der Erwartung.
-
-Diese Punkte gelten als offene Folgearbeit in Milestones 23, 26 und 27.
+- **TestFlight:** Upload **Build `1.0 (10)`** erfolgreich; interne Tester können testen.
+- **`Copy failed` / rsync:** Ursache Homebrew-`rsync` — Fix: `brew unlink rsync` → `/usr/bin/rsync`; Xcode mit System-PATH starten (Abschnitt 6).
+- **Web:** Frontend auf Server deployed; Live unter https://dicebudget.bottle-trade.de
+- **Milestone 22:** Datenschutz-Umbau ausgerollt (pseudonymes Multi, lokales Solo).
+- **UI-Fixrunde (M23/M26/M27):** iOS-Abnahme **bestätigt** — Legal-Links, Navigation, Icons, dunkler Hintergrund, Legal Safe-Area/Scroll.
+- **Offen:** App Store **kostenpflichtig** (1,19 €), Paid-Vertrag, Store-Metadaten, öffentliches Review.
 
 ---
 
@@ -103,8 +100,8 @@ Diese Milestones sind **Voraussetzung** für eine sinnvolle iOS-App; Details in 
 | 21.9 | Geschäftliches: Lizenz, EU-Händler, **Paid-Vertrag**, Bank/Steuer | **offen** | Für **1,19 €** nötig |
 | 21.10 | Preisstufe **1,19 €** in Connect | **offen** | Tab App Store → Preis und Verfügbarkeit |
 | 21.11 | App-Icon 1024, Screenshots, Beschreibung DE | **offen** | Store-Metadaten |
-| 21.12 | Xcode: Archive → Upload | **erledigt** | Build `1.0 (9)` in TestFlight verarbeitet |
-| 21.13 | TestFlight (intern + iPhone) | **in Arbeit** | Build verfuegbar; UI-Abnahme offen |
+| 21.12 | Xcode: Archive → Upload | **erledigt** | Build `1.0 (10)` in TestFlight |
+| 21.13 | TestFlight (intern + iPhone) | **in Arbeit** | Build 10 verfügbar; Store-Metadaten offen |
 | 21.14 | App Store Review (kostenpflichtig) | **offen** | Nach stabiler Beta |
 
 ---
@@ -188,7 +185,7 @@ Web separat: `sudo bash infra/scripts/deploy-frontend-prod.sh` (Server).
 | Bundle-ID mismatch | Connect **de.bottletrade.dicebudget** = Xcode; nicht `com.mlangebeck.mobileapp` |
 | App-ID Description mit Punkt | Nur alphanumerisch: z. B. `DiceBudget` |
 | Gelbe Xcode-Warnungen (WKProcessPool, Pods) | Meist ignorierbar, Build trotzdem möglich |
-| `Copy failed` / `rsync error` beim Distribute | Xcode aus Shell mit System-PATH starten: `export PATH="/usr/bin:/bin:/usr/sbin:/sbin"` und danach Xcode neu öffnen |
+| `Copy failed` / `rsync error` beim Distribute | `brew unlink rsync` (→ `/usr/bin/rsync`), Xcode beenden, dann: `env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open frontend/ios/App/App.xcworkspace` |
 | Push vom Server | SSH-Key `github_dicebudget` oder HTTPS-Token |
 
 ---
@@ -222,61 +219,62 @@ Web separat: `sudo bash infra/scripts/deploy-frontend-prod.sh` (Server).
 
 ---
 
-Du setzt **Milestone 21 (iOS / App Store)** für **dice.budget** fort. Lies zuerst:
+Du setzt **dice.budget** (iOS + App Store) fort. Lies zuerst:
 
-1. **[AGENT_RULES.md](./AGENT_RULES.md)** — kein Dauer-`npm run dev` auf dem Server, keine Polling-Loops  
-2. **[GOiOS.md](./GOiOS.md)** (dieses Dokument, Abschnitte 1–7)  
-3. Bei Bedarf: [docs/testflight-app-store.md](./docs/testflight-app-store.md), [HANDOVER.md](./HANDOVER.md)
+1. **[AGENT_RULES.md](./AGENT_RULES.md)**
+2. **[HANDOVER.md](./HANDOVER.md)** (Gesamtstand)
+3. **[GOiOS.md](./GOiOS.md)** (Abschnitte 1–7)
+4. Bei Bedarf: [docs/testflight-app-store.md](./docs/testflight-app-store.md)
 
-**Antworten auf Deutsch.** Keine Commits, es sei denn, der Nutzer verlangt es explizit.
+**Antworten auf Deutsch.** Keine Commits ohne explizite Nutzer-Anweisung.
 
-### Projektkontext
+### Ist-Stand (Mai 2026)
 
-- **Repo:** `/home/bottleadmin/projects/kniffel` (Server) · GitHub: `marclangebeck/dicebudget`  
-- **Produkt:** Strategisches Yatzy („dice.budget“), Web live unter **dicebudget.bottle-trade.de**  
-- **iOS:** Capacitor-Wrapper um statischen Next-Export; **kein** Swift-UI-Neuaufbau  
-- **Zielpreis App Store:** **1,19 €** (kostenpflichtige App, kein In-App-Kauf für den Start)
+- Branch: **`milestone-22-prep`** auf GitHub `marclangebeck/dicebudget`
+- Web live: https://dicebudget.bottle-trade.de (Frontend deployed)
+- iOS: Capacitor, Bundle **`de.bottletrade.dicebudget`**, TestFlight **Build 10** hochgeladen
+- UI iOS: Legal-Links, Navigation, Icons, dunkler Hintergrund, Legal Safe-Area — **abgenommen**
+- M22: pseudonymes Multi, lokales Solo — **ausgerollt**
 
-### Bereits erledigt (nicht neu bauen)
+### Deine Priorität (Store, nicht UI)
 
-- Web M1–M20, API, Datenschutzseite, Domain ohne `kniffel` (geschützter Name)  
-- Capacitor: `frontend/ios/`, Bundle **`de.bottletrade.dicebudget`**, `npm run build:ios`  
-- Developer: App-ID registriert (Description ohne Punkt, z. B. `DiceBudget`)  
-- Mac: Simulator zeigt Bento-Start, API/Statistik funktioniert  
-- GitHub gepusht; alter Connect-Eintrag **`com.mlangebeck.mobileapp`** / **mobile-app** ignorieren
+1. **Paid Applications Agreement**, Bank/Steuer in App Store Connect
+2. Preis **1,19 €**, Screenshots, Beschreibung DE
+3. TestFlight stabil → **App Store Review** vorbereiten
+4. Optional: `main`-Branch mit `milestone-22-prep` mergen (nur nach Nutzer-Freigabe)
 
-### Offene Punkte (deine Priorität)
+### Mac-Workflow (nach Code-Änderung)
 
-1. **App Store Connect:** App **dice.budget** mit Bundle `de.bottletrade.dicebudget` fertig anlegen (Vollzugriff)  
-2. **Geschäftliches:** Developer-Lizenz, EU-Händler-Compliance, **Paid Applications Agreement**, Bank, Steuer  
-3. **Preis ~1,19 €**, Datenschutzfragebogen, Screenshots, Beschreibung DE  
-4. Anleitung/Checkliste für Nutzer: **Archive → Upload → TestFlight → Review**  
-5. Optional: `GOiOS.md` / Milestone 21 in `milestones.md` aktualisieren, wenn Schritte abgeschlossen sind
+```bash
+cd ~/projects/kniffel && git pull origin milestone-22-prep
+cd frontend && npm run build:ios
+brew unlink rsync   # falls nötig (which rsync → /opt/homebrew/...)
+env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
+```
+
+Xcode: **Build** erhöhen → Clean → Archive → Upload.
+
+### Server-Workflow (Web)
+
+```bash
+cd /home/bottleadmin/projects/kniffel && git pull origin milestone-22-prep
+sudo bash infra/scripts/deploy-frontend-prod.sh
+```
 
 ### Wichtige Pfade
 
 ```
-frontend/capacitor.config.ts      # appId de.bottletrade.dicebudget
-frontend/lib/apiBase.ts           # Capacitor → absolute API-URL
-frontend/ios/App/App.xcworkspace  # Xcode öffnen
-frontend/components/NativeAppEntry.tsx
+frontend/app/app/page.tsx
+frontend/components/HomeBentoGrid.tsx
+frontend/components/LegalScrollShell.tsx
+frontend/app/globals.css
+frontend/ios/App/App.xcworkspace
 ```
 
 ### Regeln
 
-- **Web-Deploy** (`deploy-frontend-prod.sh`) und **iOS-Release** sind getrennt; iOS braucht Mac/Xcode.  
-- Nach Frontend-Änderungen: `npm run build:ios` auf dem Mac, Build-Nummer erhöhen, erneut uploaden.  
-- Bundle-ID in Xcode und Connect müssen **identisch** sein: `de.bottletrade.dicebudget`.  
-- Keine neue App unter `com.mlangebeck.mobileapp` mit dem aktuellen Xcode-Projekt verknüpfen.
-
-### Nutzer-Kontext
-
-- Xcode-Einsteiger — **kleine Schritte**, nach jedem Block Rückfrage („Phase X ok“).  
-- Arbeitet auf **Mac** (Clone, Xcode) und **Server** (Deploy Web); SSH-Key `github_dicebudget` für GitHub Push vom Server.
-
-### Bei Unsicherheit
-
-- Frage den Nutzer nach Screenshot oder exakter Meldung aus App Store Connect / Xcode.  
-- Kein Force-Push, keine git config-Änderungen, keine Produktions-Experimente ohne Freigabe.
+- Web-Deploy und iOS-Release sind **getrennt**.
+- Alter Connect-Eintrag `com.mlangebeck.mobileapp` **ignorieren**.
+- Nutzer ist Xcode-Einsteiger — **kopierbare Terminal-Befehle**, kleine Schritte.
 
 **Ende Prompt**

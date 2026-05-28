@@ -466,6 +466,7 @@ html.legal-route body {
 }
 
 .legal-page-scroll {
+  box-sizing: border-box;
   height: 100dvh;
   max-height: 100dvh;
   overflow-x: hidden;

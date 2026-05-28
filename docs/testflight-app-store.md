@@ -89,7 +89,17 @@ Für **nur TestFlight** reichen zunächst weniger Metadaten; für **öffentliche
 
 3. **Signing & Capabilities:** Team gewählt, **Automatically manage signing**, Bundle ID `de.bottletrade.dicebudget`.
 
-Bei jedem **neuen Upload** die **Build**-Nummer erhöhen (`1` → `2` → …). Version nur bei sichtbaren Releases ändern.
+Bei jedem **neuen Upload** die **Build**-Nummer erhöhen (`9` → `10` → …). Version nur bei sichtbaren Releases ändern.
+
+**Stand Mai 2026:** Letzter erfolgreicher Upload **Build 10**.
+
+### Copy failed beim Upload?
+
+```bash
+brew unlink rsync          # which rsync muss /usr/bin/rsync zeigen
+# Xcode beenden (⌘Q), dann:
+env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ~/projects/kniffel/frontend/ios/App/App.xcworkspace
+```
 
 ---
 
@@ -172,6 +182,7 @@ Review: meist **1–3 Werktage**. Apple kann Rückfragen stellen (Metadaten, Dat
 | Upload schlägt fehl (Signing) | Team in Xcode, gültiges Zertifikat |
 | Build bleibt „Processing“ | 30–60 Min warten |
 | TestFlight: Build nicht wählbar | Export Compliance ausfüllen |
+| `Copy failed` / rsync beim Upload | `brew unlink rsync`; Xcode mit System-PATH öffnen (siehe Phase 3) |
 | App lehnt Review ab (4.3 / Web Wrapper) | Beschreibung + Screenshots zeigen echte App; kein reiner Website-Link |
 
 ---

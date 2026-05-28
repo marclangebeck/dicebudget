@@ -38,19 +38,23 @@ In Xcode:
 |---|---------|---------|
 | Start | Landing `/` | direkt `/app` |
 | API | `/api` (same-origin) | `https://dicebudget.bottle-trade.de/api` |
+| Hintergrund | wie Web | dunkler Slate-Verlauf app-weit |
 
 Die Web-App unter https://dicebudget.bottle-trade.de bleibt unverändert deploybar (`deploy-frontend-prod.sh`).
 
-## App Store Connect (Kurz)
+## TestFlight (Stand Mai 2026)
 
-- **Privacy Policy URL:** https://dicebudget.bottle-trade.de/datenschutz
-- **Kategorie:** Spiele
-- **Netzwerk:** erforderlich (kein Offline-Spiel)
-- Screenshots aus Simulator (6.7" iPhone)
+- Branch: `milestone-22-prep`
+- Letzter Upload: **Build 10**
+- Upload-Fix bei `Copy failed`: `brew unlink rsync`, Xcode mit System-PATH öffnen
 
 ## Nach UI-Änderungen
 
 ```bash
-npm run build:ios
-# In Xcode erneut archivieren
+cd ~/projects/kniffel && git pull origin milestone-22-prep
+cd frontend && npm run build:ios
+brew unlink rsync   # falls nötig
+env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
 ```
+
+In Xcode: **Build** erhöhen → Archive → Upload.
