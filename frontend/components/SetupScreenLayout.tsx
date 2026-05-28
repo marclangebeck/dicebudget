@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { BackToHome } from "@/components/BackToHome";
 import { FixedScreenShell } from "@/components/FixedScreenShell";
 
 type Props = {
@@ -15,7 +14,6 @@ export function SetupScreenLayout({ children, scrollable = true }: Props) {
   return (
     <FixedScreenShell routeClass="setup-route">
       <main className="setup-screen-main pt-safe pb-safe mx-auto flex h-full min-h-0 w-full max-w-lg flex-1 flex-col gap-3 overflow-hidden px-4 py-4">
-        <BackToHome className="shrink-0" />
         <div
           className={`setup-screen-body flex min-h-0 flex-1 flex-col gap-4 overscroll-none ${
             scrollable ? "overflow-y-auto" : "overflow-hidden"

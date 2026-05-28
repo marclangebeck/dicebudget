@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { JoinByCodeForm } from "@/components/JoinByCodeForm";
+import { BackToHome } from "@/components/BackToHome";
 import { getSessionLobby, getSessionRanking, joinSession, createGameSession } from "@/lib/api";
 import { saveActiveGame } from "@/lib/activeGame";
 import { ResumeLobbySheet } from "@/components/ResumeLobbySheet";
@@ -332,7 +333,10 @@ function MultiJoinInner() {
 export default function MultiJoinPage() {
   return (
     <Suspense fallback={<p className="text-muted">Lade …</p>}>
-      <MultiJoinInner />
+      <div className="flex flex-col gap-3">
+        <BackToHome className="shrink-0" />
+        <MultiJoinInner />
+      </div>
     </Suspense>
   );
 }
