@@ -6,6 +6,17 @@
 **Sprache Antworten:** Deutsch  
 **Letzte inhaltliche Session:** Mai 2026 – UI-Modernisierung (Bento, Statistik, Setup, Spielzettel ohne Scroll), Docs
 
+## Update 2026-05-28 (verbindlicher Ist-Stand)
+
+- iOS/TestFlight Upload ist bis Build `1.0 (9)` erfolgreich.
+- Ursache fuer vorherige Upload-Fehler war ein lokaler `rsync`-PATH-Konflikt auf dem Mac (Homebrew-`rsync` statt `/usr/bin/rsync`).
+- Datenschutz-Umbau (Milestone 22) bleibt abgeschlossen.
+- UI/Branding-Folgepaket ist **nicht** voll abgenommen:
+  - `Startseite`-Button weiterhin nicht wie gewuenscht.
+  - `Datenschutz`/`Impressum` auf dem Auswahlscreen (`/app`) laut iOS-Abnahme weiterhin nicht sichtbar.
+  - Icon-Optik auf dem Auswahlscreen entspricht nicht der Nutzervorgabe.
+- Folgearbeiten laufen in Milestones 23, 26 und 27 (Status: in Arbeit).
+
 ---
 
 ## Prompt für neuen Agent

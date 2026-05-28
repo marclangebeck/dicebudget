@@ -21,12 +21,16 @@ export function PlayTopBar({
           href={`/multi/join?code=${encodeURIComponent(inviteCode)}`}
           className="app-nav-btn"
         >
-          <span aria-hidden>←</span>
+          <span aria-hidden className="app-nav-btn-icon">
+            ←
+          </span>
           <span>Zur Lobby</span>
         </Link>
       ) : (
         <Link href={APP_HOME_PATH} className="app-nav-btn">
-          <span aria-hidden>←</span>
+          <span aria-hidden className="app-nav-btn-icon">
+            ←
+          </span>
           <span>Startseite</span>
         </Link>
       )}

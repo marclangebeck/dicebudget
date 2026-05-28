@@ -65,12 +65,7 @@ function PairingDetailInner() {
   if (!key) {
     return (
       <div className="stats-screen flex flex-col gap-3">
-        <AppScreenHeader
-          section="Statistik"
-          title="Paarung"
-          backHref="/stats"
-          backLabel="← Alle Paarungen"
-        />
+        <AppScreenHeader section="Statistik" title="Paarung" />
         <p className="stats-empty-state">
           Keine Paarung ausgewählt.{" "}
           <Link href="/stats" className="text-link">
@@ -105,8 +100,6 @@ function PairingDetailInner() {
         section="Statistik"
         title={headerTitle}
         subtitle={headerSubtitle}
-        backHref="/stats"
-        backLabel="← Alle Paarungen"
       />
 
       {error && <p className="glass-alert-error px-3 py-2 text-sm">{error}</p>}

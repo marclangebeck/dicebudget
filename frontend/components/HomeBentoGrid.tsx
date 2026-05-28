@@ -5,17 +5,17 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { getStats } from "@/lib/api";
 import { normalizeInviteCode } from "@/lib/activeGame";
-import { APP_SHORT } from "@/lib/branding";
+import { APP_SHORT, IMPRESSUM_PATH, PRIVACY_PATH } from "@/lib/branding";
 import type { StatsDto } from "@/lib/statsTypes";
 
 function IconSolo({ className }: { className?: string }) {
   return (
     <svg aria-hidden className={className} viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.75" />
+      <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="2" />
       <path
         d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"
         stroke="currentColor"
-        strokeWidth="1.75"
+        strokeWidth="2"
         strokeLinecap="round"
       />
     </svg>
@@ -25,12 +25,12 @@ function IconSolo({ className }: { className?: string }) {
 function IconMulti({ className }: { className?: string }) {
   return (
     <svg aria-hidden className={className} viewBox="0 0 24 24" fill="none">
-      <circle cx="9" cy="9" r="2.75" stroke="currentColor" strokeWidth="1.75" />
-      <circle cx="16" cy="10" r="2.25" stroke="currentColor" strokeWidth="1.75" />
+      <circle cx="9" cy="9" r="2.75" stroke="currentColor" strokeWidth="2" />
+      <circle cx="16" cy="10" r="2.25" stroke="currentColor" strokeWidth="2" />
       <path
         d="M4 19c0-2.8 2.2-5 5-5M15 19c0-2.2 1.8-4 4-4"
         stroke="currentColor"
-        strokeWidth="1.75"
+        strokeWidth="2"
         strokeLinecap="round"
       />
     </svg>
@@ -43,7 +43,7 @@ function IconStats({ className }: { className?: string }) {
       <path
         d="M5 18V10M10 18V6M15 18v-5M20 18V8"
         stroke="currentColor"
-        strokeWidth="1.75"
+        strokeWidth="2"
         strokeLinecap="round"
       />
     </svg>
@@ -56,10 +56,26 @@ function IconJoin({ className }: { className?: string }) {
       <path
         d="M8 11h8M12 8v6M7 5h10a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3z"
         stroke="currentColor"
-        strokeWidth="1.75"
+        strokeWidth="2"
         strokeLinecap="round"
       />
     </svg>
+  );
+}
+
+function HomeLegalFooter() {
+  return (
+    <footer className="home-legal-footer shrink-0">
+      <Link href={PRIVACY_PATH} className="home-legal-link">
+        Datenschutz
+      </Link>
+      <span aria-hidden className="home-legal-sep">
+        ·
+      </span>
+      <Link href={IMPRESSUM_PATH} className="home-legal-link">
+        Impressum
+      </Link>
+    </footer>
   );
 }
 
@@ -182,7 +198,7 @@ export function HomeBentoGrid() {
     );
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3">
+    <div className="flex min-h-0 flex-1 flex-col gap-2.5">
       <header className="home-hero-banner shrink-0">
         <img
           src="/apple-touch-icon.png"
@@ -228,6 +244,8 @@ export function HomeBentoGrid() {
         />
         <JoinTile />
       </div>
+
+      <HomeLegalFooter />
     </div>
   );
 }

@@ -10,7 +10,7 @@
 | UI-Modernisierung | 20 | erledigt |
 | iOS (Capacitor) | 21 | in Arbeit |
 | Datenschutz-Umbau | 22 | erledigt |
-| UI/Branding-Folgepaket | 23–27 | geplant |
+| UI/Branding-Folgepaket | 23–27 | in Arbeit |
 
 *(Variante D „echtes Online-Spiel“ / Live-Sync bewusst nicht Teil dieser Milestones.)*
 
@@ -505,11 +505,11 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 
 | Thema | Status |
 |--------|--------|
-| Einheitliche Back/Home-Button-Komponente (Form, Größe, Kontrast, Fokuszustand) | erledigt |
-| Verwendung in `AppScreenHeader`, `PlayTopBar` und relevanten Detailseiten | erledigt |
-| Touch-optimierte Hit-Targets (iOS) | erledigt |
+| Einheitliche Back/Home-Button-Komponente (Form, Größe, Kontrast, Fokuszustand) | in Arbeit |
+| Verwendung in `AppScreenHeader`, `PlayTopBar` und relevanten Detailseiten | in Arbeit |
+| Touch-optimierte Hit-Targets (iOS) | in Arbeit |
 
-**Status:** erledigt
+**Status:** in Arbeit
 
 ---
 
@@ -557,11 +557,11 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 
 | Thema | Status |
 |--------|--------|
-| Bestehende Icons beibehalten (Solo/Multi/Stats) | erledigt |
-| Optionale Hintergrund-Illustrationsakzente je Kachel | erledigt |
-| Kontrast/Lesbarkeit im Bento-Grid sichern | erledigt |
+| Bestehende Icons beibehalten (Solo/Multi/Stats) | in Arbeit |
+| Optionale Hintergrund-Illustrationsakzente je Kachel | in Arbeit |
+| Kontrast/Lesbarkeit im Bento-Grid sichern | in Arbeit |
 
-**Status:** erledigt
+**Status:** in Arbeit
 
 ---
 
@@ -575,6 +575,21 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 |--------|--------|
 | Formulierungen auf App-first Nutzung anpassen | erledigt |
 | Technische Speicherung korrekt und verständlich beschreiben | erledigt |
-| Konsistenz mit App Store Angaben prüfen | erledigt |
+| Konsistenz mit App Store Angaben prüfen | in Arbeit |
 
-**Status:** erledigt
+**Status:** in Arbeit
+
+---
+
+## Aktueller Arbeitsstand (UI-Fixrunde, 2026-05-28)
+
+**Offene Punkte laut iOS-Simulator-Abnahme (Nutzerfeedback):**
+
+- Auf dem Auswahlscreen (`/app`) fehlen weiterhin sichtbare Links zu `Datenschutz` und `Impressum`.
+- Der obere `Startseite`-Button wirkt weiterhin nicht wie gewuenscht (Design/Konsistenz).
+- Icon-Darstellung auf dem Auswahlscreen entspricht nicht der erwarteten Zieloptik.
+
+**Bewertung:**
+
+- Milestones 24 und 25 bleiben abgeschlossen.
+- Milestones 23, 26 und 27 bleiben bis zur erfolgreichen iOS-Abnahme in Arbeit.

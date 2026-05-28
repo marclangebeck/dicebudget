@@ -46,10 +46,12 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Stats/Lobby Alias-UX:** Stift-Button öffnet Overlay; Anzeigenamen werden lokal pro `playerId` aufgelöst
 - **Kachel-Visuals (M26):** Icons bleiben primär; Bento-Kacheln mit subtilen Hintergrund-Akzenten und besserer visueller Tiefe
 - **Datenschutz (M27):** Text auf app-zentrierte Nutzung umgestellt; Website als begleitende Info-/Support-Seite beschrieben
+- **Statuskorrektur M23/M26/M27:** iOS-Abnahme zeigte offene UI-Punkte (Startseite-Button, Sichtbarkeit Legal-Links, Icon-Optik auf `/app`); finale Abnahme ausstehend
 
 ### Fixed
 - **Produktions-API-URL:** Build nutzt `NEXT_PUBLIC_API_URL` aus `.env.production` (nicht mehr Fallback `127.0.0.1:3020` auf der Live-Domain)
 - **Paarungsnavigation:** Statischer Export — Links zur Detailseite als normales `<a>` (voller Seitenload)
+- **iOS-Upload auf Mac:** `Copy failed`/`rsync`-Fehler im Xcode-Distribute-Flow umgangen, indem Xcode mit System-PATH (`/usr/bin/rsync`) statt Homebrew-`rsync` gestartet wurde
 
 ### Removed
 - `HomeModeButtons.tsx` (ersetzt durch `HomeBentoGrid`)

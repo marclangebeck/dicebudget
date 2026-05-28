@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
-import { BackToHome } from "@/components/BackToHome";
 import { clearActiveGame } from "@/lib/activeGame";
+import { APP_HOME_PATH } from "@/lib/branding";
 import { runHasOpenFields } from "@/lib/runUtils";
 import type { RunDto } from "@/lib/types";
 
@@ -74,7 +74,12 @@ export function RunFinishScreen({ run, inviteCode }: Props) {
       )}
 
       <div className="mt-4 flex flex-col gap-2">
-        <BackToHome className="btn-primary !w-full justify-center" />
+        <Link
+          href={APP_HOME_PATH}
+          className="btn-primary inline-flex min-h-10 items-center justify-center px-6 text-sm"
+        >
+          Startseite
+        </Link>
         {inviteCode && (
           <Link
             href={`/multi/join?code=${encodeURIComponent(inviteCode)}`}

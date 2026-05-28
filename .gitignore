@@ -16,8 +16,8 @@ backend/.env
 !frontend/.env.production.example
 
 # SQLite
-backend/prisma/*.db
-backend/prisma/*.db-journal
+backend/prisma/**/*.db
+backend/prisma/**/*.db-journal
 
 # Logs & OS
 *.log

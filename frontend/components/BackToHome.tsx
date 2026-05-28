@@ -7,8 +7,11 @@ type Props = {
 
 export function BackToHome({ className = "" }: Props) {
   return (
-    <Link href={APP_HOME_PATH} className={`btn-secondary text-link inline-flex min-h-9 items-center px-3 py-1.5 text-sm font-medium ${className}`}>
-      ← Startseite
+    <Link href={APP_HOME_PATH} className={`app-nav-btn ${className}`}>
+      <span aria-hidden className="app-nav-btn-icon">
+        ←
+      </span>
+      <span>Startseite</span>
     </Link>
   );
 }

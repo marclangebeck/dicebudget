@@ -20,7 +20,11 @@ export const APP_HOME_PATH = "/app";
 
 export const PRIVACY_PATH = "/datenschutz";
 
+export const IMPRESSUM_PATH = "/impressum";
+
 export const PRIVACY_URL = `${SITE_URL}${PRIVACY_PATH}`;
+
+export const IMPRESSUM_URL = `${SITE_URL}${IMPRESSUM_PATH}`;
 
 /** Kontakt für Datenschutzanfragen */
 export const PRIVACY_EMAIL = "datenschutz@bottle-trade.de";

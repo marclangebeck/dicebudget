@@ -156,6 +156,6 @@ Nach Deploy: Hard-Refresh im Browser, falls alte JS-Chunks gecacht sind.
 | 11–14 | UX, Modi, Validierung, Tests | erledigt |
 | 15–19 | Liga, Paarungsstatistik, Namen, Feld löschen, Zusatz-Yatzy | erledigt |
 | 20 | UI-Modernisierung (Bento, Statistik, Setup, Spielzettel) | erledigt |
-| 21 | iOS-App (Capacitor) | in Arbeit — [docs/ios-app-store.md](./docs/ios-app-store.md) |
+| 21 | iOS-App (Capacitor) | in Arbeit — **[GOiOS.md](./GOiOS.md)** (Prozess + Agent-Prompt) |
 
 Siehe [milestones.md](./milestones.md) für Details.

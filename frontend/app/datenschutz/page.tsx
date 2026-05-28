@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BackToHome } from "@/components/BackToHome";
 import {
   APP_HOME_PATH,
   APP_NAME,
@@ -19,9 +20,7 @@ export default function DatenschutzPage() {
     <main className="legal-page pt-safe pb-safe">
       <article className="legal-article">
         <header className="legal-header">
-          <Link href="/" className="legal-back">
-            ← {APP_NAME}
-          </Link>
+          <BackToHome className="app-nav-btn--header" />
           <h1>Datenschutzerklärung</h1>
           <p className="legal-meta">
             Stand: Mai 2026 · Gültig für die App „{APP_NAME}“ sowie die
