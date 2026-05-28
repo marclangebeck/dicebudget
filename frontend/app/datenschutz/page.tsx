@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function DatenschutzPage() {
   return (
-    <main className="legal-page pt-safe pb-safe">
+    <main className="legal-page">
       <article className="legal-article">
         <header className="legal-header">
           <BackToHome className="app-nav-btn--header" />

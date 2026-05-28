@@ -27,5 +27,5 @@ export function LegalScrollShell({ children }: Props) {
     };
   }, []);
 
-  return <div className="legal-page-scroll">{children}</div>;
+  return <div className="legal-page-scroll pt-safe pb-safe">{children}</div>;
 }
