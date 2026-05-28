@@ -1,5 +1,7 @@
 # DiceBudget Strategy Edition – Projektbeschreibung
 
+> **Stand Mai 2026:** Produktname **dice.budget**, Domain `dicebudget.bottle-trade.de`, iOS-App (Capacitor) mit Start `/app`. Multiplayer pseudonym (`playerId`), Solo lokal. Siehe `HANDOVER.md` / `milestones.md` für aktuellen Implementierungsstand.
+
 ## 1. Überblick
 
 **DiceBudget Strategy Edition** ist eine strategische Variante von Yatzy/Kniffel.  
