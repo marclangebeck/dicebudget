@@ -1,14 +1,6 @@
 import { Router } from "express";
 import { getStats } from "../services/getStats.js";
 import { getPairingDetail, listPairingSummaries } from "../services/pairingStats.js";
-import {
-  InvalidPlayerNameMergeError,
-  PlayerNameAliasNotFoundError,
-  listKnownPlayerNames,
-  listPlayerNameAliases,
-  mergePlayerNames,
-  removePlayerNameAlias,
-} from "../services/playerNames.js";
 
 export const statsRouter = Router();
 
@@ -48,43 +40,3 @@ statsRouter.get("/pairing", async (req, res, next) => {
   }
 });
 
-statsRouter.get("/names", async (_req, res, next) => {
-  try {
-    const [names, aliases] = await Promise.all([
-      listKnownPlayerNames(),
-      listPlayerNameAliases(),
-    ]);
-    res.json({ names, aliases });
-  } catch (error) {
-    next(error);
-  }
-});
-
-statsRouter.post("/names/merge", async (req, res, next) => {
-  try {
-    const aliasName = req.body?.aliasName;
-    const canonicalName = req.body?.canonicalName;
-    if (typeof aliasName !== "string" || typeof canonicalName !== "string") {
-      res.status(400).json({ error: "aliasName and canonicalName required" });
-      return;
-    }
-    const alias = await mergePlayerNames(aliasName, canonicalName);
-    res.status(201).json({ alias });
-  } catch (error) {
-    next(error);
-  }
-});
-
-statsRouter.delete("/names/merge", async (req, res, next) => {
-  try {
-    const aliasName = req.body?.aliasName;
-    if (typeof aliasName !== "string") {
-      res.status(400).json({ error: "aliasName required" });
-      return;
-    }
-    await removePlayerNameAlias(aliasName);
-    res.status(204).send();
-  } catch (error) {
-    next(error);
-  }
-});

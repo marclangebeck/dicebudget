@@ -19,13 +19,15 @@ export function PlayTopBar({
       {inviteCode ? (
         <Link
           href={`/multi/join?code=${encodeURIComponent(inviteCode)}`}
-          className="play-top-link"
+          className="app-nav-btn"
         >
-          ← Lobby
+          <span aria-hidden>←</span>
+          <span>Zur Lobby</span>
         </Link>
       ) : (
-        <Link href={APP_HOME_PATH} className="play-top-link">
-          ← Start
+        <Link href={APP_HOME_PATH} className="app-nav-btn">
+          <span aria-hidden>←</span>
+          <span>Startseite</span>
         </Link>
       )}
       {useStrategyRules && rollsRemaining !== null && (

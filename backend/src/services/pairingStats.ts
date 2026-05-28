@@ -1,5 +1,5 @@
 import { prisma } from "../db/prisma.js";
-import { loadAliasMap, resolvePlayerName } from "./playerNames.js";
+import { publicPlayerIdFromStoredName } from "../domain/playerIdentity.js";
 
 export type PairingRoundDto = {
   inviteCode: string;
@@ -28,7 +28,6 @@ export type PairingSummaryDto = {
   playerATotalScore: number;
   playerBTotalScore: number;
   lastPlayedAt: string | null;
-  manualBaselineNote: string | null;
 };
 
 export type PairingDetailDto = PairingSummaryDto & {
@@ -39,14 +38,6 @@ type SessionPlayer = {
   name: string;
   totalScore: number;
   orderIndex: number;
-};
-
-type ManualBaseline = {
-  extraWinsA: number;
-  extraWinsB: number;
-  extraBonusA: number;
-  extraBonusB: number;
-  note: string | null;
 };
 
 export function pairingKey(nameA: string, nameB: string): string {
@@ -90,7 +81,6 @@ type PairingAccumulator = {
   playerATotalScore: number;
   playerBTotalScore: number;
   lastPlayedAt: string | null;
-  manualBaselineNote: string | null;
   rounds: PairingRoundDto[];
 };
 
@@ -111,33 +101,8 @@ function emptyAccumulator(key: string, playerA: string, playerB: string): Pairin
     playerATotalScore: 0,
     playerBTotalScore: 0,
     lastPlayedAt: null,
-    manualBaselineNote: null,
     rounds: [],
   };
-}
-
-function applyManualBaseline(acc: PairingAccumulator, baseline: ManualBaseline): void {
-  acc.playerAWins += baseline.extraWinsA;
-  acc.playerBWins += baseline.extraWinsB;
-  acc.playerABonusPoints += baseline.extraBonusA;
-  acc.playerBBonusPoints += baseline.extraBonusB;
-  acc.manualBaselineNote = baseline.note;
-}
-
-async function loadManualBaselines(): Promise<Map<string, ManualBaseline>> {
-  const rows = await prisma.pairingManualBaseline.findMany();
-  return new Map(
-    rows.map((row) => [
-      row.pairingKey,
-      {
-        extraWinsA: row.extraWinsA,
-        extraWinsB: row.extraWinsB,
-        extraBonusA: row.extraBonusA,
-        extraBonusB: row.extraBonusB,
-        note: row.note,
-      },
-    ]),
-  );
 }
 
 async function loadFinishedSessions() {
@@ -155,11 +120,7 @@ async function loadFinishedSessions() {
 }
 
 async function accumulatePairings(): Promise<Map<string, PairingAccumulator>> {
-  const [sessions, aliasMap, manualBaselines] = await Promise.all([
-    loadFinishedSessions(),
-    loadAliasMap(),
-    loadManualBaselines(),
-  ]);
+  const sessions = await loadFinishedSessions();
 
   const map = new Map<string, PairingAccumulator>();
 
@@ -167,7 +128,7 @@ async function accumulatePairings(): Promise<Map<string, PairingAccumulator>> {
     if (session.players.length < 2) continue;
 
     const players: SessionPlayer[] = session.players.map((p) => ({
-      name: resolvePlayerName(p.name, aliasMap),
+      name: publicPlayerIdFromStoredName(p.name),
       totalScore: p.run.totalScore,
       orderIndex: p.orderIndex,
     }));
@@ -234,18 +195,6 @@ async function accumulatePairings(): Promise<Map<string, PairingAccumulator>> {
     }
   }
 
-  for (const [key, baseline] of manualBaselines) {
-    const names = parsePairingKey(key);
-    if (!names) continue;
-
-    let acc = map.get(key);
-    if (!acc) {
-      acc = emptyAccumulator(key, names[0], names[1]);
-      map.set(key, acc);
-    }
-    applyManualBaseline(acc, baseline);
-  }
-
   return map;
 }
 
@@ -266,7 +215,6 @@ function toSummary(acc: PairingAccumulator): PairingSummaryDto {
     playerATotalScore: acc.playerATotalScore,
     playerBTotalScore: acc.playerBTotalScore,
     lastPlayedAt: acc.lastPlayedAt,
-    manualBaselineNote: acc.manualBaselineNote,
   };
 }
 

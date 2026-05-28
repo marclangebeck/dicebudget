@@ -19,8 +19,9 @@ export function AppScreenHeader({
   return (
     <header className="app-screen-header shrink-0">
       {backHref && (
-        <Link href={backHref} className="app-screen-back-link">
-          {backLabel ?? "← Zurück"}
+        <Link href={backHref} className="app-nav-btn app-nav-btn--header">
+          <span aria-hidden>←</span>
+          <span>{backLabel ?? "Zurück"}</span>
         </Link>
       )}
       <div className="app-screen-header-row">

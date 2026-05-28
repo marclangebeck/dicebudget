@@ -3,12 +3,17 @@
 import { useCallback, useEffect, useState } from "react";
 import { getPairingSummaries } from "@/lib/api";
 import type { PairingSummaryDto } from "@/lib/pairingTypes";
-import { NameMergePanel } from "@/components/NameMergePanel";
 import { PairingSummaryCard } from "@/components/PairingSummaryCard";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
+import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
+import { loadPlayerAliases, setPlayerAlias, type PlayerAliasMap } from "@/lib/playerAliases";
+import { PlayerAliasOverlay } from "@/components/PlayerAliasOverlay";
 
 export default function StatsPage() {
   const [pairings, setPairings] = useState<PairingSummaryDto[]>([]);
+  const [ownPlayerId, setOwnPlayerId] = useState("");
+  const [aliases, setAliases] = useState<PlayerAliasMap>({});
+  const [editingPlayerId, setEditingPlayerId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -23,6 +28,11 @@ export default function StatsPage() {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    setOwnPlayerId(getOrCreatePlayerId());
+    setAliases(loadPlayerAliases());
   }, []);
 
   useEffect(() => {
@@ -53,12 +63,30 @@ export default function StatsPage() {
       {!loading && pairings.length > 0 && (
         <ul className="stats-pairing-list">
           {pairings.map((pairing) => (
-            <PairingSummaryCard key={pairing.key} pairing={pairing} />
+            <PairingSummaryCard
+              key={pairing.key}
+              pairing={pairing}
+              ownPlayerId={ownPlayerId}
+              aliases={aliases}
+              onEditPlayerAlias={setEditingPlayerId}
+            />
           ))}
         </ul>
       )}
 
-      <NameMergePanel onChanged={() => void refreshPairings()} variant="stats" />
+      {editingPlayerId && (
+        <PlayerAliasOverlay
+          playerId={editingPlayerId}
+          ownPlayerId={ownPlayerId}
+          aliases={aliases}
+          currentAlias={aliases[normalizePublicPlayerId(editingPlayerId)]}
+          onClose={() => setEditingPlayerId(null)}
+          onSave={(alias) => {
+            setAliases(setPlayerAlias(editingPlayerId, alias));
+            setEditingPlayerId(null);
+          }}
+        />
+      )}
     </div>
   );
 }

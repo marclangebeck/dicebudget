@@ -1,0 +1,87 @@
+import type { FieldTypeId } from "@/lib/types";
+
+export const UPPER_FIELD_TYPES: FieldTypeId[] = [
+  "ONES",
+  "TWOS",
+  "THREES",
+  "FOURS",
+  "FIVES",
+  "SIXES",
+];
+
+export const LOWER_FIELD_TYPES: FieldTypeId[] = [
+  "THREE_OF_A_KIND",
+  "FOUR_OF_A_KIND",
+  "FULL_HOUSE",
+  "SMALL_STRAIGHT",
+  "LARGE_STRAIGHT",
+  "KNIFFEL",
+  "CHANCE",
+];
+
+export const UPPER_BONUS_MIN = 63;
+export const UPPER_BONUS_POINTS = 35;
+
+type ScoredField = {
+  fieldType: string;
+  score: number | null;
+};
+
+export type GameBreakdown = {
+  upperSum: number;
+  bonus: number | null;
+  ergebnisOben: number | null;
+  lowerSum: number;
+  extraYatzyBonus: number;
+  gameTotal: number;
+};
+
+function sumScored(fields: ScoredField[]): number {
+  return fields
+    .filter((f) => f.score !== null)
+    .reduce((sum, f) => sum + (f.score ?? 0), 0);
+}
+
+export function computeGameBreakdown(
+  fields: ScoredField[],
+  extraYatzyBonus = 0,
+): GameBreakdown {
+  const upperFields = fields.filter((f) => UPPER_FIELD_TYPES.includes(f.fieldType as FieldTypeId));
+  const lowerFields = fields.filter((f) => LOWER_FIELD_TYPES.includes(f.fieldType as FieldTypeId));
+
+  const upperScoredCount = upperFields.filter((f) => f.score !== null).length;
+  const upperComplete = upperScoredCount === UPPER_FIELD_TYPES.length;
+
+  const upperSum = sumScored(upperFields);
+  const lowerSum = sumScored(lowerFields);
+
+  const bonus = upperComplete
+    ? upperSum >= UPPER_BONUS_MIN
+      ? UPPER_BONUS_POINTS
+      : 0
+    : null;
+
+  const ergebnisOben = upperComplete ? upperSum + (bonus ?? 0) : null;
+  const safeExtra = Math.max(0, extraYatzyBonus);
+  const gameTotal = (ergebnisOben ?? upperSum) + lowerSum + safeExtra;
+
+  return {
+    upperSum,
+    bonus,
+    ergebnisOben,
+    lowerSum,
+    extraYatzyBonus: safeExtra,
+    gameTotal,
+  };
+}
+
+export function gameIndexForExtraYatzyClick(
+  extraYatzyCountAfterClick: number,
+  gameCount: number,
+): number {
+  if (gameCount < 1 || extraYatzyCountAfterClick < 1) {
+    throw new Error("invalid extra yatzy assignment");
+  }
+  return ((extraYatzyCountAfterClick - 1) % gameCount) + 1;
+}
+

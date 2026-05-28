@@ -1,7 +1,7 @@
 /** Antwort Lobby / Ranking (wie Backend `session`-Objekt). */
 export type LeagueStandingDto = {
   rank: number;
-  name: string;
+  playerId: string;
   winPoints: number;
   bonusPoints: number;
   totalPoints: number;
@@ -21,7 +21,7 @@ export type SessionLobbyDto = {
   playerCount: number;
   players: {
     id: string;
-    name: string;
+    playerId: string;
     orderIndex: number;
     runFinished: boolean;
     totalScore: number;
@@ -34,9 +34,9 @@ export type SessionLobbyDto = {
 export type SessionRankingDto = SessionLobbyDto & {
   ranking: {
     rank: number;
-    name: string;
+    playerId: string;
     totalScore: number;
     finished: boolean;
   }[];
-  winner: { name: string; totalScore: number } | null;
+  winner: { playerId: string; totalScore: number } | null;
 };

@@ -1,6 +1,6 @@
 import { RUN_STATUS } from "../domain/fieldTypes.js";
 import { prisma } from "../db/prisma.js";
-import { loadAliasMap, resolvePlayerName } from "./playerNames.js";
+import { publicPlayerIdFromStoredName } from "../domain/playerIdentity.js";
 
 export type RoundPointsAward = {
   playerName: string;
@@ -38,24 +38,21 @@ export function computeRoundPoints(
 }
 
 export async function getLeagueStandings(leagueId: string) {
-  const [rows, aliasMap] = await Promise.all([
-    prisma.leagueStanding.findMany({ where: { leagueId } }),
-    loadAliasMap(),
-  ]);
+  const rows = await prisma.leagueStanding.findMany({ where: { leagueId } });
 
   const merged = new Map<string, { winPoints: number; bonusPoints: number }>();
   for (const row of rows) {
-    const name = resolvePlayerName(row.playerName, aliasMap);
-    const prev = merged.get(name) ?? { winPoints: 0, bonusPoints: 0 };
-    merged.set(name, {
+    const playerId = publicPlayerIdFromStoredName(row.playerName);
+    const prev = merged.get(playerId) ?? { winPoints: 0, bonusPoints: 0 };
+    merged.set(playerId, {
       winPoints: prev.winPoints + row.winPoints,
       bonusPoints: prev.bonusPoints + row.bonusPoints,
     });
   }
 
   return [...merged.entries()]
-    .map(([name, points]) => ({
-      name,
+    .map(([playerId, points]) => ({
+      playerId,
       winPoints: points.winPoints,
       bonusPoints: points.bonusPoints,
       totalPoints: points.winPoints + points.bonusPoints,
@@ -63,7 +60,7 @@ export async function getLeagueStandings(leagueId: string) {
     .sort((a, b) => {
       if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
       if (b.winPoints !== a.winPoints) return b.winPoints - a.winPoints;
-      return a.name.localeCompare(b.name, "de");
+      return a.playerId.localeCompare(b.playerId, "de");
     })
     .map((row, index) => ({ rank: index + 1, ...row }));
 }
@@ -89,17 +86,13 @@ export async function awardSessionLeaguePoints(sessionId: string): Promise<void>
 
     if (!allDone) return;
 
-    const aliasMap = await loadAliasMap();
     const awards = computeRoundPoints(
       session.players.map((p) => ({
         name: p.name,
         totalScore: p.run.totalScore,
         orderIndex: p.orderIndex,
       })),
-    ).map((award) => ({
-      ...award,
-      playerName: resolvePlayerName(award.playerName, aliasMap),
-    }));
+    );
 
     for (const award of awards) {
       const existing = await tx.leagueStanding.findUnique({

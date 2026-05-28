@@ -4,7 +4,6 @@ import {
   normalizePairingSummary,
 } from "./normalizePairing";
 import type { PairingSummaryDto } from "./pairingTypes";
-import type { PlayerNameAliasDto, PlayerNamesDto } from "./playerNameTypes";
 import type { RunDto } from "./types";
 import type { SessionLobbyDto, SessionRankingDto } from "./sessionTypes";
 import { getApiBase } from "@/lib/apiBase";
@@ -136,24 +135,6 @@ export async function getPairingDetail(key: string) {
   return { pairing: normalized };
 }
 
-export function getPlayerNames() {
-  return request<PlayerNamesDto>("/stats/names");
-}
-
-export function mergePlayerNames(aliasName: string, canonicalName: string) {
-  return request<{ alias: PlayerNameAliasDto }>("/stats/names/merge", {
-    method: "POST",
-    body: JSON.stringify({ aliasName, canonicalName }),
-  });
-}
-
-export function removePlayerNameAlias(aliasName: string) {
-  return request<void>("/stats/names/merge", {
-    method: "DELETE",
-    body: JSON.stringify({ aliasName }),
-  });
-}
-
 export function createGameSession(
   gameCount: number,
   maxPlayers: number,
@@ -172,11 +153,11 @@ export function getSessionLobby(inviteCode: string) {
   );
 }
 
-export function joinSession(inviteCode: string, name: string) {
+export function joinSession(inviteCode: string, playerId: string) {
   return request<{
     player: {
       id: string;
-      name: string;
+      playerId: string;
       orderIndex: number;
       secretToken: string;
       runId: string;
@@ -186,7 +167,7 @@ export function joinSession(inviteCode: string, name: string) {
     maxRolls: number | null;
   }>(`/sessions/invite/${encodeURIComponent(inviteCode)}/join`, {
     method: "POST",
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ playerId }),
   });
 }
 

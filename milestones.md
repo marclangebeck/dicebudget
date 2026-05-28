@@ -9,6 +9,8 @@
 | Liga & Statistik | 15–19 | erledigt |
 | UI-Modernisierung | 20 | erledigt |
 | iOS (Capacitor) | 21 | in Arbeit |
+| Datenschutz-Umbau | 22 | erledigt |
+| UI/Branding-Folgepaket | 23–27 | geplant |
 
 *(Variante D „echtes Online-Spiel“ / Live-Sync bewusst nicht Teil dieser Milestones.)*
 
@@ -382,7 +384,9 @@ Nach Abschluss von 14: `HANDOVER.md` und `CHANGELOG.md` aktualisieren; Deploy-Hi
 
 ## Milestone 21: iOS-App (Capacitor)
 
-**Ziel:** **dice.budget** im Apple App Store; Web-Produktion parallel unverändert.
+**Ziel:** **dice.budget** im Apple App Store (Zielpreis **1,19 €**); Web-Produktion parallel unverändert.
+
+**Leitfaden:** [GOiOS.md](./GOiOS.md) (Prozess, Sub-Milestones, Agent-Prompt).
 
 ### Deliverables
 
@@ -391,11 +395,16 @@ Nach Abschluss von 14: `HANDOVER.md` und `CHANGELOG.md` aktualisieren; Deploy-Hi
 | Capacitor 7, `ios/`, Bundle `de.bottletrade.dicebudget` | erledigt |
 | API nativ → `dicebudget.bottle-trade.de/api` | erledigt |
 | Native Start → `/app` (kein Landing in der App) | erledigt |
-| Doku `docs/ios-app-store.md` | erledigt |
-| Xcode Archive + TestFlight | offen (Mac) |
-| App Store Review | offen |
+| Developer App-ID `de.bottletrade.dicebudget` | erledigt |
+| GitHub `marclangebeck/dicebudget` | erledigt |
+| Mac: Simulator läuft | erledigt |
+| Doku (`docs/ios-*`, `GOiOS.md`) | erledigt |
+| App Store Connect App **dice.budget** (neu, nicht `com.mlangebeck.mobileapp`) | in Arbeit |
+| Geschäftliches: Paid-Vertrag, Bank, Steuer, EU-Compliance | offen |
+| Preis 1,19 €, Store-Metadaten | offen |
+| Archive → TestFlight → Review | offen |
 
-**Status:** in Arbeit (Mai 2026) — technische Basis im Repo; Release auf Mac.
+**Status:** in Arbeit (Mai 2026) — technische Basis erledigt; Store/Connect auf Mac durch Nutzer.
 
 ---
 
@@ -404,3 +413,168 @@ Nach Abschluss von 14: `HANDOVER.md` und `CHANGELOG.md` aktualisieren; Deploy-Hi
 - Admin-UI für `pairing_manual_baselines`
 - Frontend- / E2E-Tests
 - Echte Würfel-UI
+
+---
+
+## Milestone 22: Datenschutz-Umbau (lokal Solo, pseudonymes Multi)
+
+**Zielbild (empfohlen):**
+
+- Solo: komplett lokal auf dem Gerät.
+- Multi: zentral nur pseudonyme Spiel-Daten, keine Klarnamen.
+- Vergleich zwischen zwei Spielern bleibt abrufbar, ohne Klarname auf dem Server.
+
+**Wichtiger Realitätscheck:**
+
+„Gar nichts auf dem Server speichern“ und gleichzeitig „dauerhafte Multiplayer-Vergleiche zwischen Geräten“ geht nicht gleichzeitig.  
+Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral liegen — dann aber pseudonym statt personenbezogen.
+
+### Geplante Teilschritte
+
+| # | Teilschritt | Kurzinhalt | Status |
+|---|-------------|------------|--------|
+| 22.1 | Technisches Zielmodell festziehen | `playerId` pro Gerät (UUID, lokal gespeichert), Anzeigename nur lokal, Server speichert nur pseudonyme IDs + Matchdaten | erledigt |
+| 22.2 | Datenmodell Backend erweitern | Klarnamen aus kritischen Multi-Statistikpfaden herauslösen; Felder für pseudonyme IDs ergänzen | erledigt |
+| 22.3 | Migrationsstrategie Alt-Daten | Bestehende Klarnamen-Historie (inkl. Manual-Baselines) entfernen oder in nicht personenbezogene Form überführen | erledigt |
+| 22.4 | API für Multi anpassen | Multi-Endpunkte akzeptieren/liefern pseudonyme IDs; Vergleich `A vs B` basiert auf IDs statt Namen | erledigt |
+| 22.5 | Frontend iOS/Web anpassen | `playerId` lokal erzeugen/speichern/senden; lokales Mapping `playerId -> Anzeigename` nur auf Gerät | erledigt |
+| 22.6 | Solo vollständig lokal absichern | Solo-Stats/-Historie lokal speichern; kein personenbezogener Solo-Statistik-Write auf Server | erledigt |
+| 22.7 | Statistik-UI umstellen | Paarungsansichten aus pseudonymen Daten berechnen; lesbare Namen nur aus lokalem Mapping auflösen | erledigt |
+| 22.8 | Datenschutz-/Store-Doku aktualisieren | Datenschutzerklärung, App Privacy Angaben, technische Doku (`GOiOS.md`/`HANDOVER.md`) angleichen | erledigt |
+| 22.9 | Abnahme & Rollout | Regressionstests, iOS-Rebuild (`npm run build:ios` auf Mac), neues Archive/Upload für TestFlight | erledigt |
+
+### Akzeptanzkriterien (Definition of Done)
+
+- [x] Neuer App-Install startet mit leeren Solo-Stats auf dem Gerät.
+- [x] Server speichert in Multi-Statistik keine Klarnamen mehr.
+- [x] Vergleich zwischen zwei Spielern bleibt über pseudonyme IDs funktionsfähig.
+- [x] Alte personenbezogene Statistik-Baselines sind entfernt.
+- [x] Dokumentation/Store-Angaben sind konsistent zum neuen Datenschutzmodell.
+
+### Ergebnis (Sollzustand)
+
+- Malte kann gegen Nicole vergleichen (wenn beide gespielt haben).
+- Du als Betreiber speicherst keine Klarnamen.
+- Historie bleibt zwischen Spielern abrufbar.
+- Datenschutzrisiko ist deutlich kleiner als heute.
+
+**Status:** erledigt (Mai 2026)
+
+**Tag-1-Dokumentation:** `docs/milestone-22-preparation.md`
+
+### Startreihenfolge (nach aktuellem App-Store-Connect-Durchlauf)
+
+#### Tag 1 — Sicherheitsnetz + Datenbasis vorbereiten
+
+1. **Branch anlegen:** separater Arbeitsbranch nur für Milestone 22.
+2. **Ist-Zustand sichern:** aktuelles DB-Schema + relevante Tabellen (`players`, `game_sessions`, `pairing_manual_baselines`, `player_name_aliases`) dokumentieren.
+3. **Konzept fixieren:** endgültig festschreiben, welche Felder pseudonym bleiben dürfen (IDs, Scores, Zeitstempel) und welche entfallen (Klarnamen in Statistikpfaden).
+4. **Migration entwerfen:** Prisma-Migration für pseudonyme Multi-IDs vorbereiten; Umgang mit Alt-Daten (löschen/neutralisieren) festlegen.
+5. **Abbruchkriterium Tag 1:** Keine Codepfade geändert, aber Migrations-/Datenplan ist schriftlich final und freigegeben.
+
+#### Tag 2 — Backend pseudonym machen
+
+1. **Schema umsetzen:** neue pseudonyme ID-Felder für Multi-Flows einführen.
+2. **API umstellen:** Multi-/Statistik-Endpunkte intern auf IDs statt Klarnamen umstellen.
+3. **Alt-Baselines entfernen:** `pairing_manual_baselines` aus aktivem Statistikpfad entfernen; Alt-Klarnamen-Historie gemäß Plan bereinigen.
+4. **Regression prüfen:** bestehende Multiplayer-Kernflüsse lokal testen (Raum erstellen, beitreten, Runde beenden, Vergleich abrufen).
+5. **Abbruchkriterium Tag 2:** Backend liefert funktionsfähige Vergleichsdaten ohne Klarnamenpersistenz in den Zielpfaden.
+
+#### Tag 3 — Frontend/Client lokalisieren + Abnahme
+
+1. **`playerId` lokal einführen:** beim ersten Start UUID erzeugen und lokal speichern.
+2. **Lokales Namens-Mapping:** Anzeigename nur lokal halten (`playerId -> Anzeigename`), nicht serverseitig persistieren.
+3. **Solo lokal absichern:** Solo-Statistik ausschließlich lokal lesen/schreiben.
+4. **UI-Checks:** Statistikseiten mit pseudonymen Serverdaten + lokal aufgelösten Namen prüfen.
+5. **Doku & Release-Check:** Datenschutzerklärung/App-Privacy-Texte angleichen, dann iOS-Rebuild (`npm run build:ios` auf Mac), Buildnummer erhöhen, Archive/Upload.
+6. **Abbruchkriterium Tag 3:** DoD aus Milestone 22 vollständig erfüllt und testbar dokumentiert.
+
+#### Go/No-Go vor Produktionsstart
+
+- [x] Aktueller App-Store-Connect-Build ist abgeschlossen (kein offener Blocking-Status).
+- [ ] Milestone-22-Plan ist freigegeben.
+- [ ] Zeitfenster für Migration + Rebuild + Retest ist eingeplant.
+
+---
+
+## Milestone 23: Navigation-Polish (Startseite/Zurück)
+
+**Ziel:** „Startseite“/„Zurück“-Navigation im gesamten App-Flow moderner, klarer und konsistent im Glass-Design darstellen.
+
+### Deliverables
+
+| Thema | Status |
+|--------|--------|
+| Einheitliche Back/Home-Button-Komponente (Form, Größe, Kontrast, Fokuszustand) | erledigt |
+| Verwendung in `AppScreenHeader`, `PlayTopBar` und relevanten Detailseiten | erledigt |
+| Touch-optimierte Hit-Targets (iOS) | erledigt |
+
+**Status:** erledigt
+
+---
+
+## Milestone 24: Eröffnungsscreen (Splash A)
+
+**Entscheidung:** Variante A (animierter Intro-Screen bei Start).
+
+**Ziel:** Schwarzer Intro-Screen mit `dice.budget`, zwei Würfeln und Fortschrittskreis 0–100%, danach weicher Übergang zur App-Startseite.
+
+### Deliverables
+
+| Thema | Status |
+|--------|--------|
+| Intro-Overlay mit Branding auf schwarzem Hintergrund | erledigt |
+| Progress-Ring 0–100% (visuelle Ladeführung) | erledigt |
+| Transition/Fade zum bestehenden Home-Screen | erledigt |
+
+**Status:** erledigt
+
+---
+
+## Milestone 25: Startseite Header/Hero präsenter
+
+**Ziel:** Logo + Schriftzug auf der Startseite sichtbar größer und mittiger/breiter positionieren.
+
+### Deliverables
+
+| Thema | Status |
+|--------|--------|
+| Header-Bereich über größere Breite aufziehen | erledigt |
+| Logo + Wortmarke visuell priorisieren (Spacing/Typo) | erledigt |
+| Responsives Feintuning für iPhone-Größen | erledigt |
+
+**Status:** erledigt
+
+---
+
+## Milestone 26: Kachel-Visuals (Icons vs. Bilder)
+
+**Entscheidung:** Icons bleiben als Primärsprache; keine vollständige Umstellung auf Bilder.
+
+**Ziel:** Klarheit der Navigation beibehalten, visuell aufwerten über subtile Hintergründe/Illustrationsakzente statt Foto-Kacheln.
+
+### Deliverables
+
+| Thema | Status |
+|--------|--------|
+| Bestehende Icons beibehalten (Solo/Multi/Stats) | erledigt |
+| Optionale Hintergrund-Illustrationsakzente je Kachel | erledigt |
+| Kontrast/Lesbarkeit im Bento-Grid sichern | erledigt |
+
+**Status:** erledigt
+
+---
+
+## Milestone 27: Datenschutzseite (App-zentriert)
+
+**Ziel:** Datenschutztext auf app-zentrierte Nutzung ausrichten (Spiel primär in der App, konsistent mit tatsächlichem Verhalten).
+
+### Deliverables
+
+| Thema | Status |
+|--------|--------|
+| Formulierungen auf App-first Nutzung anpassen | erledigt |
+| Technische Speicherung korrekt und verständlich beschreiben | erledigt |
+| Konsistenz mit App Store Angaben prüfen | erledigt |
+
+**Status:** erledigt

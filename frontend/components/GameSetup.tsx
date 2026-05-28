@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { StrategyModeToggle } from "@/components/StrategyModeToggle";
 import { saveActiveGame } from "@/lib/activeGame";
-import { createRun } from "@/lib/api";
+import { createLocalSoloRun } from "@/lib/localSoloRun";
 
 export function GameSetup() {
   const router = useRouter();
@@ -17,7 +17,7 @@ export function GameSetup() {
     setLoading(true);
     setError(null);
     try {
-      const { run } = await createRun(gameCount, useStrategyRules);
+      const run = createLocalSoloRun(gameCount, useStrategyRules);
       saveActiveGame({ type: "solo", runId: run.id });
       router.push(`/play?runId=${run.id}`);
     } catch (e) {

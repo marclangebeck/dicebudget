@@ -127,6 +127,91 @@ body {
   background: rgba(15, 23, 42, 0.45);
 }
 
+.app-intro-splash {
+  background: #020617;
+}
+
+.app-intro-shell {
+  display: flex;
+  width: 100%;
+  max-width: 20rem;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.app-intro-title {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #f8fafc;
+}
+
+.app-intro-subtitle {
+  margin-top: 0.15rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.app-intro-dice-row {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.9rem;
+}
+
+.app-intro-die {
+  display: inline-flex;
+  width: 2.4rem;
+  height: 2.4rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(15, 23, 42, 0.55);
+  font-size: 1.4rem;
+  color: #f8fafc;
+}
+
+.app-intro-progress-wrap {
+  position: relative;
+  margin-top: 1.2rem;
+  width: 7.5rem;
+  height: 7.5rem;
+}
+
+.app-intro-progress-ring {
+  width: 100%;
+  height: 100%;
+}
+
+.app-intro-progress-track {
+  fill: none;
+  stroke: rgba(148, 163, 184, 0.2);
+  stroke-width: 8;
+}
+
+.app-intro-progress-value {
+  fill: none;
+  stroke: #38bdf8;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+.app-intro-progress-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
 .btn-primary {
   border-radius: 0.75rem;
   border: 1px solid #047857;
@@ -323,6 +408,42 @@ html.play-route body {
   gap: 0.75rem;
 }
 
+.home-hero-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid rgba(3, 105, 161, 0.2);
+  padding: 0.8rem 0.95rem;
+  background: linear-gradient(160deg, #ffffff 0%, #f0f9ff 45%, #e0f2fe 100%);
+  box-shadow:
+    0 2px 12px -4px rgba(15, 23, 42, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.home-hero-logo {
+  width: 3.5rem;
+  height: 3.5rem;
+  flex-shrink: 0;
+  border-radius: 0.9rem;
+  object-fit: cover;
+  box-shadow: 0 4px 14px -6px rgba(15, 23, 42, 0.28);
+}
+
+.home-hero-copy {
+  text-align: left;
+}
+
+.home-hero-kicker {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #0369a1;
+}
+
 .home-bento-brand-icon {
   width: 2.75rem;
   height: 2.75rem;
@@ -348,6 +469,7 @@ html.play-route body {
 
 .home-bento-tile {
   position: relative;
+  isolation: isolate;
   min-height: 0;
   border-radius: 1rem;
   border: 1px solid var(--glass-border);
@@ -359,6 +481,21 @@ html.play-route body {
     transform 0.15s ease,
     box-shadow 0.15s ease,
     filter 0.15s ease;
+}
+
+.home-bento-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.3;
+  z-index: 0;
+}
+
+.home-bento-tile > * {
+  position: relative;
+  z-index: 1;
 }
 
 .home-bento-icon-wrap {
@@ -418,16 +555,34 @@ html.play-route body {
   border-color: rgba(3, 105, 161, 0.22);
 }
 
+.home-bento-tile--sky::before {
+  background:
+    radial-gradient(circle at 78% 20%, rgba(14, 165, 233, 0.35), transparent 45%),
+    radial-gradient(circle at 20% 80%, rgba(2, 132, 199, 0.2), transparent 55%);
+}
+
 .home-bento-tile--primary {
   color: #064e3b;
   background: linear-gradient(155deg, #ecfdf5 0%, #d1fae5 50%, #6ee7b7 100%);
   border-color: rgba(4, 120, 87, 0.22);
 }
 
+.home-bento-tile--primary::before {
+  background:
+    radial-gradient(circle at 78% 20%, rgba(16, 185, 129, 0.35), transparent 45%),
+    radial-gradient(circle at 16% 78%, rgba(5, 150, 105, 0.2), transparent 55%);
+}
+
 .home-bento-tile--violet {
   color: #4c1d95;
   background: linear-gradient(155deg, #faf5ff 0%, #ede9fe 50%, #ddd6fe 100%);
   border-color: rgba(109, 40, 217, 0.18);
+}
+
+.home-bento-tile--violet::before {
+  background:
+    radial-gradient(circle at 82% 18%, rgba(109, 40, 217, 0.35), transparent 45%),
+    radial-gradient(circle at 18% 82%, rgba(124, 58, 237, 0.22), transparent 55%);
 }
 
 .home-bento-tile--neutral {
@@ -983,15 +1138,39 @@ html.play-route body {
 .app-screen-back-link,
 .stats-back-link {
   width: fit-content;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--link);
-  text-decoration: none;
 }
 
-.app-screen-back-link:hover,
-.stats-back-link:hover {
-  text-decoration: underline;
+.app-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  background: rgba(255, 255, 255, 0.86);
+  padding: 0.3rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none;
+  box-shadow: 0 2px 8px -4px rgba(15, 23, 42, 0.2);
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.app-nav-btn:hover {
+  border-color: rgba(3, 105, 161, 0.35);
+  background: rgba(240, 249, 255, 0.95);
+}
+
+.app-nav-btn:active {
+  transform: translateY(1px);
+}
+
+.app-nav-btn--header {
+  width: fit-content;
 }
 
 .app-screen-header-row,

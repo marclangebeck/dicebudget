@@ -56,7 +56,6 @@ export function normalizePairingSummary(raw: unknown): PairingSummaryDto | null 
     playerATotalScore: num(o.playerATotalScore),
     playerBTotalScore: num(o.playerBTotalScore),
     lastPlayedAt: str(o.lastPlayedAt),
-    manualBaselineNote: str(o.manualBaselineNote),
   };
 }
 

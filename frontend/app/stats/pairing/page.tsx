@@ -6,6 +6,9 @@ import { useSearchParams } from "next/navigation";
 import { getPairingDetail } from "@/lib/api";
 import type { PairingDetailDto } from "@/lib/pairingTypes";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
+import { getOrCreatePlayerId, normalizePublicPlayerId, playerLabel } from "@/lib/playerIdentity";
+import { loadPlayerAliases, setPlayerAlias, type PlayerAliasMap } from "@/lib/playerAliases";
+import { PlayerAliasOverlay } from "@/components/PlayerAliasOverlay";
 
 function formatDateTime(iso: string | null): string {
   if (!iso) return "—";
@@ -18,10 +21,12 @@ function formatDateTime(iso: string | null): string {
 function winnerLabel(
   round: PairingDetailDto["rounds"][number],
   pairing: PairingDetailDto,
+  ownPlayerId: string,
+  aliases: PlayerAliasMap,
 ): string {
   if (round.winner === "tie") return "Remis";
-  if (round.winner === "A") return pairing.playerA;
-  return pairing.playerB;
+  if (round.winner === "A") return playerLabel(pairing.playerA, ownPlayerId, aliases);
+  return playerLabel(pairing.playerB, ownPlayerId, aliases);
 }
 
 function PairingDetailInner() {
@@ -29,8 +34,16 @@ function PairingDetailInner() {
   const key = (searchParams.get("key") ?? "").trim();
 
   const [pairing, setPairing] = useState<PairingDetailDto | null>(null);
+  const [ownPlayerId, setOwnPlayerId] = useState("");
+  const [aliases, setAliases] = useState<PlayerAliasMap>({});
+  const [editingPlayerId, setEditingPlayerId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setOwnPlayerId(getOrCreatePlayerId());
+    setAliases(loadPlayerAliases());
+  }, []);
 
   useEffect(() => {
     if (!key) {
@@ -70,7 +83,7 @@ function PairingDetailInner() {
 
   const headerTitle =
     pairing != null
-      ? `${pairing.playerA} vs. ${pairing.playerB}`
+      ? `${playerLabel(pairing.playerA, ownPlayerId, aliases)} vs. ${playerLabel(pairing.playerB, ownPlayerId, aliases)}`
       : "Paarung";
 
   const headerSubtitle =
@@ -96,10 +109,6 @@ function PairingDetailInner() {
         backLabel="← Alle Paarungen"
       />
 
-      {pairing?.manualBaselineNote && (
-        <p className="stats-baseline-note">{pairing.manualBaselineNote}</p>
-      )}
-
       {error && <p className="glass-alert-error px-3 py-2 text-sm">{error}</p>}
       {loading && !error && <p className="stats-empty-state">Lade …</p>}
 
@@ -107,7 +116,16 @@ function PairingDetailInner() {
         <>
           <section className="stats-detail-scores">
             <div className="stats-detail-player-card">
-              <p className="stats-detail-player-name">{pairing.playerA}</p>
+              <p className="stats-detail-player-name">
+                {playerLabel(pairing.playerA, ownPlayerId, aliases)}
+              </p>
+              <button
+                type="button"
+                className="btn-chip mt-2 px-2 py-0.5 text-xs"
+                onClick={() => setEditingPlayerId(pairing.playerA)}
+              >
+                ✏️ Alias
+              </button>
               <p className="stats-detail-wins tabular-nums">{pairing.playerAWins}</p>
               <p className="stats-detail-metric-label">Siege</p>
               <p className="stats-detail-diff tabular-nums">
@@ -120,7 +138,16 @@ function PairingDetailInner() {
               )}
             </div>
             <div className="stats-detail-player-card stats-detail-player-card--b">
-              <p className="stats-detail-player-name">{pairing.playerB}</p>
+              <p className="stats-detail-player-name">
+                {playerLabel(pairing.playerB, ownPlayerId, aliases)}
+              </p>
+              <button
+                type="button"
+                className="btn-chip mt-2 px-2 py-0.5 text-xs"
+                onClick={() => setEditingPlayerId(pairing.playerB)}
+              >
+                ✏️ Alias
+              </button>
               <p className="stats-detail-wins tabular-nums">{pairing.playerBWins}</p>
               <p className="stats-detail-metric-label">Siege</p>
               <p className="stats-detail-diff tabular-nums">
@@ -141,7 +168,7 @@ function PairingDetailInner() {
             </h2>
             {pairing.appRoundsPlayed === 0 ? (
               <p className="stats-empty-state stats-empty-state--inline">
-                Noch keine App-Runden – nur historische Werte.
+                Noch keine App-Runden vorhanden.
               </p>
             ) : (
               <ul className="stats-round-list">
@@ -160,7 +187,7 @@ function PairingDetailInner() {
                         </p>
                       </div>
                       <p className="text-accent shrink-0 text-right text-xs font-semibold">
-                        {winnerLabel(round, pairing)}
+                        {winnerLabel(round, pairing, ownPlayerId, aliases)}
                         {round.winner !== "tie" && (
                           <span className="text-muted block font-normal tabular-nums">
                             +{round.scoreDiff}
@@ -174,14 +201,14 @@ function PairingDetailInner() {
                           round.winner === "A" ? "text-strong font-semibold" : "text-muted"
                         }
                       >
-                        {pairing.playerA}: {round.playerAScore}
+                        {playerLabel(pairing.playerA, ownPlayerId, aliases)}: {round.playerAScore}
                       </span>
                       <span
                         className={
                           round.winner === "B" ? "text-strong font-semibold" : "text-muted"
                         }
                       >
-                        {pairing.playerB}: {round.playerBScore}
+                        {playerLabel(pairing.playerB, ownPlayerId, aliases)}: {round.playerBScore}
                       </span>
                     </div>
                   </li>
@@ -190,6 +217,20 @@ function PairingDetailInner() {
             )}
           </section>
         </>
+      )}
+
+      {editingPlayerId && (
+        <PlayerAliasOverlay
+          playerId={editingPlayerId}
+          ownPlayerId={ownPlayerId}
+          aliases={aliases}
+          currentAlias={aliases[normalizePublicPlayerId(editingPlayerId)]}
+          onClose={() => setEditingPlayerId(null)}
+          onSave={(alias) => {
+            setAliases(setPlayerAlias(editingPlayerId, alias));
+            setEditingPlayerId(null);
+          }}
+        />
       )}
     </div>
   );

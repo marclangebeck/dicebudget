@@ -10,6 +10,15 @@ import { ScoreSheetTable } from "@/components/ScoreSheetTable";
 import { clearActiveGame, saveActiveGame } from "@/lib/activeGame";
 import { abandonRun, clearLastField, completeField, finishRun, getRun, incrementExtraYatzy } from "@/lib/api";
 import { poolDeltaForComplete } from "@/lib/gameRules";
+import {
+  abandonLocalSoloRun,
+  clearLocalSoloField,
+  completeLocalSoloField,
+  finishLocalSoloRun,
+  getLocalSoloRun,
+  incrementLocalSoloExtraYatzy,
+  isLocalSoloRunId,
+} from "@/lib/localSoloRun";
 import { ABANDON_RUN_CONFIRM, allFieldsScored, getLastScoredFieldId } from "@/lib/runUtils";
 import type { FieldDto, RunDto } from "@/lib/types";
 
@@ -21,6 +30,7 @@ type Props = {
 };
 
 export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
+  const isLocalSolo = !inviteCode && !playerSecret && isLocalSoloRunId(runId);
   const [run, setRun] = useState<RunDto | null>(null);
   const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
   const [scoreInput, setScoreInput] = useState("");
@@ -36,7 +46,9 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   }, []);
 
   const load = useCallback(async () => {
-    const { run: data } = await getRun(runId, playerSecret);
+    const data = isLocalSolo
+      ? getLocalSoloRun(runId)
+      : (await getRun(runId, playerSecret)).run;
     setRun(data);
     setActiveFieldId((current) => {
       if (
@@ -47,7 +59,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       }
       return null;
     });
-  }, [runId, playerSecret]);
+  }, [runId, playerSecret, isLocalSolo]);
 
   useEffect(() => {
     void load().catch((e) =>
@@ -110,7 +122,9 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     setBusy(true);
     setError(null);
     try {
-      const { run: updated } = await incrementExtraYatzy(runId, playerSecret);
+      const updated = isLocalSolo
+        ? incrementLocalSoloExtraYatzy(runId)
+        : (await incrementExtraYatzy(runId, playerSecret)).run;
       setRun(updated);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Zusatz-Yatzy fehlgeschlagen");
@@ -128,13 +142,17 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     setBusy(true);
     setError(null);
     try {
-      const { run: updated } = await completeField(
-        runId,
-        activeFieldId,
-        score,
-        effectiveRolls,
-        playerSecret,
-      );
+      const updated = isLocalSolo
+        ? completeLocalSoloField(runId, activeFieldId, score, effectiveRolls)
+        : (
+            await completeField(
+              runId,
+              activeFieldId,
+              score,
+              effectiveRolls,
+              playerSecret,
+            )
+          ).run;
       setRun(updated);
       resetEntry();
       setActiveFieldId(null);
@@ -154,7 +172,9 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     setBusy(true);
     setError(null);
     try {
-      const { run: updated } = await clearLastField(runId, activeFieldId, playerSecret);
+      const updated = isLocalSolo
+        ? clearLocalSoloField(runId, activeFieldId)
+        : (await clearLastField(runId, activeFieldId, playerSecret)).run;
       setRun(updated);
       setActiveFieldId(null);
       resetEntry();
@@ -180,7 +200,9 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     setBusy(true);
     setError(null);
     try {
-      const { run: updated } = await finishRun(runId, playerSecret);
+      const updated = isLocalSolo
+        ? finishLocalSoloRun(runId)
+        : (await finishRun(runId, playerSecret)).run;
       clearActiveGame();
       setRun(updated);
       setActiveFieldId(null);
@@ -198,7 +220,9 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     setBusy(true);
     setError(null);
     try {
-      const { run: updated } = await abandonRun(runId, playerSecret);
+      const updated = isLocalSolo
+        ? abandonLocalSoloRun(runId)
+        : (await abandonRun(runId, playerSecret)).run;
       clearActiveGame();
       setRun(updated);
       setActiveFieldId(null);

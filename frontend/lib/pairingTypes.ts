@@ -14,7 +14,6 @@ export type PairingSummaryDto = {
   playerATotalScore: number;
   playerBTotalScore: number;
   lastPlayedAt: string | null;
-  manualBaselineNote: string | null;
 };
 
 export type PairingRoundDto = {

@@ -10,7 +10,7 @@ import {
 
 export const metadata: Metadata = {
   title: `Datenschutzerklärung — ${APP_NAME}`,
-  description: `Datenschutzerklärung für ${APP_NAME} (Web-App und geplante iOS-App)`,
+  description: `Datenschutzerklärung für ${APP_NAME} (app-zentrierte Nutzung)`,
   alternates: { canonical: PRIVACY_URL },
 };
 
@@ -24,9 +24,9 @@ export default function DatenschutzPage() {
           </Link>
           <h1>Datenschutzerklärung</h1>
           <p className="legal-meta">
-            Stand: Mai 2026 · Gültig für die Web-App unter{" "}
-            <a href={SITE_URL}>{SITE_URL.replace(/^https:\/\//, "")}</a> und die
-            geplante iOS-App „{APP_NAME}“
+            Stand: Mai 2026 · Gültig für die App „{APP_NAME}“ sowie die
+            begleitende Website unter{" "}
+            <a href={SITE_URL}>{SITE_URL.replace(/^https:\/\//, "")}</a>
           </p>
         </header>
 
@@ -46,55 +46,55 @@ export default function DatenschutzPage() {
         <section>
           <h2>2. Überblick</h2>
           <p>
-            {APP_NAME} ist ein Würfelspiel (Yatzy-Variante) als Web-App. Es gibt
+            {APP_NAME} ist ein Würfelspiel (Yatzy-Variante) mit
+            app-zentrierter Nutzung. Es gibt
             <strong> kein Benutzerkonto</strong> und keine Registrierung mit
-            E-Mail-Adresse. Du kannst im Browser spielen oder die App zum
-            Startbildschirm hinzufügen; eine native iOS-Version ist geplant.
+            E-Mail-Adresse.
           </p>
           <p>
-            Für Spielstände und Multiplayer ist eine Verbindung zu unserem
-            Server erforderlich.
+            Die Website dient primär als Informations-, Support- und
+            Datenschutzseite. Für Multiplayer und Statistik ist eine Verbindung
+            zu unserem Server erforderlich.
           </p>
         </section>
 
         <section>
           <h2>3. Welche Daten wir verarbeiten</h2>
 
-          <h3>3.1 Spielen im Browser (Einzelspiel)</h3>
+          <h3>3.1 Einzelspiel (lokal auf dem Gerät)</h3>
           <p>
-            Beim Solo-Spiel speichern wir auf dem Server deinen Spielstand
-            (Punkte, Felder, Modus, Spielanzahl). Es wird kein Name abgefragt.
-            Lokal im Browser kann ein Hinweis auf das laufende Spiel in{" "}
-            <code>sessionStorage</code> liegen, damit du nach einem Seitenwechsel
-            weiterspielen kannst.
+            Beim Solo-Spiel speichert die App den Spielstand lokal auf deinem
+            Gerät (z. B. Punkte, Felder, Modus, Spielanzahl). Es wird kein Name
+            abgefragt und keine Solo-Statistik serverseitig persistiert.
           </p>
 
           <h3>3.2 Multiplayer</h3>
           <p>
-            Wenn du einem Raum beitrittst, gibst du einen <strong>Spielernamen</strong>{" "}
-            ein. Dieser Name, dein Punktestand und technische Zuordnungen (z. B.
-            Einladungscode, geheimer Spieler-Schlüssel) werden auf dem Server
-            gespeichert, solange die Runde bzw. Serie relevant ist.
+            Multiplayer-Daten werden pseudonym verarbeitet. Beim ersten Start
+            erzeugt die App lokal eine zufällige Spieler-ID. Auf dem Server
+            speichern wir für Multiplayer keine Klarnamen, sondern nur diese
+            pseudonyme ID sowie Spielwerte (z. B. Punkte, Sieger, Zeitstempel,
+            Einladungscode, geheimer Spieler-Schlüssel).
           </p>
           <p>
             Der geheime Schlüssel (<code>playerSecret</code>) wird in deinem
-            Browser in <code>sessionStorage</code> abgelegt — nicht in einem
-            Konto auf unserer Seite. Wechselst du das Gerät, musst du den Raum
-            erneut über den Code betreten.
+            App-WebView lokal gespeichert (technisch analog zu{" "}
+            <code>sessionStorage</code>) — nicht in einem Konto auf unserer
+            Seite. Wechselst du das Gerät, musst du den Raum erneut über den
+            Code betreten.
           </p>
 
           <h3>3.3 Statistik</h3>
           <p>
-            Abgeschlossene Spiele können in aggregierter Statistik erscheinen
-            (z. B. persönliche Rekorde, Paarungsvergleiche zwischen Spielernamen
-            aus Multiplayer-Runden). Du kannst Spielernamen in der App
-            zusammenführen; dabei werden Alias-Zuordnungen auf dem Server
-            gespeichert.
+            Abgeschlossene Multiplayer-Spiele können in aggregierter Statistik
+            erscheinen (z. B. Paarungsvergleiche zwischen pseudonymen
+            Spieler-IDs aus Multiplayer-Runden). Lesbare Anzeigenamen können
+            lokal auf dem Gerät verwaltet werden.
           </p>
 
           <h3>3.4 Technische Daten</h3>
           <p>
-            Beim Aufruf der Website und der API können Server- und
+            Beim Aufruf der App-API und der Website können Server- und
             Zugriffsprotokolle (z. B. IP-Adresse, Zeitpunkt, angeforderte URL,
             User-Agent) durch den Hosting-Anbieter und unsere Infrastruktur
             anfallen — zur Sicherheit und Fehleranalyse.

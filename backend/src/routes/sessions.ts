@@ -46,12 +46,12 @@ sessionsRouter.get("/invite/:inviteCode", async (req, res, next) => {
 
 sessionsRouter.post("/invite/:inviteCode/join", async (req, res, next) => {
   try {
-    const name = req.body?.name;
-    if (typeof name !== "string") {
-      res.status(400).json({ error: "name required" });
+    const playerId = req.body?.playerId;
+    if (typeof playerId !== "string") {
+      res.status(400).json({ error: "playerId required" });
       return;
     }
-    const result = await joinSession(req.params.inviteCode, name);
+    const result = await joinSession(req.params.inviteCode, playerId);
     res.status(201).json(result);
   } catch (error) {
     next(error);

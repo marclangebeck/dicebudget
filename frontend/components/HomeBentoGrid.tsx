@@ -183,18 +183,19 @@ export function HomeBentoGrid() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <header className="home-bento-header shrink-0">
+      <header className="home-hero-banner shrink-0">
         <img
           src="/apple-touch-icon.png"
           alt=""
-          width={44}
-          height={44}
-          className="home-bento-brand-icon"
+          width={64}
+          height={64}
+          className="home-hero-logo"
           decoding="async"
         />
-        <div className="min-w-0 text-left">
-          <h1 className="text-strong text-xl font-bold tracking-tight">{APP_SHORT}</h1>
-          <p className="text-muted text-xs">Strategy Edition</p>
+        <div className="home-hero-copy min-w-0">
+          <p className="home-hero-kicker">Willkommen bei</p>
+          <h1 className="text-strong text-2xl font-bold tracking-tight">{APP_SHORT}</h1>
+          <p className="text-muted text-sm">Strategy Edition</p>
         </div>
       </header>
 

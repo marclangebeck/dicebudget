@@ -102,9 +102,31 @@ Nach Schema-Änderung: `npx prisma migrate deploy` im Backend.
 
 ### iOS-App (Capacitor, Milestone 21)
 
-- Basis im Repo: `frontend/ios/`, `npm run build:ios`, Doku **`docs/ios-app-store.md`**
-- Bundle ID: `de.bottletrade.dicebudget`, Anzeigename **dice.budget**
-- Archive/TestFlight nur auf **Mac mit Xcode**
+- **Hauptdoku:** **[GOiOS.md](./GOiOS.md)** (Prozess, Milestones 21.x, **Prompt für neuen Agent** am Ende)
+- Basis im Repo: `frontend/ios/`, `npm run build:ios`
+- Bundle ID: `de.bottletrade.dicebudget` — **nicht** `com.mlangebeck.mobileapp` (alter Connect-Eintrag)
+- GitHub: https://github.com/marclangebeck/dicebudget
+- Ziel: App **1,19 €**, TestFlight, dann Review
+- Simulator auf Mac: OK; Archive/Connect: offen
+
+### Milestone 22 (Datenschutz-Umbau) – aktueller Zwischenstand
+
+- Branch: `milestone-22-prep`
+- Tag 1-3 umgesetzt und ausgerollt.
+- Multiplayer-Join nutzt jetzt `playerId` (UUID) statt Klarname.
+- Server speichert neue Multiplayer-Teilnehmer pseudonym als `pid:<uuid>`.
+- Lobby/Ranking/Pairing liefern `playerId` statt `name`.
+- Name-Merge-Routen in `stats` sind aus dem aktiven API-Pfad entfernt.
+- Datenbereinigungsmigration vorbereitet:
+  - `backend/prisma/migrations/20260528093000_m22_pseudonymous_cleanup/migration.sql`
+  - entfernt Baselines/Aliase und Legacy-Klarnamen-Multiplayerdaten.
+- Frontend nutzt lokale IDs/Labels (`frontend/lib/playerIdentity.ts`).
+- Solo-Run-Logik ist lokal auf dem Geraet umgesetzt (`frontend/lib/localSoloRun.ts`), inkl. lokalem Scoring (`frontend/lib/gameScoring.ts`).
+- Datenschutzseite wurde auf pseudonyme Multiplayer-Speicherung angepasst.
+- Rollout erfolgreich:
+  - Backend + Migration auf Server deployed
+  - Frontend auf Server deployed
+  - iOS Build `1.0 (2)` in TestFlight, Testerzugriff bestaetigt
 
 ### Geplante / optionale nächste Schritte
 

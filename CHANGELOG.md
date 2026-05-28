@@ -21,11 +21,31 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Letzten Eintrag löschen:** `scored_sequence`, `POST …/fields/:fieldId/clear`, UI „Eintrag löschen“
 - **Frontend:** `normalizePairing.ts`, Fehlerseite `/stats/pairing/error.tsx`, `.env.production` für API-URL
 - **Deploy:** getrennte Skripte `deploy-backend-prod.sh`, `deploy-frontend-prod.sh`
+- **Milestone 22 Vorbereitung:** `docs/milestone-22-preparation.md` mit Ist-Zustand, Zielmodell (Solo lokal, Multi pseudonym), Migrations- und Bereinigungsentwurf
+- **Player-Identität (Frontend):** `frontend/lib/playerIdentity.ts` erzeugt/speichert lokale `playerId` (UUID) und lokale Spieler-Labels
+- **M22 Datenbereinigungsmigration:** `backend/prisma/migrations/20260528093000_m22_pseudonymous_cleanup/migration.sql` entfernt Baselines/Aliase und Legacy-Multiplayerdaten mit Klarnamen
+- **Lokale Solo-Engine:** `frontend/lib/localSoloRun.ts` (Create/Get/Complete/Clear/Extra-Yatzy/Finish/Abandon in LocalStorage)
+- **Lokales Scoring-Modul:** `frontend/lib/gameScoring.ts` (Bonus-/Totalsummen und Extra-Yatzy-Verteilung)
+- **Lokale Gegner-Aliase:** `frontend/lib/playerAliases.ts` + Overlay `frontend/components/PlayerAliasOverlay.tsx` (Alias nur lokal auf Gerät)
+- **Intro-Splash (M24 A):** schwarzer Eröffnungsscreen mit Branding, Würfeln und Progress 0–100 vor `/app`
 
 ### Changed
 - Health-Endpoint: `service: dicebudget-backend`
 - **Startscreen:** `HomeModeButtons` entfernt — Navigation über Bento-Kacheln und eingebettetes Code-Feld
 - **Spielabschluss:** Finish-Ansicht (`RunFinishScreen`) darf scrollen; aktives Spiel bleibt auf einem Screen
+- **Milestones:** Milestone 22 um konkrete Startreihenfolge (Tag 1-3) erweitert; Teilschritt 22.1 auf `in Arbeit (Tag 1)` gesetzt
+- **Multiplayer-Join:** statt Klarname wird jetzt `playerId` an `/sessions/invite/:code/join` gesendet; Server persistiert Token-Form `pid:<uuid>`
+- **Lobby/Ranking DTOs:** liefern `playerId` statt Name; Frontend zeigt lokale Labels (`Du`, `Spieler <Kurz-ID>`)
+- **Paarungsstatistik:** aggregiert nur noch pseudonyme `pid:`-Spieler; manuelle Baselines und Alias-Auflösung sind nicht mehr im aktiven Statistikpfad
+- **Datenschutzseite:** Multiplayer/Statistik-Abschnitte auf pseudonyme Server-Speicherung aktualisiert
+- **Stats-API:** Name-Merge-Endpunkte (`/stats/names`, `/stats/names/merge`) aus aktiven Routen entfernt
+- **Solo-Start:** `GameSetup` erstellt lokale Runs statt Server-`POST /runs`
+- **PlayBoard:** lokale Solo-Runs werden ohne Backend-Requests gespielt; Multiplayer bleibt serverbasiert
+- **Navigation-Buttons (M23):** `Zurück`/`Startseite` als einheitliche moderne Glass-Pill-Buttons (`.app-nav-btn`)
+- **Home-Header (M25):** Startseiten-Header breiter/präsenter mit größerem Logo und Hero-Typografie
+- **Stats/Lobby Alias-UX:** Stift-Button öffnet Overlay; Anzeigenamen werden lokal pro `playerId` aufgelöst
+- **Kachel-Visuals (M26):** Icons bleiben primär; Bento-Kacheln mit subtilen Hintergrund-Akzenten und besserer visueller Tiefe
+- **Datenschutz (M27):** Text auf app-zentrierte Nutzung umgestellt; Website als begleitende Info-/Support-Seite beschrieben
 
 ### Fixed
 - **Produktions-API-URL:** Build nutzt `NEXT_PUBLIC_API_URL` aus `.env.production` (nicht mehr Fallback `127.0.0.1:3020` auf der Live-Domain)

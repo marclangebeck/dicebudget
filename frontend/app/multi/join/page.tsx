@@ -8,6 +8,9 @@ import { getSessionLobby, getSessionRanking, joinSession, createGameSession } fr
 import { saveActiveGame } from "@/lib/activeGame";
 import { ResumeLobbySheet } from "@/components/ResumeLobbySheet";
 import type { SessionLobbyDto, SessionRankingDto } from "@/lib/sessionTypes";
+import { getOrCreatePlayerId, normalizePublicPlayerId, playerLabel } from "@/lib/playerIdentity";
+import { loadPlayerAliases, setPlayerAlias, type PlayerAliasMap } from "@/lib/playerAliases";
+import { PlayerAliasOverlay } from "@/components/PlayerAliasOverlay";
 
 function MultiJoinInner() {
   const router = useRouter();
@@ -17,8 +20,15 @@ function MultiJoinInner() {
   const [lobby, setLobby] = useState<SessionLobbyDto | null>(null);
   const [ranking, setRanking] = useState<SessionRankingDto | null>(null);
   const [tab, setTab] = useState<"lobby" | "rank">("lobby");
-  const [name, setName] = useState("");
+  const [playerId, setPlayerId] = useState("");
+  const [aliases, setAliases] = useState<PlayerAliasMap>({});
+  const [editingPlayerId, setEditingPlayerId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    setPlayerId(getOrCreatePlayerId());
+    setAliases(loadPlayerAliases());
+  }, []);
+
   const [nextRoundLoading, setNextRoundLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,10 +74,11 @@ function MultiJoinInner() {
 
   async function handleJoin(e: React.FormEvent) {
     e.preventDefault();
+    if (!playerId) return;
     setLoading(true);
     setError(null);
     try {
-      const { player } = await joinSession(code, name);
+      const { player } = await joinSession(code, playerId);
       saveActiveGame({
         type: "multi",
         runId: player.runId,
@@ -164,7 +175,17 @@ function MultiJoinInner() {
                     key={p.id}
                     className="glass-stat flex justify-between px-3 py-2 text-sm"
                   >
-                    <span>{p.name}</span>
+                    <span className="flex items-center gap-2">
+                      {playerLabel(p.playerId, playerId, aliases)}
+                      <button
+                        type="button"
+                        className="btn-chip px-2 py-0.5 text-xs"
+                        onClick={() => setEditingPlayerId(p.playerId)}
+                        aria-label="Alias setzen"
+                      >
+                        ✏️
+                      </button>
+                    </span>
                     <span className="text-muted tabular-nums">
                       {p.runFinished ? `${p.totalScore} ✓` : "spielt"}
                     </span>
@@ -174,20 +195,13 @@ function MultiJoinInner() {
 
               {lobby.playerCount < lobby.maxPlayers && lobby.status !== "FINISHED" && (
                 <form onSubmit={(e) => void handleJoin(e)} className="glass-panel flex flex-col gap-3 p-4">
-                  <label className="flex flex-col gap-1 text-sm">
-                    <span className="text-secondary">Dein Name</span>
-                    <input
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      maxLength={40}
-                      className="glass-input px-3 py-2"
-                      required
-                      placeholder="Name"
-                    />
-                  </label>
+                  <p className="text-secondary text-sm">
+                    Du trittst pseudonym bei als{" "}
+                    <strong className="text-strong">{playerLabel(playerId, playerId, aliases)}</strong>.
+                  </p>
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || !playerId}
                     className="btn-primary py-3 disabled:opacity-50"
                   >
                     {loading ? "…" : "Zum Zettel – mitspielen"}
@@ -206,7 +220,7 @@ function MultiJoinInner() {
               {ranking.winner && ranking.allRunsFinished && (
                 <div className="glass-panel-emerald px-3 py-2 text-center text-sm">
                   <p className="text-accent font-semibold">
-                    Gewinner Runde {ranking.roundNumber}: {ranking.winner.name} (
+                    Gewinner Runde {ranking.roundNumber}: {playerLabel(ranking.winner.playerId, playerId, aliases)} (
                     {ranking.winner.totalScore} Punkte)
                   </p>
                   <p className="text-muted mt-1 text-xs">
@@ -220,12 +234,20 @@ function MultiJoinInner() {
                 <ol className="space-y-2">
                   {ranking.ranking.map((row) => (
                     <li
-                      key={row.name + String(row.rank)}
+                      key={row.playerId + String(row.rank)}
                       className="glass-stat flex items-center justify-between px-3 py-2 text-sm"
                     >
                       <span>
                         <span className="mr-2 text-slate-500">{row.rank}.</span>
-                        {row.name}
+                        {playerLabel(row.playerId, playerId, aliases)}
+                        <button
+                          type="button"
+                          className="btn-chip ml-2 px-2 py-0.5 text-xs"
+                          onClick={() => setEditingPlayerId(row.playerId)}
+                          aria-label="Alias setzen"
+                        >
+                          ✏️
+                        </button>
                         {!row.finished && (
                           <span className="ml-2 text-xs text-slate-600">(noch aktiv)</span>
                         )}
@@ -246,12 +268,20 @@ function MultiJoinInner() {
                   <ol className="space-y-2">
                     {ranking.leagueStandings.map((row) => (
                       <li
-                        key={row.name + String(row.rank)}
+                        key={row.playerId + String(row.rank)}
                         className="glass-stat flex items-center justify-between px-3 py-2 text-sm"
                       >
                         <span>
                           <span className="mr-2 text-slate-500">{row.rank}.</span>
-                          {row.name}
+                          {playerLabel(row.playerId, playerId, aliases)}
+                          <button
+                            type="button"
+                            className="btn-chip ml-2 px-2 py-0.5 text-xs"
+                            onClick={() => setEditingPlayerId(row.playerId)}
+                            aria-label="Alias setzen"
+                          >
+                            ✏️
+                          </button>
                         </span>
                         <span className="text-muted tabular-nums text-xs">
                           S {row.winPoints} · +{row.bonusPoints} ·{" "}
@@ -281,6 +311,20 @@ function MultiJoinInner() {
       <Link href="/multi" className="text-link text-sm">
         Neuer Raum (Host)
       </Link>
+
+      {editingPlayerId && (
+        <PlayerAliasOverlay
+          playerId={editingPlayerId}
+          ownPlayerId={playerId}
+          aliases={aliases}
+          currentAlias={aliases[normalizePublicPlayerId(editingPlayerId)]}
+          onClose={() => setEditingPlayerId(null)}
+          onSave={(alias) => {
+            setAliases(setPlayerAlias(editingPlayerId, alias));
+            setEditingPlayerId(null);
+          }}
+        />
+      )}
     </div>
   );
 }

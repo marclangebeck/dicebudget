@@ -6,6 +6,12 @@ import {
   fieldCountForGameCount,
   maxRollsForGameCount,
 } from "../config.js";
+import {
+  isValidPlayerId,
+  normalizePlayerId,
+  playerTokenFromId,
+  publicPlayerIdFromStoredName,
+} from "../domain/playerIdentity.js";
 import { assertValidGameCount, instantiateRun, parseUseStrategyRules } from "./createRun.js";
 import { getRunById } from "./getRun.js";
 import { RUN_STATUS } from "../domain/fieldTypes.js";
@@ -97,9 +103,17 @@ export class SessionFinishedError extends Error {
 
 export class InvalidPlayerNameError extends Error {
   constructor() {
-    super("name must be 1–40 non-empty characters");
+    super("playerId must be a valid UUID");
     this.name = "InvalidPlayerNameError";
   }
+}
+
+function assertValidPlayerId(playerId: string): string {
+  const normalized = normalizePlayerId(playerId);
+  if (!isValidPlayerId(normalized)) {
+    throw new InvalidPlayerNameError();
+  }
+  return normalized;
 }
 
 export function assertValidSessionPlayers(count: number): void {
@@ -209,7 +223,7 @@ export async function getSessionLobbyByInvite(inviteCode: string) {
     playerCount: session.players.length,
     players: session.players.map((p) => ({
       id: p.id,
-      name: p.name,
+      playerId: publicPlayerIdFromStoredName(p.name),
       orderIndex: p.orderIndex,
       runFinished: p.run.status === RUN_STATUS.FINISHED,
       totalScore: p.run.totalScore,
@@ -233,22 +247,20 @@ export async function getSessionRanking(inviteCode: string) {
     ...lobby,
     ranking: ranked.map((p, index) => ({
       rank: index + 1,
-      name: p.name,
+      playerId: p.playerId,
       totalScore: p.totalScore,
       finished: p.runFinished,
     })),
     winner:
       lobby.allRunsFinished && ranked[0]
-        ? { name: ranked[0].name, totalScore: ranked[0].totalScore }
+        ? { playerId: ranked[0].playerId, totalScore: ranked[0].totalScore }
         : null,
   };
 }
 
-export async function joinSession(inviteCode: string, name: string) {
-  const trimmed = name.trim();
-  if (trimmed.length < 1 || trimmed.length > 40) {
-    throw new InvalidPlayerNameError();
-  }
+export async function joinSession(inviteCode: string, playerId: string) {
+  const normalizedPlayerId = assertValidPlayerId(playerId);
+  const playerToken = playerTokenFromId(normalizedPlayerId);
 
   const rawCode = inviteCode.toUpperCase();
 
@@ -270,7 +282,7 @@ export async function joinSession(inviteCode: string, name: string) {
     const player = await tx.player.create({
       data: {
         sessionId: session.id,
-        name: trimmed,
+        name: playerToken,
         orderIndex,
         secretToken,
         runId: run.id,
@@ -293,7 +305,7 @@ export async function joinSession(inviteCode: string, name: string) {
   return {
     player: {
       id: player.id,
-      name: player.name,
+      playerId: normalizedPlayerId,
       orderIndex: player.orderIndex,
       secretToken: player.secretToken,
       runId: player.runId,
