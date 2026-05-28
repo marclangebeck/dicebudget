@@ -389,6 +389,23 @@ html.play-route body {
   touch-action: manipulation;
 }
 
+html.legal-route,
+html.legal-route body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.legal-page-scroll {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
 .home-screen,
 .setup-screen,
 .play-screen {
@@ -1779,7 +1796,7 @@ html.play-route body {
 }
 
 .legal-page {
-  min-height: 100dvh;
+  min-height: 100%;
   padding: 1.25rem 1rem 2rem;
   background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
 }
