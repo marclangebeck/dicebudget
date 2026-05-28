@@ -412,6 +412,12 @@ html.legal-route body {
   touch-action: manipulation;
 }
 
+/* Vorschau: schwarzer Verlauf nur auf Auswahlscreen (/app) */
+.home-screen.app-bg {
+  background-color: #020617;
+  background-image: linear-gradient(180deg, #1e293b 0%, #0f172a 48%, #020617 100%);
+}
+
 .home-screen-main,
 .setup-screen-main,
 .setup-screen-body {
