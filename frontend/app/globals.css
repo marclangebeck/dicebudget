@@ -1,20 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  --background: #cdd6e0;
+  --app-bg-top: #3d4f63;
+  --app-bg-mid: #243447;
+  --app-bg-bottom: #1a2332;
+  --chrome-foreground: #f1f5f9;
+  --chrome-text-secondary: #cbd5e1;
+  --chrome-text-muted: #94a3b8;
+  --chrome-text-subtle: #64748b;
+  --chrome-link: #7dd3fc;
+  --chrome-link-hover: #bae6fd;
+  --background: #1a2332;
   --foreground: #0f172a;
   --text-secondary: #334155;
   --text-muted: #475569;
   --text-subtle: #64748b;
-  --accent: #047857;
-  --accent-strong: #065f46;
   --link: #0369a1;
+  --link-hover: #075985;
   --glass-border: rgba(15, 23, 42, 0.14);
   --glass-highlight: rgba(255, 255, 255, 1);
   --emerald-glow: rgba(16, 185, 129, 0.22);
   --surface: #ffffff;
   --surface-muted: #f1f5f9;
   --surface-elevated: #ffffff;
+  --accent: #047857;
+  --accent-strong: #065f46;
 }
 
 @theme inline {
@@ -71,15 +81,74 @@ body {
 }
 
 .text-link:hover {
-  color: #075985;
+  color: var(--link-hover);
   text-decoration: underline;
+}
+
+.app-bg,
+.legal-page-scroll,
+.landing-shell {
+  --foreground: var(--chrome-foreground);
+  --text-secondary: var(--chrome-text-secondary);
+  --text-muted: var(--chrome-text-muted);
+  --text-subtle: var(--chrome-text-subtle);
+  --link: var(--chrome-link);
+  --link-hover: var(--chrome-link-hover);
+  background-color: var(--app-bg-bottom);
+  background-image: linear-gradient(
+    180deg,
+    var(--app-bg-top) 0%,
+    var(--app-bg-mid) 48%,
+    var(--app-bg-bottom) 100%
+  );
+  color: var(--chrome-foreground);
 }
 
 .app-bg {
   min-height: 100dvh;
+}
+
+/* Helle Karten/Flächen: dunkle Schrift beibehalten */
+.app-bg :where(
+    .home-hero-banner,
+    .home-bento-tile,
+    .home-bento-join-bar,
+    .home-bento-resume,
+    .glass-panel,
+    .glass-panel-emerald,
+    .glass-panel-sky,
+    .glass-panel-amber,
+    .glass-alert-error,
+    .glass-stat,
+    .glass-stat-highlight,
+    .setup-host-card,
+    .setup-slider-card,
+    .setup-host-success,
+    .stats-pairing-card,
+    .stats-empty-state,
+    .stats-detail-player-card,
+    .stats-round-card,
+    .stats-merge-panel,
+    .stats-alias-row,
+    .stats-baseline-note,
+    .play-sheet-card,
+    .play-entry-sheet,
+    .play-complete-card,
+    .play-finish-card,
+    .play-message-card,
+    .play-empty-state,
+    .play-review-banner,
+    .legal-article
+  ),
+.legal-page-scroll :where(.legal-article),
+.landing-shell :where(.landing-cta) {
+  --foreground: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #475569;
+  --text-subtle: #64748b;
+  --link: #0369a1;
+  --link-hover: #075985;
   color: var(--foreground);
-  background-color: var(--background);
-  background-image: linear-gradient(180deg, #e2e8ef 0%, #cdd6e0 100%);
 }
 
 .glass-panel {
@@ -410,12 +479,6 @@ html.legal-route body {
 .setup-screen,
 .play-screen {
   touch-action: manipulation;
-}
-
-/* Vorschau: schwarzer Verlauf nur auf Auswahlscreen (/app) */
-.home-screen.app-bg {
-  background-color: #020617;
-  background-image: linear-gradient(180deg, #1e293b 0%, #0f172a 48%, #020617 100%);
 }
 
 .home-screen-main,
@@ -766,18 +829,18 @@ html.legal-route body {
   padding: 0.15rem 0.35rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--chrome-text-secondary);
   text-decoration: none;
 }
 
 .home-legal-link:hover {
-  color: var(--link);
+  color: var(--chrome-link);
   text-decoration: underline;
 }
 
 .home-legal-sep {
   font-size: 0.625rem;
-  color: var(--text-subtle);
+  color: var(--chrome-text-subtle);
 }
 
 .setup-screen-body {
@@ -786,9 +849,6 @@ html.legal-route body {
 
 .play-screen {
   -webkit-overflow-scrolling: auto;
-  color: var(--foreground);
-  background-color: var(--background);
-  background-image: linear-gradient(180deg, #e2e8ef 0%, #cdd6e0 100%);
 }
 
 .play-screen-inner {
@@ -1291,8 +1351,8 @@ html.legal-route body {
 
 .stats-empty-state {
   border-radius: 1rem;
-  border: 1px dashed rgba(15, 23, 42, 0.16);
-  background: rgba(255, 255, 255, 0.55);
+  border: 1px dashed rgba(148, 163, 184, 0.35);
+  background: rgba(255, 255, 255, 0.9);
   padding: 1rem 0.85rem;
   text-align: center;
   font-size: 0.8125rem;
@@ -1692,7 +1752,6 @@ html.legal-route body {
   align-items: center;
   justify-content: center;
   padding: 1.5rem 1.25rem;
-  background: linear-gradient(165deg, #e8eef4 0%, #cdd6e0 45%, #b8c5d4 100%);
 }
 
 .landing-page {
@@ -1720,7 +1779,7 @@ html.legal-route body {
   font-size: 2rem;
   font-weight: 700;
   letter-spacing: -0.04em;
-  color: #0f172a;
+  color: var(--foreground);
 }
 
 .landing-tagline {
@@ -1804,7 +1863,6 @@ html.legal-route body {
 .legal-page {
   min-height: 100%;
   padding: 1.25rem 1rem 2rem;
-  background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
 }
 
 .legal-article {

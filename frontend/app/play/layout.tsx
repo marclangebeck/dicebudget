@@ -9,7 +9,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#020617",
+  themeColor: "#243447",
 };
 
 export default function PlayLayout({ children }: { children: ReactNode }) {
