@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **GitHub:** `marclangebeck/dicebudget` · Branch **`milestone-22-prep`**  
 **Sprache:** Deutsch  
-**Stand:** 2026-05-29 · Commit `aac288f`
+**Stand:** 2026-05-29 · Commit `2e68f53`
 
 ---
 
@@ -12,15 +12,15 @@
 | Bereich | Status |
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
-| Legal (dice.budget) | Impressum + Datenschutz mit Anbieterangaben — **live** |
-| Legal (Plattform) | bottle-trade.de — **live** (separates Projekt auf Server) |
-| Frontend Deploy | Erledigt (`npm run build` → Nginx aus `frontend/out/`) |
-| M22 Datenschutz | Erledigt (Solo lokal, Multi pseudonym) |
-| iOS UI (M23–27) | Abgenommen (TestFlight Build **1.0 (11)**) |
-| TestFlight | Build 11 aktuell — **kein neuer Upload** bis Nutzer batched |
-| Sync Mac/Server/GitHub | Commit **`aac288f`** überall |
+| Legal (dice.budget) | Impressum + Datenschutz — **live** |
+| Legal (Plattform) | bottle-trade.de — **live** (separates Projekt) |
+| **M29 Punktwahl-Eintrag** | **Erledigt** — Feld antippen → Overlay (Punkte + Würfe) → Eintragen |
+| Frontend Deploy (Server) | Nach Pull: `cd frontend && npm run build` (Nginx aus `out/`) |
+| iOS im Repo | Build-Nummer **15** · Version **1.0** |
+| TestFlight | Build **11** zuletzt hochgeladen · **15** im Repo, Upload durch Nutzer auf Mac |
+| Sync Mac/Server/GitHub | Commit **`2e68f53`** auf `origin/milestone-22-prep` |
 
-**Nächste Priorität:** App Store Connect (Paid Agreement, 1,19 €, Screenshots, Beschreibung, Datenschutzfragebogen) → Review.
+**Nächste Priorität (typisch):** TestFlight **1.0 (15)** hochladen & testen → App Store Connect (Paid Agreement, 1,19 €, Screenshots, Review).
 
 ---
 
@@ -47,54 +47,73 @@ Web + iOS: Next.js static export + Capacitor 7.
 ─── PFADE ───
 Prod:     https://dicebudget.bottle-trade.de
 App:      /app (iOS-Start) · Legal: /datenschutz, /impressum
-Branch:   milestone-22-prep · Commit: aac288f
+Branch:   milestone-22-prep · Commit: 2e68f53
 Server:   /home/bottleadmin/projects/kniffel
 Mac:      /Users/marclangebeck/projects/kniffel
 Xcode:    /Users/marclangebeck/projects/kniffel/frontend/ios/App/App.xcworkspace
 Bundle:   de.bottletrade.dicebudget
-Kontakt:  info@bottle-trade.de (Marc Langebeck, Kiel — siehe frontend/lib/legal.ts)
+Kontakt:  info@bottle-trade.de (Marc Langebeck, Kiel — frontend/lib/legal.ts)
+
+─── M29 EINTRAG (aktueller Stand) ───
+• Feld auf Zettel antippen → Overlay (ScoreEntryPanel) von OBEN am Bildschirm
+• Obere Sektion (Einser–Sechser): Zahlen-Buttons 0, 2, 4, … (keine Würfel-Icons)
+• Unten: Dreier/Vierer Pasch + Chance 0–30 · Full House/Straßen/Yatzy 0 oder Festwert
+• Gewählte Punkte + Würfe: hellgelbe Markierung (#fef3c7)
+• Strategy: Würfe wählen (Default 2) · Klassisch: rollsUsed=1 intern
+• Korrektur: befülltes Feld antippen → gleiches Overlay + „Eintrag löschen“
+• ENTFERNT: Würfel-Zähler, Wurf vergleichen, CommittedThrowBanner, DiceThrowOverlay
+• Kern-Dateien: PlayBoard.tsx, ScoreEntryPanel.tsx, FieldScoreChoiceGrid.tsx, lib/labels.ts (fieldScoreChoices)
 
 ─── ERLEDIGT (nicht neu erfinden) ───
 • M1–22, M23–27 (UI iOS abgenommen)
-• TestFlight 1.0 (11) — aktuell in App Store Connect
-• Legal dice.budget + bottle-trade.de mit echten Anbieterangaben (live)
-• Legal-Daten zentral: frontend/lib/legal.ts + branding.ts
-• LegalScrollShell, app-nav-btn, dunkler Hintergrund, SVG-Icons
+• M29 Punktwahl-Eintrag (Commits 087d5d9 … 2e68f53)
+• Legal dice.budget + bottle-trade.de (live)
+• Legal-Daten: frontend/lib/legal.ts + branding.ts
 • rsync-Fix: brew unlink rsync vor Xcode-Upload
+• Spiel beenden: ✕ in PlayTopBar (ABANDON_RUN_CONFIRM)
 
 ─── OFFEN (typische nächste Themen) ───
-1. App Store Connect: Paid Agreement, Bank/Steuer
-2. Store: Preis 1,19 €, Screenshots 6.7", Beschreibung DE
-3. App-Datenschutzfragebogen in Connect (URL: …/datenschutz)
-4. TestFlight Build 11 prüfen → „Zur Überprüfung einreichen“
+1. TestFlight Upload Build 1.0 (15) — Nutzer auf Mac (Signing Team in Xcode!)
+2. App Store Connect: Paid Agreement, Bank/Steuer, Preis 1,19 €
+3. Store: Screenshots 6.7", Beschreibung DE, Datenschutzfragebogen
+4. Web auf Server deployen nach UI-Änderungen (npm run build)
 5. Optional: milestone-22-prep → main (nur nach Nutzer-Freigabe)
-6. bottle-trade-platform: kein Git — nur Server /home/bottleadmin/projects/bottle-trade-platform
 
-─── iOS-BUILD (nur wenn Nutzer es verlangt) ───
-Nutzer batcht iOS-Releases — nicht pro kleiner Änderung archivieren.
-cd /Users/marclangebeck/projects/kniffel && git pull origin milestone-22-prep
-cd /Users/marclangebeck/projects/kniffel/frontend && npm install && npm run build:ios
-brew unlink rsync
-env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open /Users/marclangebeck/projects/kniffel/frontend/ios/App/App.xcworkspace
-# Build-Nummer 11→12 → Archive → Upload
+─── SYNC LOKAL + SERVER ───
+Server:
+  cd /home/bottleadmin/projects/kniffel && git pull origin milestone-22-prep
+Mac:
+  cd /Users/marclangebeck/projects/kniffel
+  git restore frontend/ios/App/App.xcodeproj/project.pbxproj   # falls Pull blockiert
+  git fetch origin milestone-22-prep && git reset --hard origin/milestone-22-prep
+  cd frontend && npm install && npm run build:ios
+
+─── iOS-BUILD / TESTFLIGHT (Mac) ───
+brew unlink rsync 2>/dev/null; true
+cd /Users/marclangebeck/projects/kniffel/frontend && npm run build:ios
+env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
+# Signing: Team wählen (DEVELOPMENT_TEAM nicht im Git!)
+# Version 1.0 · Build 15 → Clean → Archive → Upload
 
 ─── WEB-DEPLOY (Server) ───
 cd /home/bottleadmin/projects/kniffel && git pull origin milestone-22-prep
-cd /home/bottleadmin/projects/kniffel/frontend && npm run build
-# Nginx liefert aus frontend/out/ — sudo deploy-Skript optional
+cd frontend && npm run build
+# Nginx: frontend/out/ — sudo deploy-frontend-prod.sh nur bei Nginx-Config-Änderung
 
-─── WICHTIGE DATEIEN ───
-frontend/lib/legal.ts          ← Anbieterangaben (Impressum + Datenschutz)
-frontend/lib/branding.ts       ← CONTACT_EMAIL, URLs
-frontend/app/impressum/page.tsx
-frontend/app/datenschutz/page.tsx
-frontend/app/app/page.tsx
-frontend/components/HomeBentoGrid.tsx
-frontend/lib/localSoloRun.ts
-frontend/lib/playerIdentity.ts
+─── WICHTIGE DATEIEN (Spiel/Eintrag) ───
+frontend/components/PlayBoard.tsx
+frontend/components/ScoreEntryPanel.tsx
+frontend/components/FieldScoreChoiceGrid.tsx
+frontend/components/ScoreSheetTable.tsx
+frontend/lib/labels.ts              ← fieldScoreChoices, upperFieldDieCount
+frontend/lib/legal.ts
+frontend/app/globals.css              ← .field-entry-*, .play-score-btn--selected
 
 ─── STOLPERSTEINE ───
-• Web-Deploy ≠ iOS — UI in App erst nach build:ios + neuem Archive
+• Web-Deploy ≠ iOS — UI in App erst nach npm run build:ios + Archive
+• ios/App/App/public/ ist gitignored — build:ios auf Mac Pflicht
+• git pull blockiert durch pbxproj → git restore …/project.pbxproj
+• Signing-Fehler nach Pull → Xcode: Signing & Capabilities → Team wählen
 • Copy failed → brew unlink rsync, Xcode mit System-PATH
 • Capacitor scrollEnabled:false → Legal nur in LegalScrollShell
 • com.mlangebeck.mobileapp in Connect IGNORIEREN
@@ -105,11 +124,17 @@ Nutzer: Marc Langebeck, Xcode-Einsteiger — kleine Schritte, kopierbare Befehle
 
 ```
 
-**Beispiele für „DEINE AUFTRÄGE“** (eine Zeile reicht):
+---
 
-- `Hilf mir bei App Store Connect: Paid Agreement und Screenshots Schritt für Schritt.`
-- `Implementiere Feature X in frontend/…`
-- `Committe und deploye die letzten Änderungen auf Prod.`
+## M29 — Eintrag (Referenz)
+
+| Feldtyp | Auswahl im Overlay |
+|---------|-------------------|
+| Einser … Sechser | 0, face×1 … face×5 (nur Zahlen) |
+| Dreier/Vierer Pasch, Chance | 0–30 |
+| Full House, Straßen, Yatzy | 0 oder Festwert |
+
+Logik: `fieldScoreChoices()` in `frontend/lib/labels.ts` (parallel Backend `fieldScores.ts`).
 
 ---
 
@@ -119,89 +144,56 @@ Nutzer: Marc Langebeck, Xcode-Einsteiger — kleine Schritte, kopierbare Befehle
 
 - **Yatzy/Kniffel** mit wählbarer **Spielanzahl 1–6** (13 Felder pro Block).
 - **Zwei Modi:** Strategy (`useStrategyRules: true`, Pool) vs. Klassisch.
-- **Singleplayer:** lokal auf dem Gerät (`frontend/lib/localSoloRun.ts`).
-- **Multiplayer:** pseudonym via `playerId` (UUID lokal), Server speichert `pid:<uuid>`.
-- **Serien:** `leagueCode`, Ligapunkte (Sieger +1, Differenz-Bonus).
-- **Statistik:** `/stats` — Paarungen; Detail `/stats/pairing?key=…`; lokale Aliase pro `playerId`.
+- **Singleplayer:** lokal (`frontend/lib/localSoloRun.ts`).
+- **Multiplayer:** pseudonym via `playerId` (UUID lokal).
+- **Serien / Statistik:** wie in milestones.md.
 
 ### Tech-Stack
 
 | Teil | Stack |
 |------|--------|
 | Backend | Express, TypeScript, Prisma, SQLite, Port **3020** |
-| Frontend | Next.js 15, Tailwind v4, **static export** (`out/`), Dev **3021** |
-| iOS | Capacitor 7, `frontend/ios/`, Bundle `de.bottletrade.dicebudget` |
-| Prod Web | `https://dicebudget.bottle-trade.de` — Nginx + `/api/` |
-
-**Routen:** Landing `/`, App `/app`, Datenschutz `/datenschutz`, Impressum `/impressum`
-
-### Legal / Anbieter (Commit aac288f)
-
-| Feld | Wert |
-|------|------|
-| Anbieter | Marc Langebeck |
-| Anschrift | Moltkestr. 41, 24105 Kiel |
-| E-Mail | info@bottle-trade.de |
-| Telefon | +49 (0) 176 - 6 31 29 242 |
-| Hosting | netcup GmbH, Deutschland |
-| DSB | Marc Langebeck |
-| Code | `frontend/lib/legal.ts` |
-
-**Plattform-Website** (gleiche Legal-Daten, separates Repo-Ordner ohne Git):
-
-- Pfad Server: `/home/bottleadmin/projects/bottle-trade-platform`
-- Live: https://bottle-trade.de/impressum · https://bottle-trade.de/datenschutz
-- Deploy: `cd …/bottle-trade-platform && npm run build`
+| Frontend | Next.js 15, Tailwind v4, static export (`out/`), Dev **3021** |
+| iOS | Capacitor 7, Bundle `de.bottletrade.dicebudget` |
+| Prod Web | https://dicebudget.bottle-trade.de |
 
 ### Wichtige Dateien
 
 ```
-frontend/lib/legal.ts                 # Anbieterangaben (neu)
-frontend/lib/branding.ts
-frontend/app/impressum/page.tsx
-frontend/app/datenschutz/page.tsx
-frontend/app/app/page.tsx
-frontend/components/HomeBentoGrid.tsx
-frontend/components/LegalScrollShell.tsx
-frontend/components/AppScreenHeader.tsx
+frontend/components/PlayBoard.tsx
+frontend/components/ScoreEntryPanel.tsx
+frontend/components/FieldScoreChoiceGrid.tsx
+frontend/components/ScoreSheetTable.tsx
+frontend/components/PlayTopBar.tsx
+frontend/lib/labels.ts
 frontend/lib/localSoloRun.ts
-frontend/lib/playerIdentity.ts
+frontend/lib/legal.ts
 frontend/app/globals.css
 frontend/ios/App/App.xcworkspace
 ```
 
 ### Bereits erledigt
 
-- Milestones **1–22**, **23–27**
-- TestFlight **Build 11**
-- Legal-Seiten dice.budget + bottle-trade.de
-- Backend-Tests: `cd backend && npm test` (37 grün)
+- Milestones **1–22**, **23–27**, **M29** (Punktwahl-Eintrag)
+- TestFlight **Build 11** (älter); Repo-Stand **Build 15**
+- Legal-Seiten live
+- Backend-Tests: `cd backend && npm test`
 
 ### Deploy
 
 ```bash
-# Web (ohne sudo, wenn nur out/ neu gebaut wird):
+# Web (Server):
 cd /home/bottleadmin/projects/kniffel/frontend && npm run build
 
-# Mit Nginx-Reload (sudo):
-sudo bash /home/bottleadmin/projects/kniffel/infra/scripts/deploy-frontend-prod.sh
-sudo bash /home/bottleadmin/projects/kniffel/infra/scripts/deploy-backend-prod.sh
+# iOS (Mac):
+cd /Users/marclangebeck/projects/kniffel/frontend && npm run build:ios
 ```
 
 **Keine Commits**, es sei denn, der Nutzer verlangt es explizit.
 
-### iOS-Release (Mac) — nur auf Nutzerwunsch
-
-```bash
-cd /Users/marclangebeck/projects/kniffel && git pull origin milestone-22-prep
-cd /Users/marclangebeck/projects/kniffel/frontend && npm install && npm run build:ios
-brew unlink rsync
-env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open /Users/marclangebeck/projects/kniffel/frontend/ios/App/App.xcworkspace
-```
-
 ### Gesprächskontext
 
-- Nutzer batcht **iOS-Releases** — nicht nach jeder kleinen Änderung uploaden.
+- Nutzer batcht **iOS-Releases**, testet Simulator + TestFlight.
 - Antworten auf **Deutsch**, präzise, kopierbare Befehle.
 - Nutzer: Marc Langebeck, Xcode-Einsteiger.
 
@@ -210,10 +202,11 @@ env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open /Users/marclangebec
 ## Schnellcheck
 
 ```bash
-cd /home/bottleadmin/projects/kniffel/backend && npm install && npx prisma migrate deploy && npm test
-cd /home/bottleadmin/projects/kniffel/frontend && npm install && npm run build
+cd /home/bottleadmin/projects/kniffel/backend && npm test
+cd /home/bottleadmin/projects/kniffel/frontend && npm run build
 curl -s https://dicebudget.bottle-trade.de/api/health
-curl -s https://dicebudget.bottle-trade.de/impressum | grep -o "Marc Langebeck" | head -1
+git log -1 --oneline   # erwartet: 2e68f53
+grep CURRENT_PROJECT_VERSION frontend/ios/App/App.xcodeproj/project.pbxproj | head -1   # erwartet: 15
 ```
 
 ---

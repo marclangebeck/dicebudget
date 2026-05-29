@@ -583,25 +583,49 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 
 ## Aktueller Arbeitsstand (2026-05-29)
 
-**Commit:** `aac288f` · Branch `milestone-22-prep` · Mac/Server/GitHub synchron
+**Commit:** `2e68f53` · Branch `milestone-22-prep` · GitHub synchron
 
 **Erledigt:**
 
-- Legal-Links `Datenschutz` / `Impressum` auf `/app`
-- Einheitlicher `← Startseite`-Button (`app-nav-btn`)
-- Größere SVG-Kachel-Icons, dunkler Slate-Verlauf app-weit
-- Datenschutz/Impressum: Scroll + Safe-Area unter Statusleiste
-- **Impressum + Datenschutz** mit Anbieterangaben Marc Langebeck (`frontend/lib/legal.ts`) — live auf dicebudget.bottle-trade.de
-- **bottle-trade.de** Impressum/Datenschutz analog aktualisiert (Server: `bottle-trade-platform/`, kein Git)
-- Web-Frontend auf Produktion deployed
-- TestFlight **Build 1.0 (11)** — aktuell; kein neuer iOS-Upload bis Nutzer batched
-- Dokumentation synchronisiert
+- Legal-Links, app-nav-btn, dunkler Slate-Verlauf, LegalScrollShell
+- Impressum + Datenschutz live (dice.budget + bottle-trade.de)
+- **M29 Punktwahl-Eintrag:** Feld antippen → Overlay (Punkte + Würfe) → Eintragen
+  - Obere Felder: Zahlen 0 … face×5
+  - Untere Felder: Pasch/Chance 0–30, Kombinationen 0/Festwert
+  - Overlay oben am Bildschirm, Auswahl hellgelb markiert
+  - Entfernt: Würfel-Zähler, „Wurf vergleichen“, DiceThrowOverlay
+- iOS-Build-Nummer im Repo: **15**
+- Web: `npm run build` auf Server nach Pull
 
 **Nächste Schritte (Priorität):**
 
-1. **App Store Connect:** Paid Applications Agreement, Bank/Steuer
-2. **Store-Metadaten:** Preis 1,19 €, Screenshots 6.7", Beschreibung DE
-3. **App-Datenschutzfragebogen** in Connect (URL: https://dicebudget.bottle-trade.de/datenschutz)
-4. **Review:** TestFlight Build 11 stabil → „Zur Überprüfung einreichen“
-5. Optional: Branch `milestone-22-prep` → `main` (nur nach Nutzer-Freigabe)
-6. Optional: `bottle-trade-platform` in Git versionieren (Backup)
+1. **TestFlight:** Build **1.0 (15)** auf Mac archivieren & hochladen (Signing Team!)
+2. **App Store Connect:** Paid Applications Agreement, Bank/Steuer
+3. **Store-Metadaten:** Preis 1,19 €, Screenshots 6.7", Beschreibung DE
+4. **App-Datenschutzfragebogen** (URL: https://dicebudget.bottle-trade.de/datenschutz)
+5. Review vorbereiten / TestFlight auf iPhone testen
+6. Optional: Branch `milestone-22-prep` → `main` (nur nach Nutzer-Freigabe)
+
+---
+
+## Milestone 29 — Punktwahl-Eintrag (M29)
+
+**Ziel:** Analoger Wurf digital — schneller Eintrag ohne Würfel zählen.
+
+**Status:** erledigt (Mai 2026)
+
+**UX:**
+
+1. Leeres Feld auf Zettel antippen
+2. Overlay von oben: Punkte wählen (feldtypabhängig), Würfe wählen (Strategy, Default 2)
+3. **Eintragen**
+4. Korrektur: befülltes Feld antippen
+
+**Technik:**
+
+- `PlayBoard.tsx` — Feldwahl, Submit via `completeField` / `completeLocalSoloField`
+- `ScoreEntryPanel.tsx` — Overlay-UI
+- `FieldScoreChoiceGrid.tsx` — Punkt-Buttons
+- `fieldScoreChoices()` in `frontend/lib/labels.ts`
+
+**Entfernt (ersetzt):** `DiceThrowOverlay`, `DiceCountPicker`, `CommittedThrowBanner`, `FixedFieldChoiceBanner`

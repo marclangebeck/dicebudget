@@ -91,7 +91,7 @@ Für **nur TestFlight** reichen zunächst weniger Metadaten; für **öffentliche
 
 Bei jedem **neuen Upload** die **Build**-Nummer erhöhen (`9` → `10` → …). Version nur bei sichtbaren Releases ändern.
 
-**Stand Mai 2026:** Letzter erfolgreicher Upload **Build 11** (Version 1.0).
+**Stand Mai 2026:** Letzter erfolgreicher Upload **Build 11** · Repo-Stand **Build 15** (M29 Punktwahl-Eintrag).
 
 ### Copy failed beim Upload?
 

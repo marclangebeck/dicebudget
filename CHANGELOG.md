@@ -5,13 +5,27 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
-- **M29 Würfel-Eintrag:** Wurf-Overlay (Augenzahl-Häufigkeit 0–5, Wurfanzahl) → Zettel mit blass-roten Vorschlägen → Feld wählen; Yatzy/Straßen: 0 oder Festwert (`DiceCountPicker`, `FixedFieldChoiceBanner`)
+- **M29 Punktwahl-Eintrag:** Feld antippen → Overlay mit feldtypabhängiger Punktwahl + Würfe → Eintragen (`FieldScoreChoiceGrid`, `ScoreEntryPanel`)
 
 ### Changed
-- **M29 Overlay UX:** Zwei Schritte (Wurf bestätigen → Würfe wählen), Live-Vorschau der 5 Würfel, kompaktes 3×2-Raster mit +/− statt 36 Kreisen
+- **M29 UX (final):** Overlay startet oben; obere Felder nur Zahlen (0, 2, 4, …); gewählte Punkte/Würfe hellgelb markiert
+- **M29 entfernt:** Würfel-Zähler, Wurf vergleichen, `DiceThrowOverlay`, `CommittedThrowBanner`, `FixedFieldChoiceBanner`
 
 ### iOS
-- TestFlight-Build **1.0 (13)** — M29 Polish
+- Repo-Build **1.0 (15)** — M29 Punktwahl-Eintrag (Upload durch Nutzer auf Mac)
+
+### Docs
+- HANDOVER, GOiOS, milestones, testflight-app-store: Stand Commit `2e68f53`
+
+---
+
+## [Frühere Einträge — M29 Entwicklung]
+
+### Added (M29 Zwischenstände)
+- **M29 Würfel-Eintrag (ersetzt):** Wurf-Overlay mit Augenzahl-Häufigkeit — durch Punktwahl ersetzt
+
+### Changed (M29 Zwischenstände)
+- Schnellweg Feld-first, Direktwahl Chips, Kontrast-Fixes — konsolidiert in Punktwahl-Finalstand
 - Bundle ID `de.bottletrade.dicebudget`, nativer API-Zugriff, App-Start direkt `/app`
 - **Domain & Marke:** `dicebudget.bottle-trade.de`, App-Name **dice.budget**, Landing `/`, Spiel `/app`, Datenschutz `/datenschutz`
 - **Nginx:** nur `dicebudget.bottle-trade.de` (kniffel-Domain aus DNS und Config entfernt)

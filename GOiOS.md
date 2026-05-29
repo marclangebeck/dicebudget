@@ -7,14 +7,16 @@ Leitfaden für **iOS (Capacitor)**, **TestFlight** und **App Store** — ergänz
 
 ---
 
-## 0. Aktueller Stand (2026-05-28, verbindlich)
+## 0. Aktueller Stand (2026-05-29, verbindlich)
 
-- **Branch:** `milestone-22-prep` · Commit `72119ed`
-- **TestFlight:** Build **`1.0 (11)`** hochgeladen und UI-seitig abgenommen (aktuell)
-- **`Copy failed` / rsync:** Fix dokumentiert — `brew unlink rsync`, Xcode mit System-PATH (Abschnitt 6)
-- **Web:** https://dicebudget.bottle-trade.de (Frontend deployed)
-- **M22 + M23–27:** ausgerollt und abgenommen
-- **Nächster Schritt:** App Store Review vorbereiten (Paid-Vertrag, Metadaten, Screenshots)
+- **Branch:** `milestone-22-prep` · Commit **`2e68f53`**
+- **M29 Punktwahl-Eintrag:** erledigt — Overlay oben, Zahlen statt Würfel-Icons, Auswahl-Highlight
+- **iOS im Repo:** Version **1.0**, Build **15** (`CURRENT_PROJECT_VERSION` in `project.pbxproj`)
+- **TestFlight:** zuletzt **Build 11** hochgeladen · **Build 15** bereit zum Upload (Mac)
+- **`Copy failed` / rsync:** `brew unlink rsync`, Xcode mit System-PATH (Abschnitt 6)
+- **Signing:** `DEVELOPMENT_TEAM` **nicht** im Git — nach `git pull`/`reset` Team in Xcode setzen
+- **Web:** https://dicebudget.bottle-trade.de — nach UI-Änderungen `npm run build` auf Server
+- **Nächster Schritt:** TestFlight **1.0 (15)** testen → App Store Review vorbereiten
 
 ---
 
@@ -230,49 +232,51 @@ Du setzt **dice.budget** (iOS + App Store) fort. Lies zuerst:
 
 ### Ist-Stand (Mai 2026)
 
-- Branch: **`milestone-22-prep`** · Commit **`aac288f`** · Mac/Server/GitHub synchron
-- Web live: https://dicebudget.bottle-trade.de (Legal: `/impressum`, `/datenschutz`)
-- iOS: Capacitor, Bundle **`de.bottletrade.dicebudget`**, TestFlight **Build 11** (aktuell)
-- Legal: `frontend/lib/legal.ts` — Marc Langebeck, info@bottle-trade.de, netcup
-- UI iOS: abgenommen · M22: pseudonymes Multi, lokales Solo — ausgerollt
-- **iOS-Releases:** Nutzer batcht Uploads — nicht nach jeder kleinen Änderung
+- Branch: **`milestone-22-prep`** · Commit **`2e68f53`** · GitHub synchron
+- Web live: https://dicebudget.bottle-trade.de
+- iOS: Capacitor, Bundle **`de.bottletrade.dicebudget`**, Repo-Build **15**, TestFlight zuletzt **11**
+- M29: Punktwahl-Eintrag (`PlayBoard`, `ScoreEntryPanel`, `FieldScoreChoiceGrid`)
+- Legal: `frontend/lib/legal.ts`
+- **iOS-Releases:** Nutzer batcht Uploads; nach Pull Signing-Team in Xcode prüfen
 
 ### Deine Priorität (Store + Coding nach Nutzer-Auftrag)
 
-1. **Paid Applications Agreement**, Bank/Steuer in App Store Connect
-2. Preis **1,19 €**, Screenshots, Beschreibung DE, Datenschutzfragebogen
-3. TestFlight Build 11 → **App Store Review** vorbereiten
+1. TestFlight **Build 15** hochladen und auf iPhone testen
+2. **Paid Applications Agreement**, Bank/Steuer in App Store Connect
+3. Preis **1,19 €**, Screenshots, Beschreibung DE, Datenschutzfragebogen
 4. Coding-Aufgaben: siehe **DEINE AUFTRÄGE** im HANDOVER-Prompt
 5. Optional: `main`-Branch mit `milestone-22-prep` mergen (nur nach Nutzer-Freigabe)
 
 ### Mac-Workflow (nach Code-Änderung)
 
 ```bash
-cd /Users/marclangebeck/projects/kniffel && git pull origin milestone-22-prep
-cd /Users/marclangebeck/projects/kniffel/frontend && npm install && npm run build:ios
+cd /Users/marclangebeck/projects/kniffel
+git restore frontend/ios/App/App.xcodeproj/project.pbxproj   # bei Pull-Konflikt
+git pull origin milestone-22-prep
+cd frontend && npm install && npm run build:ios
 brew unlink rsync
-env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open /Users/marclangebeck/projects/kniffel/frontend/ios/App/App.xcworkspace
+env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
 ```
 
-Xcode: **Build** erhöhen → Clean → Archive → Upload.
+Xcode: **Signing → Team** · Build **15** · Clean → Archive → Upload.
 
 ### Server-Workflow (Web)
 
 ```bash
 cd /home/bottleadmin/projects/kniffel && git pull origin milestone-22-prep
-sudo bash infra/scripts/deploy-frontend-prod.sh
+cd frontend && npm run build
 ```
+
+Optional Nginx-Reload: `sudo bash infra/scripts/deploy-frontend-prod.sh`
 
 ### Wichtige Pfade
 
 ```
+frontend/components/PlayBoard.tsx
+frontend/components/ScoreEntryPanel.tsx
+frontend/components/FieldScoreChoiceGrid.tsx
+frontend/lib/labels.ts
 frontend/lib/legal.ts
-frontend/lib/branding.ts
-frontend/app/impressum/page.tsx
-frontend/app/datenschutz/page.tsx
-frontend/app/app/page.tsx
-frontend/components/HomeBentoGrid.tsx
-frontend/components/LegalScrollShell.tsx
 frontend/app/globals.css
 frontend/ios/App/App.xcworkspace
 ```
