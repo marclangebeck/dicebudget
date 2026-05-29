@@ -142,8 +142,7 @@ function FieldRowLabel({
 }
 
 function previewClass(tier: FieldPreview["tier"] | undefined): string {
-  if (tier === "best") return "play-cell--preview-best";
-  if (tier === "good") return "play-cell--preview-good";
+  if (tier === "option") return "play-cell--preview-option";
   if (tier === "zero") return "play-cell--preview-zero";
   return "";
 }
@@ -165,7 +164,9 @@ function ScoreTile({
   const label = FIELD_LABELS[field.fieldType];
   const previewTitle =
     preview !== undefined
-      ? `${label}: ${preview.score} Punkte mit diesem Wurf`
+      ? preview.fixedChoice
+        ? `${label}: 0 oder ${preview.score} Punkte`
+        : `${label}: ${preview.score} Punkte mit diesem Wurf`
       : undefined;
 
   return (

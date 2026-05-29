@@ -2,15 +2,59 @@ import type { FieldTypeId } from "@/lib/types";
 
 export type DieValue = 1 | 2 | 3 | 4 | 5 | 6;
 export type DiceValues = [DieValue, DieValue, DieValue, DieValue, DieValue];
+/** Anzahl pro Augenzahl: Index 0 = Einer, … Index 5 = Sechser. */
+export type DieCounts = [number, number, number, number, number, number];
 
-export type FieldPreviewTier = "best" | "good" | "zero";
+export type FieldPreviewTier = "option" | "zero";
 
 export type FieldPreview = {
   score: number;
   tier: FieldPreviewTier;
+  /** Yatzy / Straßen: 0 oder Festwert — Wurf egal. */
+  fixedChoice?: boolean;
 };
 
 export const DEFAULT_DICE: DiceValues = [1, 1, 1, 1, 1];
+export const DEFAULT_DIE_COUNTS: DieCounts = [5, 0, 0, 0, 0, 0];
+
+export const FIXED_RULE_FIELDS = {
+  KNIFFEL: 50,
+  SMALL_STRAIGHT: 30,
+  LARGE_STRAIGHT: 40,
+} as const satisfies Partial<Record<FieldTypeId, number>>;
+
+export function isFixedRuleField(fieldType: FieldTypeId): boolean {
+  return fieldType in FIXED_RULE_FIELDS;
+}
+
+export function fixedRuleScore(fieldType: FieldTypeId): number | null {
+  if (!isFixedRuleField(fieldType)) return null;
+  return FIXED_RULE_FIELDS[fieldType as keyof typeof FIXED_RULE_FIELDS];
+}
+
+export function dieCountsTotal(counts: DieCounts): number {
+  return counts.reduce((sum, n) => sum + n, 0);
+}
+
+export function dieCountsToDiceValues(counts: DieCounts): DiceValues | null {
+  if (dieCountsTotal(counts) !== 5) return null;
+  const values: number[] = [];
+  for (let face = 0; face < 6; face++) {
+    for (let i = 0; i < counts[face]; i++) {
+      values.push(face + 1);
+    }
+  }
+  values.sort((a, b) => a - b);
+  return values as DiceValues;
+}
+
+export function diceValuesToDieCounts(values: DiceValues): DieCounts {
+  const counts: DieCounts = [0, 0, 0, 0, 0, 0];
+  for (const value of values) {
+    counts[value - 1] += 1;
+  }
+  return counts;
+}
 
 function sumDice(values: DiceValues): number {
   return values.reduce((a, b) => a + b, 0);
@@ -80,27 +124,29 @@ export function scoreField(fieldType: FieldTypeId, diceValues: DiceValues): numb
   }
 }
 
-export function cycleDieValue(current: DieValue): DieValue {
-  return (current === 6 ? 1 : current + 1) as DieValue;
-}
-
 export function computeFieldPreviews(
   openFields: readonly { id: string; fieldType: FieldTypeId }[],
   diceValues: DiceValues,
 ): Map<string, FieldPreview> {
-  const scored = openFields.map((field) => ({
-    id: field.id,
-    score: scoreField(field.fieldType, diceValues),
-  }));
-  const maxScore = Math.max(0, ...scored.map((entry) => entry.score));
-
   const previews = new Map<string, FieldPreview>();
-  for (const entry of scored) {
-    let tier: FieldPreviewTier = "zero";
-    if (entry.score > 0) {
-      tier = entry.score === maxScore && maxScore > 0 ? "best" : "good";
+
+  for (const field of openFields) {
+    const fixed = fixedRuleScore(field.fieldType);
+    if (fixed !== null) {
+      previews.set(field.id, {
+        score: fixed,
+        tier: "option",
+        fixedChoice: true,
+      });
+      continue;
     }
-    previews.set(entry.id, { score: entry.score, tier });
+
+    const score = scoreField(field.fieldType, diceValues);
+    previews.set(field.id, {
+      score,
+      tier: score > 0 ? "option" : "zero",
+    });
   }
+
   return previews;
 }

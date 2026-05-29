@@ -1,15 +1,15 @@
 "use client";
 
-import { DicePickerGrid } from "@/components/DicePickerGrid";
-import type { DiceValues } from "@/lib/scoreFromDice";
+import { DiceCountPicker } from "@/components/DiceCountPicker";
+import { dieCountsTotal, type DieCounts } from "@/lib/scoreFromDice";
 import type { RunDto } from "@/lib/types";
 
 type Props = {
   run: RunDto;
-  draftDice: DiceValues;
+  draftCounts: DieCounts;
   rollsUsed: number | null;
   busy: boolean;
-  onDraftDiceChange: (values: DiceValues) => void;
+  onDraftCountsChange: (counts: DieCounts) => void;
   onRollsUsed: (n: number) => void;
   onConfirm: () => void;
   onCancel: () => void;
@@ -18,10 +18,10 @@ type Props = {
 
 export function DiceThrowOverlay({
   run,
-  draftDice,
+  draftCounts,
   rollsUsed,
   busy,
-  onDraftDiceChange,
+  onDraftCountsChange,
   onRollsUsed,
   onConfirm,
   onCancel,
@@ -32,7 +32,8 @@ export function DiceThrowOverlay({
     ? [1, 2, 3, ...Array.from({ length: run.rollsInPool }, (_, i) => i + 4)]
     : [1, 2, 3];
 
-  const canConfirm = run.status === "ACTIVE" && rollsUsed !== null && !busy;
+  const diceOk = dieCountsTotal(draftCounts) === 5;
+  const canConfirm = run.status === "ACTIVE" && rollsUsed !== null && diceOk && !busy;
 
   return (
     <div
@@ -56,7 +57,7 @@ export function DiceThrowOverlay({
                 Wurf einstellen
               </p>
               <p className="play-dice-entry-hint">
-                Jeder Würfel hat 6 Augen — wähle deinen letzten Wurf am Tisch.
+                Pro Augenzahl die Anzahl wählen — zusammen genau 5 Würfel.
               </p>
             </div>
             <button
@@ -69,10 +70,10 @@ export function DiceThrowOverlay({
             </button>
           </div>
 
-          <DicePickerGrid
-            values={draftDice}
+          <DiceCountPicker
+            counts={draftCounts}
             disabled={busy}
-            onChange={onDraftDiceChange}
+            onChange={onDraftCountsChange}
           />
 
           <div className="play-entry-section">

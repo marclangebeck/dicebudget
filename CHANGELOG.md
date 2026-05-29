@@ -5,7 +5,13 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
-- **M29 Würfel-Eintrag:** Overlay zum Nachstellen des Wurfs (5×6 Augen + Wurfanzahl) → Overlay schließt → Zettel markiert passende Felder → Feld antippen zum Eintragen; Fallback manuell/Korrektur (`DiceThrowOverlay`, `DicePickerGrid`, `CommittedThrowBanner`, `scoreFromDice.ts`)
+- **M29 Würfel-Eintrag:** Wurf-Overlay (Augenzahl-Häufigkeit 0–5, Wurfanzahl) → Zettel mit blass-roten Vorschlägen → Feld wählen; Yatzy/Straßen: 0 oder Festwert (`DiceCountPicker`, `FixedFieldChoiceBanner`)
+
+### Changed
+- **M29 Polish:** Spiel beenden als Icon neben Pool (mit Bestätigung); größere Würfel-Tapflächen; schwarze Zähler; blass-rote Feld-Markierung statt grün; nach Eintrag löschen zurück zum Würfel-Flow
+
+### iOS
+- TestFlight-Build **1.0 (13)** — M29 Polish
 - Bundle ID `de.bottletrade.dicebudget`, nativer API-Zugriff, App-Start direkt `/app`
 - **Domain & Marke:** `dicebudget.bottle-trade.de`, App-Name **dice.budget**, Landing `/`, Spiel `/app`, Datenschutz `/datenschutz`
 - **Nginx:** nur `dicebudget.bottle-trade.de` (kniffel-Domain aus DNS und Config entfernt)
