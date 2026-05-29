@@ -266,6 +266,10 @@ sudo bash infra/scripts/deploy-frontend-prod.sh
 ### Wichtige Pfade
 
 ```
+frontend/lib/legal.ts
+frontend/lib/branding.ts
+frontend/app/impressum/page.tsx
+frontend/app/datenschutz/page.tsx
 frontend/app/app/page.tsx
 frontend/components/HomeBentoGrid.tsx
 frontend/components/LegalScrollShell.tsx

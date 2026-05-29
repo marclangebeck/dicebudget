@@ -8,6 +8,7 @@ import {
 } from "@/lib/scoreFromDice";
 
 const FACES: DieValue[] = [1, 2, 3, 4, 5, 6];
+const COUNT_OPTIONS = [0, 1, 2, 3, 4, 5] as const;
 
 type Props = {
   counts: DieCounts;
@@ -18,73 +19,70 @@ type Props = {
 export function DiceCountPicker({ counts, disabled, onChange }: Props) {
   const total = dieCountsTotal(counts);
 
-  function adjust(faceIndex: number, delta: number) {
+  function setCount(faceIndex: number, target: number) {
     if (disabled) return;
+    if (target < 0 || target > 5) return;
     const current = counts[faceIndex];
-    const nextCount = current + delta;
-    if (nextCount < 0 || nextCount > 5) return;
-    if (delta > 0 && total >= 5) return;
+    const others = total - current;
+    if (others + target > 5) return;
 
     const next = [...counts] as DieCounts;
-    next[faceIndex] = nextCount;
+    next[faceIndex] = target;
     onChange(next);
+  }
+
+  function bump(faceIndex: number) {
+    if (disabled) return;
+    setCount(faceIndex, counts[faceIndex] + 1);
   }
 
   return (
     <div className="dice-count-picker">
       <p className="dice-count-picker-hint">
-        Pro Augenzahl die Anzahl wählen — mit +/− oder direkt antippen.
+        Zahl antippen setzt die Anzahl sofort — Würfel tippt +1 dazu.
       </p>
       <div className="dice-count-grid">
         {FACES.map((face, faceIndex) => {
           const count = counts[faceIndex];
-          const canIncrease = total < 5 && count < 5;
-          const canDecrease = count > 0;
+          const canBump = total < 5 && count < 5;
 
           return (
             <div key={face} className="dice-count-card">
-              <DiceFace
-                value={face}
-                pipClassName="bg-slate-900"
-                className="dice-count-card-face"
-              />
-              <div className="dice-count-card-controls">
-                <button
-                  type="button"
-                  disabled={disabled || !canDecrease}
-                  aria-label={`${face} minus`}
-                  onClick={() => adjust(faceIndex, -1)}
-                  className="dice-count-card-step disabled:opacity-40"
-                >
-                  −
-                </button>
-                <button
-                  type="button"
-                  disabled={disabled}
-                  aria-label={`${count}× ${face}`}
-                  onClick={() => {
-                    if (disabled) return;
-                    const next = count >= 5 ? 0 : count + 1;
-                    if (next > count && total >= 5) return;
-                    const updated = [...counts] as DieCounts;
-                    updated[faceIndex] = next;
-                    onChange(updated);
-                  }}
-                  className={`dice-count-card-value tabular-nums ${
-                    count > 0 ? "has-value" : ""
-                  }`}
-                >
-                  {count}
-                </button>
-                <button
-                  type="button"
-                  disabled={disabled || !canIncrease}
-                  aria-label={`${face} plus`}
-                  onClick={() => adjust(faceIndex, 1)}
-                  className="dice-count-card-step disabled:opacity-40"
-                >
-                  +
-                </button>
+              <button
+                type="button"
+                disabled={disabled || !canBump}
+                aria-label={`${face} hinzufügen`}
+                onClick={() => bump(faceIndex)}
+                className="dice-count-card-face-btn disabled:opacity-40"
+              >
+                <DiceFace
+                  value={face}
+                  pipClassName="bg-slate-900"
+                  className="dice-count-card-face"
+                />
+              </button>
+              <div className="dice-count-chip-grid" role="group" aria-label={`Anzahl ${face}`}>
+                {COUNT_OPTIONS.map((option) => {
+                  const others = total - count;
+                  const allowed = others + option <= 5;
+                  const selected = count === option;
+
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      disabled={disabled || !allowed}
+                      aria-label={`${option}× ${face}`}
+                      aria-pressed={selected}
+                      onClick={() => setCount(faceIndex, option)}
+                      className={`dice-count-chip tabular-nums ${
+                        selected ? "dice-count-chip--selected" : ""
+                      } disabled:opacity-30`}
+                    >
+                      {option}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           );
