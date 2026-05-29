@@ -583,15 +583,20 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 
 ## Aktueller Arbeitsstand (2026-05-28)
 
-**Erledigt (iOS-Abnahme TestFlight Build 10):**
+**Erledigt:**
 
 - Legal-Links `Datenschutz` / `Impressum` auf `/app`
 - Einheitlicher `← Startseite`-Button (`app-nav-btn`)
 - Größere SVG-Kachel-Icons, dunkler Slate-Verlauf app-weit
 - Datenschutz/Impressum: Scroll + Safe-Area unter Statusleiste
 - Web-Frontend auf Produktion deployed
+- TestFlight **Build 1.0 (10)** hochgeladen und vom Nutzer abgenommen
+- Dokumentation synchronisiert (HANDOVER, GOiOS, CHANGELOG)
 
-**Offen (App Store, Milestone 21):**
+**Nächste Schritte für neuen Agent / Nutzer:**
 
-- Paid-Vertrag, Preis 1,19 €, Screenshots, öffentliches Review
-- Impressum: Anbieterangaben vom Nutzer vervollständigen
+1. **App Store Connect:** Paid Applications Agreement, Bank/Steuer aktivieren
+2. **Store-Metadaten:** Preis 1,19 €, Screenshots 6.7", Beschreibung DE
+3. **Impressum:** Platzhalter in `frontend/app/impressum/page.tsx` durch echte Anbieterangaben ersetzen
+4. **Review:** TestFlight Build 10 stabil → „Zur Überprüfung einreichen“
+5. Optional: Branch `milestone-22-prep` → `main` mergen (nur nach Nutzer-Freigabe)

@@ -9,12 +9,12 @@ Leitfaden für **iOS (Capacitor)**, **TestFlight** und **App Store** — ergänz
 
 ## 0. Aktueller Stand (2026-05-28, verbindlich)
 
-- **TestFlight:** Upload **Build `1.0 (10)`** erfolgreich; interne Tester können testen.
-- **`Copy failed` / rsync:** Ursache Homebrew-`rsync` — Fix: `brew unlink rsync` → `/usr/bin/rsync`; Xcode mit System-PATH starten (Abschnitt 6).
-- **Web:** Frontend auf Server deployed; Live unter https://dicebudget.bottle-trade.de
-- **Milestone 22:** Datenschutz-Umbau ausgerollt (pseudonymes Multi, lokales Solo).
-- **UI-Fixrunde (M23/M26/M27):** iOS-Abnahme **bestätigt** — Legal-Links, Navigation, Icons, dunkler Hintergrund, Legal Safe-Area/Scroll.
-- **Offen:** App Store **kostenpflichtig** (1,19 €), Paid-Vertrag, Store-Metadaten, öffentliches Review.
+- **Branch:** `milestone-22-prep` · Commit `72119ed`
+- **TestFlight:** Build **`1.0 (10)`** hochgeladen und UI-seitig abgenommen
+- **`Copy failed` / rsync:** Fix dokumentiert — `brew unlink rsync`, Xcode mit System-PATH (Abschnitt 6)
+- **Web:** https://dicebudget.bottle-trade.de (Frontend deployed)
+- **M22 + M23–27:** ausgerollt und abgenommen
+- **Nächster Schritt:** App Store Review vorbereiten (Paid-Vertrag, Metadaten, Screenshots)
 
 ---
 

@@ -60,6 +60,9 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Paarungsnavigation:** Statischer Export — Links zur Detailseite als normales `<a>` (voller Seitenload)
 - **iOS-Upload auf Mac (`Copy failed`):** Homebrew-`rsync` deaktivieren (`brew unlink rsync`) → `/usr/bin/rsync`; Xcode mit System-PATH starten
 
+### Docs
+- **Dokumentation:** HANDOVER, GOiOS, milestones, iOS-Anleitungen auf Stand TestFlight Build 10 aktualisiert (Mai 2026)
+
 ### Removed
 - `HomeModeButtons.tsx` (ersetzt durch `HomeBentoGrid`)
 

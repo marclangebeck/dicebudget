@@ -6,7 +6,8 @@ Strategische Würfelspiel-Variante mit Wurf-Pool und wählbarer Spielanzahl (1�
 
 Weitere Dokumentation:
 
-- **[HANDOVER.md](./HANDOVER.md)** – Übergabe für neue Agents (Stand, offene Punkte)
+- **[HANDOVER.md](./HANDOVER.md)** – Übergabe-Prompt für neue Agents (Copy & Paste oben)
+- **[GOiOS.md](./GOiOS.md)** – iOS / TestFlight / App Store
 - **[AGENT_RULES.md](./AGENT_RULES.md)** – verbindlich: kein Abuse-Risiko (keine Loops/Dauerprozesse)
 - [projektbeschreibung.md](./projektbeschreibung.md) – fachliche und technische Spezifikation
 - [milestones.md](./milestones.md) – Meilensteine und Status

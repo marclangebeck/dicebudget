@@ -1,27 +1,103 @@
-# Übergabe-Prompt – DiceBudget Strategy Edition
-
-**Zweck:** Abschnitt „Prompt für neuen Agent“ (unten) in einen neuen Cursor-Chat kopieren.
+# Übergabe – dice.budget (Kniffel Strategy Edition)
 
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
-**Sprache Antworten:** Deutsch  
-**Letzte inhaltliche Session:** Mai 2026 – iOS-UI-Fixrunde (Navigation, Legal-Links, dunkler App-Hintergrund, TestFlight Build 10)
-
-## Update 2026-05-28 (verbindlicher Ist-Stand)
-
-- **Web-Produktion:** Frontend auf Server deployed (`deploy-frontend-prod.sh`), HTTPS OK.
-- **GitHub:** Branch `milestone-22-prep`, letzter relevanter Commit `0c734e8`.
-- **iOS/TestFlight:** Upload **Build `1.0 (10)`** erfolgreich (nach `Copy failed`-Fix via Homebrew-`rsync` deaktivieren → `/usr/bin/rsync`).
-- **Milestone 22** (Datenschutz-Umbau, pseudonymes Multi, lokales Solo): abgeschlossen und ausgerollt.
-- **UI-Fixrunde iOS (M23/M26/M27):** Nutzer-Abnahme **bestätigt** (TestFlight):
-  - Legal-Links `Datenschutz` / `Impressum` auf `/app` sichtbar
-  - Einheitlicher `← Startseite`-Button (`app-nav-btn`) auf Unterseiten
-  - Größere SVG-Kachel-Icons, dunkler Slate-Verlauf app-weit
-  - Datenschutz/Impressum: scrollbar, Safe-Area unter Statusleiste
-- **Offen (Store, nicht UI):** Paid-Vertrag, Preis 1,19 €, Store-Metadaten, öffentliches Review (Milestone 21.9–21.11, 21.14).
+**GitHub:** `marclangebeck/dicebudget` · Branch **`milestone-22-prep`**  
+**Sprache:** Deutsch  
+**Stand:** 2026-05-28 · Commit `72119ed`
 
 ---
 
-## Prompt für neuen Agent
+## Ist-Stand (kurz)
+
+| Bereich | Status |
+|---------|--------|
+| Web/API | Live: https://dicebudget.bottle-trade.de |
+| Frontend Deploy | Erledigt (`deploy-frontend-prod.sh`) |
+| M22 Datenschutz | Erledigt (Solo lokal, Multi pseudonym) |
+| iOS UI (M23–27) | Abgenommen (TestFlight Build **1.0 (10)**) |
+| TestFlight Upload | Build 10 erfolgreich |
+| App Store Review | **Offen** — Paid-Vertrag, 1,19 €, Metadaten |
+
+**Nächste Priorität:** App Store Connect (Paid Agreement, Screenshots, Beschreibung) → Review. Optional: Impressum-Platzhalter ausfüllen.
+
+---
+
+## Übergabe-Prompt (Copy & Paste)
+
+```
+Du arbeitest am Projekt dice.budget weiter (Repo-Ordner: kniffel).
+
+LIES ZUERST (in dieser Reihenfolge):
+1. AGENT_RULES.md
+2. HANDOVER.md
+3. GOiOS.md
+4. milestones.md → Abschnitt „Aktueller Arbeitsstand“
+
+Antworten auf Deutsch. Keine Commits ohne explizite Nutzer-Anweisung.
+
+─── PROJEKT ───
+Yatzy/Kniffel, 1–6 Spiele pro Partie, Strategy (Pool) vs. Klassisch.
+Solo: lokal auf Gerät (frontend/lib/localSoloRun.ts).
+Multi: pseudonym via playerId (UUID), Server speichert pid:<uuid>.
+Web + iOS teilen frontend/ (Next.js static export + Capacitor).
+
+─── URLs / PFADE ───
+Prod:     https://dicebudget.bottle-trade.de
+App:      /app (iOS-Start)
+Legal:    /datenschutz, /impressum
+Branch:   milestone-22-prep
+Server:   /home/bottleadmin/projects/kniffel
+Mac:      ~/projects/kniffel
+Xcode:    frontend/ios/App/App.xcworkspace
+Bundle:   de.bottletrade.dicebudget
+
+─── ERLEDIGT (nicht neu bauen) ───
+• Milestones 1–22, 23–27 (UI iOS abgenommen)
+• TestFlight Build 1.0 (10) hochgeladen
+• Legal-Links /app, app-nav-btn Navigation, SVG-Icons, dunkler Hintergrund
+• LegalScrollShell (Scroll + Safe-Area Datenschutz/Impressum)
+• rsync-Fix: brew unlink rsync vor Xcode-Upload
+
+─── OFFEN (deine Priorität) ───
+1. App Store Connect: Paid Applications Agreement, Bank/Steuer
+2. Preis 1,19 €, Screenshots (6.7" iPhone), Beschreibung DE
+3. App-Datenschutzfragebogen finalisieren
+4. Impressum: Platzhalter-Anbieterangaben (frontend/app/impressum/page.tsx)
+5. TestFlight stabil → Zur Überprüfung einreichen
+
+─── MAC: iOS-Build ───
+cd ~/projects/kniffel && git pull origin milestone-22-prep
+cd frontend && npm install && npm run build:ios
+brew unlink rsync   # falls which rsync → /opt/homebrew/bin/rsync
+env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
+# Xcode: Build-Nummer erhöhen → Any iOS Device → Archive → Upload
+
+─── SERVER: Web-Deploy ───
+cd /home/bottleadmin/projects/kniffel && git pull origin milestone-22-prep
+sudo bash infra/scripts/deploy-frontend-prod.sh
+
+─── WICHTIGE DATEIEN ───
+frontend/app/app/page.tsx
+frontend/components/HomeBentoGrid.tsx
+frontend/components/LegalScrollShell.tsx
+frontend/components/AppScreenHeader.tsx
+frontend/app/globals.css
+frontend/lib/localSoloRun.ts
+frontend/lib/playerIdentity.ts
+frontend/lib/branding.ts
+
+─── STOLPERSTEINE ───
+• Web-Deploy ≠ iOS — nach UI-Änderung immer npm run build:ios + neues Archive
+• Copy failed beim Upload → brew unlink rsync, Xcode mit System-PATH öffnen
+• Capacitor scrollEnabled:false → Legal-Seiten scrollen nur in LegalScrollShell
+• Alter Connect-Eintrag com.mlangebeck.mobileapp IGNORIEREN
+
+Nutzer: Marc, Xcode-Einsteiger — kleine Schritte, kopierbare Terminal-Befehle.
+```
+
+---
+
+## Prompt für neuen Agent (Referenz)
 
 Du arbeitest am Projekt **dice.budget** (Repo-Ordner: `kniffel`) weiter. Lies zuerst **`AGENT_RULES.md`**, dann **`GOiOS.md`** (iOS/Store) und diese Datei.
 
@@ -51,14 +127,13 @@ Du arbeitest am Projekt **dice.budget** (Repo-Ordner: `kniffel`) weiter. Lies zu
 
 ```
 backend/prisma/schema.prisma
-backend/src/services/playField.ts
 backend/src/services/sessionService.ts
 backend/src/services/pairingStats.ts
 
-frontend/app/app/page.tsx              # iOS-Start / Bento
+frontend/app/app/page.tsx
 frontend/app/datenschutz/              # LegalScrollShell + Safe-Area
 frontend/app/impressum/
-frontend/components/HomeBentoGrid.tsx  # Kacheln, Legal-Footer
+frontend/components/HomeBentoGrid.tsx
 frontend/components/AppScreenHeader.tsx
 frontend/components/BackToHome.tsx
 frontend/components/LegalScrollShell.tsx
@@ -67,26 +142,22 @@ frontend/components/PlayTopBar.tsx
 frontend/components/PlayBoard.tsx
 frontend/lib/localSoloRun.ts
 frontend/lib/playerIdentity.ts
-frontend/lib/branding.ts               # APP_HOME_PATH, PRIVACY_PATH, IMPRESSUM_PATH
-frontend/app/globals.css               # .app-bg, .app-nav-btn, .home-bento-*, dunkler Verlauf
-frontend/capacitor.config.ts
+frontend/lib/branding.ts
+frontend/app/globals.css
 frontend/ios/App/App.xcworkspace
 ```
 
-### Bereits erledigt (nicht neu erfinden)
+### Bereits erledigt
 
-- Milestones **1–20** (Grundgerüst, MP, UI-Modernisierung)
-- Milestone **22** (pseudonymes Multi, lokales Solo, Migration, Deploy)
-- Milestones **23–27** UI-Fixrunde: Navigation, Kachel-Icons, dunkler Hintergrund, Legal-Seiten, Impressum
-- Milestone **21** technische Basis: Capacitor, TestFlight-Uploads bis Build **10**
+- Milestones **1–22**, **23–27** (UI iOS abgenommen)
+- TestFlight **Build 10** hochgeladen
 - Backend-Tests: `cd backend && npm test` (37 grün)
 
 ### Deploy
 
 ```bash
-sudo bash infra/scripts/deploy-prod.sh
-sudo bash infra/scripts/deploy-backend-prod.sh
 sudo bash infra/scripts/deploy-frontend-prod.sh
+sudo bash infra/scripts/deploy-backend-prod.sh
 ```
 
 **Keine Commits**, es sei denn, der Nutzer verlangt es explizit.
@@ -94,46 +165,27 @@ sudo bash infra/scripts/deploy-frontend-prod.sh
 ### iOS-Release (Mac)
 
 ```bash
-cd ~/projects/kniffel
-git pull origin milestone-22-prep
+cd ~/projects/kniffel && git pull origin milestone-22-prep
 cd frontend && npm run build:ios
-brew unlink rsync   # falls which rsync → /opt/homebrew/bin/rsync
+brew unlink rsync
 env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
 ```
 
-Xcode: Build-Nummer erhöhen → **Any iOS Device** → Archive → Upload.
-
-### Bekannte Stolpersteine
-
-- Web-Deploy ≠ iOS-App — nach UI-Änderungen immer `npm run build:ios` + neues Archive.
-- `Copy failed` beim Upload: Homebrew-`rsync` deaktivieren, Xcode mit System-PATH starten.
-- Capacitor `scrollEnabled: false` — Legal-Seiten scrollen über `LegalScrollShell` (innerer Container).
-- Statischer Export: Paarungs-Links als `<a href>` (voller Load).
-- Frontend ohne `.env.production` → API zeigt auf localhost.
-
-### Nächste sinnvolle Schritte (Store)
-
-1. App Store Connect: Paid-Vertrag, Bank/Steuer, Preis **1,19 €**
-2. Screenshots, Beschreibung DE, App-Datenschutzfragebogen finalisieren
-3. TestFlight stabil halten → **Zur Überprüfung einreichen**
-
 ### Gesprächskontext
 
-- Antworten auf **Deutsch**, präzise.
-- Nutzer: Marc Langebeck, Xcode-Einsteiger — kleine Schritte mit kopierbaren Befehlen.
-- Keine Drive-by-Refactors, keine Commits ohne Aufforderung.
+- Antworten auf **Deutsch**, präzise, kopierbare Befehle.
+- Nutzer: Marc Langebeck, Xcode-Einsteiger.
 
 ---
 
-## Schnellcheck nach Checkout
+## Schnellcheck
 
 ```bash
 cd /home/bottleadmin/projects/kniffel/backend && npm install && npx prisma migrate deploy && npm test
 cd /home/bottleadmin/projects/kniffel/frontend && npm install && npm run build
+curl -s https://dicebudget.bottle-trade.de/api/health
 ```
-
-Health: `curl -s https://dicebudget.bottle-trade.de/api/health`
 
 ---
 
-*Bei Fortsetzung `CHANGELOG.md`, `milestones.md` und ggf. diese Datei aktualisieren.*
+*Doku-Index: GOiOS.md · milestones.md · CHANGELOG.md · docs/testflight-app-store.md*
