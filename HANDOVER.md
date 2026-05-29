@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **GitHub:** `marclangebeck/dicebudget` · Branch **`milestone-22-prep`**  
 **Sprache:** Deutsch  
-**Stand:** 2026-05-28 · Commit `72119ed`
+**Stand:** 2026-05-28 · Commit `f5b2a02`
 
 ---
 
@@ -14,8 +14,8 @@
 | Web/API | Live: https://dicebudget.bottle-trade.de |
 | Frontend Deploy | Erledigt (`deploy-frontend-prod.sh`) |
 | M22 Datenschutz | Erledigt (Solo lokal, Multi pseudonym) |
-| iOS UI (M23–27) | Abgenommen (TestFlight Build **1.0 (10)**) |
-| TestFlight Upload | Build 10 erfolgreich |
+| iOS UI (M23–27) | Abgenommen (TestFlight Build **1.0 (11)**) |
+| TestFlight Upload | Build 11 aktuell (Upload 2026-05-28) |
 | App Store Review | **Offen** — Paid-Vertrag, 1,19 €, Metadaten |
 
 **Nächste Priorität:** App Store Connect (Paid Agreement, Screenshots, Beschreibung) → Review. Optional: Impressum-Platzhalter ausfüllen.
@@ -47,13 +47,13 @@ App:      /app (iOS-Start)
 Legal:    /datenschutz, /impressum
 Branch:   milestone-22-prep
 Server:   /home/bottleadmin/projects/kniffel
-Mac:      ~/projects/kniffel
-Xcode:    frontend/ios/App/App.xcworkspace
+Mac:      /Users/marclangebeck/projects/kniffel
+Xcode:    /Users/marclangebeck/projects/kniffel/frontend/ios/App/App.xcworkspace
 Bundle:   de.bottletrade.dicebudget
 
 ─── ERLEDIGT (nicht neu bauen) ───
 • Milestones 1–22, 23–27 (UI iOS abgenommen)
-• TestFlight Build 1.0 (10) hochgeladen
+• TestFlight Build 1.0 (11) hochgeladen (aktuell)
 • Legal-Links /app, app-nav-btn Navigation, SVG-Icons, dunkler Hintergrund
 • LegalScrollShell (Scroll + Safe-Area Datenschutz/Impressum)
 • rsync-Fix: brew unlink rsync vor Xcode-Upload
@@ -65,26 +65,26 @@ Bundle:   de.bottletrade.dicebudget
 4. Impressum: Platzhalter-Anbieterangaben (frontend/app/impressum/page.tsx)
 5. TestFlight stabil → Zur Überprüfung einreichen
 
-─── MAC: iOS-Build ───
-cd ~/projects/kniffel && git pull origin milestone-22-prep
-cd frontend && npm install && npm run build:ios
-brew unlink rsync   # falls which rsync → /opt/homebrew/bin/rsync
-env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
+─── MAC: iOS-Build (Copy & Paste) ───
+cd /Users/marclangebeck/projects/kniffel && git pull origin milestone-22-prep
+cd /Users/marclangebeck/projects/kniffel/frontend && npm install && npm run build:ios
+brew unlink rsync
+env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open /Users/marclangebeck/projects/kniffel/frontend/ios/App/App.xcworkspace
 # Xcode: Build-Nummer erhöhen → Any iOS Device → Archive → Upload
 
 ─── SERVER: Web-Deploy ───
 cd /home/bottleadmin/projects/kniffel && git pull origin milestone-22-prep
 sudo bash infra/scripts/deploy-frontend-prod.sh
 
-─── WICHTIGE DATEIEN ───
-frontend/app/app/page.tsx
-frontend/components/HomeBentoGrid.tsx
-frontend/components/LegalScrollShell.tsx
-frontend/components/AppScreenHeader.tsx
-frontend/app/globals.css
-frontend/lib/localSoloRun.ts
-frontend/lib/playerIdentity.ts
-frontend/lib/branding.ts
+─── WICHTIGE DATEIEN (Mac) ───
+/Users/marclangebeck/projects/kniffel/frontend/app/app/page.tsx
+/Users/marclangebeck/projects/kniffel/frontend/components/HomeBentoGrid.tsx
+/Users/marclangebeck/projects/kniffel/frontend/components/LegalScrollShell.tsx
+/Users/marclangebeck/projects/kniffel/frontend/components/AppScreenHeader.tsx
+/Users/marclangebeck/projects/kniffel/frontend/app/globals.css
+/Users/marclangebeck/projects/kniffel/frontend/lib/localSoloRun.ts
+/Users/marclangebeck/projects/kniffel/frontend/lib/playerIdentity.ts
+/Users/marclangebeck/projects/kniffel/frontend/lib/branding.ts
 
 ─── STOLPERSTEINE ───
 • Web-Deploy ≠ iOS — nach UI-Änderung immer npm run build:ios + neues Archive
@@ -150,7 +150,7 @@ frontend/ios/App/App.xcworkspace
 ### Bereits erledigt
 
 - Milestones **1–22**, **23–27** (UI iOS abgenommen)
-- TestFlight **Build 10** hochgeladen
+- TestFlight **Build 11** hochgeladen (aktuell)
 - Backend-Tests: `cd backend && npm test` (37 grün)
 
 ### Deploy
@@ -165,10 +165,10 @@ sudo bash infra/scripts/deploy-backend-prod.sh
 ### iOS-Release (Mac)
 
 ```bash
-cd ~/projects/kniffel && git pull origin milestone-22-prep
-cd frontend && npm run build:ios
+cd /Users/marclangebeck/projects/kniffel && git pull origin milestone-22-prep
+cd /Users/marclangebeck/projects/kniffel/frontend && npm install && npm run build:ios
 brew unlink rsync
-env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
+env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open /Users/marclangebeck/projects/kniffel/frontend/ios/App/App.xcworkspace
 ```
 
 ### Gesprächskontext

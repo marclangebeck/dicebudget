@@ -10,7 +10,7 @@ Leitfaden für **iOS (Capacitor)**, **TestFlight** und **App Store** — ergänz
 ## 0. Aktueller Stand (2026-05-28, verbindlich)
 
 - **Branch:** `milestone-22-prep` · Commit `72119ed`
-- **TestFlight:** Build **`1.0 (10)`** hochgeladen und UI-seitig abgenommen
+- **TestFlight:** Build **`1.0 (11)`** hochgeladen und UI-seitig abgenommen (aktuell)
 - **`Copy failed` / rsync:** Fix dokumentiert — `brew unlink rsync`, Xcode mit System-PATH (Abschnitt 6)
 - **Web:** https://dicebudget.bottle-trade.de (Frontend deployed)
 - **M22 + M23–27:** ausgerollt und abgenommen
@@ -100,8 +100,8 @@ Diese Milestones sind **Voraussetzung** für eine sinnvolle iOS-App; Details in 
 | 21.9 | Geschäftliches: Lizenz, EU-Händler, **Paid-Vertrag**, Bank/Steuer | **offen** | Für **1,19 €** nötig |
 | 21.10 | Preisstufe **1,19 €** in Connect | **offen** | Tab App Store → Preis und Verfügbarkeit |
 | 21.11 | App-Icon 1024, Screenshots, Beschreibung DE | **offen** | Store-Metadaten |
-| 21.12 | Xcode: Archive → Upload | **erledigt** | Build `1.0 (10)` in TestFlight |
-| 21.13 | TestFlight (intern + iPhone) | **in Arbeit** | Build 10 verfügbar; Store-Metadaten offen |
+| 21.12 | Xcode: Archive → Upload | **erledigt** | Build `1.0 (11)` in TestFlight (aktuell) |
+| 21.13 | TestFlight (intern + iPhone) | **in Arbeit** | Build 11 verfügbar; Store-Metadaten offen |
 | 21.14 | App Store Review (kostenpflichtig) | **offen** | Nach stabiler Beta |
 
 ---
@@ -232,7 +232,7 @@ Du setzt **dice.budget** (iOS + App Store) fort. Lies zuerst:
 
 - Branch: **`milestone-22-prep`** auf GitHub `marclangebeck/dicebudget`
 - Web live: https://dicebudget.bottle-trade.de (Frontend deployed)
-- iOS: Capacitor, Bundle **`de.bottletrade.dicebudget`**, TestFlight **Build 10** hochgeladen
+- iOS: Capacitor, Bundle **`de.bottletrade.dicebudget`**, TestFlight **Build 11** hochgeladen (aktuell)
 - UI iOS: Legal-Links, Navigation, Icons, dunkler Hintergrund, Legal Safe-Area — **abgenommen**
 - M22: pseudonymes Multi, lokales Solo — **ausgerollt**
 
@@ -246,10 +246,10 @@ Du setzt **dice.budget** (iOS + App Store) fort. Lies zuerst:
 ### Mac-Workflow (nach Code-Änderung)
 
 ```bash
-cd ~/projects/kniffel && git pull origin milestone-22-prep
-cd frontend && npm run build:ios
-brew unlink rsync   # falls nötig (which rsync → /opt/homebrew/...)
-env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
+cd /Users/marclangebeck/projects/kniffel && git pull origin milestone-22-prep
+cd /Users/marclangebeck/projects/kniffel/frontend && npm install && npm run build:ios
+brew unlink rsync
+env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open /Users/marclangebeck/projects/kniffel/frontend/ios/App/App.xcworkspace
 ```
 
 Xcode: **Build** erhöhen → Clean → Archive → Upload.

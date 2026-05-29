@@ -45,7 +45,7 @@ Die Web-App unter https://dicebudget.bottle-trade.de bleibt unverändert deployb
 ## TestFlight (Stand Mai 2026)
 
 - Branch: `milestone-22-prep`
-- Letzter Upload: **Build 10**
+- Letzter Upload: **Build 11** (Version 1.0, aktuell)
 - Upload-Fix bei `Copy failed`: `brew unlink rsync`, Xcode mit System-PATH öffnen
 
 ## Nach UI-Änderungen

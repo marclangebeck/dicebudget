@@ -509,7 +509,7 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 | Verwendung in `AppScreenHeader`, `PlayTopBar` und relevanten Detailseiten | erledigt |
 | Touch-optimierte Hit-Targets (iOS) | erledigt |
 
-**Status:** erledigt (Mai 2026, TestFlight Build 10)
+**Status:** erledigt (Mai 2026, TestFlight Build 11)
 
 ---
 
@@ -590,7 +590,7 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 - Größere SVG-Kachel-Icons, dunkler Slate-Verlauf app-weit
 - Datenschutz/Impressum: Scroll + Safe-Area unter Statusleiste
 - Web-Frontend auf Produktion deployed
-- TestFlight **Build 1.0 (10)** hochgeladen und vom Nutzer abgenommen
+- TestFlight **Build 1.0 (11)** hochgeladen (aktuell; Build 10 zuvor)
 - Dokumentation synchronisiert (HANDOVER, GOiOS, CHANGELOG)
 
 **Nächste Schritte für neuen Agent / Nutzer:**
@@ -598,5 +598,5 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 1. **App Store Connect:** Paid Applications Agreement, Bank/Steuer aktivieren
 2. **Store-Metadaten:** Preis 1,19 €, Screenshots 6.7", Beschreibung DE
 3. **Impressum:** Platzhalter in `frontend/app/impressum/page.tsx` durch echte Anbieterangaben ersetzen
-4. **Review:** TestFlight Build 10 stabil → „Zur Überprüfung einreichen“
+4. **Review:** TestFlight Build 11 stabil → „Zur Überprüfung einreichen“
 5. Optional: Branch `milestone-22-prep` → `main` mergen (nur nach Nutzer-Freigabe)

@@ -60,10 +60,11 @@ sudo bash infra/scripts/deploy-frontend-prod.sh   # Web
 **Mac vor Xcode:**
 
 ```bash
-cd ~/projects/kniffel && git pull origin milestone-22-prep
-cd frontend && npm run build:ios
+cd /Users/marclangebeck/projects/kniffel && git pull origin milestone-22-prep
+cd /Users/marclangebeck/projects/kniffel/frontend && npm install && npm run build:ios
+brew unlink rsync
+env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open /Users/marclangebeck/projects/kniffel/frontend/ios/App/App.xcworkspace
 # Build-Nummer in Xcode erhöhen → Archive → Upload
-# Bei Copy failed: brew unlink rsync
 ```
 
 ## Nicht im Repo
