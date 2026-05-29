@@ -26,5 +26,8 @@ export const PRIVACY_URL = `${SITE_URL}${PRIVACY_PATH}`;
 
 export const IMPRESSUM_URL = `${SITE_URL}${IMPRESSUM_PATH}`;
 
-/** Kontakt für Datenschutzanfragen */
-export const PRIVACY_EMAIL = "datenschutz@bottle-trade.de";
+/** Kontakt (Impressum, Datenschutz, Support) */
+export const CONTACT_EMAIL = "info@bottle-trade.de";
+
+/** Alias für Datenschutzanfragen */
+export const PRIVACY_EMAIL = CONTACT_EMAIL;

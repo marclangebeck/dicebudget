@@ -4,10 +4,16 @@ import { BackToHome } from "@/components/BackToHome";
 import {
   APP_HOME_PATH,
   APP_NAME,
-  PRIVACY_EMAIL,
+  CONTACT_EMAIL,
   PRIVACY_URL,
   SITE_URL,
 } from "@/lib/branding";
+import {
+  HOSTING,
+  LEGAL_DATA_PROTECTION_OFFICER,
+  LEGAL_PROVIDER,
+  formatLegalAddress,
+} from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: `Datenschutzerklärung — ${APP_NAME}`,
@@ -16,6 +22,8 @@ export const metadata: Metadata = {
 };
 
 export default function DatenschutzPage() {
+  const address = formatLegalAddress();
+
   return (
     <main className="legal-page">
       <article className="legal-article">
@@ -33,17 +41,34 @@ export default function DatenschutzPage() {
           <h2>1. Verantwortlicher</h2>
           <p>
             Verantwortlich für die Datenverarbeitung im Sinne der
-            Datenschutz-Grundverordnung (DSGVO) ist der Betreiber der App{" "}
-            <strong>{APP_NAME}</strong> (nachfolgend „wir“).
+            Datenschutz-Grundverordnung (DSGVO) ist:
           </p>
           <p>
-            Kontakt für Datenschutzanfragen:{" "}
-            <a href={`mailto:${PRIVACY_EMAIL}`}>{PRIVACY_EMAIL}</a>
+            <strong>{LEGAL_PROVIDER.name}</strong>
+            <br />
+            {address}
+            <br />
+            E-Mail:{" "}
+            <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+          </p>
+          <p>
+            Die App <strong>{APP_NAME}</strong> wird im Rahmen des Projekts{" "}
+            <strong>bottle-trade.de</strong> betrieben.
           </p>
         </section>
 
         <section>
-          <h2>2. Überblick</h2>
+          <h2>2. Datenschutzbeauftragter</h2>
+          <p>
+            Datenschutzbeauftragter: <strong>{LEGAL_DATA_PROTECTION_OFFICER}</strong>
+            <br />
+            Erreichbar unter{" "}
+            <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+          </p>
+        </section>
+
+        <section>
+          <h2>3. Überblick</h2>
           <p>
             {APP_NAME} ist ein Würfelspiel (Yatzy-Variante) mit
             app-zentrierter Nutzung. Es gibt
@@ -58,16 +83,16 @@ export default function DatenschutzPage() {
         </section>
 
         <section>
-          <h2>3. Welche Daten wir verarbeiten</h2>
+          <h2>4. Welche Daten wir verarbeiten</h2>
 
-          <h3>3.1 Einzelspiel (lokal auf dem Gerät)</h3>
+          <h3>4.1 Einzelspiel (lokal auf dem Gerät)</h3>
           <p>
             Beim Solo-Spiel speichert die App den Spielstand lokal auf deinem
             Gerät (z. B. Punkte, Felder, Modus, Spielanzahl). Es wird kein Name
             abgefragt und keine Solo-Statistik serverseitig persistiert.
           </p>
 
-          <h3>3.2 Multiplayer</h3>
+          <h3>4.2 Multiplayer</h3>
           <p>
             Multiplayer-Daten werden pseudonym verarbeitet. Beim ersten Start
             erzeugt die App lokal eine zufällige Spieler-ID. Auf dem Server
@@ -83,7 +108,7 @@ export default function DatenschutzPage() {
             Code betreten.
           </p>
 
-          <h3>3.3 Statistik</h3>
+          <h3>4.3 Statistik</h3>
           <p>
             Abgeschlossene Multiplayer-Spiele können in aggregierter Statistik
             erscheinen (z. B. Paarungsvergleiche zwischen pseudonymen
@@ -91,7 +116,7 @@ export default function DatenschutzPage() {
             lokal auf dem Gerät verwaltet werden.
           </p>
 
-          <h3>3.4 Technische Daten</h3>
+          <h3>4.4 Technische Daten</h3>
           <p>
             Beim Aufruf der App-API und der Website können Server- und
             Zugriffsprotokolle (z. B. IP-Adresse, Zeitpunkt, angeforderte URL,
@@ -101,7 +126,7 @@ export default function DatenschutzPage() {
         </section>
 
         <section>
-          <h2>4. Was wir nicht tun</h2>
+          <h2>5. Was wir nicht tun</h2>
           <ul>
             <li>Kein Verkauf deiner Daten an Dritte</li>
             <li>Keine Werbe-Tracker oder Social-Media-Pixel in der App</li>
@@ -111,7 +136,7 @@ export default function DatenschutzPage() {
         </section>
 
         <section>
-          <h2>5. Rechtsgrundlagen</h2>
+          <h2>6. Rechtsgrundlagen</h2>
           <p>
             Die Verarbeitung erfolgt zur Bereitstellung der App und
             Erfüllung des Spielvertrags mit dir (Art. 6 Abs. 1 lit. b DSGVO)
@@ -121,7 +146,7 @@ export default function DatenschutzPage() {
         </section>
 
         <section>
-          <h2>6. Speicherdauer</h2>
+          <h2>7. Speicherdauer</h2>
           <p>
             Spiel- und Session-Daten bleiben gespeichert, solange sie für
             laufende oder ausgewertete Partien benötigt werden. Abgeschlossene
@@ -134,17 +159,36 @@ export default function DatenschutzPage() {
         </section>
 
         <section>
-          <h2>7. Hosting und Auftragsverarbeitung</h2>
+          <h2>8. Hosting und Auftragsverarbeitung</h2>
           <p>
-            Die Anwendung wird auf Servern im Rahmen des Projekts betrieben
-            (Domain <strong>dicebudget.bottle-trade.de</strong>). Mit dem
-            Hosting-Anbieter bestehen die üblichen technischen Zugriffe; eine
-            Verarbeitung kann in der EU bzw. im EWR erfolgen.
+            Die Anwendung wird von <strong>{HOSTING.operator}</strong> betrieben
+            und auf Servern der <strong>{HOSTING.provider}</strong> gehostet
+            (Standort: <strong>{HOSTING.location}</strong>). Die Domain lautet{" "}
+            <strong>dicebudget.bottle-trade.de</strong>.
+          </p>
+          <p>
+            Mit dem Hosting-Anbieter bestehen die üblichen technischen Zugriffe
+            auf Server- und Zugriffsprotokolle im Rahmen des Betriebs.
           </p>
         </section>
 
         <section>
-          <h2>8. Deine Rechte</h2>
+          <h2>9. Apple App Store (iOS)</h2>
+          <p>
+            Die iOS-App wird über den Apple App Store bereitgestellt. Für
+            Kaufabwicklung, Store-Kontoverwaltung und plattformspezifische
+            Verarbeitung durch Apple gelten die Datenschutzhinweise von Apple
+            Inc. Wir erhalten von Apple keine E-Mail-Adresse von dir, sofern du
+            uns keine mitteilst.
+          </p>
+          <p>
+            Die App enthält keine Werbe-Tracker oder Analyse-SDKs von
+            Drittanbietern.
+          </p>
+        </section>
+
+        <section>
+          <h2>10. Deine Rechte</h2>
           <p>Du hast nach der DSGVO insbesondere das Recht auf:</p>
           <ul>
             <li>Auskunft über gespeicherte Daten</li>
@@ -156,12 +200,12 @@ export default function DatenschutzPage() {
           </ul>
           <p>
             Wende dich dazu an{" "}
-            <a href={`mailto:${PRIVACY_EMAIL}`}>{PRIVACY_EMAIL}</a>.
+            <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
           </p>
         </section>
 
         <section>
-          <h2>9. Kinder</h2>
+          <h2>11. Kinder</h2>
           <p>
             Die App richtet sich nicht gezielt an Kinder unter 16 Jahren. Wenn
             du als Erziehungsberechtigte oder Erziehungsberechtigter von
@@ -171,7 +215,7 @@ export default function DatenschutzPage() {
         </section>
 
         <section>
-          <h2>10. Änderungen</h2>
+          <h2>12. Änderungen</h2>
           <p>
             Wir können diese Erklärung anpassen, wenn sich die App oder
             rechtliche Anforderungen ändern. Die aktuelle Fassung ist unter{" "}

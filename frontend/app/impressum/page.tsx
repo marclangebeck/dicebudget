@@ -4,11 +4,17 @@ import { BackToHome } from "@/components/BackToHome";
 import {
   APP_HOME_PATH,
   APP_NAME,
+  CONTACT_EMAIL,
   IMPRESSUM_URL,
-  PRIVACY_EMAIL,
   PRIVACY_PATH,
   SITE_URL,
 } from "@/lib/branding";
+import {
+  LEGAL_PHONE_DISPLAY,
+  LEGAL_PHONE_TEL,
+  LEGAL_PROVIDER,
+  formatLegalAddress,
+} from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: `Impressum — ${APP_NAME}`,
@@ -17,6 +23,8 @@ export const metadata: Metadata = {
 };
 
 export default function ImpressumPage() {
+  const address = formatLegalAddress();
+
   return (
     <main className="legal-page">
       <article className="legal-article">
@@ -31,15 +39,24 @@ export default function ImpressumPage() {
         <section>
           <h2>Diensteanbieter</h2>
           <p>
-            Bitte ergänze hier die vollständigen Anbieterangaben (Name/Firma,
-            Anschrift, Land).
+            {LEGAL_PROVIDER.name}
+            <br />
+            {address}
+          </p>
+          <p>
+            Die App <strong>{APP_NAME}</strong> wird im Rahmen des Projekts{" "}
+            <strong>bottle-trade.de</strong> betrieben.
           </p>
         </section>
 
         <section>
           <h2>Kontakt</h2>
           <p>
-            E-Mail: <a href={`mailto:${PRIVACY_EMAIL}`}>{PRIVACY_EMAIL}</a>
+            E-Mail:{" "}
+            <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+          </p>
+          <p>
+            Telefon: <a href={`tel:${LEGAL_PHONE_TEL}`}>{LEGAL_PHONE_DISPLAY}</a>
           </p>
           <p>
             Website: <a href={SITE_URL}>{SITE_URL.replace(/^https:\/\//, "")}</a>
@@ -48,14 +65,14 @@ export default function ImpressumPage() {
 
         <section>
           <h2>Vertretungsberechtigte Person</h2>
-          <p>Bitte ergänze hier die vertretungsberechtigte Person.</p>
+          <p>{LEGAL_PROVIDER.name}</p>
         </section>
 
         <section>
           <h2>Inhaltlich verantwortlich</h2>
           <p>
             Verantwortlich für journalistisch-redaktionelle Inhalte nach § 18
-            Abs. 2 MStV: Bitte Namen und Anschrift ergänzen.
+            Abs. 2 MStV: {LEGAL_PROVIDER.name}, {address}
           </p>
         </section>
 
