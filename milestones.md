@@ -575,13 +575,15 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 |--------|--------|
 | Formulierungen auf App-first Nutzung anpassen | erledigt |
 | Technische Speicherung korrekt und verständlich beschreiben | erledigt |
-| Konsistenz mit App Store Angaben prüfen | in Arbeit |
+| Konsistenz mit App Store Angaben prüfen | erledigt (Legal live, Connect-Fragebogen offen) |
 
-**Status:** in Arbeit (Impressum-Platzhaltertexte vom Nutzer ergänzen)
+**Status:** erledigt (Mai 2026)
 
 ---
 
-## Aktueller Arbeitsstand (2026-05-28)
+## Aktueller Arbeitsstand (2026-05-29)
+
+**Commit:** `aac288f` · Branch `milestone-22-prep` · Mac/Server/GitHub synchron
 
 **Erledigt:**
 
@@ -589,14 +591,17 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 - Einheitlicher `← Startseite`-Button (`app-nav-btn`)
 - Größere SVG-Kachel-Icons, dunkler Slate-Verlauf app-weit
 - Datenschutz/Impressum: Scroll + Safe-Area unter Statusleiste
+- **Impressum + Datenschutz** mit Anbieterangaben Marc Langebeck (`frontend/lib/legal.ts`) — live auf dicebudget.bottle-trade.de
+- **bottle-trade.de** Impressum/Datenschutz analog aktualisiert (Server: `bottle-trade-platform/`, kein Git)
 - Web-Frontend auf Produktion deployed
-- TestFlight **Build 1.0 (11)** hochgeladen (aktuell; Build 10 zuvor)
-- Dokumentation synchronisiert (HANDOVER, GOiOS, CHANGELOG)
+- TestFlight **Build 1.0 (11)** — aktuell; kein neuer iOS-Upload bis Nutzer batched
+- Dokumentation synchronisiert
 
-**Nächste Schritte für neuen Agent / Nutzer:**
+**Nächste Schritte (Priorität):**
 
-1. **App Store Connect:** Paid Applications Agreement, Bank/Steuer aktivieren
+1. **App Store Connect:** Paid Applications Agreement, Bank/Steuer
 2. **Store-Metadaten:** Preis 1,19 €, Screenshots 6.7", Beschreibung DE
-3. **Impressum:** Platzhalter in `frontend/app/impressum/page.tsx` durch echte Anbieterangaben ersetzen
+3. **App-Datenschutzfragebogen** in Connect (URL: https://dicebudget.bottle-trade.de/datenschutz)
 4. **Review:** TestFlight Build 11 stabil → „Zur Überprüfung einreichen“
-5. Optional: Branch `milestone-22-prep` → `main` mergen (nur nach Nutzer-Freigabe)
+5. Optional: Branch `milestone-22-prep` → `main` (nur nach Nutzer-Freigabe)
+6. Optional: `bottle-trade-platform` in Git versionieren (Backup)

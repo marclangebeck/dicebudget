@@ -28,7 +28,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Lokales Scoring-Modul:** `frontend/lib/gameScoring.ts` (Bonus-/Totalsummen und Extra-Yatzy-Verteilung)
 - **Lokale Gegner-Aliase:** `frontend/lib/playerAliases.ts` + Overlay `frontend/components/PlayerAliasOverlay.tsx` (Alias nur lokal auf Gerät)
 - **Intro-Splash (M24 A):** schwarzer Eröffnungsscreen mit Branding, Würfeln und Progress 0–100 vor `/app`
-- **Impressum:** `/impressum` mit Platzhalter-Anbieterangaben
+- **Impressum:** `/impressum` mit Anbieterangaben (Marc Langebeck, `frontend/lib/legal.ts`)
 - **LegalScrollShell:** scrollbarer Container für Datenschutz/Impressum (Capacitor iOS)
 
 ### Changed
@@ -60,8 +60,16 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Paarungsnavigation:** Statischer Export — Links zur Detailseite als normales `<a>` (voller Seitenload)
 - **iOS-Upload auf Mac (`Copy failed`):** Homebrew-`rsync` deaktivieren (`brew unlink rsync`) → `/usr/bin/rsync`; Xcode mit System-PATH starten
 
+### Added
+- **Legal-Anbieterdaten:** `frontend/lib/legal.ts` (Marc Langebeck, Kiel, netcup); Impressum/Datenschutz ausgefüllt
+- Kontakt zentral: `info@bottle-trade.de` in `frontend/lib/branding.ts`
+
+### Changed
+- **Impressum/Datenschutz:** Platzhalter durch echte Anbieterangaben ersetzt; Apple-Abschnitt in Datenschutz
+- **bottle-trade.de:** Impressum/Datenschutz in `/home/bottleadmin/projects/bottle-trade-platform` analog (ohne Git)
+
 ### Docs
-- **Dokumentation:** HANDOVER, GOiOS, milestones, iOS-Anleitungen auf Stand TestFlight Build 11 aktualisiert (Mai 2026)
+- HANDOVER, GOiOS, milestones: Stand Commit `aac288f`, Übergabe-Prompt für nächsten Agent
 
 ### Removed
 - `HomeModeButtons.tsx` (ersetzt durch `HomeBentoGrid`)

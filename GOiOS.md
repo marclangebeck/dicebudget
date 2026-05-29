@@ -230,18 +230,20 @@ Du setzt **dice.budget** (iOS + App Store) fort. Lies zuerst:
 
 ### Ist-Stand (Mai 2026)
 
-- Branch: **`milestone-22-prep`** auf GitHub `marclangebeck/dicebudget`
-- Web live: https://dicebudget.bottle-trade.de (Frontend deployed)
-- iOS: Capacitor, Bundle **`de.bottletrade.dicebudget`**, TestFlight **Build 11** hochgeladen (aktuell)
-- UI iOS: Legal-Links, Navigation, Icons, dunkler Hintergrund, Legal Safe-Area — **abgenommen**
-- M22: pseudonymes Multi, lokales Solo — **ausgerollt**
+- Branch: **`milestone-22-prep`** · Commit **`aac288f`** · Mac/Server/GitHub synchron
+- Web live: https://dicebudget.bottle-trade.de (Legal: `/impressum`, `/datenschutz`)
+- iOS: Capacitor, Bundle **`de.bottletrade.dicebudget`**, TestFlight **Build 11** (aktuell)
+- Legal: `frontend/lib/legal.ts` — Marc Langebeck, info@bottle-trade.de, netcup
+- UI iOS: abgenommen · M22: pseudonymes Multi, lokales Solo — ausgerollt
+- **iOS-Releases:** Nutzer batcht Uploads — nicht nach jeder kleinen Änderung
 
-### Deine Priorität (Store, nicht UI)
+### Deine Priorität (Store + Coding nach Nutzer-Auftrag)
 
 1. **Paid Applications Agreement**, Bank/Steuer in App Store Connect
-2. Preis **1,19 €**, Screenshots, Beschreibung DE
-3. TestFlight stabil → **App Store Review** vorbereiten
-4. Optional: `main`-Branch mit `milestone-22-prep` mergen (nur nach Nutzer-Freigabe)
+2. Preis **1,19 €**, Screenshots, Beschreibung DE, Datenschutzfragebogen
+3. TestFlight Build 11 → **App Store Review** vorbereiten
+4. Coding-Aufgaben: siehe **DEINE AUFTRÄGE** im HANDOVER-Prompt
+5. Optional: `main`-Branch mit `milestone-22-prep` mergen (nur nach Nutzer-Freigabe)
 
 ### Mac-Workflow (nach Code-Änderung)
 
