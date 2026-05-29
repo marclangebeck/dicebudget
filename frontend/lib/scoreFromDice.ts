@@ -38,6 +38,10 @@ export function dieCountsTotal(counts: DieCounts): number {
 
 export function dieCountsToDiceValues(counts: DieCounts): DiceValues | null {
   if (dieCountsTotal(counts) !== 5) return null;
+  return dieCountsToPartialDice(counts) as DiceValues;
+}
+
+export function dieCountsToPartialDice(counts: DieCounts): DieValue[] {
   const values: number[] = [];
   for (let face = 0; face < 6; face++) {
     for (let i = 0; i < counts[face]; i++) {
@@ -45,7 +49,7 @@ export function dieCountsToDiceValues(counts: DieCounts): DiceValues | null {
     }
   }
   values.sort((a, b) => a - b);
-  return values as DiceValues;
+  return values as DieValue[];
 }
 
 export function diceValuesToDieCounts(values: DiceValues): DieCounts {

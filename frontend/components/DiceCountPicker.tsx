@@ -8,7 +8,6 @@ import {
 } from "@/lib/scoreFromDice";
 
 const FACES: DieValue[] = [1, 2, 3, 4, 5, 6];
-const COUNT_OPTIONS = [0, 1, 2, 3, 4, 5] as const;
 
 type Props = {
   counts: DieCounts;
@@ -19,52 +18,78 @@ type Props = {
 export function DiceCountPicker({ counts, disabled, onChange }: Props) {
   const total = dieCountsTotal(counts);
 
-  function setCount(faceIndex: number, count: number) {
+  function adjust(faceIndex: number, delta: number) {
     if (disabled) return;
+    const current = counts[faceIndex];
+    const nextCount = current + delta;
+    if (nextCount < 0 || nextCount > 5) return;
+    if (delta > 0 && total >= 5) return;
+
     const next = [...counts] as DieCounts;
-    next[faceIndex] = count;
+    next[faceIndex] = nextCount;
     onChange(next);
   }
 
   return (
     <div className="dice-count-picker">
-      <p className="dice-count-picker-total tabular-nums" aria-live="polite">
-        {total} / 5 Würfel
+      <p className="dice-count-picker-hint">
+        Pro Augenzahl die Anzahl wählen — mit +/− oder direkt antippen.
       </p>
-      {FACES.map((face, faceIndex) => (
-        <div key={face} className="dice-count-picker-row">
-          <DiceFace
-            value={face}
-            pipClassName="bg-slate-900"
-            className="dice-count-picker-face"
-          />
-          <div
-            className="dice-count-picker-options"
-            role="radiogroup"
-            aria-label={`Anzahl ${face}`}
-          >
-            {COUNT_OPTIONS.map((count) => {
-              const selected = counts[faceIndex] === count;
-              return (
+      <div className="dice-count-grid">
+        {FACES.map((face, faceIndex) => {
+          const count = counts[faceIndex];
+          const canIncrease = total < 5 && count < 5;
+          const canDecrease = count > 0;
+
+          return (
+            <div key={face} className="dice-count-card">
+              <DiceFace
+                value={face}
+                pipClassName="bg-slate-900"
+                className="dice-count-card-face"
+              />
+              <div className="dice-count-card-controls">
                 <button
-                  key={count}
                   type="button"
-                  role="radio"
-                  aria-checked={selected}
+                  disabled={disabled || !canDecrease}
+                  aria-label={`${face} minus`}
+                  onClick={() => adjust(faceIndex, -1)}
+                  className="dice-count-card-step disabled:opacity-40"
+                >
+                  −
+                </button>
+                <button
+                  type="button"
                   disabled={disabled}
                   aria-label={`${count}× ${face}`}
-                  onClick={() => setCount(faceIndex, count)}
-                  className={`dice-count-picker-option tabular-nums ${
-                    selected ? "is-selected" : ""
-                  } disabled:opacity-40`}
+                  onClick={() => {
+                    if (disabled) return;
+                    const next = count >= 5 ? 0 : count + 1;
+                    if (next > count && total >= 5) return;
+                    const updated = [...counts] as DieCounts;
+                    updated[faceIndex] = next;
+                    onChange(updated);
+                  }}
+                  className={`dice-count-card-value tabular-nums ${
+                    count > 0 ? "has-value" : ""
+                  }`}
                 >
                   {count}
                 </button>
-              );
-            })}
-          </div>
-        </div>
-      ))}
+                <button
+                  type="button"
+                  disabled={disabled || !canIncrease}
+                  aria-label={`${face} plus`}
+                  onClick={() => adjust(faceIndex, 1)}
+                  className="dice-count-card-step disabled:opacity-40"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

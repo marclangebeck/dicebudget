@@ -1253,68 +1253,188 @@ html.legal-route body {
   }
 }
 
+.dice-throw-step-kicker {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.dice-throw-preview {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: #f8fafc;
+  padding: 0.65rem 0.75rem;
+}
+
+.dice-throw-preview--compact {
+  padding: 0.5rem 0.65rem;
+}
+
+.dice-throw-preview-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.dice-throw-preview-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.dice-throw-preview-total {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.dice-throw-preview-total.is-complete {
+  color: #047857;
+}
+
+.dice-throw-preview-dice {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.dice-throw-preview-die {
+  height: 2.25rem;
+  width: 2.25rem;
+  border-radius: 0.45rem;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  padding: 0.25rem;
+}
+
+.dice-throw-preview-die span {
+  height: 0.34rem !important;
+  width: 0.34rem !important;
+}
+
+.dice-throw-preview-empty {
+  display: flex;
+  height: 2.25rem;
+  width: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.45rem;
+  border: 1.5px dashed #cbd5e1;
+  background: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
 .dice-count-picker {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.dice-count-picker-total {
+.dice-count-picker-hint {
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  color: var(--text-muted);
   text-align: center;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: #0f172a;
 }
 
-.dice-count-picker-row {
+.dice-count-grid {
   display: grid;
-  grid-template-columns: 2.75rem 1fr;
-  align-items: center;
-  gap: 0.5rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
 }
 
-.dice-count-picker-face {
-  height: 2.5rem;
-  width: 2.5rem;
-  border-radius: 0.5rem;
+.dice-count-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: #fff;
+  padding: 0.45rem 0.35rem 0.5rem;
+}
+
+.dice-count-card-face {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 0.4rem;
   border: 1px solid #cbd5e1;
   background: #fff;
-  padding: 0.3rem;
+  padding: 0.2rem;
 }
 
-.dice-count-picker-face span {
-  height: 0.38rem !important;
-  width: 0.38rem !important;
+.dice-count-card-face span {
+  height: 0.3rem !important;
+  width: 0.3rem !important;
 }
 
-.dice-count-picker-options {
+.dice-count-card-controls {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 0.35rem;
+  grid-template-columns: 2.25rem 1fr 2.25rem;
+  align-items: center;
+  gap: 0.2rem;
+  width: 100%;
 }
 
-.dice-count-picker-option {
+.dice-count-card-step {
   display: flex;
-  min-height: 2.75rem;
-  min-width: 2.75rem;
+  min-height: 2.25rem;
+  min-width: 2.25rem;
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  border: 2px solid rgba(15, 23, 42, 0.14);
-  background: #fff;
-  font-size: 1rem;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  background: #f1f5f9;
+  font-size: 1.125rem;
   font-weight: 700;
+  line-height: 1;
   color: #0f172a;
-  transition:
-    border-color 0.12s ease,
-    background 0.12s ease,
-    box-shadow 0.12s ease;
 }
 
-.dice-count-picker-option.is-selected {
+.dice-count-card-value {
+  display: flex;
+  min-height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.55rem;
+  border: 2px solid rgba(15, 23, 42, 0.12);
+  background: #fff;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.dice-count-card-value.has-value {
   border-color: #334155;
-  background: #f1f5f9;
-  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.12);
+  background: #f8fafc;
+}
+
+.dice-throw-rolls-section {
+  margin-top: 0.15rem;
+}
+
+.play-roll-chips--large {
+  gap: 0.45rem;
+}
+
+.play-roll-chip--large {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.play-entry-btn--secondary {
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  background: #fff;
+  color: #334155;
 }
 
 .play-fixed-choice-banner {

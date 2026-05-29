@@ -8,7 +8,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **M29 Würfel-Eintrag:** Wurf-Overlay (Augenzahl-Häufigkeit 0–5, Wurfanzahl) → Zettel mit blass-roten Vorschlägen → Feld wählen; Yatzy/Straßen: 0 oder Festwert (`DiceCountPicker`, `FixedFieldChoiceBanner`)
 
 ### Changed
-- **M29 Polish:** Spiel beenden als Icon neben Pool (mit Bestätigung); größere Würfel-Tapflächen; schwarze Zähler; blass-rote Feld-Markierung statt grün; nach Eintrag löschen zurück zum Würfel-Flow
+- **M29 Overlay UX:** Zwei Schritte (Wurf bestätigen → Würfe wählen), Live-Vorschau der 5 Würfel, kompaktes 3×2-Raster mit +/− statt 36 Kreisen
 
 ### iOS
 - TestFlight-Build **1.0 (13)** — M29 Polish
