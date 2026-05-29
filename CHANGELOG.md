@@ -5,7 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
-- **iOS (Capacitor):** `frontend/ios/`, `capacitor.config.ts`, `npm run build:ios`, Doku `docs/ios-app-store.md`
+- **M29 Würfel-Eintrag:** Overlay zum Nachstellen des Wurfs (5×6 Augen + Wurfanzahl) → Overlay schließt → Zettel markiert passende Felder → Feld antippen zum Eintragen; Fallback manuell/Korrektur (`DiceThrowOverlay`, `DicePickerGrid`, `CommittedThrowBanner`, `scoreFromDice.ts`)
 - Bundle ID `de.bottletrade.dicebudget`, nativer API-Zugriff, App-Start direkt `/app`
 - **Domain & Marke:** `dicebudget.bottle-trade.de`, App-Name **dice.budget**, Landing `/`, Spiel `/app`, Datenschutz `/datenschutz`
 - **Nginx:** nur `dicebudget.bottle-trade.de` (kniffel-Domain aus DNS und Config entfernt)

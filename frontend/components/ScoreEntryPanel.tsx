@@ -19,6 +19,7 @@ type Props = {
   onSubmit: () => void;
   onClearLast?: () => void;
   onCancel: () => void;
+  onBackToDice?: () => void;
 };
 
 export function ScoreEntryPanel({
@@ -37,6 +38,7 @@ export function ScoreEntryPanel({
   onSubmit,
   onClearLast,
   onCancel,
+  onBackToDice,
 }: Props) {
   const scoreChoices = fieldScoreChoices(field.fieldType);
 
@@ -180,6 +182,17 @@ export function ScoreEntryPanel({
             {isCorrection ? "Korrigieren" : "Eintragen"}
           </button>
         </div>
+
+        {onBackToDice && !isCorrection && (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={onBackToDice}
+            className="play-dice-entry-manual-link mt-2 w-full disabled:opacity-50"
+          >
+            Mit Würfeln eintragen
+          </button>
+        )}
       </div>
     </aside>
   );

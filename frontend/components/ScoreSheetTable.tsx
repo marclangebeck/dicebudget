@@ -9,11 +9,13 @@ import {
   UPPER_FIELD_TYPES,
 } from "@/lib/labels";
 import type { SheetRow, SummaryRowKey } from "@/lib/labels";
+import type { FieldPreview } from "@/lib/scoreFromDice";
 import type { FieldDto, FieldTypeId, GameDto, RunDto } from "@/lib/types";
 
 type Props = {
   run: RunDto;
   activeFieldId: string | null;
+  fieldPreviews?: Map<string, FieldPreview> | null;
   onSelectField: (fieldId: string) => void;
   onIncrementExtraYatzy?: () => void;
   extraYatzyBusy?: boolean;
@@ -139,19 +141,32 @@ function FieldRowLabel({
   return <span className="text-[10px] leading-tight md:text-[11px]">{FIELD_LABELS[row.fieldType]}</span>;
 }
 
+function previewClass(tier: FieldPreview["tier"] | undefined): string {
+  if (tier === "best") return "play-cell--preview-best";
+  if (tier === "good") return "play-cell--preview-good";
+  if (tier === "zero") return "play-cell--preview-zero";
+  return "";
+}
+
 function ScoreTile({
   field,
   isActive,
   disabled,
+  preview,
   onSelect,
 }: {
   field: FieldDto;
   isActive: boolean;
   disabled: boolean;
+  preview?: FieldPreview;
   onSelect: () => void;
 }) {
   const done = field.score !== null;
   const label = FIELD_LABELS[field.fieldType];
+  const previewTitle =
+    preview !== undefined
+      ? `${label}: ${preview.score} Punkte mit diesem Wurf`
+      : undefined;
 
   return (
     <button
@@ -161,13 +176,17 @@ function ScoreTile({
       title={
         done
           ? `${label}: ${field.score} Punkte · ${field.rollsUsed} Würfe – tippen zum Korrigieren`
-          : `${label} – tippen zum Eintragen`
+          : previewTitle ?? `${label} – tippen zum Eintragen`
       }
       className={`play-cell flex h-8 w-full items-center justify-center text-[11px] font-semibold tabular-nums md:h-7 md:text-[10px] ${
-        done ? "play-cell--done" : isActive ? "play-cell--active" : ""
+        done
+          ? "play-cell--done"
+          : isActive
+            ? "play-cell--active"
+            : previewClass(preview?.tier)
       }`}
     >
-      {done ? field.score : null}
+      {done ? field.score : preview !== undefined ? preview.score : null}
     </button>
   );
 }
@@ -207,6 +226,7 @@ function SummaryTile({
 export function ScoreSheetTable({
   run,
   activeFieldId,
+  fieldPreviews,
   onSelectField,
   onIncrementExtraYatzy,
   extraYatzyBusy,
@@ -284,6 +304,11 @@ export function ScoreSheetTable({
                             field={field}
                             isActive={field.id === activeFieldId}
                             disabled={!runActive}
+                            preview={
+                              field.score === null
+                                ? fieldPreviews?.get(field.id)
+                                : undefined
+                            }
                             onSelect={() => onSelectField(field.id)}
                           />
                         );
