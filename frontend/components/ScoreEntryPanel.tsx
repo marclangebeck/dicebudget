@@ -60,12 +60,10 @@ export function ScoreEntryPanel({
     (strategy ? rollsUsed !== null : true) &&
     !busy;
 
-  const isUpperField = scoreChoices.length === 6;
-
   return (
     <div
       id={id}
-      className="field-entry-overlay fixed inset-0 z-50 flex items-end justify-center sm:items-center"
+      className="field-entry-overlay fixed inset-0 z-50 flex justify-center"
       role="dialog"
       aria-modal="true"
       aria-labelledby="field-entry-title"
@@ -77,7 +75,7 @@ export function ScoreEntryPanel({
         onClick={onCancel}
       />
 
-      <div className="field-entry-card pb-safe relative mx-auto w-full max-w-md px-3 sm:px-4">
+      <div className="field-entry-card relative mx-auto w-full max-w-md px-3 sm:px-4">
         <div className="play-entry-panel">
           <div className="play-entry-header">
             <div className="min-w-0">
@@ -106,9 +104,7 @@ export function ScoreEntryPanel({
           </div>
 
           <div className="play-entry-section">
-            <p className="play-entry-section-label mb-1.5">
-              {isUpperField ? "Würfel wählen" : "Punkte"}
-            </p>
+            <p className="play-entry-section-label mb-1.5">Punkte</p>
             <FieldScoreChoiceGrid
               fieldType={field.fieldType}
               selectedScore={parsedScore}
@@ -120,7 +116,11 @@ export function ScoreEntryPanel({
           {strategy && (
             <div className="play-entry-section">
               <p className="play-entry-section-label mb-1.5">Würfe für dieses Feld</p>
-              <div className="play-roll-chips play-roll-chips--large">
+              <div
+                className={`play-roll-chips play-roll-chips--large ${
+                  rollOptions.length > 6 ? "play-roll-chips--dense" : ""
+                }`}
+              >
                 {rollOptions.map((n) => (
                   <button
                     key={n}

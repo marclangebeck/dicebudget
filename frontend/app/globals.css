@@ -1190,10 +1190,11 @@ html.legal-route body {
 }
 
 .play-score-btn--selected {
-  border-color: #0f172a;
-  background: #f1f5f9;
+  border-color: #fbbf24;
+  background: #fef3c7;
   color: #0f172a;
-  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.12);
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.4);
 }
 
 .play-roll-chips {
@@ -1208,15 +1209,18 @@ html.legal-route body {
   border-radius: 0.5rem;
   border: 1px solid rgba(15, 23, 42, 0.14);
   background: #fff;
+  color: #0f172a;
   padding: 0.25rem 0.45rem;
   font-size: 0.75rem;
   font-weight: 600;
 }
 
 .play-roll-chip--selected {
-  border-color: #0369a1;
-  background: #e0f2fe;
-  color: #0c4a6e;
+  border-color: #fbbf24;
+  background: #fef3c7;
+  color: #0f172a;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.4);
 }
 
 .play-entry-hint {
@@ -1227,6 +1231,8 @@ html.legal-route body {
 
 .field-entry-overlay {
   background: rgba(15, 23, 42, 0.5);
+  align-items: flex-start;
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 .field-entry-overlay-backdrop {
@@ -1239,14 +1245,15 @@ html.legal-route body {
   max-height: calc(100dvh - env(safe-area-inset-top, 0px));
   overflow-y: auto;
   overscroll-behavior: contain;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .field-entry-card .play-entry-panel {
-  max-height: min(88dvh, 32rem);
-  border-radius: 1rem 1rem 0 0;
+  border-radius: 0 0 1rem 1rem;
   background: #ffffff;
   color: #0f172a;
-  box-shadow: 0 -10px 36px -8px rgba(15, 23, 42, 0.28);
+  box-shadow: 0 8px 32px -8px rgba(15, 23, 42, 0.35);
+  max-height: none;
 }
 
 .field-entry-card .play-entry-title {
@@ -1266,94 +1273,14 @@ html.legal-route body {
   color: #0f172a;
 }
 
-.field-entry-card .play-roll-chip--selected {
-  border-color: #0f172a;
-  background: #f1f5f9;
-  color: #0f172a;
-}
-
 @media (min-width: 640px) {
+  .field-entry-overlay {
+    padding-top: max(1rem, env(safe-area-inset-top, 0px));
+  }
+
   .field-entry-card .play-entry-panel {
     border-radius: 1rem;
-    box-shadow: 0 16px 40px -12px rgba(15, 23, 42, 0.35);
   }
-}
-
-.upper-field-score-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.45rem;
-}
-
-.upper-field-score-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.2rem;
-  min-height: 4.25rem;
-  border-radius: 0.65rem;
-  border: 1px solid rgba(15, 23, 42, 0.16);
-  background: #ffffff;
-  color: #0f172a;
-  padding: 0.35rem 0.25rem 0.3rem;
-}
-
-.upper-field-score-btn--selected {
-  border-color: #0f172a;
-  background: #f1f5f9;
-  color: #0f172a;
-  outline: 2px solid #0f172a;
-  outline-offset: 1px;
-}
-
-.upper-field-dice-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-content: center;
-  gap: 0.12rem;
-  min-height: 1.85rem;
-  width: 100%;
-}
-
-.upper-field-dice {
-  height: 1.5rem;
-  width: 1.5rem;
-  border-radius: 0.32rem;
-  border: 1px solid #cbd5e1;
-  background: #fff;
-  padding: 0.15rem;
-}
-
-.upper-field-dice--sm {
-  height: 1.2rem;
-  width: 1.2rem;
-  padding: 0.1rem;
-}
-
-.upper-field-dice span {
-  height: 0.26rem !important;
-  width: 0.26rem !important;
-}
-
-.upper-field-dice--sm span {
-  height: 0.2rem !important;
-  width: 0.2rem !important;
-}
-
-.upper-field-empty {
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1;
-  color: #94a3b8;
-}
-
-.upper-field-pts {
-  font-size: 0.6875rem;
-  font-weight: 700;
-  line-height: 1;
-  color: #0f172a;
 }
 
 .field-score-fixed-grid {
@@ -1406,6 +1333,27 @@ html.legal-route body {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.5rem;
+}
+
+.field-score-upper-btn {
+  min-height: 3rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.field-entry-card .play-roll-chips--dense {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(2.5rem, 1fr));
+  gap: 0.35rem;
+}
+
+.field-entry-card .play-roll-chips--dense .play-roll-chip--large {
+  min-width: 0;
+  width: 100%;
 }
 
 .play-roll-chips--large {
