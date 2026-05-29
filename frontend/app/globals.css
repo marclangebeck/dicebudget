@@ -1058,9 +1058,11 @@ html.legal-route body {
 }
 
 .play-cell--active {
-  border-color: #059669;
-  background: #d1fae5;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35);
+  border-color: #0f172a;
+  background: #ffffff;
+  color: #0f172a;
+  font-weight: 700;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.18);
 }
 
 .play-cell--done {
@@ -1184,13 +1186,14 @@ html.legal-route body {
   border-radius: 0.5rem;
   border: 1px solid rgba(15, 23, 42, 0.14);
   background: #fff;
+  color: #0f172a;
 }
 
 .play-score-btn--selected {
-  border-color: #059669;
-  background: #d1fae5;
-  color: #064e3b;
-  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.35);
+  border-color: #0f172a;
+  background: #f1f5f9;
+  color: #0f172a;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.12);
 }
 
 .play-roll-chips {
@@ -1222,200 +1225,187 @@ html.legal-route body {
   color: var(--text-subtle);
 }
 
-.dice-throw-overlay {
+.field-entry-overlay {
   background: rgba(15, 23, 42, 0.5);
 }
 
-.dice-throw-overlay-backdrop {
+.field-entry-overlay-backdrop {
   border: none;
   background: transparent;
   cursor: pointer;
 }
 
-.dice-throw-card {
+.field-entry-card {
   max-height: calc(100dvh - env(safe-area-inset-top, 0px));
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 
-.play-dice-throw-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
+.field-entry-card .play-entry-panel {
+  max-height: min(88dvh, 32rem);
   border-radius: 1rem 1rem 0 0;
+  background: #ffffff;
+  color: #0f172a;
   box-shadow: 0 -10px 36px -8px rgba(15, 23, 42, 0.28);
 }
 
+.field-entry-card .play-entry-title {
+  color: #0f172a;
+}
+
+.field-entry-card .play-entry-kicker,
+.field-entry-card .play-entry-section-label {
+  color: #475569;
+}
+
+.field-entry-card .play-entry-hint {
+  color: #64748b;
+}
+
+.field-entry-card .play-roll-chip {
+  color: #0f172a;
+}
+
+.field-entry-card .play-roll-chip--selected {
+  border-color: #0f172a;
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
 @media (min-width: 640px) {
-  .play-dice-throw-panel {
+  .field-entry-card .play-entry-panel {
     border-radius: 1rem;
     box-shadow: 0 16px 40px -12px rgba(15, 23, 42, 0.35);
   }
 }
 
-.dice-throw-step-kicker {
-  font-size: 0.625rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #64748b;
-}
-
-.dice-throw-preview {
-  border-radius: 0.75rem;
-  border: 1px solid rgba(15, 23, 42, 0.1);
-  background: #f8fafc;
-  padding: 0.65rem 0.75rem;
-}
-
-.dice-throw-preview--compact {
-  padding: 0.5rem 0.65rem;
-}
-
-.dice-throw-preview-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.dice-throw-preview-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #334155;
-}
-
-.dice-throw-preview-total {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.dice-throw-preview-total.is-complete {
-  color: #047857;
-}
-
-.dice-throw-preview-dice {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.4rem;
-}
-
-.dice-throw-preview-die {
-  height: 2.25rem;
-  width: 2.25rem;
-  border-radius: 0.45rem;
-  border: 1px solid #cbd5e1;
-  background: #fff;
-  padding: 0.25rem;
-}
-
-.dice-throw-preview-die span {
-  height: 0.34rem !important;
-  width: 0.34rem !important;
-}
-
-.dice-throw-preview-empty {
-  display: flex;
-  height: 2.25rem;
-  width: 2.25rem;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.45rem;
-  border: 1.5px dashed #cbd5e1;
-  background: #fff;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #94a3b8;
-}
-
-.dice-count-picker {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.dice-count-picker-hint {
-  font-size: 0.6875rem;
-  line-height: 1.35;
-  color: var(--text-muted);
-  text-align: center;
-}
-
-.dice-count-grid {
+.upper-field-score-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.45rem;
 }
 
-.dice-count-card {
+.upper-field-score-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.3rem;
-  border-radius: 0.75rem;
-  border: 1px solid rgba(15, 23, 42, 0.1);
-  background: #fff;
-  padding: 0.4rem 0.3rem 0.45rem;
+  justify-content: center;
+  gap: 0.2rem;
+  min-height: 4.25rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  background: #ffffff;
+  color: #0f172a;
+  padding: 0.35rem 0.25rem 0.3rem;
 }
 
-.dice-count-card-face-btn {
+.upper-field-score-btn--selected {
+  border-color: #0f172a;
+  background: #f1f5f9;
+  color: #0f172a;
+  outline: 2px solid #0f172a;
+  outline-offset: 1px;
+}
+
+.upper-field-dice-row {
   display: flex;
-  border: none;
-  background: none;
-  padding: 0.1rem;
-  border-radius: 0.45rem;
-}
-
-.dice-count-card-face-btn:not(:disabled):active {
-  transform: scale(0.94);
-}
-
-.dice-count-card-face {
-  height: 2rem;
-  width: 2rem;
-  border-radius: 0.4rem;
-  border: 1px solid #cbd5e1;
-  background: #fff;
-  padding: 0.2rem;
-}
-
-.dice-count-card-face span {
-  height: 0.3rem !important;
-  width: 0.3rem !important;
-}
-
-.dice-count-chip-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.18rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  gap: 0.12rem;
+  min-height: 1.85rem;
   width: 100%;
 }
 
-.dice-count-chip {
-  display: flex;
-  min-height: 1.65rem;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.35rem;
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  background: #f8fafc;
-  font-size: 0.75rem;
+.upper-field-dice {
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 0.32rem;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  padding: 0.15rem;
+}
+
+.upper-field-dice--sm {
+  height: 1.2rem;
+  width: 1.2rem;
+  padding: 0.1rem;
+}
+
+.upper-field-dice span {
+  height: 0.26rem !important;
+  width: 0.26rem !important;
+}
+
+.upper-field-dice--sm span {
+  height: 0.2rem !important;
+  width: 0.2rem !important;
+}
+
+.upper-field-empty {
+  font-size: 1rem;
   font-weight: 700;
   line-height: 1;
-  color: #334155;
+  color: #94a3b8;
 }
 
-.dice-count-chip--selected {
-  border-color: #0f172a;
-  background: #0f172a;
-  color: #fff;
+.upper-field-pts {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #0f172a;
 }
 
-.dice-throw-rolls-section {
-  margin-top: 0.15rem;
+.field-score-fixed-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.field-score-fixed-btn {
+  min-height: 3.5rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.field-score-sum-grid {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 0.2rem;
+}
+
+@media (min-width: 640px) {
+  .field-score-sum-grid {
+    grid-template-columns: repeat(11, minmax(0, 1fr));
+    gap: 0.35rem;
+  }
+}
+
+.field-score-sum-btn {
+  min-height: 2.25rem;
+  border-radius: 0.4rem;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+@media (min-width: 640px) {
+  .field-score-sum-btn {
+    min-height: 2.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+.field-score-default-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
 }
 
 .play-roll-chips--large {
@@ -1433,175 +1423,6 @@ html.legal-route body {
   border: 1px solid rgba(15, 23, 42, 0.16);
   background: #fff;
   color: #334155;
-}
-
-.play-fixed-choice-banner {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  border-radius: 0.85rem;
-  border: 1px solid rgba(248, 113, 113, 0.35);
-  background: linear-gradient(155deg, #fef2f2 0%, #fee2e2 100%);
-  padding: 0.55rem 0.65rem;
-}
-
-.play-fixed-choice-label {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #7f1d1d;
-  text-align: center;
-}
-
-.play-fixed-choice-actions {
-  display: flex;
-  gap: 0.4rem;
-}
-
-.play-fixed-choice-btn {
-  flex: 1;
-  min-height: 2.5rem;
-  border-radius: 0.6rem;
-  border: 1px solid rgba(15, 23, 42, 0.14);
-  background: #fff;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.play-fixed-choice-btn--primary {
-  border-color: #fca5a5;
-  background: #fee2e2;
-}
-
-.play-fixed-choice-btn--muted {
-  flex: 0 0 2.5rem;
-  color: #64748b;
-}
-
-.play-dice-entry-hint {
-  font-size: 0.6875rem;
-  line-height: 1.35;
-  color: var(--text-muted);
-}
-
-.play-dice-entry-manual-link {
-  border: none;
-  background: none;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: #0369a1;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.play-throw-start-btn,
-.play-throw-compare-btn {
-  min-height: 2.75rem;
-  border-radius: 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 700;
-}
-
-.play-throw-start-btn {
-  border: 1px solid #047857;
-  background: linear-gradient(180deg, #10b981 0%, #059669 100%);
-  color: #fff;
-  box-shadow: 0 4px 14px -4px rgba(5, 150, 105, 0.55);
-}
-
-.play-throw-compare-btn {
-  border: 1px solid rgba(15, 23, 42, 0.18);
-  background: #fff;
-  color: #334155;
-}
-
-.dice-throw-live-score {
-  margin: 0 0 0.35rem;
-  text-align: center;
-  font-size: 1.125rem;
-  font-weight: 800;
-  color: #0f172a;
-}
-
-.play-fixed-choice-actions--overlay {
-  margin: 0.25rem 0 0.5rem;
-}
-
-.play-fixed-choice-actions--overlay .play-fixed-choice-btn {
-  min-height: 3rem;
-  font-size: 1.125rem;
-}
-
-.play-fixed-choice-btn--selected {
-  outline: 2px solid #0f172a;
-  outline-offset: 1px;
-}
-
-.play-throw-banner {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  border-radius: 0.85rem;
-  border: 1px solid rgba(4, 120, 87, 0.28);
-  background: linear-gradient(155deg, #ecfdf5 0%, #d1fae5 100%);
-  padding: 0.55rem 0.65rem;
-}
-
-.play-throw-banner-main {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.play-throw-banner-dice {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.play-throw-banner-die {
-  height: 1.65rem;
-  width: 1.65rem;
-  border-radius: 0.35rem;
-  border: 1px solid #94a3b8;
-  background: #fff;
-  padding: 0.15rem;
-}
-
-.play-throw-banner-die span {
-  height: 0.28rem !important;
-  width: 0.28rem !important;
-}
-
-.play-throw-banner-text {
-  min-width: 0;
-  flex: 1;
-  font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1.35;
-  color: #065f46;
-}
-
-.play-throw-banner-actions {
-  display: flex;
-  gap: 0.35rem;
-}
-
-.play-throw-banner-btn {
-  flex: 1;
-  min-height: 1.85rem;
-  border-radius: 0.5rem;
-  border: 1px solid rgba(4, 120, 87, 0.35);
-  background: rgba(255, 255, 255, 0.85);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: #047857;
-}
-
-.play-throw-banner-btn--muted {
-  border-color: rgba(15, 23, 42, 0.12);
-  color: var(--text-muted);
 }
 
 .play-manual-hint-panel {

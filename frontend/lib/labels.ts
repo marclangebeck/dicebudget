@@ -70,6 +70,13 @@ export function diceValueForField(fieldType: FieldTypeId): 1 | 2 | 3 | 4 | 5 | 6
   return DICE_VALUE_BY_FIELD[fieldType] ?? null;
 }
 
+/** Anzahl Würfel einer Augenzahl für einen gültigen oberen Eintrag. */
+export function upperFieldDieCount(fieldType: FieldTypeId, score: number): number {
+  const face = diceValueForField(fieldType);
+  if (face === null || score === 0) return 0;
+  return score / face;
+}
+
 export const LOWER_FIELD_TYPES: FieldTypeId[] = [
   "THREE_OF_A_KIND",
   "FOUR_OF_A_KIND",

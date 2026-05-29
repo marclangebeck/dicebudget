@@ -1,12 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { CommittedThrowBanner } from "@/components/CommittedThrowBanner";
-import {
-  DiceThrowOverlay,
-  type ThrowOverlayMode,
-} from "@/components/DiceThrowOverlay";
-import { FixedFieldChoiceBanner } from "@/components/FixedFieldChoiceBanner";
+import { useCallback, useEffect, useState } from "react";
 import { RunCompleteOverlay } from "@/components/RunCompleteOverlay";
 import { RunFinishScreen } from "@/components/RunFinishScreen";
 import { FitScoreSheet } from "@/components/FitScoreSheet";
@@ -26,23 +20,7 @@ import {
   isLocalSoloRunId,
 } from "@/lib/localSoloRun";
 import { ABANDON_RUN_CONFIRM, allFieldsScored, getLastScoredFieldId } from "@/lib/runUtils";
-import {
-  computeFieldPreviews,
-  DEFAULT_DICE,
-  DEFAULT_DIE_COUNTS,
-  dieCountsToDiceValues,
-  diceValuesToDieCounts,
-  isFixedRuleField,
-  scoreField,
-  type DieCounts,
-  type DiceValues,
-} from "@/lib/scoreFromDice";
 import type { FieldDto, RunDto } from "@/lib/types";
-
-type CommittedThrow = {
-  dice: DiceValues;
-  rollsUsed: number;
-};
 
 type Props = {
   runId: string;
@@ -65,14 +43,6 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   const [busy, setBusy] = useState(false);
   const [showCompleteOverlay, setShowCompleteOverlay] = useState(false);
   const [sheetReviewAfterComplete, setSheetReviewAfterComplete] = useState(false);
-  const [manualEntryMode, setManualEntryMode] = useState(false);
-  const [overlayMode, setOverlayMode] = useState<ThrowOverlayMode | null>(null);
-  const [overlayTargetFieldId, setOverlayTargetFieldId] = useState<string | null>(null);
-  const [overlayDraftCounts, setOverlayDraftCounts] = useState<DieCounts>(DEFAULT_DIE_COUNTS);
-  const [overlayRollsUsed, setOverlayRollsUsed] = useState<number | null>(null);
-  const [overlayFixedScore, setOverlayFixedScore] = useState<number | null>(null);
-  const [committedThrow, setCommittedThrow] = useState<CommittedThrow | null>(null);
-  const [pendingFixedFieldId, setPendingFixedFieldId] = useState<string | null>(null);
 
   const resetEntry = useCallback(() => {
     setScoreInput("");
@@ -119,26 +89,9 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     }
   }, [run, runId, inviteCode, playerSecret]);
 
-  const fieldPreviews = useMemo(() => {
-    if (!run || !committedThrow || manualEntryMode || showCompleteOverlay) return null;
-    const openFields = run.games
-      .flatMap((g) => g.fields)
-      .filter((f) => f.score === null)
-      .map((f) => ({ id: f.id, fieldType: f.fieldType }));
-    return computeFieldPreviews(openFields, committedThrow.dice);
-  }, [run, committedThrow, manualEntryMode, showCompleteOverlay]);
-
   const activeField: FieldDto | undefined = run?.games
     .flatMap((g) => g.fields)
     .find((f) => f.id === activeFieldId);
-
-  const overlayTargetField: FieldDto | undefined = run?.games
-    .flatMap((g) => g.fields)
-    .find((f) => f.id === overlayTargetFieldId);
-
-  const overlayTargetGameIndex =
-    run?.games.find((g) => g.fields.some((f) => f.id === overlayTargetFieldId))?.index ??
-    null;
 
   const isCorrection = !!activeField && activeField.score !== null;
 
@@ -152,152 +105,25 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     isCorrection &&
     activeField.id === lastScoredFieldId;
 
-  function closeThrowOverlay() {
-    const wasFieldMode = overlayMode === "field";
-    setOverlayMode(null);
-    setOverlayTargetFieldId(null);
-    setOverlayFixedScore(null);
-    if (wasFieldMode) {
-      setActiveFieldId(null);
-    }
-  }
-
-  function openFieldOverlay(fieldId: string) {
-    if (!run) return;
-    setOverlayTargetFieldId(fieldId);
-    setOverlayDraftCounts(DEFAULT_DIE_COUNTS);
-    setOverlayRollsUsed(defaultRollsUsed(run));
-    setOverlayFixedScore(null);
-    setOverlayMode("field");
-    setActiveFieldId(fieldId);
-    setManualEntryMode(false);
-  }
-
-  function openCompareOverlay() {
-    if (!run) return;
-    const source = committedThrow;
-    setOverlayTargetFieldId(null);
-    setOverlayDraftCounts(
-      source ? diceValuesToDieCounts(source.dice) : DEFAULT_DIE_COUNTS,
-    );
-    setOverlayRollsUsed(source?.rollsUsed ?? defaultRollsUsed(run));
-    setOverlayFixedScore(null);
-    setOverlayMode("compare");
-  }
-
-  function confirmCompareOverlay() {
-    if (overlayRollsUsed === null) return;
-    const dice = dieCountsToDiceValues(overlayDraftCounts);
-    if (!dice) return;
-    setCommittedThrow({ dice, rollsUsed: overlayRollsUsed });
-    setPendingFixedFieldId(null);
-    resetEntry();
-    setManualEntryMode(false);
-    closeThrowOverlay();
-  }
-
-  async function submitFieldOverlay() {
-    if (!overlayTargetFieldId || !run || overlayRollsUsed === null) return;
-    const field = run.games.flatMap((g) => g.fields).find((f) => f.id === overlayTargetFieldId);
-    if (!field || field.score !== null) return;
-
-    if (isFixedRuleField(field.fieldType)) {
-      if (overlayFixedScore === null) return;
-      await submitThrowToField(
-        overlayTargetFieldId,
-        { dice: DEFAULT_DICE, rollsUsed: overlayRollsUsed },
-        overlayFixedScore,
-      );
-    } else {
-      const dice = dieCountsToDiceValues(overlayDraftCounts);
-      if (!dice) return;
-      await submitThrowToField(overlayTargetFieldId, { dice, rollsUsed: overlayRollsUsed });
-    }
-    closeThrowOverlay();
-  }
-
-  function cancelCommittedThrow() {
-    setCommittedThrow(null);
-    setPendingFixedFieldId(null);
-    setActiveFieldId(null);
-    resetEntry();
-  }
-
   function cancelEntry() {
     setActiveFieldId(null);
     resetEntry();
-    setManualEntryMode(false);
   }
 
   function selectField(fieldId: string) {
     const field = run?.games.flatMap((g) => g.fields).find((f) => f.id === fieldId);
     if (!field || !run) return;
 
+    setActiveFieldId(fieldId);
+
     if (field.score !== null && field.score !== undefined) {
-      setCommittedThrow(null);
-      setManualEntryMode(true);
-      setActiveFieldId(fieldId);
       setScoreInput(String(field.score));
       setRollsUsed(run.useStrategyRules ? field.rollsUsed : 1);
       return;
     }
 
-    if (manualEntryMode) {
-      setActiveFieldId(fieldId);
-      resetEntry();
-      return;
-    }
-
-    if (committedThrow) {
-      if (isFixedRuleField(field.fieldType)) {
-        setPendingFixedFieldId(fieldId);
-        return;
-      }
-      void submitThrowToField(fieldId, committedThrow);
-      return;
-    }
-
-    openFieldOverlay(fieldId);
-  }
-
-  async function submitThrowToField(
-    fieldId: string,
-    throwData: CommittedThrow,
-    scoreOverride?: number,
-  ) {
-    if (!run || busy) return;
-    const field = run.games.flatMap((g) => g.fields).find((f) => f.id === fieldId);
-    if (!field || field.score !== null) return;
-
-    const score = scoreOverride ?? scoreField(field.fieldType, throwData.dice);
-    setBusy(true);
-    setError(null);
-    try {
-      const updated = isLocalSolo
-        ? completeLocalSoloField(runId, fieldId, score, throwData.rollsUsed)
-        : (
-            await completeField(
-              runId,
-              fieldId,
-              score,
-              throwData.rollsUsed,
-              playerSecret,
-            )
-          ).run;
-      setRun(updated);
-      setCommittedThrow(null);
-      setPendingFixedFieldId(null);
-      setActiveFieldId(null);
-      resetEntry();
-      if (allFieldsScored(updated)) {
-        setSheetReviewAfterComplete(false);
-        setShowCompleteOverlay(true);
-      }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Eintrag fehlgeschlagen");
-    } finally {
-      setBusy(false);
-    }
+    resetEntry();
+    setRollsUsed(defaultRollsUsed(run));
   }
 
   async function handleExtraYatzy() {
@@ -339,7 +165,6 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       setRun(updated);
       resetEntry();
       setActiveFieldId(null);
-      setManualEntryMode(false);
       if (allFieldsScored(updated)) {
         setSheetReviewAfterComplete(false);
         setShowCompleteOverlay(true);
@@ -362,9 +187,6 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       setRun(updated);
       setActiveFieldId(null);
       resetEntry();
-      setManualEntryMode(false);
-      setCommittedThrow(null);
-      setPendingFixedFieldId(null);
       setShowCompleteOverlay(false);
       setSheetReviewAfterComplete(false);
     } catch (e) {
@@ -414,9 +236,6 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       setRun(updated);
       setActiveFieldId(null);
       resetEntry();
-      setCommittedThrow(null);
-      setPendingFixedFieldId(null);
-      closeThrowOverlay();
       scrollToFinish();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Beenden fehlgeschlagen");
@@ -430,13 +249,9 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   }
 
   const allScored = allFieldsScored(run);
-  const showManualPanel =
-    run.status === "ACTIVE" && !showCompleteOverlay && manualEntryMode;
-  const showManualHint = showManualPanel && !activeField;
-  const showManualEntryPanel = showManualPanel && !!activeField;
-  const showBottomPanel = showManualHint || showManualEntryPanel;
+  const showEntryPanel = !!activeField && !showCompleteOverlay;
 
-  const sheetLayoutKey = `${run.gameCount}-${showBottomPanel ? "entry" : "idle"}-${showCompleteOverlay ? "overlay" : "sheet"}-${committedThrow ? "throw" : "none"}`;
+  const sheetLayoutKey = `${run.gameCount}-${showEntryPanel ? "entry" : "idle"}-${showCompleteOverlay ? "overlay" : "sheet"}`;
 
   const rollsInPoolForEntry =
     isCorrection && activeField && run.useStrategyRules
@@ -445,10 +260,6 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
           return run.rollsInPool + oldDelta.poolCost - oldDelta.spareToPool;
         })()
       : run.rollsInPool;
-
-  const pendingFixedField = pendingFixedFieldId
-    ? run.games.flatMap((g) => g.fields).find((f) => f.id === pendingFixedFieldId)
-    : undefined;
 
   if (run.status === "FINISHED") {
     return (
@@ -486,25 +297,6 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         <p className="glass-alert-error shrink-0 px-3 py-2 text-sm">{error}</p>
       )}
 
-      {pendingFixedField && committedThrow && !showCompleteOverlay && (
-        <FixedFieldChoiceBanner
-          fieldType={pendingFixedField.fieldType}
-          busy={busy}
-          onPick={(score) => void submitThrowToField(pendingFixedField.id, committedThrow, score)}
-          onCancel={() => setPendingFixedFieldId(null)}
-        />
-      )}
-
-      {committedThrow && !manualEntryMode && !showCompleteOverlay && !pendingFixedField && (
-        <CommittedThrowBanner
-          dice={committedThrow.dice}
-          rollsUsed={committedThrow.rollsUsed}
-          busy={busy}
-          onEdit={openCompareOverlay}
-          onCancel={cancelCommittedThrow}
-        />
-      )}
-
       {sheetReviewAfterComplete && allScored && !showCompleteOverlay && (
         <div className="play-review-banner shrink-0">
           <p className="play-review-score tabular-nums">{run.totalScore} Punkte</p>
@@ -529,37 +321,18 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         </div>
       )}
 
-      <div
-        className={`play-board-main flex min-h-0 flex-1 flex-col overflow-hidden ${
-          showBottomPanel ? "play-board-main--entry" : ""
-        }`}
-      >
+      <div className="play-board-main flex min-h-0 flex-1 flex-col overflow-hidden">
         <div className="play-sheet-card flex min-h-0 flex-1 overflow-hidden">
           <FitScoreSheet layoutKey={sheetLayoutKey}>
             <ScoreSheetTable
               run={run}
               activeFieldId={activeFieldId}
-              fieldPreviews={fieldPreviews}
               onSelectField={selectField}
               onIncrementExtraYatzy={() => void handleExtraYatzy()}
               extraYatzyBusy={busy}
             />
           </FitScoreSheet>
         </div>
-
-        {!committedThrow &&
-          !manualEntryMode &&
-          overlayMode === null &&
-          !showCompleteOverlay && (
-            <button
-              type="button"
-              disabled={busy}
-              onClick={openCompareOverlay}
-              className="play-throw-compare-btn shrink-0 disabled:opacity-50"
-            >
-              Wurf vergleichen
-            </button>
-          )}
       </div>
 
       {showCompleteOverlay && run && (
@@ -575,52 +348,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         />
       )}
 
-      {overlayMode !== null && !showCompleteOverlay && (
-        <DiceThrowOverlay
-          run={run}
-          mode={overlayMode}
-          targetField={overlayTargetField ?? null}
-          gameIndex={overlayTargetGameIndex}
-          draftCounts={overlayDraftCounts}
-          rollsUsed={overlayRollsUsed}
-          fixedScore={overlayFixedScore}
-          busy={busy}
-          onDraftCountsChange={setOverlayDraftCounts}
-          onRollsUsed={setOverlayRollsUsed}
-          onFixedScore={setOverlayFixedScore}
-          onSubmit={() =>
-            void (overlayMode === "field"
-              ? submitFieldOverlay()
-              : confirmCompareOverlay())
-          }
-          onCancel={closeThrowOverlay}
-          onManualEntry={() => {
-            closeThrowOverlay();
-            cancelCommittedThrow();
-            setManualEntryMode(true);
-            setActiveFieldId(null);
-            resetEntry();
-          }}
-        />
-      )}
-
-      {showManualHint && (
-        <aside className="play-entry-sheet pb-safe pointer-events-auto fixed inset-x-0 bottom-0 z-30 px-2">
-          <div className="play-entry-panel play-manual-hint-panel">
-            <p className="play-manual-hint-text">Manuell eintragen — tippe ein Feld auf dem Zettel.</p>
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => setManualEntryMode(false)}
-              className="play-dice-entry-manual-link disabled:opacity-50"
-            >
-              Mit Würfeln eintragen
-            </button>
-          </div>
-        </aside>
-      )}
-
-      {showManualEntryPanel && activeField && !showCompleteOverlay && (
+      {showEntryPanel && activeField && (
         <ScoreEntryPanel
           id="score-entry-panel"
           run={run}
@@ -637,15 +365,6 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
           onSubmit={() => void handleSubmit()}
           onClearLast={() => void handleClearLast()}
           onCancel={cancelEntry}
-          onBackToDice={
-            !isCorrection
-              ? () => {
-                  setManualEntryMode(false);
-                  setActiveFieldId(null);
-                  resetEntry();
-                }
-              : undefined
-          }
         />
       )}
     </div>
