@@ -75,6 +75,52 @@ export function computeGameBreakdown(
   };
 }
 
+/** Augenzahl je oberem Feld (für die maximal erreichbare Restpunktzahl). */
+const UPPER_FIELD_FACE: Record<string, number> = {
+  ONES: 1,
+  TWOS: 2,
+  THREES: 3,
+  FOURS: 4,
+  FIVES: 5,
+  SIXES: 6,
+};
+
+export type UpperBonusState = "open" | "secured" | "missed";
+
+export type UpperBonusStatus = {
+  state: UpperBonusState;
+  /** Noch fehlende Punkte bis zum Bonus (nur bei state "open"). */
+  needed: number;
+  upperSum: number;
+};
+
+/**
+ * Live-Status des oberen Bonus (35 ab 63) anhand der bisher gefüllten Felder.
+ * - "secured": Summe ≥ 63
+ * - "missed": auch mit bestmöglichen Resteinträgen nicht mehr erreichbar
+ * - "open": noch erreichbar, `needed` = Punkte bis zur Schwelle
+ */
+export function upperBonusStatus(fields: ScoredField[]): UpperBonusStatus {
+  const upperFields = fields.filter((f) =>
+    UPPER_FIELD_TYPES.includes(f.fieldType as FieldTypeId),
+  );
+  const upperSum = sumScored(upperFields);
+
+  if (upperSum >= UPPER_BONUS_MIN) {
+    return { state: "secured", needed: 0, upperSum };
+  }
+
+  const maxRemaining = upperFields
+    .filter((f) => f.score === null)
+    .reduce((sum, f) => sum + (UPPER_FIELD_FACE[f.fieldType] ?? 0) * 5, 0);
+
+  if (upperSum + maxRemaining < UPPER_BONUS_MIN) {
+    return { state: "missed", needed: 0, upperSum };
+  }
+
+  return { state: "open", needed: UPPER_BONUS_MIN - upperSum, upperSum };
+}
+
 export function gameIndexForExtraYatzyClick(
   extraYatzyCountAfterClick: number,
   gameCount: number,

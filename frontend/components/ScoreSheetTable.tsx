@@ -2,6 +2,12 @@
 
 import { DiceFace } from "@/components/DiceFace";
 import {
+  UPPER_BONUS_MIN,
+  UPPER_BONUS_POINTS,
+  upperBonusStatus,
+  type UpperBonusStatus,
+} from "@/lib/gameScoring";
+import {
   diceValueForField,
   FIELD_LABELS,
   SHEET_ROWS,
@@ -192,16 +198,46 @@ function ScoreTile({
   );
 }
 
+function bonusHint(status: UpperBonusStatus): {
+  text: string;
+  cls: string;
+  title: string;
+} {
+  switch (status.state) {
+    case "secured":
+      return {
+        text: `✓ +${UPPER_BONUS_POINTS}`,
+        cls: "text-emerald-700",
+        title: `Bonus gesichert: +${UPPER_BONUS_POINTS} (obere Summe ${status.upperSum} ≥ ${UPPER_BONUS_MIN})`,
+      };
+    case "missed":
+      return {
+        text: "kein",
+        cls: "text-slate-500",
+        title: `Bonus nicht mehr möglich (obere Summe ${status.upperSum}, Schwelle ${UPPER_BONUS_MIN})`,
+      };
+    case "open":
+      return {
+        text: `+${status.needed}`,
+        cls: "text-amber-600",
+        title: `Noch ${status.needed} Punkte bis zum Bonus (+${UPPER_BONUS_POINTS})`,
+      };
+  }
+}
+
 function SummaryTile({
   value,
   highlight,
   extraYatzyBonus,
+  bonusStatus,
 }: {
   value: string | number | null;
   highlight?: boolean;
   extraYatzyBonus?: number;
+  bonusStatus?: UpperBonusStatus;
 }) {
   const display = value === null ? "" : value;
+  const hint = bonusStatus && value !== null ? bonusHint(bonusStatus) : null;
 
   return (
     <div
@@ -215,6 +251,14 @@ function SummaryTile({
       }
     >
       <span>{display}</span>
+      {hint && (
+        <span
+          className={`whitespace-nowrap text-[8px] font-semibold leading-none ${hint.cls}`}
+          title={hint.title}
+        >
+          {hint.text}
+        </span>
+      )}
       {extraYatzyBonus !== undefined && extraYatzyBonus > 0 && highlight && (
         <span className="text-[8px] font-semibold leading-none text-emerald-800">
           +{extraYatzyBonus}
@@ -321,6 +365,11 @@ export function ScoreSheetTable({
                         extraYatzyBonus={
                           row.kind === "summary" && row.key === "gameTotal"
                             ? game.summary.extraYatzyBonus
+                            : undefined
+                        }
+                        bonusStatus={
+                          row.kind === "summary" && row.key === "ergebnis1"
+                            ? upperBonusStatus(game.fields)
                             : undefined
                         }
                       />
