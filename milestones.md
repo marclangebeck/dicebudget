@@ -586,7 +586,7 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 
 ## Aktueller Arbeitsstand (2026-05-30)
 
-**Commit:** `86637df` · Branch `milestone-22-prep` · GitHub synchron · Server/Mac/GitHub gleichauf
+**Commit:** `dade49d` · Branch `milestone-22-prep` · GitHub synchron · Server/Mac/GitHub gleichauf
 
 **Erledigt:**
 
@@ -596,16 +596,18 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 - **M30 Bonus-Delta-Anzeige:** „Ergebnis 1“ zeigt pro Block das Delta zur Soll-Marke „3 je Augenzahl“ (`+` grün / `−` rot / `±0` grau)
 - **M31 Bonus-Einblendung:** kurzes Glückwunsch-Overlay (Animation, Auto-Close 2,5 s) wenn eine obere Reihe 6/6 mit ≥63 abschließt; Geräte-Toggle auf `/solo` + `/multi`
 - **M32 Topbar & Gegner-Pool:** „Rest"-Chip entfernt; Multiplayer-Host kann „Gegner-Pool sichtbar" aktivieren → bei genau 2 Spielern zeigt die Topbar den Gegner-Pool (kein Polling: Nachladen nur bei Start + eigener Eintragung)
-- Backend: Session-Flag `show_opponent_pool` (Migration angewandt + deployed, Service läuft)
-- iOS: **Build 17** (1.0) in TestFlight, auf iPhone getestet (funktioniert)
-- Web + Backend auf Server deployed
+- **M33 Pool-Endspiel:** Multiplayer-Host-Toggle „Pool-Endspiel"; nach Abschluss aller Runs darf der Spieler mit dem eindeutig größten Wurf-Pool ein Feld verbessern (neuer Wert oder behalten), erst danach Liga-Punkte
+- **Würfe-Standard:** Strategy-Eintrag-Voreinstellung von 2 auf **3** geändert
+- Backend: Session-Flags `show_opponent_pool` + `pool_endgame_*` (Migrationen angewandt + deployed, Service läuft)
+- iOS: **Build 18** (1.0) in TestFlight — enthält M29–M33 + Würfe-Standard 3 (Upload durch Nutzer)
+- Web + Backend auf Server deployed (Stand `dade49d`)
 
 **Nächste Schritte (Priorität):**
 
 1. **App Store Connect:** Paid Applications Agreement, Bank/Steuer
 2. **Store-Metadaten:** Preis 1,19 €, Screenshots 6.7", Beschreibung DE
 3. **App-Datenschutzfragebogen** (URL: https://dicebudget.bottle-trade.de/datenschutz)
-4. Review vorbereiten / TestFlight Build 17 weiter testen
+4. Review vorbereiten / TestFlight Build 18 weiter testen (inkl. M33)
 5. Optional: Branch `milestone-22-prep` → `main` (nur nach Nutzer-Freigabe)
 
 ---

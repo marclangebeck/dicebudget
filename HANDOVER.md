@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **GitHub:** `marclangebeck/dicebudget` · Branch **`milestone-22-prep`**  
 **Sprache:** Deutsch  
-**Stand:** 2026-05-30 · Commit `86637df`
+**Stand:** 2026-05-30 · Commit `dade49d`
 
 ---
 
@@ -18,14 +18,14 @@
 | **M30 Bonus-Delta-Anzeige** | **Erledigt** — „Ergebnis 1“ zeigt Delta zur Soll-Marke „3 je Augenzahl“ (+ grün / − rot / ±0 grau) |
 | **M31 Bonus-Einblendung** | **Erledigt** — Overlay bei 6/6 & ≥63, Auto-Close 2,5 s, Geräte-Toggle |
 | **M32 Topbar & Gegner-Pool** | **Erledigt** — „Rest" entfernt; Multiplayer-Host-Toggle „Gegner-Pool sichtbar" (2 Spieler) |
-| **M33 Pool-Endspiel** | **Erledigt (Code)** — Multiplayer-Host-Toggle „Pool-Endspiel": Sieger mit größtem Pool verbessert am Ende 1 Feld. **Backend-Deploy + Migration noch nötig** (`pool_endgame_*`). Würfe-Standard 2→3 |
-| Frontend Deploy (Server) | Nach Pull: `cd frontend && npm run build` (Nginx aus `out/`) |
-| Backend Deploy (Server) | `sudo bash infra/scripts/deploy-backend-prod.sh` (Migration + Restart) — **deployed**, Service läuft |
+| **M33 Pool-Endspiel** | **Erledigt + deployed** — Multiplayer-Host-Toggle „Pool-Endspiel": Sieger mit eindeutig größtem Pool verbessert am Ende 1 Feld (neuer Wert oder behalten). Würfe-Standard 2→3 |
+| Frontend Deploy (Server) | Nach Pull: `cd frontend && npm run build` (Nginx aus `out/`) — **deployed** (M33) |
+| Backend Deploy (Server) | `sudo bash infra/scripts/deploy-backend-prod.sh` (Migration + Restart) — **deployed** (Migration `pool_endgame`, Service aktiv) |
 | iOS im Repo | Version **1.0** (Build-Nr. in Xcode setzen) |
-| TestFlight | Build **17** hochgeladen + auf iPhone getestet — enthält M29–M32 |
-| Sync Mac/Server/GitHub | Commit **`86637df`** auf `origin/milestone-22-prep` (alle gleichauf) |
+| TestFlight | Build **18** (1.0) — enthält M29–M33 + Würfe-Standard 3 (Upload durch Nutzer; nächster Upload = 19). Build 17 = M29–M32 |
+| Sync Mac/Server/GitHub | Commit **`dade49d`** auf `origin/milestone-22-prep` (alle gleichauf) |
 
-**Nächste Priorität (typisch):** App Store Connect (Paid Agreement, Bank/Steuer, 1,19 €, Screenshots, Datenschutzfragebogen, Review) → TestFlight Build 17 weiter testen.
+**Nächste Priorität (typisch):** App Store Connect (Paid Agreement, Bank/Steuer, 1,19 €, Screenshots, Datenschutzfragebogen, Review) → TestFlight Build 18 weiter testen (inkl. M33 Pool-Endspiel).
 
 ---
 
@@ -52,7 +52,7 @@ Web + iOS: Next.js static export + Capacitor 7.
 ─── PFADE ───
 Prod:     https://dicebudget.bottle-trade.de
 App:      /app (iOS-Start) · Legal: /datenschutz, /impressum
-Branch:   milestone-22-prep · Commit: 86637df
+Branch:   milestone-22-prep · Commit: dade49d
 Server:   /home/bottleadmin/projects/kniffel
 Mac:      /Users/marclangebeck/projects/kniffel
 Xcode:    /Users/marclangebeck/projects/kniffel/frontend/ios/App/App.xcworkspace
@@ -91,22 +91,38 @@ Kontakt:  info@bottle-trade.de (Marc Langebeck, Kiel — frontend/lib/legal.ts)
 • Backend: Session-Flag show_opponent_pool (Migration), Lobby liefert rollsInPool je Spieler nur wenn Flag an
 • Kern-Dateien: backend sessionService.ts/sessions.ts, app/multi/page.tsx, PlayBoard.tsx, PlayTopBar.tsx, lib/sessionTypes.ts
 
+─── M33 POOL-ENDSPIEL (aktueller Stand) ───
+• NUR Multiplayer (Strategy). Host-Toggle „Pool-Endspiel" auf /multi
+• Nach Abschluss ALLER Runs: Spieler mit dem EINDEUTIG größten Wurf-Pool darf
+  EIN Feld verbessern → neuen Wert eintragen ODER „Alten Wert behalten & beenden"
+• Erst danach Liga-Punkte + Session FINISHED. Gleichstand an der Spitze → niemand
+• Kein Polling: Auflösung beim Öffnen des Abschluss-Screens des Siegers
+• Backend: GameSession pool_endgame_enabled/_improver_id/_resolved (Migration
+  20260530120000_session_pool_endgame), determinePoolEndgameImprover(),
+  resolvePoolEndgame(), Endpunkt POST /sessions/invite/:code/pool-endgame
+• Kern-Dateien: backend sessionService.ts/sessions.ts/errorHandler.ts,
+  PoolEndgamePanel.tsx, PlayBoard.tsx (Improver-Phase), app/multi/page.tsx,
+  lib/api.ts, lib/sessionTypes.ts, app/globals.css (.play-endgame-*)
+• ZUSATZ: Würfe-Voreinstellung Strategy 2 → 3 (PlayBoard.defaultRollsUsed)
+
 ─── ERLEDIGT (nicht neu erfinden) ───
 • M1–22, M23–27 (UI iOS abgenommen)
 • M29 Punktwahl-Eintrag (Commits 087d5d9 … 2e68f53)
 • M30 Bonus-Delta-Anzeige (Commit 1a03a32)
 • M31 Bonus-Einblendung + M32 Topbar/Gegner-Pool (Commit 86637df)
+• M33 Pool-Endspiel + Würfe-Standard 3 (Commit dade49d)
 • Legal dice.budget + bottle-trade.de (live)
 • Legal-Daten: frontend/lib/legal.ts + branding.ts
 • rsync-Fix: brew unlink rsync vor Xcode-Upload
 • Spiel beenden: ✕ in PlayTopBar (ABANDON_RUN_CONFIRM)
-• Backend deployed (Migration show_opponent_pool, Service läuft)
-• TestFlight Build 1.0 (17) hochgeladen + auf iPhone getestet (enthält M29–M32)
+• Backend deployed (Migrationen show_opponent_pool + pool_endgame, Service läuft)
+• Web deployed (frontend/out/ nach M33 neu gebaut)
+• TestFlight Build 1.0 (18) — enthält M29–M33 + Würfe-Standard 3 (Upload durch Nutzer)
 
 ─── OFFEN (typische nächste Themen) ───
 1. App Store Connect: Paid Agreement, Bank/Steuer, Preis 1,19 €
 2. Store: Screenshots 6.7", Beschreibung DE, Datenschutzfragebogen
-3. TestFlight Build 17 weiter testen
+3. TestFlight Build 18 weiter testen (inkl. M33 Pool-Endspiel)
 4. Web auf Server deployen nach UI-Änderungen (npm run build)
 5. Bei Backend-Änderungen: sudo bash infra/scripts/deploy-backend-prod.sh (Migration + Restart)
 6. Optional: milestone-22-prep → main (nur nach Nutzer-Freigabe)
@@ -125,7 +141,7 @@ brew unlink rsync 2>/dev/null; true
 cd /Users/marclangebeck/projects/kniffel/frontend && npm run build:ios
 env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
 # Signing: Team wählen (DEVELOPMENT_TEAM nicht im Git!)
-# Version 1.0 · Build 18 (nächster Upload; 17 ist hochgeladen) → Clean → Archive → Upload
+# Version 1.0 · Build 19 (nächster Upload; 18 enthält M29–M33) → Clean → Archive → Upload
 
 ─── WEB-DEPLOY (Server) ───
 cd /home/bottleadmin/projects/kniffel && git pull origin milestone-22-prep
@@ -148,7 +164,8 @@ frontend/lib/gameScoring.ts         ← upperBonusDelta (M30), upperBonusAchieve
 frontend/lib/uiPrefs.ts             ← Bonus-Einblendung-Toggle (M31)
 frontend/lib/legal.ts
 frontend/app/globals.css              ← .field-entry-*, .bonus-overlay-* (M31)
-backend/src/services/sessionService.ts ← show_opponent_pool, rollsInPool (M32)
+backend/src/services/sessionService.ts ← show_opponent_pool/rollsInPool (M32), Pool-Endspiel (M33)
+frontend/components/PoolEndgamePanel.tsx ← Pool-Endspiel: Feld verbessern (M33)
 
 ─── STOLPERSTEINE ───
 • Web-Deploy ≠ iOS — UI in App erst nach npm run build:ios + Archive
@@ -220,9 +237,9 @@ frontend/ios/App/App.xcworkspace
 
 ### Bereits erledigt
 
-- Milestones **1–22**, **23–27**, **M29** (Punktwahl-Eintrag), **M30** (Bonus-Delta), **M31** (Bonus-Einblendung), **M32** (Topbar/Gegner-Pool)
-- TestFlight **Build 17** hochgeladen + auf iPhone getestet (enthält M29–M32); nächster Upload wäre **18**
-- Backend deployed: Migration `show_opponent_pool`, Service läuft
+- Milestones **1–22**, **23–27**, **M29** (Punktwahl-Eintrag), **M30** (Bonus-Delta), **M31** (Bonus-Einblendung), **M32** (Topbar/Gegner-Pool), **M33** (Pool-Endspiel)
+- TestFlight **Build 18** (enthält M29–M33 + Würfe-Standard 3; Upload durch Nutzer); nächster Upload wäre **19**
+- Backend deployed: Migrationen `show_opponent_pool` + `pool_endgame`, Service läuft
 - Legal-Seiten live
 - Backend-Tests: `cd backend && npm test`
 
@@ -252,7 +269,7 @@ cd /Users/marclangebeck/projects/kniffel/frontend && npm run build:ios
 cd /home/bottleadmin/projects/kniffel/backend && npm test
 cd /home/bottleadmin/projects/kniffel/frontend && npm run build
 curl -s https://dicebudget.bottle-trade.de/api/health
-git log -1 --oneline   # erwartet: 86637df
+git log -1 --oneline   # erwartet: dade49d
 grep CURRENT_PROJECT_VERSION frontend/ios/App/App.xcodeproj/project.pbxproj | head -1   # Build-Nr. wird in Xcode gesetzt
 ```
 

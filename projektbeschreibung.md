@@ -89,6 +89,8 @@ API: `POST /runs/:runId/fields/:fieldId/clear` — danach kann ein anderes Feld 
 
 **Gegner-Pool (M32):** Aktiviert der Host beim Erstellen `showOpponentPool`, liefert das Lobby-DTO je Spieler den Wert `rollsInPool`. Die Spiel-Topbar zeigt den Gegner-Pool **nur bei genau 2 Spielern** (Strategy-Modus). Das Frontend lädt den Wert ohne Polling — nur bei Spielstart und nach jeder eigenen Eintragung. Persistiert als Session-Flag `show_opponent_pool` (Default `false`).
 
+**Pool-Endspiel (M33, nur Multiplayer/Strategy):** Aktiviert der Host beim Erstellen `poolEndgameEnabled`, darf nach Abschluss **aller** Runs der Spieler mit dem **eindeutig größten** Wurf-Pool **ein** bereits eingetragenes Feld verbessern: neuen (für den Feldtyp gültigen) Wert eintragen oder den alten Wert behalten. Erst danach werden Liga-Punkte vergeben und die Session auf `FINISHED` gesetzt; bei Gleichstand an der Spitze verbessert niemand. Sieger-Bestimmung: `determinePoolEndgameImprover`. Auflösung über `POST /sessions/invite/:code/pool-endgame` (`X-Player-Secret` des Siegers), **kein Polling** (Auflösung beim Öffnen des Abschluss-Screens). Session-Felder `pool_endgame_enabled` / `pool_endgame_improver_id` / `pool_endgame_resolved`. Die Eintrag-Voreinstellung im Strategy-Modus ist seitdem **3 Würfe** (vorher 2).
+
 ### 3.2 Serien (Liga)
 
 Jede Session gehört zu einer **Serie** (`League` mit `leagueCode`):
@@ -244,6 +246,7 @@ Multiplayer-Runs: Header **`X-Player-Secret`**.
 - `invite_code`, `game_count`, `max_players`, `use_strategy_rules`, `status`
 - `league_id`, `round_number`, `points_awarded`
 - `show_opponent_pool` (Default `false`, M32)
+- `pool_endgame_enabled` / `pool_endgame_improver_id` / `pool_endgame_resolved` (Default `false`/`null`/`false`, M33)
 
 ### Player
 

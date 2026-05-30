@@ -64,6 +64,8 @@ npm run icons   # aus public/logo-source.png
 | `components/BonusOverlay.tsx` | Bonus-Einblendung bei erreichtem Oberbonus (M31), Auto-Close 2,5 s |
 | `lib/uiPrefs.ts` | Geräte-Einstellung Bonus-Einblendung (LocalStorage, M31) |
 | `components/PlayTopBar.tsx` | Topbar: eigener Pool + optionaler Gegner-Pool (M32) |
+| `components/PoolEndgamePanel.tsx` | Pool-Endspiel: Sieger verbessert 1 Feld (M33) |
+| `components/PlayBoard.tsx` | Spielsteuerung; Würfe-Standard Strategy = 3; Pool-Endspiel-Improver-Phase (M33) |
 
 ## iOS (Capacitor)
 

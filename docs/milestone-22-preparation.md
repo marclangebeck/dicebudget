@@ -175,7 +175,7 @@ Tag 1 gilt als erledigt, wenn:
 - Backend-Deploy inkl. Migration erfolgreich auf Server.
 - Frontend-Deploy erfolgreich auf Server.
 - SSL fuer `dicebudget.bottle-trade.de` erfolgreich erstellt und aktiv.
-- iOS-Builds bis einschliesslich `1.0 (17)` erfolgreich in TestFlight verarbeitet (M29 Punktwahl-Eintrag, M30 Bonus-Delta, M31 Bonus-Einblendung, M32 Topbar/Gegner-Pool); UI-Fixrunde abgenommen.
+- iOS-Builds bis einschliesslich `1.0 (18)` (M29 Punktwahl-Eintrag, M30 Bonus-Delta, M31 Bonus-Einblendung, M32 Topbar/Gegner-Pool, M33 Pool-Endspiel + Würfe-Standard 3); UI-Fixrunde abgenommen.
 - Web-Frontend (dunkler Hintergrund, Legal-Seiten, Navigation) auf Produktion deployed.
 - Impressum unter `/impressum` (Platzhalter-Anbieterangaben — vom Nutzer zu ergänzen).
 

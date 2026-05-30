@@ -18,11 +18,11 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **M29 entfernt:** Würfel-Zähler, Wurf vergleichen, `DiceThrowOverlay`, `CommittedThrowBanner`, `FixedFieldChoiceBanner`
 
 ### iOS
-- TestFlight-Build **1.0 (17)** — M31 Bonus-Einblendung + M32 Gegner-Pool/Topbar (auf iPhone getestet)
-- (zuvor) Build **1.0 (16)** — M29 + M30 · Build **1.0 (15)** — M29
+- TestFlight-Build **1.0 (18)** — M33 Pool-Endspiel + Würfe-Standard 3 (zusätzlich M29–M32); Upload durch Nutzer · nächster Upload = 19
+- (zuvor) Build **1.0 (17)** — M31 + M32 · Build **1.0 (16)** — M29 + M30 · Build **1.0 (15)** — M29
 
 ### Docs
-- HANDOVER, GOiOS, milestones, README, projektbeschreibung, testflight-app-store: Stand Commit `86637df`
+- HANDOVER, GOiOS, milestones, README, projektbeschreibung, ios-app-store, testflight-app-store, milestone-22-preparation: Stand Commit `dade49d` (M33 + Würfe-Standard 3)
 
 ---
 
