@@ -5,19 +5,22 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **M32 Gegner-Pool (Multiplayer):** Host-Toggle „Gegner-Pool sichtbar" beim Raum-Erstellen; bei genau 2 Spielern zeigt die Spiel-Topbar den Wurf-Pool des Gegners. Backend: Session-Flag `show_opponent_pool` (Migration), Lobby-DTO um `rollsInPool` je Spieler erweitert. Kein Polling (Nachladen nur bei Start + eigener Eintragung)
+- **M31 Bonus-Einblendung:** kurzes Glückwunsch-Overlay mit Animation, wenn eine obere Reihe 6/6 mit ≥63 abschließt; Auto-Close 2,5 s; Geräte-Toggle (`lib/uiPrefs.ts`, `BonusCelebrationToggle`) auf `/solo` + `/multi`; `BonusOverlay`, `upperBonusAchieved()`
 - **M30 Bonus-Delta-Anzeige:** Zeile „Ergebnis 1“ zeigt pro Spielblock das laufende Delta zur Soll-Marke „3 je Augenzahl“ (Bonus 63). `+` in Grün (über Schnitt), `−` in Rot (unter Schnitt), `±0` in Grau. Helfer `upperBonusDelta()` in `frontend/lib/gameScoring.ts`, Anzeige in `ScoreSheetTable`
 - **M29 Punktwahl-Eintrag:** Feld antippen → Overlay mit feldtypabhängiger Punktwahl + Würfe → Eintragen (`FieldScoreChoiceGrid`, `ScoreEntryPanel`)
 
 ### Changed
+- **M32 Topbar:** „Rest"-Chip (Restwürfe bis Spielende) entfernt — Topbar zeigt nur noch den eigenen Pool
 - **M29 UX (final):** Overlay startet oben; obere Felder nur Zahlen (0, 2, 4, …); gewählte Punkte/Würfe hellgelb markiert
 - **M29 entfernt:** Würfel-Zähler, Wurf vergleichen, `DiceThrowOverlay`, `CommittedThrowBanner`, `FixedFieldChoiceBanner`
 
 ### iOS
-- TestFlight-Build **1.0 (16)** — M29 Punktwahl-Eintrag + M30 Bonus-Delta (Upload durch Nutzer auf Mac, erfolgreich)
-- (zuvor) Repo-Build **1.0 (15)** — M29 Punktwahl-Eintrag
+- TestFlight-Build **1.0 (17)** — M31 Bonus-Einblendung + M32 Gegner-Pool/Topbar (auf iPhone getestet)
+- (zuvor) Build **1.0 (16)** — M29 + M30 · Build **1.0 (15)** — M29
 
 ### Docs
-- HANDOVER, GOiOS, milestones, README, projektbeschreibung, testflight-app-store: Stand Commit `1a03a32`
+- HANDOVER, GOiOS, milestones, README, projektbeschreibung, testflight-app-store: Stand Commit `86637df`
 
 ---
 

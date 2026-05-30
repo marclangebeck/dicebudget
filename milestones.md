@@ -12,6 +12,7 @@
 | Datenschutz-Umbau | 22 | erledigt |
 | UI/Branding-Folgepaket | 23–27 | erledigt |
 | Eintrag & Bonus-Hilfe | 29–30 | erledigt |
+| Spielfluss & Gegner-Pool | 31–32 | erledigt |
 
 *(Variante D „echtes Online-Spiel“ / Live-Sync bewusst nicht Teil dieser Milestones.)*
 
@@ -584,27 +585,26 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 
 ## Aktueller Arbeitsstand (2026-05-30)
 
-**Commit:** `1a03a32` · Branch `milestone-22-prep` · GitHub synchron
+**Commit:** `86637df` · Branch `milestone-22-prep` · GitHub synchron · Server/Mac/GitHub gleichauf
 
 **Erledigt:**
 
 - Legal-Links, app-nav-btn, dunkler Slate-Verlauf, LegalScrollShell
 - Impressum + Datenschutz live (dice.budget + bottle-trade.de)
 - **M29 Punktwahl-Eintrag:** Feld antippen → Overlay (Punkte + Würfe) → Eintragen
-  - Obere Felder: Zahlen 0 … face×5
-  - Untere Felder: Pasch/Chance 0–30, Kombinationen 0/Festwert
-  - Overlay oben am Bildschirm, Auswahl hellgelb markiert
-  - Entfernt: Würfel-Zähler, „Wurf vergleichen“, DiceThrowOverlay
 - **M30 Bonus-Delta-Anzeige:** „Ergebnis 1“ zeigt pro Block das Delta zur Soll-Marke „3 je Augenzahl“ (`+` grün / `−` rot / `±0` grau)
-- iOS: **Build 16** (1.0) erfolgreich in TestFlight hochgeladen
-- Web: `npm run build` auf Server nach Pull
+- **M31 Bonus-Einblendung:** kurzes Glückwunsch-Overlay (Animation, Auto-Close 2,5 s) wenn eine obere Reihe 6/6 mit ≥63 abschließt; Geräte-Toggle auf `/solo` + `/multi`
+- **M32 Topbar & Gegner-Pool:** „Rest"-Chip entfernt; Multiplayer-Host kann „Gegner-Pool sichtbar" aktivieren → bei genau 2 Spielern zeigt die Topbar den Gegner-Pool (kein Polling: Nachladen nur bei Start + eigener Eintragung)
+- Backend: Session-Flag `show_opponent_pool` (Migration angewandt + deployed, Service läuft)
+- iOS: **Build 17** (1.0) in TestFlight, auf iPhone getestet (funktioniert)
+- Web + Backend auf Server deployed
 
 **Nächste Schritte (Priorität):**
 
 1. **App Store Connect:** Paid Applications Agreement, Bank/Steuer
 2. **Store-Metadaten:** Preis 1,19 €, Screenshots 6.7", Beschreibung DE
 3. **App-Datenschutzfragebogen** (URL: https://dicebudget.bottle-trade.de/datenschutz)
-4. Review vorbereiten / TestFlight Build 16 auf iPhone testen
+4. Review vorbereiten / TestFlight Build 17 weiter testen
 5. Optional: Branch `milestone-22-prep` → `main` (nur nach Nutzer-Freigabe)
 
 ---
@@ -660,3 +660,47 @@ delta = obere Summe − 3 × (Summe der Augenzahlen der eingetragenen Felder)
 - `upperBonusDelta()` in `frontend/lib/gameScoring.ts`
 - Anzeige in `ScoreSheetTable.tsx` (Zweitzeile in `SummaryTile` der `ergebnis1`-Zeile)
 - Reine UI-/Anzeige-Logik, kein Backend; gilt für Solo und Multiplayer
+
+---
+
+## Milestone 31 — Bonus-Einblendung (M31)
+
+**Ziel:** Den Moment feiern, in dem eine obere Reihe den Bonus erreicht.
+
+**Status:** erledigt (Mai 2026, in Build 17)
+
+**UX:**
+
+- Sobald eine obere Reihe **komplett (6/6)** mit **≥63** abgeschlossen wird, erscheint ein kurzes Overlay „Bonus erreicht! +35" mit Pop-/Spin-Animation.
+- **Schließt automatisch nach 2,5 s** (oder Tippen). Bei mehreren Spielen wird der Spielblock genannt.
+- Ist der Run dadurch komplett, erscheint nur das Abschluss-Overlay (keine Stapelung).
+- **Geräte-Einstellung** (pro Gerät, nicht serverseitig): Toggle „Bonus-Einblendung" auf `/solo` und `/multi`, Standard an.
+
+**Technik:**
+
+- `upperBonusAchieved()` in `frontend/lib/gameScoring.ts`
+- Erkennung des Übergangs in `PlayBoard.handleSubmit`
+- `BonusOverlay.tsx` (Anzeige + Animation in `globals.css`, respektiert `prefers-reduced-motion`)
+- `BonusCelebrationToggle.tsx` + `lib/uiPrefs.ts` (LocalStorage)
+
+---
+
+## Milestone 32 — Topbar-Umbau & Gegner-Pool (M32)
+
+**Ziel:** Spiel-Topbar verschlanken und im Multiplayer optional den Gegner-Pool zeigen.
+
+**Status:** erledigt (Mai 2026, in Build 17)
+
+**Änderungen:**
+
+- **„Rest"-Chip entfernt** (Restwürfe bis Spielende) — Topbar zeigt nur noch den eigenen **Pool**.
+- **Gegner-Pool (Multiplayer):** Host entscheidet beim Raum-Erstellen über Toggle „Gegner-Pool sichtbar".
+  - Anzeige nur bei **genau 2 Spielern** und Strategy-Modus.
+  - Topbar zeigt neben dem eigenen Pool den **Gegner-Pool**.
+- **Kein Polling:** Gegner-Pool wird nur **bei Spielstart** und **nach jeder eigenen Eintragung** einmalig nachgeladen (gezielte Einzel-Requests, gemäß `AGENT_RULES.md`).
+
+**Technik:**
+
+- Backend: Session-Flag `show_opponent_pool` (Prisma-Migration `20260530090000_session_show_opponent_pool`); Lobby-DTO liefert `rollsInPool` je Spieler **nur**, wenn das Flag an ist.
+- `sessionService.ts`, `routes/sessions.ts`
+- Frontend: `app/multi/page.tsx` (Host-Toggle), `PlayBoard.tsx` (Gegner-Pool laden, Selbst-Ausschluss über `playerId`), `PlayTopBar.tsx` (Chip), `lib/api.ts`, `lib/sessionTypes.ts`

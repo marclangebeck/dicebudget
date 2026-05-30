@@ -59,8 +59,11 @@ npm run icons   # aus public/logo-source.png
 | `lib/localSoloRun.ts` | Solo lokal (LocalStorage) |
 | `lib/playerIdentity.ts` | Lokale `playerId` |
 | `lib/branding.ts` | Pfade, URLs |
-| `lib/gameScoring.ts` | Scoring (Bonus 63/35) + `upperBonusDelta` (M30 Bonus-Delta) |
+| `lib/gameScoring.ts` | Scoring (Bonus 63/35) + `upperBonusDelta` (M30) + `upperBonusAchieved` (M31) |
 | `components/ScoreSheetTable.tsx` | Zettel; „Ergebnis 1“ zeigt Bonus-Delta (+ grün / − rot / ±0 grau) |
+| `components/BonusOverlay.tsx` | Bonus-Einblendung bei erreichtem Oberbonus (M31), Auto-Close 2,5 s |
+| `lib/uiPrefs.ts` | Geräte-Einstellung Bonus-Einblendung (LocalStorage, M31) |
+| `components/PlayTopBar.tsx` | Topbar: eigener Pool + optionaler Gegner-Pool (M32) |
 
 ## iOS (Capacitor)
 

@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **GitHub:** `marclangebeck/dicebudget` · Branch **`milestone-22-prep`**  
 **Sprache:** Deutsch  
-**Stand:** 2026-05-30 · Commit `1a03a32`
+**Stand:** 2026-05-30 · Commit `86637df`
 
 ---
 
@@ -16,12 +16,15 @@
 | Legal (Plattform) | bottle-trade.de — **live** (separates Projekt) |
 | **M29 Punktwahl-Eintrag** | **Erledigt** — Feld antippen → Overlay (Punkte + Würfe) → Eintragen |
 | **M30 Bonus-Delta-Anzeige** | **Erledigt** — „Ergebnis 1“ zeigt Delta zur Soll-Marke „3 je Augenzahl“ (+ grün / − rot / ±0 grau) |
+| **M31 Bonus-Einblendung** | **Erledigt** — Overlay bei 6/6 & ≥63, Auto-Close 2,5 s, Geräte-Toggle |
+| **M32 Topbar & Gegner-Pool** | **Erledigt** — „Rest" entfernt; Multiplayer-Host-Toggle „Gegner-Pool sichtbar" (2 Spieler) |
 | Frontend Deploy (Server) | Nach Pull: `cd frontend && npm run build` (Nginx aus `out/`) |
-| iOS im Repo | Build-Nummer **16** · Version **1.0** |
-| TestFlight | Build **16** hochgeladen (erfolgreich) — enthält M29 + M30 |
-| Sync Mac/Server/GitHub | Commit **`1a03a32`** auf `origin/milestone-22-prep` |
+| Backend Deploy (Server) | `sudo bash infra/scripts/deploy-backend-prod.sh` (Migration + Restart) — **deployed**, Service läuft |
+| iOS im Repo | Version **1.0** (Build-Nr. in Xcode setzen) |
+| TestFlight | Build **17** hochgeladen + auf iPhone getestet — enthält M29–M32 |
+| Sync Mac/Server/GitHub | Commit **`86637df`** auf `origin/milestone-22-prep` (alle gleichauf) |
 
-**Nächste Priorität (typisch):** App Store Connect (Paid Agreement, Bank/Steuer, 1,19 €, Screenshots, Datenschutzfragebogen, Review) → TestFlight Build 16 auf iPhone testen.
+**Nächste Priorität (typisch):** App Store Connect (Paid Agreement, Bank/Steuer, 1,19 €, Screenshots, Datenschutzfragebogen, Review) → TestFlight Build 17 weiter testen.
 
 ---
 
@@ -48,7 +51,7 @@ Web + iOS: Next.js static export + Capacitor 7.
 ─── PFADE ───
 Prod:     https://dicebudget.bottle-trade.de
 App:      /app (iOS-Start) · Legal: /datenschutz, /impressum
-Branch:   milestone-22-prep · Commit: 1a03a32
+Branch:   milestone-22-prep · Commit: 86637df
 Server:   /home/bottleadmin/projects/kniffel
 Mac:      /Users/marclangebeck/projects/kniffel
 Xcode:    /Users/marclangebeck/projects/kniffel/frontend/ios/App/App.xcworkspace
@@ -72,22 +75,40 @@ Kontakt:  info@bottle-trade.de (Marc Langebeck, Kiel — frontend/lib/legal.ts)
 • Erscheint erst ab erstem oberen Eintrag; gilt Solo + Multiplayer
 • Kern-Dateien: lib/gameScoring.ts (upperBonusDelta), ScoreSheetTable.tsx (SummaryTile)
 
+─── M31 BONUS-EINBLENDUNG (aktueller Stand) ───
+• Overlay „Bonus erreicht! +35“ wenn obere Reihe 6/6 mit ≥63 abschließt
+• Pop-/Spin-Animation, Auto-Close 2,5 s (oder Tippen); nennt Spielblock
+• Bei komplettem Run nur Abschluss-Overlay (keine Stapelung)
+• Geräte-Einstellung (kein Backend): Toggle auf /solo + /multi, Standard an
+• Kern-Dateien: BonusOverlay.tsx, BonusCelebrationToggle.tsx, lib/uiPrefs.ts, gameScoring.upperBonusAchieved, PlayBoard.handleSubmit
+
+─── M32 TOPBAR & GEGNER-POOL (aktueller Stand) ───
+• „Rest“-Chip entfernt — Topbar zeigt nur eigenen Pool
+• Multiplayer: Host-Toggle „Gegner-Pool sichtbar“ auf /multi
+• Anzeige nur bei genau 2 Spielern + Strategy → Chip „Gegner“
+• Kein Polling: Nachladen nur bei Start + nach eigener Eintragung
+• Backend: Session-Flag show_opponent_pool (Migration), Lobby liefert rollsInPool je Spieler nur wenn Flag an
+• Kern-Dateien: backend sessionService.ts/sessions.ts, app/multi/page.tsx, PlayBoard.tsx, PlayTopBar.tsx, lib/sessionTypes.ts
+
 ─── ERLEDIGT (nicht neu erfinden) ───
 • M1–22, M23–27 (UI iOS abgenommen)
 • M29 Punktwahl-Eintrag (Commits 087d5d9 … 2e68f53)
-• M30 Bonus-Delta-Anzeige (Commit 1a03a32) — Ergebnis-1-Delta zur Soll-Marke „3 je Augenzahl“
+• M30 Bonus-Delta-Anzeige (Commit 1a03a32)
+• M31 Bonus-Einblendung + M32 Topbar/Gegner-Pool (Commit 86637df)
 • Legal dice.budget + bottle-trade.de (live)
 • Legal-Daten: frontend/lib/legal.ts + branding.ts
 • rsync-Fix: brew unlink rsync vor Xcode-Upload
 • Spiel beenden: ✕ in PlayTopBar (ABANDON_RUN_CONFIRM)
-• TestFlight Build 1.0 (16) hochgeladen (enthält M29 + M30)
+• Backend deployed (Migration show_opponent_pool, Service läuft)
+• TestFlight Build 1.0 (17) hochgeladen + auf iPhone getestet (enthält M29–M32)
 
 ─── OFFEN (typische nächste Themen) ───
 1. App Store Connect: Paid Agreement, Bank/Steuer, Preis 1,19 €
 2. Store: Screenshots 6.7", Beschreibung DE, Datenschutzfragebogen
-3. TestFlight Build 16 auf iPhone testen
+3. TestFlight Build 17 weiter testen
 4. Web auf Server deployen nach UI-Änderungen (npm run build)
-5. Optional: milestone-22-prep → main (nur nach Nutzer-Freigabe)
+5. Bei Backend-Änderungen: sudo bash infra/scripts/deploy-backend-prod.sh (Migration + Restart)
+6. Optional: milestone-22-prep → main (nur nach Nutzer-Freigabe)
 
 ─── SYNC LOKAL + SERVER ───
 Server:
@@ -103,21 +124,30 @@ brew unlink rsync 2>/dev/null; true
 cd /Users/marclangebeck/projects/kniffel/frontend && npm run build:ios
 env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
 # Signing: Team wählen (DEVELOPMENT_TEAM nicht im Git!)
-# Version 1.0 · Build 17 (nächster Upload; 16 ist hochgeladen) → Clean → Archive → Upload
+# Version 1.0 · Build 18 (nächster Upload; 17 ist hochgeladen) → Clean → Archive → Upload
 
 ─── WEB-DEPLOY (Server) ───
 cd /home/bottleadmin/projects/kniffel && git pull origin milestone-22-prep
 cd frontend && npm run build
 # Nginx: frontend/out/ — sudo deploy-frontend-prod.sh nur bei Nginx-Config-Änderung
 
+─── BACKEND-DEPLOY (Server, nur bei Backend-Änderung) ───
+cd /home/bottleadmin/projects/kniffel && git pull origin milestone-22-prep
+sudo bash infra/scripts/deploy-backend-prod.sh   # npm install + prisma migrate deploy + Restart
+
 ─── WICHTIGE DATEIEN (Spiel/Eintrag) ───
 frontend/components/PlayBoard.tsx
 frontend/components/ScoreEntryPanel.tsx
 frontend/components/FieldScoreChoiceGrid.tsx
 frontend/components/ScoreSheetTable.tsx
+frontend/components/PlayTopBar.tsx     ← Pool/Gegner-Pool-Chips (M32)
+frontend/components/BonusOverlay.tsx   ← Bonus-Einblendung (M31)
 frontend/lib/labels.ts              ← fieldScoreChoices, upperFieldDieCount
+frontend/lib/gameScoring.ts         ← upperBonusDelta (M30), upperBonusAchieved (M31)
+frontend/lib/uiPrefs.ts             ← Bonus-Einblendung-Toggle (M31)
 frontend/lib/legal.ts
-frontend/app/globals.css              ← .field-entry-*, .play-score-btn--selected
+frontend/app/globals.css              ← .field-entry-*, .bonus-overlay-* (M31)
+backend/src/services/sessionService.ts ← show_opponent_pool, rollsInPool (M32)
 
 ─── STOLPERSTEINE ───
 • Web-Deploy ≠ iOS — UI in App erst nach npm run build:ios + Archive
@@ -175,17 +205,23 @@ frontend/components/ScoreEntryPanel.tsx
 frontend/components/FieldScoreChoiceGrid.tsx
 frontend/components/ScoreSheetTable.tsx
 frontend/components/PlayTopBar.tsx
+frontend/components/BonusOverlay.tsx
 frontend/lib/labels.ts
+frontend/lib/gameScoring.ts
+frontend/lib/uiPrefs.ts
 frontend/lib/localSoloRun.ts
 frontend/lib/legal.ts
 frontend/app/globals.css
+frontend/app/multi/page.tsx
+backend/src/services/sessionService.ts
 frontend/ios/App/App.xcworkspace
 ```
 
 ### Bereits erledigt
 
-- Milestones **1–22**, **23–27**, **M29** (Punktwahl-Eintrag), **M30** (Bonus-Delta)
-- TestFlight **Build 16** hochgeladen (enthält M29 + M30); nächster Upload wäre **17**
+- Milestones **1–22**, **23–27**, **M29** (Punktwahl-Eintrag), **M30** (Bonus-Delta), **M31** (Bonus-Einblendung), **M32** (Topbar/Gegner-Pool)
+- TestFlight **Build 17** hochgeladen + auf iPhone getestet (enthält M29–M32); nächster Upload wäre **18**
+- Backend deployed: Migration `show_opponent_pool`, Service läuft
 - Legal-Seiten live
 - Backend-Tests: `cd backend && npm test`
 
@@ -215,8 +251,8 @@ cd /Users/marclangebeck/projects/kniffel/frontend && npm run build:ios
 cd /home/bottleadmin/projects/kniffel/backend && npm test
 cd /home/bottleadmin/projects/kniffel/frontend && npm run build
 curl -s https://dicebudget.bottle-trade.de/api/health
-git log -1 --oneline   # erwartet: 1a03a32
-grep CURRENT_PROJECT_VERSION frontend/ios/App/App.xcodeproj/project.pbxproj | head -1   # Repo: 15 (Build-Nr. wird in Xcode gesetzt)
+git log -1 --oneline   # erwartet: 86637df
+grep CURRENT_PROJECT_VERSION frontend/ios/App/App.xcodeproj/project.pbxproj | head -1   # Build-Nr. wird in Xcode gesetzt
 ```
 
 ---

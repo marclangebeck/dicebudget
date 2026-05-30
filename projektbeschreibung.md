@@ -57,6 +57,8 @@ Pro Spielblock (Spalte auf dem Zettel):
 
 **Bonus-Delta-Anzeige (M30):** Der Bonus bei 63 entspricht „3 Würfeln je Augenzahl“ (`3 × 21 = 63`). Die Zeile „Ergebnis 1“ zeigt pro Block das laufende Delta `obere Summe − 3 × (Summe Augenzahlen der eingetragenen oberen Felder)` — `+N` grün (über Schnitt), `−N` rot (darunter), `±0` grau. Reine Frontend-Anzeige (`upperBonusDelta` in `frontend/lib/gameScoring.ts`), gilt für beide Modi.
 
+**Bonus-Einblendung (M31):** Schließt eine obere Reihe vollständig (6/6) mit ≥63 ab, erscheint ein kurzes Glückwunsch-Overlay („Bonus erreicht! +35“) mit Animation, das nach 2,5 s automatisch schließt (oder per Tippen). Erkennung über `upperBonusAchieved` in `gameScoring.ts`, Anzeige via `BonusOverlay`. Pro Gerät abschaltbar (`lib/uiPrefs.ts`, Toggle auf `/solo` + `/multi`; kein Backend). Respektiert `prefers-reduced-motion`.
+
 ### 2.4 Zusatz-Yatzy
 
 Ab dem 7. Yatzy-Eintrag (über alle Spielblöcke): per `POST /runs/:id/extra-yatzy` jeweils **+100** auf „Ergebnis Spiel“, rotierend Sp1 → Sp2 → …  
@@ -80,10 +82,12 @@ API: `POST /runs/:runId/fields/:fieldId/clear` — danach kann ein anderes Feld 
 
 ### 3.1 Sessions
 
-- Host: `POST /sessions` mit `gameCount`, `maxPlayers`, `useStrategyRules`, optional `leagueCode`
+- Host: `POST /sessions` mit `gameCount`, `maxPlayers`, `useStrategyRules`, optional `leagueCode`, optional `showOpponentPool`
 - Einladungscode; Gäste: Startseite Code eingeben oder `/multi/join?code=…`
 - Join erzeugt `Player` + `Run` (Kopie der Session-Regeln)
 - Auth: Header **`X-Player-Secret`** auf Run-Endpunkten
+
+**Gegner-Pool (M32):** Aktiviert der Host beim Erstellen `showOpponentPool`, liefert das Lobby-DTO je Spieler den Wert `rollsInPool`. Die Spiel-Topbar zeigt den Gegner-Pool **nur bei genau 2 Spielern** (Strategy-Modus). Das Frontend lädt den Wert ohne Polling — nur bei Spielstart und nach jeder eigenen Eintragung. Persistiert als Session-Flag `show_opponent_pool` (Default `false`).
 
 ### 3.2 Serien (Liga)
 
@@ -173,7 +177,8 @@ Tabelle `player_name_aliases` (`aliasName` → `canonicalName`):
 | `GameSetup` | Solo-Start mit `StrategyModeToggle` |
 | `JoinByCodeForm` | Code auf Startseite (in Bento) |
 | `PlayBoard` | Spiel, Overlay, Abandon, Feld löschen |
-| `PlayTopBar` | Zurück (Start/Lobby), Pool/Rest-Chips |
+| `PlayTopBar` | Zurück (Start/Lobby), eigener Pool + optionaler Gegner-Pool (M32) |
+| `BonusOverlay` | Bonus-Einblendung bei erreichtem Oberbonus (M31) |
 | `FitScoreSheet` | Skaliert Zettel auf verfügbare Höhe |
 | `ScoreSheetTable` | Zettel inkl. Zusatz-Yatzy und Bonus-Delta („Ergebnis 1“) |
 | `ScoreEntryPanel` | Fixiertes Panel unten; Würfe nur bei Strategy |
@@ -214,7 +219,7 @@ Tabelle `player_name_aliases` (`aliasName` → `canonicalName`):
 
 | Methode | Pfad | Beschreibung |
 |---------|------|--------------|
-| `POST` | `/sessions` | `{ "gameCount", "maxPlayers", "useStrategyRules", "leagueCode"? }` |
+| `POST` | `/sessions` | `{ "gameCount", "maxPlayers", "useStrategyRules", "leagueCode"?, "showOpponentPool"? }` |
 | `GET` | `/sessions/invite/:inviteCode` | Lobby |
 | `POST` | `/sessions/invite/:inviteCode/join` | `{ "name" }` |
 | `GET` | `/sessions/invite/:inviteCode/ranking` | Rangliste + Serienpunkte |
@@ -238,6 +243,7 @@ Multiplayer-Runs: Header **`X-Player-Secret`**.
 
 - `invite_code`, `game_count`, `max_players`, `use_strategy_rules`, `status`
 - `league_id`, `round_number`, `points_awarded`
+- `show_opponent_pool` (Default `false`, M32)
 
 ### Player
 
