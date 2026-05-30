@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { getStats } from "@/lib/api";
 import { normalizeInviteCode } from "@/lib/activeGame";
-import { APP_SHORT, IMPRESSUM_PATH, PRIVACY_PATH } from "@/lib/branding";
+import { APP_SHORT, CONTACT_EMAIL, IMPRESSUM_PATH, PRIVACY_PATH } from "@/lib/branding";
 import type { StatsDto } from "@/lib/statsTypes";
 
 function IconSolo({ className }: { className?: string }) {
@@ -75,6 +75,15 @@ function HomeLegalFooter() {
       <Link href={IMPRESSUM_PATH} className="home-legal-link">
         Impressum
       </Link>
+      <span aria-hidden className="home-legal-sep">
+        ·
+      </span>
+      <a
+        href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("dice.budget Support")}`}
+        className="home-legal-link"
+      >
+        Support
+      </a>
     </footer>
   );
 }
