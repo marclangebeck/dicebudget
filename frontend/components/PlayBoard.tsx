@@ -115,6 +115,21 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     void refreshLobby();
   }, [refreshLobby]);
 
+  // Gegner-Pool ohne Polling aktualisieren: einzelner Lobby-Request, wenn die App
+  // wieder in den Vordergrund kommt (Geräte-/App-Wechsel). Kein Dauerprozess.
+  useEffect(() => {
+    if (!inviteCode) return;
+    const onActive = () => {
+      if (document.visibilityState === "visible") void refreshLobby();
+    };
+    document.addEventListener("visibilitychange", onActive);
+    window.addEventListener("focus", onActive);
+    return () => {
+      document.removeEventListener("visibilitychange", onActive);
+      window.removeEventListener("focus", onActive);
+    };
+  }, [inviteCode, refreshLobby]);
+
   // Bin ich der Pool-Sieger und darf (noch) ein Feld verbessern? (M33)
   const amPoolEndgameImprover =
     !!lobby &&
@@ -478,6 +493,8 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         rollsInPool={run.rollsInPool}
         rollsRemaining={run.rollsRemaining}
         opponentPool={opponentPool}
+        showOpponentPoolControl={!!lobby?.showOpponentPool}
+        onRefreshOpponentPool={() => void refreshLobby()}
         showAbandon
         abandonBusy={busy}
         onAbandon={() => void handleAbandon()}

@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **Bonus-Konfetti-Regen:** Beim Erreichen des oberen Bonus regnet im Glückwunsch-Overlay (`BonusOverlay`) kurz Konfetti hinter der Karte – nur solange das Overlay eingeblendet ist (verschwindet automatisch mit). Reines CSS (`.bonus-confetti*` in `globals.css`), respektiert `prefers-reduced-motion`, keine neue Abhängigkeit
 - **Support-Link im Start-Footer:** Auf dem App-Start (`HomeBentoGrid`) neben „Datenschutz" und „Impressum" ein dritter Link „Support" (`mailto:` an `CONTACT_EMAIL` mit Betreff „dice.budget Support") — öffnet das Standard-Mailprogramm
 - **M33 Pool-Endspiel (Multiplayer):** Host-Toggle „Pool-Endspiel" beim Raum-Erstellen (nur Strategy). Sobald alle Runs beendet sind, darf der Spieler mit dem eindeutig größten Wurf-Pool **ein** Feld verbessern: Feld antippen → neuen Wert eintragen oder „Alten Wert behalten". Erst danach werden Liga-Punkte vergeben und die Session beendet. Bei Gleichstand an der Spitze verbessert niemand. Backend: Session-Felder `pool_endgame_enabled` / `pool_endgame_improver_id` / `pool_endgame_resolved` (Migration), neuer Endpunkt `POST /sessions/invite/:code/pool-endgame`, Sieger-Bestimmung `determinePoolEndgameImprover()`. Frontend: `PoolEndgamePanel`, Improver-Phase in `PlayBoard`. Kein Polling (Auflösung ereignisbasiert beim Öffnen des Abschluss-Screens)
 - **M32 Gegner-Pool (Multiplayer):** Host-Toggle „Gegner-Pool sichtbar" beim Raum-Erstellen; bei genau 2 Spielern zeigt die Spiel-Topbar den Wurf-Pool des Gegners. Backend: Session-Flag `show_opponent_pool` (Migration), Lobby-DTO um `rollsInPool` je Spieler erweitert. Kein Polling (Nachladen nur bei Start + eigener Eintragung)
@@ -13,6 +14,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **M29 Punktwahl-Eintrag:** Feld antippen → Overlay mit feldtypabhängiger Punktwahl + Würfe → Eintragen (`FieldScoreChoiceGrid`, `ScoreEntryPanel`)
 
 ### Changed
+- **Gegner-Pool aktualisieren (M32-Fix):** Der Gegner-Pool wird jetzt auch bei App-Rückkehr (`visibilitychange`/`focus`) und über einen dezenten Aktualisieren-Tap in der Spiel-Topbar neu geladen. Behebt, dass der Host (zuerst im Spiel) den später beitretenden Gegner ohne Polling nie sah. Weiterhin kein Polling (nur gezielte Einzel-Requests). Dateien: `PlayBoard.tsx`, `PlayTopBar.tsx`, `globals.css`
 - **Eintrag-Voreinstellung:** Würfe-Standard im Strategy-Modus von 2 auf **3** geändert (`PlayBoard.defaultRollsUsed`)
 - **M32 Topbar:** „Rest"-Chip (Restwürfe bis Spielende) entfernt — Topbar zeigt nur noch den eigenen Pool
 - **M29 UX (final):** Overlay startet oben; obere Felder nur Zahlen (0, 2, 4, …); gewählte Punkte/Würfe hellgelb markiert

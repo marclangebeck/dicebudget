@@ -8,6 +8,10 @@ type Props = {
   rollsRemaining: number | null;
   /** Wurf-Pool des Gegners (nur 2 Spieler + Host hat es erlaubt); sonst null. */
   opponentPool?: number | null;
+  /** Host hat „Gegner-Pool sichtbar" aktiviert → Aktualisieren-Tap anzeigen. */
+  showOpponentPoolControl?: boolean;
+  /** Einzelner Lobby-Request auf Tippen (kein Polling). */
+  onRefreshOpponentPool?: () => void;
   showAbandon?: boolean;
   abandonBusy?: boolean;
   onAbandon?: () => void;
@@ -19,6 +23,8 @@ export function PlayTopBar({
   rollsInPool,
   rollsRemaining,
   opponentPool,
+  showOpponentPoolControl,
+  onRefreshOpponentPool,
   showAbandon,
   abandonBusy,
   onAbandon,
@@ -54,6 +60,30 @@ export function PlayTopBar({
               <span className="play-chip play-chip--sky">
                 Gegner <strong className="tabular-nums">{opponentPool}</strong>
               </span>
+            )}
+            {showOpponentPoolControl && onRefreshOpponentPool && (
+              <button
+                type="button"
+                onClick={onRefreshOpponentPool}
+                className="play-chip-refresh"
+                aria-label="Gegner-Pool aktualisieren"
+                title="Gegner-Pool aktualisieren"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  className="play-chip-refresh-icon"
+                  aria-hidden
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 12a8 8 0 0 1 13.66-5.66L20 8M20 4v4h-4M20 12a8 8 0 0 1-13.66 5.66L4 16M4 20v-4h4"
+                  />
+                </svg>
+              </button>
             )}
           </div>
         )}
