@@ -3,8 +3,13 @@
 import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { getPairingDetail } from "@/lib/api";
+import { getPairingDetail, getPairingSummaries } from "@/lib/api";
 import type { PairingDetailDto } from "@/lib/pairingTypes";
+import {
+  isMergedPairingKey,
+  mergePairingDetails,
+  mergePairingSummaries,
+} from "@/lib/pairingMerge";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { getOrCreatePlayerId, normalizePublicPlayerId, playerLabel } from "@/lib/playerIdentity";
 import { loadPlayerAliases, setPlayerAlias, type PlayerAliasMap } from "@/lib/playerAliases";
@@ -41,21 +46,41 @@ function PairingDetailInner() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setOwnPlayerId(getOrCreatePlayerId());
-    setAliases(loadPlayerAliases());
-  }, []);
-
-  useEffect(() => {
     if (!key) {
       setLoading(false);
       setError("Keine Paarung ausgewählt.");
       return;
     }
 
+    const own = getOrCreatePlayerId();
+    const al = loadPlayerAliases();
+    setOwnPlayerId(own);
+    setAliases(al);
+
     setLoading(true);
     setError(null);
-    void getPairingDetail(key)
-      .then(({ pairing: data }) => setPairing(data))
+
+    const loadMerged = async () => {
+      // Quell-Paarungen der zusammengeführten Gruppe ermitteln und kombinieren.
+      const { pairings } = await getPairingSummaries();
+      const group = mergePairingSummaries(pairings, al, own).find(
+        (m) => m.key === key,
+      );
+      if (!group) throw new Error("Paarung nicht gefunden");
+      const details = await Promise.all(
+        group.sourceKeys.map((k) => getPairingDetail(k).then((r) => r.pairing)),
+      );
+      const merged = mergePairingDetails(details, al, own);
+      if (!merged) throw new Error("Paarung nicht gefunden");
+      return merged;
+    };
+
+    const load = isMergedPairingKey(key)
+      ? loadMerged()
+      : getPairingDetail(key).then(({ pairing: data }) => data);
+
+    void load
+      .then((data) => setPairing(data))
       .catch((e) =>
         setError(e instanceof Error ? e.message : "Paarung nicht geladen"),
       )

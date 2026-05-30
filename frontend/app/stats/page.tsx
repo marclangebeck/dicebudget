@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getPairingSummaries } from "@/lib/api";
 import type { PairingSummaryDto } from "@/lib/pairingTypes";
+import { mergePairingSummaries } from "@/lib/pairingMerge";
 import { PairingSummaryCard } from "@/components/PairingSummaryCard";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
@@ -39,6 +40,12 @@ export default function StatsPage() {
     void refreshPairings();
   }, [refreshPairings]);
 
+  // Gleicher Alias = dieselbe Person → Paarungen lokal zusammenführen.
+  const mergedPairings = useMemo(
+    () => mergePairingSummaries(pairings, aliases, ownPlayerId),
+    [pairings, aliases, ownPlayerId],
+  );
+
   return (
     <div className="stats-screen flex flex-col gap-3 pb-2">
       <AppScreenHeader
@@ -53,16 +60,16 @@ export default function StatsPage() {
         <p className="stats-empty-state">Lade Paarungen …</p>
       )}
 
-      {!loading && !error && pairings.length === 0 && (
+      {!loading && !error && mergedPairings.length === 0 && (
         <p className="stats-empty-state">
           Noch keine Paarungen. Spiele mindestens eine Multiplayer-Runde mit zwei oder
           mehr Spielern zu Ende.
         </p>
       )}
 
-      {!loading && pairings.length > 0 && (
+      {!loading && mergedPairings.length > 0 && (
         <ul className="stats-pairing-list">
-          {pairings.map((pairing) => (
+          {mergedPairings.map((pairing) => (
             <PairingSummaryCard
               key={pairing.key}
               pairing={pairing}

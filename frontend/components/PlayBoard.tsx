@@ -466,6 +466,47 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       );
     }
 
+    // Pool-Endspiel aktiviert, aber noch nicht aufgelöst: Sieger steht ggf. noch
+    // nicht fest (es sind noch nicht alle fertig) oder verbessert gerade. Ohne
+    // Polling kann der bereits fertige Spieler die Improver-Phase verpassen –
+    // daher Warte-Hinweis mit gezieltem Aktualisieren (+ Focus-Refresh).
+    const poolEndgamePending =
+      !!lobby?.poolEndgameEnabled && !lobby?.poolEndgameResolved;
+    if (poolEndgamePending) {
+      return (
+        <div className="play-board play-board--finished flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
+          <PlayTopBar
+            inviteCode={inviteCode}
+            useStrategyRules={run.useStrategyRules}
+            rollsInPool={run.rollsInPool}
+            rollsRemaining={run.rollsRemaining}
+          />
+          <div className="play-endgame-banner shrink-0">
+            <p className="play-endgame-banner-title">⏳ Pool-Endspiel läuft</p>
+            <p className="play-endgame-banner-text">
+              Sobald alle Mitspieler fertig sind, darf der Spieler mit dem größten
+              Wurf-Pool ein Feld verbessern. Tippe auf „Aktualisieren“, sobald die
+              anderen fertig sind.
+            </p>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => void refreshLobby()}
+              className="play-endgame-keep-btn disabled:opacity-50"
+            >
+              {busy ? "…" : "Aktualisieren"}
+            </button>
+          </div>
+          {error && (
+            <p className="glass-alert-error shrink-0 px-3 py-2 text-sm">{error}</p>
+          )}
+          <div className="play-finish-scroll min-h-0 flex-1 overflow-y-auto">
+            <RunFinishScreen run={run} inviteCode={inviteCode ?? undefined} />
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="play-board play-board--finished flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
         <PlayTopBar

@@ -13,6 +13,10 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **M30 Bonus-Delta-Anzeige:** Zeile „Ergebnis 1“ zeigt pro Spielblock das laufende Delta zur Soll-Marke „3 je Augenzahl“ (Bonus 63). `+` in Grün (über Schnitt), `−` in Rot (unter Schnitt), `±0` in Grau. Helfer `upperBonusDelta()` in `frontend/lib/gameScoring.ts`, Anzeige in `ScoreSheetTable`
 - **M29 Punktwahl-Eintrag:** Feld antippen → Overlay mit feldtypabhängiger Punktwahl + Würfe → Eintragen (`FieldScoreChoiceGrid`, `ScoreEntryPanel`)
 
+### Fixed
+- **Pool-Endspiel ausführbar (M33-Fix):** Beendete der Pool-Sieger seinen Run **vor** den Mitspielern, erschien die Verbesserungs-Phase nie (ohne Polling kein Nachladen). Der Abschluss-Screen zeigt jetzt „Pool-Endspiel läuft" mit Aktualisieren-Tap; zusammen mit dem Focus-Refresh erhält der Sieger die Verbesserung zuverlässig. Datei: `PlayBoard.tsx`
+- **Stats zusammenführen bei Alias:** Spieler-IDs mit demselben lokalen Alias werden in der Statistik wieder als dieselbe Person zusammengeführt (Übersicht + Detail), rein lokal/clientseitig ohne Klarnamen. Neu: `lib/pairingMerge.ts`; angepasst: `app/stats/page.tsx`, `app/stats/pairing/page.tsx`
+
 ### Changed
 - **Gegner-Pool aktualisieren (M32-Fix):** Der Gegner-Pool wird jetzt auch bei App-Rückkehr (`visibilitychange`/`focus`) und über einen dezenten Aktualisieren-Tap in der Spiel-Topbar neu geladen. Behebt, dass der Host (zuerst im Spiel) den später beitretenden Gegner ohne Polling nie sah. Weiterhin kein Polling (nur gezielte Einzel-Requests). Dateien: `PlayBoard.tsx`, `PlayTopBar.tsx`, `globals.css`
 - **Eintrag-Voreinstellung:** Würfe-Standard im Strategy-Modus von 2 auf **3** geändert (`PlayBoard.defaultRollsUsed`)
