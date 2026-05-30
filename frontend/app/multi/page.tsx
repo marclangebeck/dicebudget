@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
+import { BonusCelebrationToggle } from "@/components/BonusCelebrationToggle";
 import { StrategyModeToggle } from "@/components/StrategyModeToggle";
 import { createGameSession } from "@/lib/api";
 
@@ -10,6 +11,7 @@ export default function MultiHostPage() {
   const [gameCount, setGameCount] = useState(6);
   const [maxPlayers, setMaxPlayers] = useState(2);
   const [useStrategyRules, setUseStrategyRules] = useState(true);
+  const [showOpponentPool, setShowOpponentPool] = useState(false);
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [leagueCode, setLeagueCode] = useState<string | null>(null);
   const [createdStrategyMode, setCreatedStrategyMode] = useState<boolean | null>(null);
@@ -24,7 +26,13 @@ export default function MultiHostPage() {
     setLoading(true);
     setError(null);
     try {
-      const { session } = await createGameSession(gameCount, maxPlayers, useStrategyRules);
+      const { session } = await createGameSession(
+        gameCount,
+        maxPlayers,
+        useStrategyRules,
+        undefined,
+        showOpponentPool,
+      );
       setInviteCode(session.inviteCode);
       setLeagueCode(session.leagueCode);
       setCreatedStrategyMode(session.useStrategyRules);
@@ -63,6 +71,46 @@ export default function MultiHostPage() {
             variant="setup"
           />
         </div>
+
+        <div className="setup-host-card setup-host-card--mode">
+          <BonusCelebrationToggle disabled={roomLocked} />
+        </div>
+
+        {useStrategyRules && (
+          <div className="setup-host-card setup-host-card--mode">
+            <div className="setup-mode-toggle">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-strong text-sm font-semibold">Gegner-Pool sichtbar</p>
+                  <p className="text-muted mt-0.5 text-xs leading-snug">
+                    Zeigt im Spiel den Wurf-Pool des Gegners (nur bei genau 2 Spielern)
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={showOpponentPool}
+                  aria-label={
+                    showOpponentPool ? "Gegner-Pool ausblenden" : "Gegner-Pool anzeigen"
+                  }
+                  disabled={roomLocked}
+                  onClick={() => setShowOpponentPool((v) => !v)}
+                  className={`relative h-8 w-14 shrink-0 rounded-full border-2 transition disabled:opacity-50 ${
+                    showOpponentPool
+                      ? "border-emerald-800 bg-emerald-600"
+                      : "border-slate-500 bg-slate-400"
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 block h-6 w-6 rounded-full bg-white shadow-md transition-transform ${
+                      showOpponentPool ? "translate-x-6" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="setup-host-sliders">
           <label className="setup-slider-card setup-slider-card--sky">

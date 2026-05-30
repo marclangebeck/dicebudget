@@ -16,6 +16,7 @@ sessionsRouter.post("/", async (req, res, next) => {
       req.body?.useStrategyRules === undefined
         ? true
         : Boolean(req.body.useStrategyRules);
+    const showOpponentPool = Boolean(req.body?.showOpponentPool);
     if (Number.isNaN(gameCount) || Number.isNaN(maxPlayers)) {
       res.status(400).json({ error: "gameCount and maxPlayers required" });
       return;
@@ -24,7 +25,13 @@ sessionsRouter.post("/", async (req, res, next) => {
       typeof req.body?.leagueCode === "string" && req.body.leagueCode.trim()
         ? req.body.leagueCode.trim()
         : undefined;
-    const session = await createGameSession(gameCount, maxPlayers, useStrategyRules, leagueCode);
+    const session = await createGameSession(
+      gameCount,
+      maxPlayers,
+      useStrategyRules,
+      leagueCode,
+      showOpponentPool,
+    );
     res.status(201).json({ session });
   } catch (error) {
     next(error);

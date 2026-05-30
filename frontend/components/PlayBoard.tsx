@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { BonusOverlay } from "@/components/BonusOverlay";
 import { RunCompleteOverlay } from "@/components/RunCompleteOverlay";
 import { RunFinishScreen } from "@/components/RunFinishScreen";
 import { FitScoreSheet } from "@/components/FitScoreSheet";
@@ -8,8 +9,19 @@ import { PlayTopBar } from "@/components/PlayTopBar";
 import { ScoreEntryPanel } from "@/components/ScoreEntryPanel";
 import { ScoreSheetTable } from "@/components/ScoreSheetTable";
 import { clearActiveGame, saveActiveGame } from "@/lib/activeGame";
-import { abandonRun, clearLastField, completeField, finishRun, getRun, incrementExtraYatzy } from "@/lib/api";
+import {
+  abandonRun,
+  clearLastField,
+  completeField,
+  finishRun,
+  getRun,
+  getSessionLobby,
+  incrementExtraYatzy,
+} from "@/lib/api";
 import { poolDeltaForComplete } from "@/lib/gameRules";
+import { upperBonusAchieved } from "@/lib/gameScoring";
+import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
+import { getBonusCelebrationEnabled } from "@/lib/uiPrefs";
 import {
   abandonLocalSoloRun,
   clearLocalSoloField,
@@ -43,6 +55,8 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   const [busy, setBusy] = useState(false);
   const [showCompleteOverlay, setShowCompleteOverlay] = useState(false);
   const [sheetReviewAfterComplete, setSheetReviewAfterComplete] = useState(false);
+  const [bonusOverlayGame, setBonusOverlayGame] = useState<number | null>(null);
+  const [opponentPool, setOpponentPool] = useState<number | null>(null);
 
   const resetEntry = useCallback(() => {
     setScoreInput("");
@@ -71,6 +85,29 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     );
   }, [load]);
 
+  // Gegner-Pool nur gezielt nachladen (Start + nach eigener Eintragung), kein Polling.
+  const refreshOpponentPool = useCallback(async () => {
+    if (!inviteCode) return;
+    try {
+      const { session } = await getSessionLobby(inviteCode);
+      if (!session.showOpponentPool || session.players.length !== 2) {
+        setOpponentPool(null);
+        return;
+      }
+      const myId = normalizePublicPlayerId(getOrCreatePlayerId());
+      const opponent = session.players.find(
+        (p) => normalizePublicPlayerId(p.playerId) !== myId,
+      );
+      setOpponentPool(opponent?.rollsInPool ?? null);
+    } catch {
+      // Anzeige ist optional – Fehler hier nicht ins Spiel durchreichen.
+    }
+  }, [inviteCode]);
+
+  useEffect(() => {
+    void refreshOpponentPool();
+  }, [refreshOpponentPool]);
+
   useEffect(() => {
     if (!run) return;
     if (run.status === "FINISHED") {
@@ -88,6 +125,12 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       saveActiveGame({ type: "solo", runId });
     }
   }, [run, runId, inviteCode, playerSecret]);
+
+  useEffect(() => {
+    if (bonusOverlayGame === null) return;
+    const timer = window.setTimeout(() => setBonusOverlayGame(null), 2500);
+    return () => window.clearTimeout(timer);
+  }, [bonusOverlayGame]);
 
   const activeField: FieldDto | undefined = run?.games
     .flatMap((g) => g.fields)
@@ -162,13 +205,27 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
               playerSecret,
             )
           ).run;
+      const gameBefore = run.games.find((g) =>
+        g.fields.some((f) => f.id === activeFieldId),
+      );
+      const gameAfter = updated.games.find((g) =>
+        g.fields.some((f) => f.id === activeFieldId),
+      );
+      const bonusJustAchieved =
+        !!gameBefore &&
+        !!gameAfter &&
+        !upperBonusAchieved(gameBefore.fields) &&
+        upperBonusAchieved(gameAfter.fields);
       setRun(updated);
       resetEntry();
       setActiveFieldId(null);
       if (allFieldsScored(updated)) {
         setSheetReviewAfterComplete(false);
         setShowCompleteOverlay(true);
+      } else if (bonusJustAchieved && getBonusCelebrationEnabled()) {
+        setBonusOverlayGame(gameAfter?.index ?? null);
       }
+      void refreshOpponentPool();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Eintrag fehlgeschlagen");
     } finally {
@@ -189,6 +246,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       resetEntry();
       setShowCompleteOverlay(false);
       setSheetReviewAfterComplete(false);
+      setBonusOverlayGame(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Löschen fehlgeschlagen");
     } finally {
@@ -288,6 +346,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         useStrategyRules={run.useStrategyRules}
         rollsInPool={run.rollsInPool}
         rollsRemaining={run.rollsRemaining}
+        opponentPool={opponentPool}
         showAbandon
         abandonBusy={busy}
         onAbandon={() => void handleAbandon()}
@@ -334,6 +393,13 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
           </FitScoreSheet>
         </div>
       </div>
+
+      {bonusOverlayGame !== null && !showCompleteOverlay && (
+        <BonusOverlay
+          gameIndex={run.gameCount > 1 ? bonusOverlayGame : null}
+          onClose={() => setBonusOverlayGame(null)}
+        />
+      )}
 
       {showCompleteOverlay && run && (
         <RunCompleteOverlay

@@ -131,6 +131,7 @@ export async function createGameSession(
   maxPlayers: number,
   useStrategyRules = true,
   leagueCode?: string,
+  showOpponentPool = false,
 ) {
   assertValidGameCount(gameCount);
   assertValidSessionPlayers(maxPlayers);
@@ -169,6 +170,7 @@ export async function createGameSession(
         gameCount,
         maxPlayers,
         useStrategyRules,
+        showOpponentPool,
         status: SESSION_STATUS.OPEN,
         leagueId,
         roundNumber,
@@ -185,6 +187,7 @@ export async function createGameSession(
     gameCount: session.gameCount,
     maxPlayers: session.maxPlayers,
     useStrategyRules: session.useStrategyRules,
+    showOpponentPool: session.showOpponentPool,
     status: session.status,
     createdAt: session.createdAt.toISOString(),
     leagueCode: session.league.leagueCode,
@@ -200,7 +203,9 @@ export async function getSessionLobbyByInvite(inviteCode: string) {
       league: { select: { leagueCode: true } },
       players: {
         orderBy: { orderIndex: "asc" },
-        include: { run: { select: { status: true, totalScore: true } } },
+        include: {
+          run: { select: { status: true, totalScore: true, rollsInPool: true } },
+        },
       },
     },
   });
@@ -215,6 +220,7 @@ export async function getSessionLobbyByInvite(inviteCode: string) {
     gameCount: session.gameCount,
     maxPlayers: session.maxPlayers,
     useStrategyRules: session.useStrategyRules,
+    showOpponentPool: session.showOpponentPool,
     status: session.status,
     createdAt: session.createdAt.toISOString(),
     leagueCode: session.league.leagueCode,
@@ -227,6 +233,8 @@ export async function getSessionLobbyByInvite(inviteCode: string) {
       orderIndex: p.orderIndex,
       runFinished: p.run.status === RUN_STATUS.FINISHED,
       totalScore: p.run.totalScore,
+      /** Pool nur offenlegen, wenn der Host es für die Partie erlaubt hat. */
+      rollsInPool: session.showOpponentPool ? p.run.rollsInPool : null,
     })),
     allRunsFinished:
       session.players.length > 0 &&

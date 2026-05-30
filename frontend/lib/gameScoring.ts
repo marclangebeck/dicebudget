@@ -104,6 +104,21 @@ export function upperBonusDelta(fields: ScoredField[]): number {
   return upperSum - 3 * facesSum;
 }
 
+/**
+ * True, wenn die obere Sektion vollständig eingetragen ist (alle 6 Felder)
+ * und den Bonus erreicht (Summe ≥ 63). Basis für die Bonus-Einblendung (M31).
+ */
+export function upperBonusAchieved(fields: ScoredField[]): boolean {
+  const upperFields = fields.filter((f) =>
+    UPPER_FIELD_TYPES.includes(f.fieldType as FieldTypeId),
+  );
+  const allScored =
+    upperFields.length === UPPER_FIELD_TYPES.length &&
+    upperFields.every((f) => f.score !== null);
+  if (!allScored) return false;
+  return sumScored(upperFields) >= UPPER_BONUS_MIN;
+}
+
 export function gameIndexForExtraYatzyClick(
   extraYatzyCountAfterClick: number,
   gameCount: number,

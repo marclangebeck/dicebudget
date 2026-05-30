@@ -140,10 +140,17 @@ export function createGameSession(
   maxPlayers: number,
   useStrategyRules = true,
   leagueCode?: string,
+  showOpponentPool = false,
 ) {
   return request<{ session: SessionLobbyDto }>("/sessions", {
     method: "POST",
-    body: JSON.stringify({ gameCount, maxPlayers, useStrategyRules, leagueCode }),
+    body: JSON.stringify({
+      gameCount,
+      maxPlayers,
+      useStrategyRules,
+      leagueCode,
+      showOpponentPool,
+    }),
   });
 }
 

@@ -13,6 +13,7 @@ export type SessionLobbyDto = {
   gameCount: number;
   maxPlayers: number;
   useStrategyRules: boolean;
+  showOpponentPool: boolean;
   status: string;
   createdAt: string;
   leagueCode: string;
@@ -25,6 +26,8 @@ export type SessionLobbyDto = {
     orderIndex: number;
     runFinished: boolean;
     totalScore: number;
+    /** Wurf-Pool des Spielers; nur gesetzt, wenn der Host es erlaubt hat. */
+    rollsInPool: number | null;
   }[];
   allRunsFinished: boolean;
   leagueStandings: LeagueStandingDto[];

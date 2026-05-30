@@ -6,6 +6,8 @@ type Props = {
   useStrategyRules: boolean;
   rollsInPool: number;
   rollsRemaining: number | null;
+  /** Wurf-Pool des Gegners (nur 2 Spieler + Host hat es erlaubt); sonst null. */
+  opponentPool?: number | null;
   showAbandon?: boolean;
   abandonBusy?: boolean;
   onAbandon?: () => void;
@@ -16,6 +18,7 @@ export function PlayTopBar({
   useStrategyRules,
   rollsInPool,
   rollsRemaining,
+  opponentPool,
   showAbandon,
   abandonBusy,
   onAbandon,
@@ -47,9 +50,11 @@ export function PlayTopBar({
             <span className="play-chip">
               Pool <strong className="tabular-nums">{rollsInPool}</strong>
             </span>
-            <span className="play-chip play-chip--sky">
-              Rest <strong className="tabular-nums">{rollsRemaining}</strong>
-            </span>
+            {opponentPool !== null && opponentPool !== undefined && (
+              <span className="play-chip play-chip--sky">
+                Gegner <strong className="tabular-nums">{opponentPool}</strong>
+              </span>
+            )}
           </div>
         )}
         {showAbandon && onAbandon && (

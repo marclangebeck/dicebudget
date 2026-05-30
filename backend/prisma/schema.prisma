@@ -57,6 +57,7 @@ model GameSession {
   gameCount         Int      @map("game_count")
   maxPlayers        Int      @map("max_players")
   useStrategyRules  Boolean  @default(true) @map("use_strategy_rules")
+  showOpponentPool  Boolean  @default(false) @map("show_opponent_pool")
   status            String   @default("OPEN")
   leagueId          String   @map("league_id")
   league            League   @relation(fields: [leagueId], references: [id], onDelete: Cascade)

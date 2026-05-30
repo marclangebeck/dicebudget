@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { BonusCelebrationToggle } from "@/components/BonusCelebrationToggle";
 import { StrategyModeToggle } from "@/components/StrategyModeToggle";
 import { saveActiveGame } from "@/lib/activeGame";
 import { createLocalSoloRun } from "@/lib/localSoloRun";
@@ -42,6 +43,10 @@ export function GameSetup() {
           disabled={loading}
           variant="setup"
         />
+      </div>
+
+      <div className="setup-host-card setup-host-card--mode">
+        <BonusCelebrationToggle disabled={loading} />
       </div>
 
       <label className="setup-slider-card setup-slider-card--sky setup-slider-card--wide">
