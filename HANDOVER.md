@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **GitHub:** `marclangebeck/dicebudget` · Branch **`milestone-22-prep`**  
 **Sprache:** Deutsch  
-**Stand:** 2026-05-29 · Commit `2e68f53`
+**Stand:** 2026-05-30 · Commit `1a03a32`
 
 ---
 
@@ -15,12 +15,13 @@
 | Legal (dice.budget) | Impressum + Datenschutz — **live** |
 | Legal (Plattform) | bottle-trade.de — **live** (separates Projekt) |
 | **M29 Punktwahl-Eintrag** | **Erledigt** — Feld antippen → Overlay (Punkte + Würfe) → Eintragen |
+| **M30 Bonus-Delta-Anzeige** | **Erledigt** — „Ergebnis 1“ zeigt Delta zur Soll-Marke „3 je Augenzahl“ (+ grün / − rot / ±0 grau) |
 | Frontend Deploy (Server) | Nach Pull: `cd frontend && npm run build` (Nginx aus `out/`) |
-| iOS im Repo | Build-Nummer **15** · Version **1.0** |
-| TestFlight | Build **11** zuletzt hochgeladen · **15** im Repo, Upload durch Nutzer auf Mac |
-| Sync Mac/Server/GitHub | Commit **`2e68f53`** auf `origin/milestone-22-prep` |
+| iOS im Repo | Build-Nummer **16** · Version **1.0** |
+| TestFlight | Build **16** hochgeladen (erfolgreich) — enthält M29 + M30 |
+| Sync Mac/Server/GitHub | Commit **`1a03a32`** auf `origin/milestone-22-prep` |
 
-**Nächste Priorität (typisch):** TestFlight **1.0 (15)** hochladen & testen → App Store Connect (Paid Agreement, 1,19 €, Screenshots, Review).
+**Nächste Priorität (typisch):** App Store Connect (Paid Agreement, Bank/Steuer, 1,19 €, Screenshots, Datenschutzfragebogen, Review) → TestFlight Build 16 auf iPhone testen.
 
 ---
 
@@ -47,7 +48,7 @@ Web + iOS: Next.js static export + Capacitor 7.
 ─── PFADE ───
 Prod:     https://dicebudget.bottle-trade.de
 App:      /app (iOS-Start) · Legal: /datenschutz, /impressum
-Branch:   milestone-22-prep · Commit: 2e68f53
+Branch:   milestone-22-prep · Commit: 1a03a32
 Server:   /home/bottleadmin/projects/kniffel
 Mac:      /Users/marclangebeck/projects/kniffel
 Xcode:    /Users/marclangebeck/projects/kniffel/frontend/ios/App/App.xcworkspace
@@ -64,18 +65,27 @@ Kontakt:  info@bottle-trade.de (Marc Langebeck, Kiel — frontend/lib/legal.ts)
 • ENTFERNT: Würfel-Zähler, Wurf vergleichen, CommittedThrowBanner, DiceThrowOverlay
 • Kern-Dateien: PlayBoard.tsx, ScoreEntryPanel.tsx, FieldScoreChoiceGrid.tsx, lib/labels.ts (fieldScoreChoices)
 
+─── M30 BONUS-DELTA (aktueller Stand) ───
+• Zeile „Ergebnis 1“ zeigt pro Block Delta zur Soll-Marke „3 je Augenzahl“ (Bonus 63)
+• delta = obere Summe − 3 × (Summe Augenzahlen der eingetragenen oberen Felder)
+• Anzeige nur das Delta: +N grün · −N rot · ±0 grau · Tooltip mit Klartext
+• Erscheint erst ab erstem oberen Eintrag; gilt Solo + Multiplayer
+• Kern-Dateien: lib/gameScoring.ts (upperBonusDelta), ScoreSheetTable.tsx (SummaryTile)
+
 ─── ERLEDIGT (nicht neu erfinden) ───
 • M1–22, M23–27 (UI iOS abgenommen)
 • M29 Punktwahl-Eintrag (Commits 087d5d9 … 2e68f53)
+• M30 Bonus-Delta-Anzeige (Commit 1a03a32) — Ergebnis-1-Delta zur Soll-Marke „3 je Augenzahl“
 • Legal dice.budget + bottle-trade.de (live)
 • Legal-Daten: frontend/lib/legal.ts + branding.ts
 • rsync-Fix: brew unlink rsync vor Xcode-Upload
 • Spiel beenden: ✕ in PlayTopBar (ABANDON_RUN_CONFIRM)
+• TestFlight Build 1.0 (16) hochgeladen (enthält M29 + M30)
 
 ─── OFFEN (typische nächste Themen) ───
-1. TestFlight Upload Build 1.0 (15) — Nutzer auf Mac (Signing Team in Xcode!)
-2. App Store Connect: Paid Agreement, Bank/Steuer, Preis 1,19 €
-3. Store: Screenshots 6.7", Beschreibung DE, Datenschutzfragebogen
+1. App Store Connect: Paid Agreement, Bank/Steuer, Preis 1,19 €
+2. Store: Screenshots 6.7", Beschreibung DE, Datenschutzfragebogen
+3. TestFlight Build 16 auf iPhone testen
 4. Web auf Server deployen nach UI-Änderungen (npm run build)
 5. Optional: milestone-22-prep → main (nur nach Nutzer-Freigabe)
 
@@ -93,7 +103,7 @@ brew unlink rsync 2>/dev/null; true
 cd /Users/marclangebeck/projects/kniffel/frontend && npm run build:ios
 env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
 # Signing: Team wählen (DEVELOPMENT_TEAM nicht im Git!)
-# Version 1.0 · Build 15 → Clean → Archive → Upload
+# Version 1.0 · Build 17 (nächster Upload; 16 ist hochgeladen) → Clean → Archive → Upload
 
 ─── WEB-DEPLOY (Server) ───
 cd /home/bottleadmin/projects/kniffel && git pull origin milestone-22-prep
@@ -174,8 +184,8 @@ frontend/ios/App/App.xcworkspace
 
 ### Bereits erledigt
 
-- Milestones **1–22**, **23–27**, **M29** (Punktwahl-Eintrag)
-- TestFlight **Build 11** (älter); Repo-Stand **Build 15**
+- Milestones **1–22**, **23–27**, **M29** (Punktwahl-Eintrag), **M30** (Bonus-Delta)
+- TestFlight **Build 16** hochgeladen (enthält M29 + M30); nächster Upload wäre **17**
 - Legal-Seiten live
 - Backend-Tests: `cd backend && npm test`
 
@@ -205,8 +215,8 @@ cd /Users/marclangebeck/projects/kniffel/frontend && npm run build:ios
 cd /home/bottleadmin/projects/kniffel/backend && npm test
 cd /home/bottleadmin/projects/kniffel/frontend && npm run build
 curl -s https://dicebudget.bottle-trade.de/api/health
-git log -1 --oneline   # erwartet: 2e68f53
-grep CURRENT_PROJECT_VERSION frontend/ios/App/App.xcodeproj/project.pbxproj | head -1   # erwartet: 15
+git log -1 --oneline   # erwartet: 1a03a32
+grep CURRENT_PROJECT_VERSION frontend/ios/App/App.xcodeproj/project.pbxproj | head -1   # Repo: 15 (Build-Nr. wird in Xcode gesetzt)
 ```
 
 ---

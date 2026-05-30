@@ -59,6 +59,8 @@ npm run icons   # aus public/logo-source.png
 | `lib/localSoloRun.ts` | Solo lokal (LocalStorage) |
 | `lib/playerIdentity.ts` | Lokale `playerId` |
 | `lib/branding.ts` | Pfade, URLs |
+| `lib/gameScoring.ts` | Scoring (Bonus 63/35) + `upperBonusDelta` (M30 Bonus-Delta) |
+| `components/ScoreSheetTable.tsx` | Zettel; „Ergebnis 1“ zeigt Bonus-Delta (+ grün / − rot / ±0 grau) |
 
 ## iOS (Capacitor)
 

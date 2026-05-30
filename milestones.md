@@ -11,6 +11,7 @@
 | iOS (Capacitor) | 21 | in Arbeit |
 | Datenschutz-Umbau | 22 | erledigt |
 | UI/Branding-Folgepaket | 23–27 | erledigt |
+| Eintrag & Bonus-Hilfe | 29–30 | erledigt |
 
 *(Variante D „echtes Online-Spiel“ / Live-Sync bewusst nicht Teil dieser Milestones.)*
 
@@ -509,7 +510,7 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 | Verwendung in `AppScreenHeader`, `PlayTopBar` und relevanten Detailseiten | erledigt |
 | Touch-optimierte Hit-Targets (iOS) | erledigt |
 
-**Status:** erledigt (Mai 2026, TestFlight Build 11)
+**Status:** erledigt (Mai 2026; UI in TestFlight Build 16)
 
 ---
 
@@ -581,9 +582,9 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 
 ---
 
-## Aktueller Arbeitsstand (2026-05-29)
+## Aktueller Arbeitsstand (2026-05-30)
 
-**Commit:** `2e68f53` · Branch `milestone-22-prep` · GitHub synchron
+**Commit:** `1a03a32` · Branch `milestone-22-prep` · GitHub synchron
 
 **Erledigt:**
 
@@ -594,17 +595,17 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
   - Untere Felder: Pasch/Chance 0–30, Kombinationen 0/Festwert
   - Overlay oben am Bildschirm, Auswahl hellgelb markiert
   - Entfernt: Würfel-Zähler, „Wurf vergleichen“, DiceThrowOverlay
-- iOS-Build-Nummer im Repo: **15**
+- **M30 Bonus-Delta-Anzeige:** „Ergebnis 1“ zeigt pro Block das Delta zur Soll-Marke „3 je Augenzahl“ (`+` grün / `−` rot / `±0` grau)
+- iOS: **Build 16** (1.0) erfolgreich in TestFlight hochgeladen
 - Web: `npm run build` auf Server nach Pull
 
 **Nächste Schritte (Priorität):**
 
-1. **TestFlight:** Build **1.0 (15)** auf Mac archivieren & hochladen (Signing Team!)
-2. **App Store Connect:** Paid Applications Agreement, Bank/Steuer
-3. **Store-Metadaten:** Preis 1,19 €, Screenshots 6.7", Beschreibung DE
-4. **App-Datenschutzfragebogen** (URL: https://dicebudget.bottle-trade.de/datenschutz)
-5. Review vorbereiten / TestFlight auf iPhone testen
-6. Optional: Branch `milestone-22-prep` → `main` (nur nach Nutzer-Freigabe)
+1. **App Store Connect:** Paid Applications Agreement, Bank/Steuer
+2. **Store-Metadaten:** Preis 1,19 €, Screenshots 6.7", Beschreibung DE
+3. **App-Datenschutzfragebogen** (URL: https://dicebudget.bottle-trade.de/datenschutz)
+4. Review vorbereiten / TestFlight Build 16 auf iPhone testen
+5. Optional: Branch `milestone-22-prep` → `main` (nur nach Nutzer-Freigabe)
 
 ---
 
@@ -629,3 +630,33 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 - `fieldScoreChoices()` in `frontend/lib/labels.ts`
 
 **Entfernt (ersetzt):** `DiceThrowOverlay`, `DiceCountPicker`, `CommittedThrowBanner`, `FixedFieldChoiceBanner`
+
+---
+
+## Milestone 30 — Bonus-Delta-Anzeige (M30)
+
+**Ziel:** Den oberen Bonus (35 ab 63) während des Spiels sichtbar machen, ohne im Kopf zu rechnen.
+
+**Status:** erledigt (Mai 2026, in Build 16)
+
+**Idee:** Der Bonus bei 63 entspricht genau **3 Würfeln je Augenzahl** (`3 × (1+…+6) = 63`). Pro Feld ist die Soll-Marke `3 × Augenzahl`. Die Zeile **„Ergebnis 1“** zeigt pro Spielblock das **laufende Delta** über die bereits eingetragenen oberen Felder:
+
+```
+delta = obere Summe − 3 × (Summe der Augenzahlen der eingetragenen Felder)
+```
+
+- Beispiel: 1er = 1 → `−2`; danach vier 3er (12) → `+1`; danach vier 4er (16) → `+5`
+- Sind alle 6 oberen Felder gefüllt, gilt: `delta ≥ 0 ⇔ Bonus erreicht`
+
+**Anzeige (nur das Delta):**
+
+- `+N` in **Grün** (über Schnitt)
+- `−N` in **Rot** (unter Schnitt)
+- `±0` in **Grau** (genau auf Kurs)
+- Erscheint erst, sobald ein oberes Feld eingetragen ist; Tooltip mit Klartext
+
+**Technik:**
+
+- `upperBonusDelta()` in `frontend/lib/gameScoring.ts`
+- Anzeige in `ScoreSheetTable.tsx` (Zweitzeile in `SummaryTile` der `ergebnis1`-Zeile)
+- Reine UI-/Anzeige-Logik, kein Backend; gilt für Solo und Multiplayer

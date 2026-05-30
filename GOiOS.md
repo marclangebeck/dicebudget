@@ -7,16 +7,17 @@ Leitfaden für **iOS (Capacitor)**, **TestFlight** und **App Store** — ergänz
 
 ---
 
-## 0. Aktueller Stand (2026-05-29, verbindlich)
+## 0. Aktueller Stand (2026-05-30, verbindlich)
 
-- **Branch:** `milestone-22-prep` · Commit **`2e68f53`**
+- **Branch:** `milestone-22-prep` · Commit **`1a03a32`**
 - **M29 Punktwahl-Eintrag:** erledigt — Overlay oben, Zahlen statt Würfel-Icons, Auswahl-Highlight
-- **iOS im Repo:** Version **1.0**, Build **15** (`CURRENT_PROJECT_VERSION` in `project.pbxproj`)
-- **TestFlight:** zuletzt **Build 11** hochgeladen · **Build 15** bereit zum Upload (Mac)
+- **M30 Bonus-Delta-Anzeige:** erledigt — „Ergebnis 1“ zeigt Delta zur Soll-Marke „3 je Augenzahl“ (+ grün / − rot / ±0 grau)
+- **iOS im Repo:** Version **1.0** (Build-Nummer wird in Xcode gesetzt; Repo steht auf 15)
+- **TestFlight:** **Build 16** hochgeladen (erfolgreich) — enthält M29 + M30; nächster Upload wäre **17**
 - **`Copy failed` / rsync:** `brew unlink rsync`, Xcode mit System-PATH (Abschnitt 6)
 - **Signing:** `DEVELOPMENT_TEAM` **nicht** im Git — nach `git pull`/`reset` Team in Xcode setzen
 - **Web:** https://dicebudget.bottle-trade.de — nach UI-Änderungen `npm run build` auf Server
-- **Nächster Schritt:** TestFlight **1.0 (15)** testen → App Store Review vorbereiten
+- **Nächster Schritt:** App Store Connect (Paid Agreement, Preis, Store-Metadaten, Datenschutzfragebogen) → TestFlight Build 16 auf iPhone testen
 
 ---
 
@@ -102,8 +103,8 @@ Diese Milestones sind **Voraussetzung** für eine sinnvolle iOS-App; Details in 
 | 21.9 | Geschäftliches: Lizenz, EU-Händler, **Paid-Vertrag**, Bank/Steuer | **offen** | Für **1,19 €** nötig |
 | 21.10 | Preisstufe **1,19 €** in Connect | **offen** | Tab App Store → Preis und Verfügbarkeit |
 | 21.11 | App-Icon 1024, Screenshots, Beschreibung DE | **offen** | Store-Metadaten |
-| 21.12 | Xcode: Archive → Upload | **erledigt** | Build `1.0 (11)` in TestFlight (aktuell) |
-| 21.13 | TestFlight (intern + iPhone) | **in Arbeit** | Build 11 verfügbar; Store-Metadaten offen |
+| 21.12 | Xcode: Archive → Upload | **erledigt** | Build `1.0 (16)` in TestFlight (aktuell, M29 + M30) |
+| 21.13 | TestFlight (intern + iPhone) | **in Arbeit** | Build 16 verfügbar; Store-Metadaten offen |
 | 21.14 | App Store Review (kostenpflichtig) | **offen** | Nach stabiler Beta |
 
 ---
@@ -232,16 +233,17 @@ Du setzt **dice.budget** (iOS + App Store) fort. Lies zuerst:
 
 ### Ist-Stand (Mai 2026)
 
-- Branch: **`milestone-22-prep`** · Commit **`2e68f53`** · GitHub synchron
+- Branch: **`milestone-22-prep`** · Commit **`1a03a32`** · GitHub synchron
 - Web live: https://dicebudget.bottle-trade.de
-- iOS: Capacitor, Bundle **`de.bottletrade.dicebudget`**, Repo-Build **15**, TestFlight zuletzt **11**
+- iOS: Capacitor, Bundle **`de.bottletrade.dicebudget`**, TestFlight **Build 16** hochgeladen (nächster Upload 17)
 - M29: Punktwahl-Eintrag (`PlayBoard`, `ScoreEntryPanel`, `FieldScoreChoiceGrid`)
+- M30: Bonus-Delta-Anzeige (`gameScoring.upperBonusDelta`, `ScoreSheetTable`)
 - Legal: `frontend/lib/legal.ts`
 - **iOS-Releases:** Nutzer batcht Uploads; nach Pull Signing-Team in Xcode prüfen
 
 ### Deine Priorität (Store + Coding nach Nutzer-Auftrag)
 
-1. TestFlight **Build 15** hochladen und auf iPhone testen
+1. TestFlight **Build 16** auf iPhone testen
 2. **Paid Applications Agreement**, Bank/Steuer in App Store Connect
 3. Preis **1,19 €**, Screenshots, Beschreibung DE, Datenschutzfragebogen
 4. Coding-Aufgaben: siehe **DEINE AUFTRÄGE** im HANDOVER-Prompt

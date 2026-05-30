@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **M30 Bonus-Delta-Anzeige:** Zeile „Ergebnis 1“ zeigt pro Spielblock das laufende Delta zur Soll-Marke „3 je Augenzahl“ (Bonus 63). `+` in Grün (über Schnitt), `−` in Rot (unter Schnitt), `±0` in Grau. Helfer `upperBonusDelta()` in `frontend/lib/gameScoring.ts`, Anzeige in `ScoreSheetTable`
 - **M29 Punktwahl-Eintrag:** Feld antippen → Overlay mit feldtypabhängiger Punktwahl + Würfe → Eintragen (`FieldScoreChoiceGrid`, `ScoreEntryPanel`)
 
 ### Changed
@@ -12,10 +13,11 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **M29 entfernt:** Würfel-Zähler, Wurf vergleichen, `DiceThrowOverlay`, `CommittedThrowBanner`, `FixedFieldChoiceBanner`
 
 ### iOS
-- Repo-Build **1.0 (15)** — M29 Punktwahl-Eintrag (Upload durch Nutzer auf Mac)
+- TestFlight-Build **1.0 (16)** — M29 Punktwahl-Eintrag + M30 Bonus-Delta (Upload durch Nutzer auf Mac, erfolgreich)
+- (zuvor) Repo-Build **1.0 (15)** — M29 Punktwahl-Eintrag
 
 ### Docs
-- HANDOVER, GOiOS, milestones, testflight-app-store: Stand Commit `2e68f53`
+- HANDOVER, GOiOS, milestones, README, projektbeschreibung, testflight-app-store: Stand Commit `1a03a32`
 
 ---
 

@@ -55,6 +55,8 @@ Pro Spielblock (Spalte auf dem Zettel):
 
 **Gesamtpunktzahl Run** = Summe aller `gameTotal` über alle Spiele (`run.totalScore`).
 
+**Bonus-Delta-Anzeige (M30):** Der Bonus bei 63 entspricht „3 Würfeln je Augenzahl“ (`3 × 21 = 63`). Die Zeile „Ergebnis 1“ zeigt pro Block das laufende Delta `obere Summe − 3 × (Summe Augenzahlen der eingetragenen oberen Felder)` — `+N` grün (über Schnitt), `−N` rot (darunter), `±0` grau. Reine Frontend-Anzeige (`upperBonusDelta` in `frontend/lib/gameScoring.ts`), gilt für beide Modi.
+
 ### 2.4 Zusatz-Yatzy
 
 Ab dem 7. Yatzy-Eintrag (über alle Spielblöcke): per `POST /runs/:id/extra-yatzy` jeweils **+100** auf „Ergebnis Spiel“, rotierend Sp1 → Sp2 → …  
@@ -173,7 +175,7 @@ Tabelle `player_name_aliases` (`aliasName` → `canonicalName`):
 | `PlayBoard` | Spiel, Overlay, Abandon, Feld löschen |
 | `PlayTopBar` | Zurück (Start/Lobby), Pool/Rest-Chips |
 | `FitScoreSheet` | Skaliert Zettel auf verfügbare Höhe |
-| `ScoreSheetTable` | Zettel inkl. Zusatz-Yatzy |
+| `ScoreSheetTable` | Zettel inkl. Zusatz-Yatzy und Bonus-Delta („Ergebnis 1“) |
 | `ScoreEntryPanel` | Fixiertes Panel unten; Würfe nur bei Strategy |
 | `RunCompleteOverlay` | Nach letztem Feld |
 | `RunFinishScreen` | Nach `finish` (darf scrollen) |

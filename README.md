@@ -157,8 +157,9 @@ Nach Deploy: Hard-Refresh im Browser, falls alte JS-Chunks gecacht sind.
 | 11–14 | UX, Modi, Validierung, Tests | erledigt |
 | 15–19 | Liga, Paarungsstatistik, Namen, Feld löschen, Zusatz-Yatzy | erledigt |
 | 20 | UI-Modernisierung (Bento, Statistik, Setup, Spielzettel) | erledigt |
-| 21 | iOS-App (Capacitor), TestFlight Build 11, Legal live | in Arbeit (Store) — **[GOiOS.md](./GOiOS.md)** |
+| 21 | iOS-App (Capacitor), TestFlight Build 16, Legal live | in Arbeit (Store) — **[GOiOS.md](./GOiOS.md)** |
 | 22 | Datenschutz-Umbau (pseudonym, lokales Solo) | erledigt |
 | 23–27 | UI/Branding iOS (Navigation, Icons, Hintergrund, Legal) | erledigt |
+| 29–30 | Punktwahl-Eintrag, Bonus-Delta-Anzeige | erledigt |
 
 Siehe [milestones.md](./milestones.md) für Details.

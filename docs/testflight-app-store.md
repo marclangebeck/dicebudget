@@ -91,7 +91,7 @@ Für **nur TestFlight** reichen zunächst weniger Metadaten; für **öffentliche
 
 Bei jedem **neuen Upload** die **Build**-Nummer erhöhen (`9` → `10` → …). Version nur bei sichtbaren Releases ändern.
 
-**Stand Mai 2026:** Letzter erfolgreicher Upload **Build 11** · Repo-Stand **Build 15** (M29 Punktwahl-Eintrag).
+**Stand Mai 2026:** Letzter erfolgreicher Upload **Build 16** (M29 Punktwahl-Eintrag + M30 Bonus-Delta) · nächster Upload wäre **17**. Build-Nummer in Xcode setzen (Repo-`project.pbxproj` wird wegen Signing-Team nicht gepusht).
 
 ### Copy failed beim Upload?
 
