@@ -1,12 +1,7 @@
 "use client";
 
 import { DiceFace } from "@/components/DiceFace";
-import {
-  UPPER_BONUS_MIN,
-  UPPER_BONUS_POINTS,
-  upperBonusStatus,
-  type UpperBonusStatus,
-} from "@/lib/gameScoring";
+import { upperBonusDelta } from "@/lib/gameScoring";
 import {
   diceValueForField,
   FIELD_LABELS,
@@ -198,46 +193,41 @@ function ScoreTile({
   );
 }
 
-function bonusHint(status: UpperBonusStatus): {
-  text: string;
-  cls: string;
-  title: string;
-} {
-  switch (status.state) {
-    case "secured":
-      return {
-        text: `✓ +${UPPER_BONUS_POINTS}`,
-        cls: "text-emerald-700",
-        title: `Bonus gesichert: +${UPPER_BONUS_POINTS} (obere Summe ${status.upperSum} ≥ ${UPPER_BONUS_MIN})`,
-      };
-    case "missed":
-      return {
-        text: "kein",
-        cls: "text-slate-500",
-        title: `Bonus nicht mehr möglich (obere Summe ${status.upperSum}, Schwelle ${UPPER_BONUS_MIN})`,
-      };
-    case "open":
-      return {
-        text: `+${status.needed}`,
-        cls: "text-amber-600",
-        title: `Noch ${status.needed} Punkte bis zum Bonus (+${UPPER_BONUS_POINTS})`,
-      };
+function bonusHint(delta: number): { text: string; cls: string; title: string } {
+  if (delta > 0) {
+    return {
+      text: `+${delta}`,
+      cls: "text-emerald-700",
+      title: `${delta} über dem Schnitt für den Bonus (Soll: 3 je Augenzahl)`,
+    };
   }
+  if (delta < 0) {
+    return {
+      text: `−${Math.abs(delta)}`,
+      cls: "text-red-600",
+      title: `${Math.abs(delta)} unter dem Schnitt für den Bonus (Soll: 3 je Augenzahl)`,
+    };
+  }
+  return {
+    text: "±0",
+    cls: "text-slate-500",
+    title: "Genau auf Kurs für den Bonus (Soll: 3 je Augenzahl)",
+  };
 }
 
 function SummaryTile({
   value,
   highlight,
   extraYatzyBonus,
-  bonusStatus,
+  bonusDelta,
 }: {
   value: string | number | null;
   highlight?: boolean;
   extraYatzyBonus?: number;
-  bonusStatus?: UpperBonusStatus;
+  bonusDelta?: number;
 }) {
   const display = value === null ? "" : value;
-  const hint = bonusStatus && value !== null ? bonusHint(bonusStatus) : null;
+  const hint = bonusDelta !== undefined && value !== null ? bonusHint(bonusDelta) : null;
 
   return (
     <div
@@ -367,9 +357,9 @@ export function ScoreSheetTable({
                             ? game.summary.extraYatzyBonus
                             : undefined
                         }
-                        bonusStatus={
+                        bonusDelta={
                           row.kind === "summary" && row.key === "ergebnis1"
-                            ? upperBonusStatus(game.fields)
+                            ? upperBonusDelta(game.fields)
                             : undefined
                         }
                       />
