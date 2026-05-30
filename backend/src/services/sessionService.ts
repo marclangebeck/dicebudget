@@ -15,6 +15,9 @@ import {
 import { assertValidGameCount, instantiateRun, parseUseStrategyRules } from "./createRun.js";
 import { getRunById } from "./getRun.js";
 import { RUN_STATUS } from "../domain/fieldTypes.js";
+import { computeGameBreakdown } from "../domain/gameScoring.js";
+import { assertValidScoreForField } from "../domain/fieldScores.js";
+import { ForbiddenRunError } from "./runPlayerAuth.js";
 import { prisma } from "../db/prisma.js";
 import { awardSessionLeaguePoints, getLeagueStandings } from "./leaguePoints.js";
 
@@ -108,6 +111,35 @@ export class InvalidPlayerNameError extends Error {
   }
 }
 
+/** Pool-Endspiel ist für diese Session nicht (mehr) verfügbar. */
+export class PoolEndgameNotAvailableError extends Error {
+  constructor() {
+    super("Pool endgame is not available for this session");
+    this.name = "PoolEndgameNotAvailableError";
+  }
+}
+
+/** Ungültige Feldwahl beim Pool-Endspiel (z. B. leeres Feld). */
+export class PoolEndgameInputError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "PoolEndgameInputError";
+  }
+}
+
+/**
+ * Sieger des Pool-Endspiels = Spieler mit dem eindeutig größten Wurf-Pool.
+ * Bei Gleichstand an der Spitze bekommt niemand die Verbesserung (null).
+ */
+export function determinePoolEndgameImprover<
+  T extends { id: string; rollsInPool: number },
+>(players: T[]): T | null {
+  if (players.length < 2) return null;
+  const maxPool = Math.max(...players.map((p) => p.rollsInPool));
+  const leaders = players.filter((p) => p.rollsInPool === maxPool);
+  return leaders.length === 1 ? leaders[0]! : null;
+}
+
 function assertValidPlayerId(playerId: string): string {
   const normalized = normalizePlayerId(playerId);
   if (!isValidPlayerId(normalized)) {
@@ -132,6 +164,7 @@ export async function createGameSession(
   useStrategyRules = true,
   leagueCode?: string,
   showOpponentPool = false,
+  poolEndgameEnabled = false,
 ) {
   assertValidGameCount(gameCount);
   assertValidSessionPlayers(maxPlayers);
@@ -171,6 +204,7 @@ export async function createGameSession(
         maxPlayers,
         useStrategyRules,
         showOpponentPool,
+        poolEndgameEnabled: poolEndgameEnabled && useStrategyRules,
         status: SESSION_STATUS.OPEN,
         leagueId,
         roundNumber,
@@ -188,6 +222,7 @@ export async function createGameSession(
     maxPlayers: session.maxPlayers,
     useStrategyRules: session.useStrategyRules,
     showOpponentPool: session.showOpponentPool,
+    poolEndgameEnabled: session.poolEndgameEnabled,
     status: session.status,
     createdAt: session.createdAt.toISOString(),
     leagueCode: session.league.leagueCode,
@@ -214,6 +249,10 @@ export async function getSessionLobbyByInvite(inviteCode: string) {
 
   const leagueStandings = await getLeagueStandings(session.leagueId);
 
+  const improver = session.poolEndgameImproverId
+    ? session.players.find((p) => p.id === session.poolEndgameImproverId)
+    : undefined;
+
   return {
     id: session.id,
     inviteCode: session.inviteCode,
@@ -221,6 +260,11 @@ export async function getSessionLobbyByInvite(inviteCode: string) {
     maxPlayers: session.maxPlayers,
     useStrategyRules: session.useStrategyRules,
     showOpponentPool: session.showOpponentPool,
+    poolEndgameEnabled: session.poolEndgameEnabled,
+    poolEndgameResolved: session.poolEndgameResolved,
+    poolEndgameImproverPlayerId: improver
+      ? publicPlayerIdFromStoredName(improver.name)
+      : null,
     status: session.status,
     createdAt: session.createdAt.toISOString(),
     leagueCode: session.league.leagueCode,
@@ -342,7 +386,121 @@ export async function maybeFinishSessionForRun(runId: string) {
     session.players.length > 0 &&
     session.players.every((p) => p.run.status === RUN_STATUS.FINISHED);
 
-  if (allDone) {
-    await awardSessionLeaguePoints(session.id);
+  if (!allDone) return;
+
+  // Pool-Endspiel: Sieger (größter Pool) darf vor der Punktevergabe ein Feld
+  // verbessern. Bis dahin Liga-Punkte zurückhalten.
+  if (
+    session.poolEndgameEnabled &&
+    session.useStrategyRules &&
+    !session.poolEndgameResolved
+  ) {
+    if (session.poolEndgameImproverId == null) {
+      const improver = determinePoolEndgameImprover(
+        session.players.map((p) => ({ id: p.id, rollsInPool: p.run.rollsInPool })),
+      );
+      if (improver) {
+        await prisma.gameSession.update({
+          where: { id: session.id },
+          data: { poolEndgameImproverId: improver.id },
+        });
+        return; // Auf Entscheidung des Siegers warten.
+      }
+      // Gleichstand → niemand verbessert, direkt auflösen.
+      await prisma.gameSession.update({
+        where: { id: session.id },
+        data: { poolEndgameResolved: true },
+      });
+    } else {
+      return; // Sieger steht fest, hat aber noch nicht entschieden.
+    }
   }
+
+  await awardSessionLeaguePoints(session.id);
+}
+
+/**
+ * Pool-Endspiel auflösen: Der Sieger trägt entweder einen neuen Wert für ein
+ * Feld ein (`fieldId` + `score`) oder behält den alten Wert (`keep: true`).
+ * Danach werden die Liga-Punkte vergeben und die Session beendet.
+ */
+export async function resolvePoolEndgame(
+  inviteCode: string,
+  input: { keep?: boolean; fieldId?: string; score?: number },
+  playerSecret: string | undefined,
+) {
+  const session = await prisma.gameSession.findUnique({
+    where: { inviteCode: inviteCode.toUpperCase() },
+    include: { players: true },
+  });
+
+  if (!session) throw new SessionNotFoundError();
+  if (
+    !session.poolEndgameEnabled ||
+    session.poolEndgameResolved ||
+    !session.poolEndgameImproverId
+  ) {
+    throw new PoolEndgameNotAvailableError();
+  }
+
+  const improver = session.players.find(
+    (p) => p.id === session.poolEndgameImproverId,
+  );
+  if (!improver) throw new PoolEndgameNotAvailableError();
+
+  const token = playerSecret?.trim();
+  if (!token || token !== improver.secretToken) throw new ForbiddenRunError();
+
+  const keep = input.keep === true || !input.fieldId;
+
+  if (!keep) {
+    const fieldId = input.fieldId!;
+    const score = Number(input.score);
+    if (!Number.isInteger(score) || score < 0 || score > 999) {
+      throw new PoolEndgameInputError("score must be an integer from 0 to 999");
+    }
+
+    const field = await prisma.field.findFirst({
+      where: { id: fieldId, game: { runId: improver.runId } },
+    });
+    if (!field) throw new PoolEndgameInputError("Field not found for this run");
+    if (field.score === null) {
+      throw new PoolEndgameInputError("Field is not scored");
+    }
+    assertValidScoreForField(field.fieldType, score);
+
+    await prisma.$transaction(async (tx) => {
+      await tx.field.update({ where: { id: fieldId }, data: { score } });
+
+      const games = await tx.game.findMany({
+        where: { runId: improver.runId },
+        include: { fields: true },
+      });
+      let totalScore = 0;
+      for (const game of games) {
+        const breakdown = computeGameBreakdown(game.fields, game.extraYatzyBonus);
+        await tx.game.update({
+          where: { id: game.id },
+          data: { score: breakdown.gameTotal },
+        });
+        totalScore += breakdown.gameTotal;
+      }
+      await tx.run.update({
+        where: { id: improver.runId },
+        data: { totalScore },
+      });
+      await tx.gameSession.update({
+        where: { id: session.id },
+        data: { poolEndgameResolved: true },
+      });
+    });
+  } else {
+    await prisma.gameSession.update({
+      where: { id: session.id },
+      data: { poolEndgameResolved: true },
+    });
+  }
+
+  await awardSessionLeaguePoints(session.id);
+  return getSessionRanking(session.inviteCode);
 }

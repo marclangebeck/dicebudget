@@ -14,6 +14,12 @@ export type SessionLobbyDto = {
   maxPlayers: number;
   useStrategyRules: boolean;
   showOpponentPool: boolean;
+  /** Host-Option: Sieger mit größtem Pool darf am Ende ein Feld verbessern (M33). */
+  poolEndgameEnabled: boolean;
+  /** True, sobald das Pool-Endspiel entschieden ist (verbessert oder behalten). */
+  poolEndgameResolved: boolean;
+  /** Öffentliche playerId des Pool-Siegers, oder null (kein eindeutiger Sieger / noch offen). */
+  poolEndgameImproverPlayerId: string | null;
   status: string;
   createdAt: string;
   leagueCode: string;

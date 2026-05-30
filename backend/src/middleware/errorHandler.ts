@@ -18,6 +18,8 @@ import {
   InvalidPlayerNameError,
   InvalidSessionPlayersError,
   LeagueNotFoundError,
+  PoolEndgameInputError,
+  PoolEndgameNotAvailableError,
   SessionFinishedError,
   SessionFullError,
   SessionNotFoundError,
@@ -39,9 +41,14 @@ export function errorHandler(
   }
   if (
     err instanceof InvalidSessionPlayersError ||
-    err instanceof InvalidPlayerNameError
+    err instanceof InvalidPlayerNameError ||
+    err instanceof PoolEndgameInputError
   ) {
     res.status(400).json({ error: err.message });
+    return;
+  }
+  if (err instanceof PoolEndgameNotAvailableError) {
+    res.status(409).json({ error: err.message });
     return;
   }
   if (err instanceof LeagueNotFoundError) {

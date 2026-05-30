@@ -1543,6 +1543,41 @@ html.legal-route body {
   color: var(--text-muted);
 }
 
+.play-endgame-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(4, 120, 87, 0.3);
+  background: linear-gradient(155deg, #ecfdf5 0%, #d1fae5 100%);
+  padding: 0.6rem 0.75rem;
+  text-align: center;
+}
+
+.play-endgame-banner-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #065f46;
+}
+
+.play-endgame-banner-text {
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: #047857;
+}
+
+.play-endgame-keep-btn {
+  margin-top: 0.1rem;
+  align-self: center;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(4, 120, 87, 0.35);
+  background: rgba(255, 255, 255, 0.85);
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #065f46;
+}
+
 .play-finish-scroll {
   -webkit-overflow-scrolling: touch;
 }

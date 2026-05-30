@@ -5,12 +5,14 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **M33 Pool-Endspiel (Multiplayer):** Host-Toggle „Pool-Endspiel" beim Raum-Erstellen (nur Strategy). Sobald alle Runs beendet sind, darf der Spieler mit dem eindeutig größten Wurf-Pool **ein** Feld verbessern: Feld antippen → neuen Wert eintragen oder „Alten Wert behalten". Erst danach werden Liga-Punkte vergeben und die Session beendet. Bei Gleichstand an der Spitze verbessert niemand. Backend: Session-Felder `pool_endgame_enabled` / `pool_endgame_improver_id` / `pool_endgame_resolved` (Migration), neuer Endpunkt `POST /sessions/invite/:code/pool-endgame`, Sieger-Bestimmung `determinePoolEndgameImprover()`. Frontend: `PoolEndgamePanel`, Improver-Phase in `PlayBoard`. Kein Polling (Auflösung ereignisbasiert beim Öffnen des Abschluss-Screens)
 - **M32 Gegner-Pool (Multiplayer):** Host-Toggle „Gegner-Pool sichtbar" beim Raum-Erstellen; bei genau 2 Spielern zeigt die Spiel-Topbar den Wurf-Pool des Gegners. Backend: Session-Flag `show_opponent_pool` (Migration), Lobby-DTO um `rollsInPool` je Spieler erweitert. Kein Polling (Nachladen nur bei Start + eigener Eintragung)
 - **M31 Bonus-Einblendung:** kurzes Glückwunsch-Overlay mit Animation, wenn eine obere Reihe 6/6 mit ≥63 abschließt; Auto-Close 2,5 s; Geräte-Toggle (`lib/uiPrefs.ts`, `BonusCelebrationToggle`) auf `/solo` + `/multi`; `BonusOverlay`, `upperBonusAchieved()`
 - **M30 Bonus-Delta-Anzeige:** Zeile „Ergebnis 1“ zeigt pro Spielblock das laufende Delta zur Soll-Marke „3 je Augenzahl“ (Bonus 63). `+` in Grün (über Schnitt), `−` in Rot (unter Schnitt), `±0` in Grau. Helfer `upperBonusDelta()` in `frontend/lib/gameScoring.ts`, Anzeige in `ScoreSheetTable`
 - **M29 Punktwahl-Eintrag:** Feld antippen → Overlay mit feldtypabhängiger Punktwahl + Würfe → Eintragen (`FieldScoreChoiceGrid`, `ScoreEntryPanel`)
 
 ### Changed
+- **Eintrag-Voreinstellung:** Würfe-Standard im Strategy-Modus von 2 auf **3** geändert (`PlayBoard.defaultRollsUsed`)
 - **M32 Topbar:** „Rest"-Chip (Restwürfe bis Spielende) entfernt — Topbar zeigt nur noch den eigenen Pool
 - **M29 UX (final):** Overlay startet oben; obere Felder nur Zahlen (0, 2, 4, …); gewählte Punkte/Würfe hellgelb markiert
 - **M29 entfernt:** Würfel-Zähler, Wurf vergleichen, `DiceThrowOverlay`, `CommittedThrowBanner`, `FixedFieldChoiceBanner`

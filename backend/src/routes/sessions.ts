@@ -4,7 +4,9 @@ import {
   getSessionLobbyByInvite,
   getSessionRanking,
   joinSession,
+  resolvePoolEndgame,
 } from "../services/sessionService.js";
+import { readPlayerSecret } from "./readPlayerSecret.js";
 
 export const sessionsRouter = Router();
 
@@ -17,6 +19,7 @@ sessionsRouter.post("/", async (req, res, next) => {
         ? true
         : Boolean(req.body.useStrategyRules);
     const showOpponentPool = Boolean(req.body?.showOpponentPool);
+    const poolEndgameEnabled = Boolean(req.body?.poolEndgameEnabled);
     if (Number.isNaN(gameCount) || Number.isNaN(maxPlayers)) {
       res.status(400).json({ error: "gameCount and maxPlayers required" });
       return;
@@ -31,6 +34,7 @@ sessionsRouter.post("/", async (req, res, next) => {
       useStrategyRules,
       leagueCode,
       showOpponentPool,
+      poolEndgameEnabled,
     );
     res.status(201).json({ session });
   } catch (error) {
@@ -60,6 +64,24 @@ sessionsRouter.post("/invite/:inviteCode/join", async (req, res, next) => {
     }
     const result = await joinSession(req.params.inviteCode, playerId);
     res.status(201).json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+sessionsRouter.post("/invite/:inviteCode/pool-endgame", async (req, res, next) => {
+  try {
+    const keep = req.body?.keep === true;
+    const fieldId =
+      typeof req.body?.fieldId === "string" ? req.body.fieldId : undefined;
+    const score =
+      req.body?.score === undefined ? undefined : Number(req.body.score);
+    const data = await resolvePoolEndgame(
+      req.params.inviteCode,
+      { keep, fieldId, score },
+      readPlayerSecret(req),
+    );
+    res.json({ session: data });
   } catch (error) {
     next(error);
   }

@@ -13,6 +13,7 @@
 | UI/Branding-Folgepaket | 23–27 | erledigt |
 | Eintrag & Bonus-Hilfe | 29–30 | erledigt |
 | Spielfluss & Gegner-Pool | 31–32 | erledigt |
+| Pool-Endspiel | 33 | erledigt |
 
 *(Variante D „echtes Online-Spiel“ / Live-Sync bewusst nicht Teil dieser Milestones.)*
 
@@ -704,3 +705,30 @@ delta = obere Summe − 3 × (Summe der Augenzahlen der eingetragenen Felder)
 - Backend: Session-Flag `show_opponent_pool` (Prisma-Migration `20260530090000_session_show_opponent_pool`); Lobby-DTO liefert `rollsInPool` je Spieler **nur**, wenn das Flag an ist.
 - `sessionService.ts`, `routes/sessions.ts`
 - Frontend: `app/multi/page.tsx` (Host-Toggle), `PlayBoard.tsx` (Gegner-Pool laden, Selbst-Ausschluss über `playerId`), `PlayTopBar.tsx` (Chip), `lib/api.ts`, `lib/sessionTypes.ts`
+
+---
+
+## Milestone 33 — Pool-Endspiel (M33)
+
+**Ziel:** Effizientes Pool-Management am Spielende belohnen — der Spieler mit dem größten Wurf-Pool darf ein Feld verbessern.
+
+**Status:** erledigt (Mai 2026) — **nur Multiplayer**
+
+**UX:**
+
+- Host aktiviert beim Raum-Erstellen den Toggle „Pool-Endspiel" (nur Strategy-Modus).
+- Sobald **alle** Runs der Session beendet sind, bestimmt das Backend den Spieler mit dem **eindeutig größten** Wurf-Pool (`rollsInPool`).
+- Dieser Spieler sieht im Abschluss-Screen ein Banner „Pool-Sieger!" + den Spielzettel. Er tippt **ein** Feld an → wählt einen neuen Wert (frei aus den gültigen Feldwerten) und „Übernehmen", **oder** „Alten Wert behalten & beenden".
+- Erst danach werden die **Liga-Punkte vergeben** und die Session abgeschlossen (das verbesserte Ergebnis zählt für die Rangliste).
+- **Gleichstand** an der Spitze → niemand verbessert, Punkte werden sofort vergeben.
+- **Kein Polling:** Die Auflösung ist ereignisbasiert (beim Öffnen des Abschluss-Screens des Siegers), konform zu `AGENT_RULES.md`.
+
+**Technik:**
+
+- Backend: GameSession-Felder `pool_endgame_enabled`, `pool_endgame_improver_id`, `pool_endgame_resolved` (Prisma-Migration `20260530120000_session_pool_endgame`).
+- Sieger-Bestimmung `determinePoolEndgameImprover()`; Liga-Punkte werden in `maybeFinishSessionForRun` zurückgehalten, bis `resolvePoolEndgame()` greift.
+- Endpunkt `POST /sessions/invite/:code/pool-endgame` (`keep` oder `fieldId` + `score`), Auth via `X-Player-Secret` des Siegers.
+- `sessionService.ts`, `routes/sessions.ts`, `errorHandler.ts`, Test `services/poolEndgame.test.ts`.
+- Frontend: `app/multi/page.tsx` (Host-Toggle), `PlayBoard.tsx` (Improver-Phase), neue `PoolEndgamePanel.tsx`, `lib/api.ts`, `lib/sessionTypes.ts`, `app/globals.css` (`.play-endgame-*`).
+
+**Begleitänderung:** Würfe-Voreinstellung im Strategy-Eintrag von 2 → **3** (`PlayBoard.defaultRollsUsed`).

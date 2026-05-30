@@ -141,6 +141,7 @@ export function createGameSession(
   useStrategyRules = true,
   leagueCode?: string,
   showOpponentPool = false,
+  poolEndgameEnabled = false,
 ) {
   return request<{ session: SessionLobbyDto }>("/sessions", {
     method: "POST",
@@ -150,6 +151,7 @@ export function createGameSession(
       useStrategyRules,
       leagueCode,
       showOpponentPool,
+      poolEndgameEnabled,
     }),
   });
 }
@@ -181,5 +183,21 @@ export function joinSession(inviteCode: string, playerId: string) {
 export function getSessionRanking(inviteCode: string) {
   return request<{ session: SessionRankingDto }>(
     `/sessions/invite/${encodeURIComponent(inviteCode)}/ranking`,
+  );
+}
+
+/** Pool-Endspiel auflösen: Feld verbessern oder alten Wert behalten (M33). */
+export function resolvePoolEndgame(
+  inviteCode: string,
+  payload: { keep: true } | { fieldId: string; score: number },
+  playerSecret?: string,
+) {
+  return request<{ session: SessionRankingDto }>(
+    `/sessions/invite/${encodeURIComponent(inviteCode)}/pool-endgame`,
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+      playerSecret,
+    },
   );
 }

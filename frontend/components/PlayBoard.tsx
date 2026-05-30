@@ -6,6 +6,7 @@ import { RunCompleteOverlay } from "@/components/RunCompleteOverlay";
 import { RunFinishScreen } from "@/components/RunFinishScreen";
 import { FitScoreSheet } from "@/components/FitScoreSheet";
 import { PlayTopBar } from "@/components/PlayTopBar";
+import { PoolEndgamePanel } from "@/components/PoolEndgamePanel";
 import { ScoreEntryPanel } from "@/components/ScoreEntryPanel";
 import { ScoreSheetTable } from "@/components/ScoreSheetTable";
 import { clearActiveGame, saveActiveGame } from "@/lib/activeGame";
@@ -17,7 +18,9 @@ import {
   getRun,
   getSessionLobby,
   incrementExtraYatzy,
+  resolvePoolEndgame,
 } from "@/lib/api";
+import type { SessionLobbyDto } from "@/lib/sessionTypes";
 import { poolDeltaForComplete } from "@/lib/gameRules";
 import { upperBonusAchieved } from "@/lib/gameScoring";
 import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
@@ -42,7 +45,7 @@ type Props = {
 };
 
 function defaultRollsUsed(run: RunDto): number {
-  return run.useStrategyRules ? 2 : 1;
+  return run.useStrategyRules ? 3 : 1;
 }
 
 export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
@@ -57,6 +60,9 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   const [sheetReviewAfterComplete, setSheetReviewAfterComplete] = useState(false);
   const [bonusOverlayGame, setBonusOverlayGame] = useState<number | null>(null);
   const [opponentPool, setOpponentPool] = useState<number | null>(null);
+  const [lobby, setLobby] = useState<SessionLobbyDto | null>(null);
+  const [endgameFieldId, setEndgameFieldId] = useState<string | null>(null);
+  const [endgameScoreInput, setEndgameScoreInput] = useState("");
 
   const resetEntry = useCallback(() => {
     setScoreInput("");
@@ -85,28 +91,39 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     );
   }, [load]);
 
-  // Gegner-Pool nur gezielt nachladen (Start + nach eigener Eintragung), kein Polling.
-  const refreshOpponentPool = useCallback(async () => {
+  // Lobby nur gezielt nachladen (Start + nach eigener Eintragung + Abschluss), kein Polling.
+  const refreshLobby = useCallback(async () => {
     if (!inviteCode) return;
     try {
       const { session } = await getSessionLobby(inviteCode);
-      if (!session.showOpponentPool || session.players.length !== 2) {
+      setLobby(session);
+      if (session.showOpponentPool && session.players.length === 2) {
+        const myId = normalizePublicPlayerId(getOrCreatePlayerId());
+        const opponent = session.players.find(
+          (p) => normalizePublicPlayerId(p.playerId) !== myId,
+        );
+        setOpponentPool(opponent?.rollsInPool ?? null);
+      } else {
         setOpponentPool(null);
-        return;
       }
-      const myId = normalizePublicPlayerId(getOrCreatePlayerId());
-      const opponent = session.players.find(
-        (p) => normalizePublicPlayerId(p.playerId) !== myId,
-      );
-      setOpponentPool(opponent?.rollsInPool ?? null);
     } catch {
       // Anzeige ist optional – Fehler hier nicht ins Spiel durchreichen.
     }
   }, [inviteCode]);
 
   useEffect(() => {
-    void refreshOpponentPool();
-  }, [refreshOpponentPool]);
+    void refreshLobby();
+  }, [refreshLobby]);
+
+  // Bin ich der Pool-Sieger und darf (noch) ein Feld verbessern? (M33)
+  const amPoolEndgameImprover =
+    !!lobby &&
+    lobby.poolEndgameEnabled &&
+    !lobby.poolEndgameResolved &&
+    !!lobby.poolEndgameImproverPlayerId &&
+    !!inviteCode &&
+    normalizePublicPlayerId(lobby.poolEndgameImproverPlayerId) ===
+      normalizePublicPlayerId(getOrCreatePlayerId());
 
   useEffect(() => {
     if (!run) return;
@@ -225,7 +242,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       } else if (bonusJustAchieved && getBonusCelebrationEnabled()) {
         setBonusOverlayGame(gameAfter?.index ?? null);
       }
-      void refreshOpponentPool();
+      void refreshLobby();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Eintrag fehlgeschlagen");
     } finally {
@@ -274,9 +291,57 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       setRun(updated);
       setActiveFieldId(null);
       setShowCompleteOverlay(false);
+      void refreshLobby();
       scrollToFinish();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Abschluss fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function selectEndgameField(fieldId: string) {
+    const field = run?.games.flatMap((g) => g.fields).find((f) => f.id === fieldId);
+    if (!field || field.score === null) return;
+    setEndgameFieldId(fieldId);
+    setEndgameScoreInput(String(field.score));
+  }
+
+  async function handleEndgameSubmit() {
+    if (!inviteCode || !endgameFieldId || endgameScoreInput === "") return;
+    const score = Number(endgameScoreInput);
+    if (Number.isNaN(score)) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await resolvePoolEndgame(
+        inviteCode,
+        { fieldId: endgameFieldId, score },
+        playerSecret,
+      );
+      setEndgameFieldId(null);
+      setEndgameScoreInput("");
+      const { run: updated } = await getRun(runId, playerSecret);
+      setRun(updated);
+      await refreshLobby();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Verbesserung fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleEndgameKeep() {
+    if (!inviteCode) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await resolvePoolEndgame(inviteCode, { keep: true }, playerSecret);
+      setEndgameFieldId(null);
+      setEndgameScoreInput("");
+      await refreshLobby();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Aktion fehlgeschlagen");
     } finally {
       setBusy(false);
     }
@@ -320,6 +385,72 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       : run.rollsInPool;
 
   if (run.status === "FINISHED") {
+    if (amPoolEndgameImprover) {
+      const endgameField = run.games
+        .flatMap((g) => g.fields)
+        .find((f) => f.id === endgameFieldId);
+      const endgameGameIndex =
+        run.games.find((g) => g.fields.some((f) => f.id === endgameFieldId))?.index ??
+        null;
+      return (
+        <div className="play-board relative flex min-h-0 flex-1 flex-col gap-1.5 overflow-hidden">
+          <PlayTopBar
+            inviteCode={inviteCode}
+            useStrategyRules={run.useStrategyRules}
+            rollsInPool={run.rollsInPool}
+            rollsRemaining={run.rollsRemaining}
+          />
+
+          <div className="play-endgame-banner shrink-0">
+            <p className="play-endgame-banner-title">🎲 Pool-Sieger!</p>
+            <p className="play-endgame-banner-text">
+              Du hattest die meisten Würfe im Pool – wähle ein Feld zum Verbessern
+              oder behalte alles.
+            </p>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => void handleEndgameKeep()}
+              className="play-endgame-keep-btn disabled:opacity-50"
+            >
+              {busy ? "…" : "Alten Wert behalten & beenden"}
+            </button>
+          </div>
+
+          {error && (
+            <p className="glass-alert-error shrink-0 px-3 py-2 text-sm">{error}</p>
+          )}
+
+          <div className="play-board-main flex min-h-0 flex-1 flex-col overflow-hidden">
+            <div className="play-sheet-card flex min-h-0 flex-1 overflow-hidden">
+              <FitScoreSheet layoutKey={`endgame-${run.gameCount}`}>
+                <ScoreSheetTable
+                  run={run}
+                  activeFieldId={endgameFieldId}
+                  onSelectField={selectEndgameField}
+                />
+              </FitScoreSheet>
+            </div>
+          </div>
+
+          {endgameField && (
+            <PoolEndgamePanel
+              field={endgameField}
+              gameIndex={endgameGameIndex}
+              scoreInput={endgameScoreInput}
+              busy={busy}
+              onPickScoreValue={(v) => setEndgameScoreInput(String(v))}
+              onSubmit={() => void handleEndgameSubmit()}
+              onCancel={() => {
+                setEndgameFieldId(null);
+                setEndgameScoreInput("");
+              }}
+            />
+          )}
+        </div>
+      );
+    }
+
     return (
       <div className="play-board play-board--finished flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
         <PlayTopBar

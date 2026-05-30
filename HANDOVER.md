@@ -18,6 +18,7 @@
 | **M30 Bonus-Delta-Anzeige** | **Erledigt** — „Ergebnis 1“ zeigt Delta zur Soll-Marke „3 je Augenzahl“ (+ grün / − rot / ±0 grau) |
 | **M31 Bonus-Einblendung** | **Erledigt** — Overlay bei 6/6 & ≥63, Auto-Close 2,5 s, Geräte-Toggle |
 | **M32 Topbar & Gegner-Pool** | **Erledigt** — „Rest" entfernt; Multiplayer-Host-Toggle „Gegner-Pool sichtbar" (2 Spieler) |
+| **M33 Pool-Endspiel** | **Erledigt (Code)** — Multiplayer-Host-Toggle „Pool-Endspiel": Sieger mit größtem Pool verbessert am Ende 1 Feld. **Backend-Deploy + Migration noch nötig** (`pool_endgame_*`). Würfe-Standard 2→3 |
 | Frontend Deploy (Server) | Nach Pull: `cd frontend && npm run build` (Nginx aus `out/`) |
 | Backend Deploy (Server) | `sudo bash infra/scripts/deploy-backend-prod.sh` (Migration + Restart) — **deployed**, Service läuft |
 | iOS im Repo | Version **1.0** (Build-Nr. in Xcode setzen) |

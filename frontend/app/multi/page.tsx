@@ -12,6 +12,7 @@ export default function MultiHostPage() {
   const [maxPlayers, setMaxPlayers] = useState(2);
   const [useStrategyRules, setUseStrategyRules] = useState(true);
   const [showOpponentPool, setShowOpponentPool] = useState(false);
+  const [poolEndgameEnabled, setPoolEndgameEnabled] = useState(false);
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [leagueCode, setLeagueCode] = useState<string | null>(null);
   const [createdStrategyMode, setCreatedStrategyMode] = useState<boolean | null>(null);
@@ -32,6 +33,7 @@ export default function MultiHostPage() {
         useStrategyRules,
         undefined,
         showOpponentPool,
+        poolEndgameEnabled,
       );
       setInviteCode(session.inviteCode);
       setLeagueCode(session.leagueCode);
@@ -104,6 +106,42 @@ export default function MultiHostPage() {
                   <span
                     className={`absolute top-0.5 block h-6 w-6 rounded-full bg-white shadow-md transition-transform ${
                       showOpponentPool ? "translate-x-6" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {useStrategyRules && (
+          <div className="setup-host-card setup-host-card--mode">
+            <div className="setup-mode-toggle">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-strong text-sm font-semibold">Pool-Endspiel</p>
+                  <p className="text-muted mt-0.5 text-xs leading-snug">
+                    Wer am Ende die meisten Würfe im Pool hat, darf ein Feld verbessern
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={poolEndgameEnabled}
+                  aria-label={
+                    poolEndgameEnabled ? "Pool-Endspiel deaktivieren" : "Pool-Endspiel aktivieren"
+                  }
+                  disabled={roomLocked}
+                  onClick={() => setPoolEndgameEnabled((v) => !v)}
+                  className={`relative h-8 w-14 shrink-0 rounded-full border-2 transition disabled:opacity-50 ${
+                    poolEndgameEnabled
+                      ? "border-emerald-800 bg-emerald-600"
+                      : "border-slate-500 bg-slate-400"
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 block h-6 w-6 rounded-full bg-white shadow-md transition-transform ${
+                      poolEndgameEnabled ? "translate-x-6" : "translate-x-0.5"
                     }`}
                   />
                 </button>
