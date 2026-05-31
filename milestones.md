@@ -584,9 +584,11 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 
 ---
 
-## Aktueller Arbeitsstand (2026-05-30)
+## Aktueller Arbeitsstand (2026-05-31)
 
-**Commit:** `dade49d` · Branch `milestone-22-prep` · GitHub synchron · Server/Mac/GitHub gleichauf
+**Commit:** `164d2b1` · Branch `milestone-22-prep` · GitHub synchron · Server/Mac/GitHub gleichauf
+
+**Wichtig — Versionierung iOS:** App Store Connect ist bei **Version 2.0**, aktueller Build **2.0 (6)**. Die früher genannten „1.0 / Build 18/19" sind überholt. Build-Nummern zählen **pro Versionsstring** — der nächste Upload nach 2.0 (6) ist 2.0 (7).
 
 **Erledigt:**
 
@@ -598,17 +600,28 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 - **M32 Topbar & Gegner-Pool:** „Rest"-Chip entfernt; Multiplayer-Host kann „Gegner-Pool sichtbar" aktivieren → bei genau 2 Spielern zeigt die Topbar den Gegner-Pool (kein Polling: Nachladen nur bei Start + eigener Eintragung)
 - **M33 Pool-Endspiel:** Multiplayer-Host-Toggle „Pool-Endspiel"; nach Abschluss aller Runs darf der Spieler mit dem eindeutig größten Wurf-Pool ein Feld verbessern (neuer Wert oder behalten), erst danach Liga-Punkte
 - **Würfe-Standard:** Strategy-Eintrag-Voreinstellung von 2 auf **3** geändert
-- Backend: Session-Flags `show_opponent_pool` + `pool_endgame_*` (Migrationen angewandt + deployed, Service läuft)
-- iOS: **Build 18** (1.0) in TestFlight — enthält M29–M33 + Würfe-Standard 3 (Upload durch Nutzer)
-- Web + Backend auf Server deployed (Stand `dade49d`)
+- **M34 (2026-05-31) — Bugfixes + Stats-Reset:**
+  - **Bonus-Konfetti:** Konfetti-Regen hinter dem Bonus-Overlay (`BonusOverlay`, reines CSS, respektiert `prefers-reduced-motion`)
+  - **Support-Link:** „Support"-Link (`mailto:`) im Start-Footer (`HomeBentoGrid`)
+  - **M32-Fix Gegner-Pool:** Nachladen bei App-Rückkehr (`visibilitychange`/`focus`) + Aktualisieren-Tap in der Topbar (behebt, dass der Host den später beitretenden Gegner ohne Polling nie sah)
+  - **M33-Fix Pool-Endspiel ausführbar:** Beendete der Sieger seinen Run vor den Mitspielern, erschien die Verbesserungs-Phase nie → Abschluss-Screen zeigt „Pool-Endspiel läuft" + Aktualisieren; `ScoreSheetTable.allowSelectWhenFinished`
+  - **Prob 2 — Stats-Zusammenführung bei Alias:** Paarungen mit gleichem Alias werden reihenfolge-unabhängig zusammengeführt (Alias-Vorrang vor „self"), rein clientseitig (`lib/pairingMerge.ts`)
+  - **Prob 3 — Statistik serverseitig zurücksetzen (destruktiv):** in `/stats` Paarungen auswählen + endgültig löschen; Backend `resetPairings()` + `POST /stats/pairings/reset` löscht abgeschlossene 2-Spieler-Sessions inkl. Runs/Games/Fields/Rolls; Mehr-Spieler-Sessions geschützt. Hinweis: Liga-/Serien-Punkte (`LeagueStanding`) werden dabei nicht rückwirkend neu berechnet; Endpunkt ohne Auth
+  - **Capacitor-Fix Paarungs-Detail:** Tippen auf Paarung sprang in der App zum Start (voller `<a>`-Reload → `index.html` → `NativeAppEntry`-Redirect) → jetzt `next/link`
+- Backend: Session-Flags `show_opponent_pool` + `pool_endgame_*` (Migrationen angewandt + deployed, Service läuft); Reset-Endpunkt deployed (kein neues Schema)
+- iOS: TestFlight **2.0 (6)** (Upload durch Nutzer); M34-Fixes erfordern neuen Upload (2.0 (7))
+- Web + Backend auf Server deployed (Stand `164d2b1`)
+
+**Sync-Workflow (Pflicht):** siehe **`AGENT_RULES.md` Sektion 9** — nach jeder Änderung GitHub + Server + Mac gleichziehen, nummerierte `[Server]`/`[Mac]`-Befehle, sudo nur durch Nutzer.
 
 **Nächste Schritte (Priorität):**
 
 1. **App Store Connect:** Paid Applications Agreement, Bank/Steuer
 2. **Store-Metadaten:** Preis 1,19 €, Screenshots 6.7", Beschreibung DE
 3. **App-Datenschutzfragebogen** (URL: https://dicebudget.bottle-trade.de/datenschutz)
-4. Review vorbereiten / TestFlight Build 18 weiter testen (inkl. M33)
-5. Optional: Branch `milestone-22-prep` → `main` (nur nach Nutzer-Freigabe)
+4. Neuen iOS-Build 2.0 (7) mit M34-Fixes hochladen; TestFlight weiter testen
+5. Optional: Stats-Reset-Endpunkt auf „nur eigene Paarungen" einschränken (aktuell ohne Auth)
+6. Optional: Branch `milestone-22-prep` → `main` (nur nach Nutzer-Freigabe)
 
 ---
 
