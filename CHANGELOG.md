@@ -15,6 +15,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **M29 Punktwahl-Eintrag:** Feld antippen → Overlay mit feldtypabhängiger Punktwahl + Würfe → Eintragen (`FieldScoreChoiceGrid`, `ScoreEntryPanel`)
 
 ### Fixed
+- **Paarungs-Detail in der iOS-App (Capacitor-Fix):** Tippen auf eine Paarung führte in der nativen App zum Start-Screen statt zur Detailansicht. Ursache: die Karte navigierte per normalem `<a href>` (voller Reload), den Capacitor ohne `.html`-Auflösung auf `index.html` → `NativeAppEntry` (Redirect zum Start) zurückfallen ließ. Jetzt clientseitige Navigation via `next/link`. Datei: `components/PairingSummaryCard.tsx`
 - **Pool-Endspiel ausführbar (M33-Fix):** Beendete der Pool-Sieger seinen Run **vor** den Mitspielern, erschien die Verbesserungs-Phase nie (ohne Polling kein Nachladen). Der Abschluss-Screen zeigt jetzt „Pool-Endspiel läuft" mit Aktualisieren-Tap; zusammen mit dem Focus-Refresh erhält der Sieger die Verbesserung zuverlässig. Datei: `PlayBoard.tsx`
 - **Stats zusammenführen bei Alias:** Spieler-IDs mit demselben lokalen Alias werden in der Statistik wieder als dieselbe Person zusammengeführt (Übersicht + Detail), rein lokal/clientseitig ohne Klarnamen. Neu: `lib/pairingMerge.ts`; angepasst: `app/stats/page.tsx`, `app/stats/pairing/page.tsx`
 

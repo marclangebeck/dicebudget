@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { PairingSummaryDto } from "@/lib/pairingTypes";
 import { playerLabel } from "@/lib/playerIdentity";
 
@@ -41,7 +42,7 @@ export function PairingSummaryCard({
         <span className="stats-pairing-card-arrow" aria-hidden>
           →
         </span>
-        <a href={href} className="no-underline">
+        <Link href={href} className="no-underline">
           <p className="stats-pairing-card-title">
             <span className="text-strong">
               {playerLabel(pairing.playerA, ownPlayerId, aliases)}
@@ -85,7 +86,7 @@ export function PairingSummaryCard({
               <span>Noch keine App-Runden</span>
             )}
           </p>
-        </a>
+        </Link>
         {onEditPlayerAlias && (
           <div className="mt-2 flex justify-center gap-2">
             <button
