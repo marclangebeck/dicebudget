@@ -143,7 +143,68 @@ Nginx- oder Certbot-Änderungen: minimal, andere VHosts nicht anfassen.
 
 ---
 
-## 9. ZUSAMMENFASSUNG FÜR AGENTS
+## 9. ABGLEICH-WORKFLOW: GIT + SERVER + LOKAL (PFLICHT)
+
+Der Nutzer will **nach jeder Code-Änderung**, dass **GitHub, Server und lokaler Mac auf demselben Stand** sind. Der Agent arbeitet **direkt auf dem Server** (`/home/bottleadmin/projects/kniffel`); der Mac ist ein **getrennter Git-Clone**, auf den der Agent **keinen Zugriff** hat.
+
+**Regel für die Kommunikation:** Bei jeder Änderung dem Nutzer **immer** eine **nummerierte Reihenfolge mit kopierbaren Befehlen** ausgeben, jeweils markiert mit **[Server]** (macht der Agent) oder **[Mac]** (macht der Nutzer). Schritte mit `sudo` sind **immer Nutzer-Aufgabe** (Agent hat kein sudo). Keine Inline-Kommentare (`#`) in kopierbaren Befehlen (Mac-Shell interpretiert sie sonst falsch).
+
+**Standard-Reihenfolge nach einer Code-Änderung:**
+
+1. **[Server] GitHub aktualisieren** (Agent):
+
+```bash
+cd /home/bottleadmin/projects/kniffel
+git add -A && git commit -m "..." && git push origin milestone-22-prep
+```
+
+2. **[Server] bauen** (Agent) — nur was geändert wurde:
+
+```bash
+cd /home/bottleadmin/projects/kniffel/backend && npm run build
+cd /home/bottleadmin/projects/kniffel/frontend && npm run build
+```
+
+Frontend-`out/` wird von Nginx direkt ausgeliefert → **kein sudo, sofort live**.
+
+3. **[Mac] nur bei geändertem Backend-Code: Service neu starten** (Nutzer, sudo):
+
+```bash
+sudo bash /home/bottleadmin/projects/kniffel/infra/scripts/deploy-backend-prod.sh
+```
+
+Reine Frontend-Änderungen brauchen **keinen** Backend-Neustart. Prüfen, ob Backend neuen Code hat: ein neuer Endpunkt liefert nach Neustart z. B. `400` statt `404`.
+
+4. **[Mac] lokal nachziehen** (Nutzer):
+
+```bash
+cd /Users/marclangebeck/projects/kniffel
+git pull origin milestone-22-prep
+```
+
+Bei Pull-Konflikt durch Xcode-Änderung an der Projektdatei vorher:
+
+```bash
+git restore frontend/ios/App/App.xcodeproj/project.pbxproj
+git pull origin milestone-22-prep
+```
+
+5. **[Mac] iOS-Build (nur wenn ein App-Build gewünscht ist)** (Nutzer):
+
+```bash
+cd /Users/marclangebeck/projects/kniffel/frontend
+npm run build:ios
+brew unlink rsync
+env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
+```
+
+Danach in Xcode: Team prüfen, Build-Nummer erhöhen, **Any iOS Device** → **Product → Archive** → Upload.
+
+**Wichtig:** Der Agent darf `sudo` **nicht** ausführen (Passwortabfrage scheitert) und hat **keinen** Zugriff auf den Mac. Daher Schritte 3–5 immer klar als Nutzer-Aufgabe ausweisen und **nicht** behaupten, sie seien erledigt, ohne es per Beleg (Zeitstempel/HTTP-Status) zu verifizieren.
+
+---
+
+## 10. ZUSAMMENFASSUNG FÜR AGENTS
 
 | Verboten | Erlaubt |
 |----------|---------|
