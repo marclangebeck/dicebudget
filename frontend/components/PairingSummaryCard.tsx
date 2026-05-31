@@ -6,6 +6,9 @@ type Props = {
   ownPlayerId?: string;
   aliases?: Record<string, string>;
   onEditPlayerAlias?: (playerId: string) => void;
+  selectable?: boolean;
+  selected?: boolean;
+  onToggleSelect?: () => void;
 };
 
 export function PairingSummaryCard({
@@ -13,12 +16,28 @@ export function PairingSummaryCard({
   ownPlayerId,
   aliases,
   onEditPlayerAlias,
+  selectable,
+  selected,
+  onToggleSelect,
 }: Props) {
   const href = `/stats/pairing?key=${encodeURIComponent(pairing.key)}`;
 
   return (
     <li>
-      <div className="stats-pairing-card">
+      <div
+        className={`stats-pairing-card${selected ? " stats-pairing-card--selected" : ""}`}
+      >
+        {selectable && (
+          <label className="stats-pairing-select">
+            <input
+              type="checkbox"
+              checked={!!selected}
+              onChange={onToggleSelect}
+              aria-label="Paarung zum Zurücksetzen auswählen"
+            />
+            <span>Auswählen</span>
+          </label>
+        )}
         <span className="stats-pairing-card-arrow" aria-hidden>
           →
         </span>

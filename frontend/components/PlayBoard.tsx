@@ -443,6 +443,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
                   run={run}
                   activeFieldId={endgameFieldId}
                   onSelectField={selectEndgameField}
+                  allowSelectWhenFinished
                 />
               </FitScoreSheet>
             </div>

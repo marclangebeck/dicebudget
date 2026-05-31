@@ -124,6 +124,16 @@ export async function getPairingSummaries() {
   };
 }
 
+export function resetPairings(keys: string[]) {
+  return request<{ deletedSessions: number; skippedMultiPlayer: number }>(
+    "/stats/pairings/reset",
+    {
+      method: "POST",
+      body: JSON.stringify({ keys }),
+    },
+  );
+}
+
 export async function getPairingDetail(key: string) {
   const { pairing } = await request<{ pairing: unknown }>(
     `/stats/pairing?key=${encodeURIComponent(key)}`,

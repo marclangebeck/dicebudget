@@ -16,8 +16,9 @@ export type MergedPairingSummary = PairingSummaryDto & {
 };
 
 /**
- * Kanonische Identität eines Spielers: eigener Spieler → "self",
- * gleicher Alias → "alias:<alias>", sonst die pseudonyme ID.
+ * Kanonische Identität eines Spielers: gleicher Alias → "alias:<alias>" (hat
+ * Vorrang, damit auch eigene Zweit-IDs mit demselben Alias zusammengeführt
+ * werden), sonst eigener Spieler → "self", sonst die pseudonyme ID.
  */
 function canonicalIdentity(
   playerId: string,
@@ -25,10 +26,17 @@ function canonicalIdentity(
   ownId: string | undefined,
 ): string {
   const norm = normalizePublicPlayerId(playerId);
-  if (ownId && norm === normalizePublicPlayerId(ownId)) return "self";
   const alias = aliases?.[norm]?.trim().toLowerCase();
   if (alias) return `alias:${alias}`;
+  if (ownId && norm === normalizePublicPlayerId(ownId)) return "self";
   return `pid:${norm}`;
+}
+
+function isOwn(playerId: string, ownId: string | undefined): boolean {
+  return (
+    !!ownId &&
+    normalizePublicPlayerId(playerId) === normalizePublicPlayerId(ownId)
+  );
 }
 
 /** Reihenfolge-unabhängiger Schlüssel für ein zusammengeführtes Paar. */
@@ -38,12 +46,8 @@ function mergedKeyFor(canonA: string, canonB: string): string {
   );
 }
 
-function representative(
-  playerId: string,
-  canon: string,
-  ownId: string | undefined,
-): string {
-  return canon === "self" && ownId ? ownId : playerId;
+function representative(playerId: string, ownId: string | undefined): string {
+  return isOwn(playerId, ownId) ? ownId! : playerId;
 }
 
 function maxDate(a: string | null, b: string | null): string | null {
@@ -74,10 +78,10 @@ export function mergePairingSummaries(
     const key = mergedKeyFor(canonA, canonB);
     // Quell-Seite A landet auf mergedB, wenn ihre Canon "größer" ist.
     const swap = canonA > canonB;
-    const mergedCanonA = swap ? canonB : canonA;
-    const mergedCanonB = swap ? canonA : canonB;
-    const repA = representative(swap ? s.playerB : s.playerA, mergedCanonA, ownId);
-    const repB = representative(swap ? s.playerA : s.playerB, mergedCanonB, ownId);
+    const sideAId = swap ? s.playerB : s.playerA;
+    const sideBId = swap ? s.playerA : s.playerB;
+    const repA = representative(sideAId, ownId);
+    const repB = representative(sideBId, ownId);
 
     let acc = map.get(key);
     if (!acc) {
@@ -101,6 +105,10 @@ export function mergePairingSummaries(
       };
       map.set(key, acc);
     }
+
+    // Eigene ID als Repräsentant bevorzugen, damit weiterhin „Du" angezeigt wird.
+    if (isOwn(sideAId, ownId)) acc.playerA = ownId!;
+    if (isOwn(sideBId, ownId)) acc.playerB = ownId!;
 
     acc.roundsPlayed += s.roundsPlayed;
     acc.appRoundsPlayed += s.appRoundsPlayed;

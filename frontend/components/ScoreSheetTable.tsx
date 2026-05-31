@@ -20,6 +20,8 @@ type Props = {
   onSelectField: (fieldId: string) => void;
   onIncrementExtraYatzy?: () => void;
   extraYatzyBusy?: boolean;
+  /** Pool-Endspiel: bereits eingetragene Felder trotz beendetem Run antippbar. */
+  allowSelectWhenFinished?: boolean;
 };
 
 function fieldForGame(game: GameDto, fieldType: FieldTypeId): FieldDto | undefined {
@@ -265,8 +267,10 @@ export function ScoreSheetTable({
   onSelectField,
   onIncrementExtraYatzy,
   extraYatzyBusy,
+  allowSelectWhenFinished,
 }: Props) {
   const runActive = run.status === "ACTIVE";
+  const tilesSelectable = runActive || !!allowSelectWhenFinished;
   const games = run.games;
   const gameColCount = games.length;
   const labelColPct = gameColCount <= 2 ? 30 : gameColCount <= 4 ? 26 : 22;
@@ -338,7 +342,7 @@ export function ScoreSheetTable({
                           <ScoreTile
                             field={field}
                             isActive={field.id === activeFieldId}
-                            disabled={!runActive}
+                            disabled={!tilesSelectable}
                             preview={
                               field.score === null
                                 ? fieldPreviews?.get(field.id)

@@ -230,6 +230,81 @@ export async function listPairingSummaries(): Promise<PairingSummaryDto[]> {
     });
 }
 
+/** Normalisiert eingehende Pairing-Keys zu einem Set kanonischer Keys. */
+export function normalizePairingKeys(keys: string[]): Set<string> {
+  const set = new Set<string>();
+  for (const k of keys) {
+    const names = parsePairingKey(k);
+    if (names) set.add(pairingKey(names[0], names[1]));
+  }
+  return set;
+}
+
+/**
+ * Entscheidet, wie eine Session bzgl. der ausgewählten Paarungen behandelt wird:
+ * - "delete": exakte 2-Spieler-Paarung, deren Key ausgewählt ist
+ * - "skip-multi": Mehr-Spieler-Session, die ein ausgewähltes Paar enthält (nicht löschbar)
+ * - "ignore": betrifft keine ausgewählte Paarung
+ */
+export function sessionResetAction(
+  publicIds: string[],
+  targetKeys: Set<string>,
+): "delete" | "skip-multi" | "ignore" {
+  const unique = [...new Set(publicIds)];
+  if (unique.length === 2) {
+    return targetKeys.has(pairingKey(unique[0]!, unique[1]!)) ? "delete" : "ignore";
+  }
+  for (let i = 0; i < unique.length; i += 1) {
+    for (let j = i + 1; j < unique.length; j += 1) {
+      if (targetKeys.has(pairingKey(unique[i]!, unique[j]!))) return "skip-multi";
+    }
+  }
+  return "ignore";
+}
+
+/**
+ * Setzt ausgewählte Paarungen zurück: löscht die zugehörigen abgeschlossenen
+ * 2-Spieler-Sessions (inkl. Runs/Games/Fields/Rolls). Mehr-Spieler-Sessions
+ * werden zum Schutz anderer Paarungen nicht angetastet.
+ */
+export async function resetPairings(
+  keys: string[],
+): Promise<{ deletedSessions: number; skippedMultiPlayer: number }> {
+  const targetKeys = normalizePairingKeys(keys);
+  if (targetKeys.size === 0) return { deletedSessions: 0, skippedMultiPlayer: 0 };
+
+  const sessions = await prisma.gameSession.findMany({
+    where: { pointsAwarded: true },
+    include: { players: { include: { run: { select: { id: true } } } } },
+  });
+
+  let deletedSessions = 0;
+  let skippedMultiPlayer = 0;
+
+  for (const session of sessions) {
+    const publicIds = session.players.map((p) =>
+      publicPlayerIdFromStoredName(p.name),
+    );
+    const action = sessionResetAction(publicIds, targetKeys);
+    if (action === "skip-multi") {
+      skippedMultiPlayer += 1;
+      continue;
+    }
+    if (action !== "delete") continue;
+
+    const runIds = session.players.map((p) => p.run.id);
+    await prisma.$transaction(async (tx) => {
+      await tx.gameSession.delete({ where: { id: session.id } });
+      if (runIds.length > 0) {
+        await tx.run.deleteMany({ where: { id: { in: runIds } } });
+      }
+    });
+    deletedSessions += 1;
+  }
+
+  return { deletedSessions, skippedMultiPlayer };
+}
+
 export async function getPairingDetail(key: string): Promise<PairingDetailDto | null> {
   const names = parsePairingKey(key);
   if (!names) return null;

@@ -1862,6 +1862,56 @@ html.legal-route body {
   font-style: italic;
 }
 
+.stats-pairing-card--selected {
+  border-color: #b91c1c;
+  box-shadow:
+    0 0 0 2px rgba(185, 28, 28, 0.55),
+    0 2px 12px -4px rgba(15, 23, 42, 0.14);
+}
+
+.stats-pairing-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  align-self: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #4c1d95;
+  cursor: pointer;
+}
+
+.stats-pairing-select input {
+  width: 1.05rem;
+  height: 1.05rem;
+  accent-color: #b91c1c;
+}
+
+.glass-alert-success {
+  border-radius: 0.75rem;
+  border: 1px solid #047857;
+  background: #ecfdf5;
+  color: #065f46;
+  font-weight: 500;
+}
+
+.btn-danger {
+  border-radius: 0.5rem;
+  border: 1px solid #991b1b;
+  background: #dc2626;
+  color: #ffffff;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.btn-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .stats-merge-panel {
   border-radius: 1rem;
   border: 1px solid var(--glass-border);
