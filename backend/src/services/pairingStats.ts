@@ -25,6 +25,9 @@ export type PairingSummaryDto = {
   ties: number;
   playerABonusPoints: number;
   playerBBonusPoints: number;
+  /** Manueller Anteil (außerhalb der App nachgetragen) der Differenz je Spieler. */
+  playerAManualBonus: number;
+  playerBManualBonus: number;
   playerATotalScore: number;
   playerBTotalScore: number;
   lastPlayedAt: string | null;
@@ -65,7 +68,7 @@ function winnerSide(
   return "tie";
 }
 
-type PairingAccumulator = {
+export type PairingAccumulator = {
   key: string;
   playerA: string;
   playerB: string;
@@ -78,13 +81,15 @@ type PairingAccumulator = {
   ties: number;
   playerABonusPoints: number;
   playerBBonusPoints: number;
+  playerAManualBonus: number;
+  playerBManualBonus: number;
   playerATotalScore: number;
   playerBTotalScore: number;
   lastPlayedAt: string | null;
   rounds: PairingRoundDto[];
 };
 
-function emptyAccumulator(key: string, playerA: string, playerB: string): PairingAccumulator {
+export function emptyAccumulator(key: string, playerA: string, playerB: string): PairingAccumulator {
   return {
     key,
     playerA,
@@ -98,6 +103,8 @@ function emptyAccumulator(key: string, playerA: string, playerB: string): Pairin
     ties: 0,
     playerABonusPoints: 0,
     playerBBonusPoints: 0,
+    playerAManualBonus: 0,
+    playerBManualBonus: 0,
     playerATotalScore: 0,
     playerBTotalScore: 0,
     lastPlayedAt: null,
@@ -119,8 +126,59 @@ async function loadFinishedSessions() {
   });
 }
 
+async function loadManualBaselines() {
+  return prisma.pairingManualBaseline.findMany();
+}
+
+/**
+ * Rechnet manuell nachgetragene Werte (außerhalb der App gespielt) in die
+ * Gesamt-Statistik ein: erhöht Gesamt-Siege und Gesamt-Differenz je Spieler,
+ * lässt die App-Werte (`*AppWins`, `appRoundsPlayed`, `rounds`) unberührt.
+ * Existiert für ein Paar noch kein App-Eintrag, wird ein reiner Baseline-
+ * Eintrag erzeugt, damit die Paarung trotzdem erscheint.
+ */
+export function foldManualBaselines(
+  map: Map<string, PairingAccumulator>,
+  baselines: {
+    pairingKey: string;
+    extraWinsA: number;
+    extraWinsB: number;
+    extraBonusA: number;
+    extraBonusB: number;
+  }[],
+): void {
+  for (const baseline of baselines) {
+    const names = parsePairingKey(baseline.pairingKey);
+    if (!names) continue;
+    const key = pairingKey(names[0], names[1]);
+    const [playerA, playerB] = parsePairingKey(key)!;
+
+    let acc = map.get(key);
+    if (!acc) {
+      acc = emptyAccumulator(key, playerA, playerB);
+      map.set(key, acc);
+    }
+
+    const winsA = Math.max(0, Math.trunc(baseline.extraWinsA));
+    const winsB = Math.max(0, Math.trunc(baseline.extraWinsB));
+    const bonusA = Math.max(0, Math.trunc(baseline.extraBonusA));
+    const bonusB = Math.max(0, Math.trunc(baseline.extraBonusB));
+
+    acc.roundsPlayed += winsA + winsB;
+    acc.playerAWins += winsA;
+    acc.playerBWins += winsB;
+    acc.playerABonusPoints += bonusA;
+    acc.playerBBonusPoints += bonusB;
+    acc.playerAManualBonus += bonusA;
+    acc.playerBManualBonus += bonusB;
+  }
+}
+
 async function accumulatePairings(): Promise<Map<string, PairingAccumulator>> {
-  const sessions = await loadFinishedSessions();
+  const [sessions, baselines] = await Promise.all([
+    loadFinishedSessions(),
+    loadManualBaselines(),
+  ]);
 
   const map = new Map<string, PairingAccumulator>();
 
@@ -195,6 +253,8 @@ async function accumulatePairings(): Promise<Map<string, PairingAccumulator>> {
     }
   }
 
+  foldManualBaselines(map, baselines);
+
   return map;
 }
 
@@ -212,6 +272,8 @@ function toSummary(acc: PairingAccumulator): PairingSummaryDto {
     ties: acc.ties,
     playerABonusPoints: acc.playerABonusPoints,
     playerBBonusPoints: acc.playerBBonusPoints,
+    playerAManualBonus: acc.playerAManualBonus,
+    playerBManualBonus: acc.playerBManualBonus,
     playerATotalScore: acc.playerATotalScore,
     playerBTotalScore: acc.playerBTotalScore,
     lastPlayedAt: acc.lastPlayedAt,
@@ -273,6 +335,11 @@ export async function resetPairings(
   const targetKeys = normalizePairingKeys(keys);
   if (targetKeys.size === 0) return { deletedSessions: 0, skippedMultiPlayer: 0 };
 
+  // Manuell nachgetragene Werte der betroffenen Paarungen ebenfalls entfernen.
+  await prisma.pairingManualBaseline.deleteMany({
+    where: { pairingKey: { in: [...targetKeys] } },
+  });
+
   const sessions = await prisma.gameSession.findMany({
     where: { pointsAwarded: true },
     include: { players: { include: { run: { select: { id: true } } } } },
@@ -303,6 +370,71 @@ export async function resetPairings(
   }
 
   return { deletedSessions, skippedMultiPlayer };
+}
+
+export type PairingBaselineInput = {
+  key: string;
+  extraWinsA: number;
+  extraWinsB: number;
+  extraBonusA: number;
+  extraBonusB: number;
+  note?: string | null;
+};
+
+function clampInt(value: unknown): number {
+  const n = Math.trunc(Number(value));
+  if (!Number.isFinite(n) || n < 0) return 0;
+  return n;
+}
+
+/**
+ * Schreibt manuell nachgetragene Werte für Paarungen (außerhalb der App
+ * gespielt). Pro Eintrag wird anhand des kanonischen Paar-Schlüssels ge-upsertet.
+ * Sind alle Werte 0 und keine Notiz gesetzt, wird ein vorhandener Eintrag
+ * gelöscht (hält die Tabelle sauber). Gibt die Zahl geschriebener/gelöschter
+ * Einträge zurück.
+ */
+export async function upsertPairingBaselines(
+  inputs: PairingBaselineInput[],
+): Promise<{ written: number; deleted: number }> {
+  let written = 0;
+  let deleted = 0;
+
+  for (const input of inputs) {
+    const names = parsePairingKey(input.key);
+    if (!names) continue;
+    const key = pairingKey(names[0], names[1]);
+
+    const extraWinsA = clampInt(input.extraWinsA);
+    const extraWinsB = clampInt(input.extraWinsB);
+    const extraBonusA = clampInt(input.extraBonusA);
+    const extraBonusB = clampInt(input.extraBonusB);
+    const note = typeof input.note === "string" && input.note.trim() ? input.note.trim() : null;
+
+    const isEmpty =
+      extraWinsA === 0 &&
+      extraWinsB === 0 &&
+      extraBonusA === 0 &&
+      extraBonusB === 0 &&
+      note === null;
+
+    if (isEmpty) {
+      const res = await prisma.pairingManualBaseline.deleteMany({
+        where: { pairingKey: key },
+      });
+      deleted += res.count;
+      continue;
+    }
+
+    await prisma.pairingManualBaseline.upsert({
+      where: { pairingKey: key },
+      update: { extraWinsA, extraWinsB, extraBonusA, extraBonusB, note },
+      create: { pairingKey: key, extraWinsA, extraWinsB, extraBonusA, extraBonusB, note },
+    });
+    written += 1;
+  }
+
+  return { written, deleted };
 }
 
 export async function getPairingDetail(key: string): Promise<PairingDetailDto | null> {

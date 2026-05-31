@@ -4,6 +4,8 @@ import {
   getPairingDetail,
   listPairingSummaries,
   resetPairings,
+  upsertPairingBaselines,
+  type PairingBaselineInput,
 } from "../services/pairingStats.js";
 
 export const statsRouter = Router();
@@ -37,6 +39,39 @@ statsRouter.post("/pairings/reset", async (req, res, next) => {
       return;
     }
     const result = await resetPairings(keys);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+statsRouter.post("/pairings/baseline", async (req, res, next) => {
+  try {
+    const raw = (req.body as { entries?: unknown })?.entries;
+    if (!Array.isArray(raw)) {
+      res.status(400).json({ error: "entries required" });
+      return;
+    }
+    const entries: PairingBaselineInput[] = [];
+    for (const item of raw) {
+      if (!item || typeof item !== "object") continue;
+      const o = item as Record<string, unknown>;
+      const key = typeof o.key === "string" ? o.key.trim() : "";
+      if (!key) continue;
+      entries.push({
+        key,
+        extraWinsA: Number(o.extraWinsA),
+        extraWinsB: Number(o.extraWinsB),
+        extraBonusA: Number(o.extraBonusA),
+        extraBonusB: Number(o.extraBonusB),
+        note: typeof o.note === "string" ? o.note : null,
+      });
+    }
+    if (entries.length === 0) {
+      res.status(400).json({ error: "no valid entries" });
+      return;
+    }
+    const result = await upsertPairingBaselines(entries);
     res.json(result);
   } catch (error) {
     next(error);

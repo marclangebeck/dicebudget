@@ -53,6 +53,8 @@ export function normalizePairingSummary(raw: unknown): PairingSummaryDto | null 
     ties: num(o.ties),
     playerABonusPoints: num(o.playerABonusPoints),
     playerBBonusPoints: num(o.playerBBonusPoints),
+    playerAManualBonus: num(o.playerAManualBonus),
+    playerBManualBonus: num(o.playerBManualBonus),
     playerATotalScore: num(o.playerATotalScore),
     playerBTotalScore: num(o.playerBTotalScore),
     lastPlayedAt: str(o.lastPlayedAt),

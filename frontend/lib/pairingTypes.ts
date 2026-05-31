@@ -11,6 +11,9 @@ export type PairingSummaryDto = {
   ties: number;
   playerABonusPoints: number;
   playerBBonusPoints: number;
+  /** Manueller Anteil (außerhalb der App nachgetragen) der Differenz je Spieler. */
+  playerAManualBonus: number;
+  playerBManualBonus: number;
   playerATotalScore: number;
   playerBTotalScore: number;
   lastPlayedAt: string | null;

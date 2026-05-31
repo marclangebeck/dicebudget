@@ -4,16 +4,18 @@ import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getPairingDetail, getPairingSummaries } from "@/lib/api";
-import type { PairingDetailDto } from "@/lib/pairingTypes";
+import type { PairingDetailDto, PairingSummaryDto } from "@/lib/pairingTypes";
 import {
   isMergedPairingKey,
   mergePairingDetails,
   mergePairingSummaries,
+  type MergedPairingSummary,
 } from "@/lib/pairingMerge";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { getOrCreatePlayerId, normalizePublicPlayerId, playerLabel } from "@/lib/playerIdentity";
 import { loadPlayerAliases, setPlayerAlias, type PlayerAliasMap } from "@/lib/playerAliases";
 import { PlayerAliasOverlay } from "@/components/PlayerAliasOverlay";
+import { PairingEditOverlay } from "@/components/PairingEditOverlay";
 
 function formatDateTime(iso: string | null): string {
   if (!iso) return "—";
@@ -39,11 +41,15 @@ function PairingDetailInner() {
   const key = (searchParams.get("key") ?? "").trim();
 
   const [pairing, setPairing] = useState<PairingDetailDto | null>(null);
+  const [group, setGroup] = useState<MergedPairingSummary | null>(null);
+  const [sourceSummaries, setSourceSummaries] = useState<PairingSummaryDto[]>([]);
   const [ownPlayerId, setOwnPlayerId] = useState("");
   const [aliases, setAliases] = useState<PlayerAliasMap>({});
   const [editingPlayerId, setEditingPlayerId] = useState<string | null>(null);
+  const [editingPairing, setEditingPairing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [reloadToken, setReloadToken] = useState(0);
 
   useEffect(() => {
     if (!key) {
@@ -60,32 +66,34 @@ function PairingDetailInner() {
     setLoading(true);
     setError(null);
 
-    const loadMerged = async () => {
-      // Quell-Paarungen der zusammengeführten Gruppe ermitteln und kombinieren.
+    const load = async () => {
+      // Zusammengeführte Gruppe (Alias-gleiche Personen) auflösen.
       const { pairings } = await getPairingSummaries();
-      const group = mergePairingSummaries(pairings, al, own).find(
-        (m) => m.key === key,
-      );
-      if (!group) throw new Error("Paarung nicht gefunden");
+      const mergedList = mergePairingSummaries(pairings, al, own);
+      const matched = isMergedPairingKey(key)
+        ? mergedList.find((m) => m.key === key)
+        : mergedList.find((m) => m.sourceKeys.includes(key));
+      if (!matched) throw new Error("Paarung nicht gefunden");
+      const sources = pairings.filter((p) => matched.sourceKeys.includes(p.key));
       const details = await Promise.all(
-        group.sourceKeys.map((k) => getPairingDetail(k).then((r) => r.pairing)),
+        matched.sourceKeys.map((k) => getPairingDetail(k).then((r) => r.pairing)),
       );
       const merged = mergePairingDetails(details, al, own);
       if (!merged) throw new Error("Paarung nicht gefunden");
-      return merged;
+      return { detail: merged, matched, sources };
     };
 
-    const load = isMergedPairingKey(key)
-      ? loadMerged()
-      : getPairingDetail(key).then(({ pairing: data }) => data);
-
-    void load
-      .then((data) => setPairing(data))
+    void load()
+      .then(({ detail, matched, sources }) => {
+        setPairing(detail);
+        setGroup(matched);
+        setSourceSummaries(sources);
+      })
       .catch((e) =>
         setError(e instanceof Error ? e.message : "Paarung nicht geladen"),
       )
       .finally(() => setLoading(false));
-  }, [key]);
+  }, [key, reloadToken]);
 
   if (!key) {
     return (
@@ -111,13 +119,15 @@ function PairingDetailInner() {
       ? [
           `Siege ${pairing.playerAWins}:${pairing.playerBWins}`,
           pairing.ties > 0 ? `${pairing.ties} Remis` : null,
-          pairing.appRoundsPlayed > 0
-            ? `${pairing.appRoundsPlayed} ${pairing.appRoundsPlayed === 1 ? "Runde" : "Runden"} in der App`
+          pairing.roundsPlayed > 0
+            ? `${pairing.roundsPlayed} ${pairing.roundsPlayed === 1 ? "Runde" : "Runden"} gesamt`
             : null,
         ]
           .filter(Boolean)
           .join(" · ")
       : undefined;
+
+  const netDiff = pairing ? pairing.playerABonusPoints - pairing.playerBBonusPoints : 0;
 
   return (
     <div className="stats-screen flex flex-col gap-3 pb-2">
@@ -132,6 +142,18 @@ function PairingDetailInner() {
 
       {pairing && (
         <>
+          {group && (
+            <div className="flex justify-end">
+              <button
+                type="button"
+                className="btn-chip px-3 py-1 text-xs"
+                onClick={() => setEditingPairing(true)}
+              >
+                ✏️ Paarung bearbeiten
+              </button>
+            </div>
+          )}
+
           <section className="stats-detail-scores">
             <div className="stats-detail-player-card">
               <p className="stats-detail-player-name">
@@ -147,13 +169,8 @@ function PairingDetailInner() {
               <p className="stats-detail-wins tabular-nums">{pairing.playerAWins}</p>
               <p className="stats-detail-metric-label">Siege</p>
               <p className="stats-detail-diff tabular-nums">
-                +{pairing.playerABonusPoints} Differenz
+                {netDiff > 0 ? `+${netDiff} Differenz` : "\u00a0"}
               </p>
-              {pairing.playerAAppWins > 0 && (
-                <p className="stats-detail-app-wins">
-                  davon {pairing.playerAAppWins} in der App
-                </p>
-              )}
             </div>
             <div className="stats-detail-player-card stats-detail-player-card--b">
               <p className="stats-detail-player-name">
@@ -169,13 +186,8 @@ function PairingDetailInner() {
               <p className="stats-detail-wins tabular-nums">{pairing.playerBWins}</p>
               <p className="stats-detail-metric-label">Siege</p>
               <p className="stats-detail-diff tabular-nums">
-                +{pairing.playerBBonusPoints} Differenz
+                {netDiff < 0 ? `+${-netDiff} Differenz` : "\u00a0"}
               </p>
-              {pairing.playerBAppWins > 0 && (
-                <p className="stats-detail-app-wins">
-                  davon {pairing.playerBAppWins} in der App
-                </p>
-              )}
             </div>
           </section>
 
@@ -247,6 +259,20 @@ function PairingDetailInner() {
           onSave={(alias) => {
             setAliases(setPlayerAlias(editingPlayerId, alias));
             setEditingPlayerId(null);
+          }}
+        />
+      )}
+
+      {editingPairing && group && (
+        <PairingEditOverlay
+          merged={group}
+          sourceSummaries={sourceSummaries}
+          ownPlayerId={ownPlayerId}
+          aliases={aliases}
+          onClose={() => setEditingPairing(false)}
+          onSaved={() => {
+            setEditingPairing(false);
+            setReloadToken((t) => t + 1);
           }}
         />
       )}

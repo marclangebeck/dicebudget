@@ -98,6 +98,8 @@ export function mergePairingSummaries(
         ties: 0,
         playerABonusPoints: 0,
         playerBBonusPoints: 0,
+        playerAManualBonus: 0,
+        playerBManualBonus: 0,
         playerATotalScore: 0,
         playerBTotalScore: 0,
         lastPlayedAt: null,
@@ -119,6 +121,8 @@ export function mergePairingSummaries(
     acc.ties += s.ties;
     acc.playerABonusPoints += swap ? s.playerBBonusPoints : s.playerABonusPoints;
     acc.playerBBonusPoints += swap ? s.playerABonusPoints : s.playerBBonusPoints;
+    acc.playerAManualBonus += swap ? s.playerBManualBonus : s.playerAManualBonus;
+    acc.playerBManualBonus += swap ? s.playerAManualBonus : s.playerBManualBonus;
     acc.playerATotalScore += swap ? s.playerBTotalScore : s.playerATotalScore;
     acc.playerBTotalScore += swap ? s.playerATotalScore : s.playerBTotalScore;
     acc.lastPlayedAt = maxDate(acc.lastPlayedAt, s.lastPlayedAt);
@@ -168,4 +172,86 @@ export function mergePairingDetails(
   rounds.sort((a, b) => (b.finishedAt ?? "").localeCompare(a.finishedAt ?? ""));
 
   return { ...base, rounds };
+}
+
+/** Ein Schreibauftrag für die serverseitige manuelle Baseline (Backend-Key). */
+export type PairingBaselineWrite = {
+  key: string;
+  extraWinsA: number;
+  extraWinsB: number;
+  extraBonusA: number;
+  extraBonusB: number;
+};
+
+export type DesiredPairingTotals = {
+  /** Gewünschte Gesamt-Siege Spieler A (inkl. App-Runden). */
+  totalWinsA: number;
+  totalWinsB: number;
+  /** Netto-Punktedifferenz: positiv = zugunsten A, negativ = zugunsten B. */
+  netDiff: number;
+};
+
+/**
+ * Übersetzt die gewünschten Gesamtwerte einer (ggf. zusammengeführten) Paarung
+ * in manuelle Baseline-Schreibaufträge. Der manuelle Anteil = Gesamt − App.
+ * App-Siege sind die Untergrenze (echte Runden lassen sich nur über „Löschen"
+ * entfernen). Die Netto-Differenz wird einseitig (A oder B) abgelegt.
+ *
+ * Die volle Baseline landet auf einem Repräsentanten-Quell-Key; alle weiteren
+ * Quell-Keys der Gruppe werden auf 0 gesetzt, damit der Wert eindeutig bleibt.
+ */
+export function buildBaselineWrites(
+  merged: MergedPairingSummary,
+  sourceSummaries: PairingSummaryDto[],
+  aliases: Record<string, string> | undefined,
+  ownId: string | undefined,
+  desired: DesiredPairingTotals,
+): PairingBaselineWrite[] {
+  const appWinsA = merged.playerAAppWins;
+  const appWinsB = merged.playerBAppWins;
+  const manualWinsA = Math.max(0, Math.round(desired.totalWinsA) - appWinsA);
+  const manualWinsB = Math.max(0, Math.round(desired.totalWinsB) - appWinsB);
+
+  const currentManualNet = merged.playerAManualBonus - merged.playerBManualBonus;
+  const totalNet = merged.playerABonusPoints - merged.playerBBonusPoints;
+  const appNet = totalNet - currentManualNet;
+  const newManualNet = Math.round(desired.netDiff) - appNet;
+  const manualBonusA = newManualNet > 0 ? newManualNet : 0;
+  const manualBonusB = newManualNet < 0 ? -newManualNet : 0;
+
+  const sortedKeys = [...merged.sourceKeys].sort();
+  const repKey = sortedKeys[0];
+  const writes: PairingBaselineWrite[] = [];
+
+  for (const key of sortedKeys) {
+    const src = sourceSummaries.find((s) => s.key === key);
+    if (!src) continue;
+    if (key !== repKey) {
+      writes.push({ key, extraWinsA: 0, extraWinsB: 0, extraBonusA: 0, extraBonusB: 0 });
+      continue;
+    }
+    // Orientierung dieser Quell-Paarung relativ zur zusammengeführten Sicht.
+    const swap =
+      canonicalIdentity(src.playerA, aliases, ownId) >
+      canonicalIdentity(src.playerB, aliases, ownId);
+    writes.push(
+      swap
+        ? {
+            key,
+            extraWinsA: manualWinsB,
+            extraWinsB: manualWinsA,
+            extraBonusA: manualBonusB,
+            extraBonusB: manualBonusA,
+          }
+        : {
+            key,
+            extraWinsA: manualWinsA,
+            extraWinsB: manualWinsB,
+            extraBonusA: manualBonusA,
+            extraBonusB: manualBonusB,
+          },
+    );
+  }
+
+  return writes;
 }

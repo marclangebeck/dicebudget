@@ -22,6 +22,7 @@ export function PairingSummaryCard({
   onToggleSelect,
 }: Props) {
   const href = `/stats/pairing?key=${encodeURIComponent(pairing.key)}`;
+  const netDiff = pairing.playerABonusPoints - pairing.playerBBonusPoints;
 
   return (
     <li>
@@ -56,10 +57,8 @@ export function PairingSummaryCard({
             <div className="stats-pairing-card-player">
               <p className="stats-pairing-card-wins tabular-nums">{pairing.playerAWins}</p>
               <p className="stats-pairing-card-label">Siege</p>
-              {pairing.playerABonusPoints > 0 && (
-                <p className="stats-pairing-card-diff tabular-nums">
-                  +{pairing.playerABonusPoints} Δ
-                </p>
+              {netDiff > 0 && (
+                <p className="stats-pairing-card-diff tabular-nums">+{netDiff} Δ</p>
               )}
             </div>
             <div className="stats-pairing-card-vs text-muted" aria-hidden>
@@ -68,22 +67,20 @@ export function PairingSummaryCard({
             <div className="stats-pairing-card-player stats-pairing-card-player--b">
               <p className="stats-pairing-card-wins tabular-nums">{pairing.playerBWins}</p>
               <p className="stats-pairing-card-label">Siege</p>
-              {pairing.playerBBonusPoints > 0 && (
-                <p className="stats-pairing-card-diff tabular-nums">
-                  +{pairing.playerBBonusPoints} Δ
-                </p>
+              {netDiff < 0 && (
+                <p className="stats-pairing-card-diff tabular-nums">+{-netDiff} Δ</p>
               )}
             </div>
           </div>
           <p className="stats-pairing-card-meta">
             {pairing.ties > 0 && <span>{pairing.ties} Remis · </span>}
-            {pairing.appRoundsPlayed > 0 ? (
+            {pairing.roundsPlayed > 0 ? (
               <span>
-                {pairing.appRoundsPlayed}{" "}
-                {pairing.appRoundsPlayed === 1 ? "Runde" : "Runden"} in der App
+                {pairing.roundsPlayed}{" "}
+                {pairing.roundsPlayed === 1 ? "Runde" : "Runden"} gesamt
               </span>
             ) : (
-              <span>Noch keine App-Runden</span>
+              <span>Noch keine Runden</span>
             )}
           </p>
         </Link>

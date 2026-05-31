@@ -134,6 +134,26 @@ export function resetPairings(keys: string[]) {
   );
 }
 
+export type PairingBaselineEntry = {
+  key: string;
+  extraWinsA: number;
+  extraWinsB: number;
+  extraBonusA: number;
+  extraBonusB: number;
+  note?: string | null;
+};
+
+/** Manuell nachgetragene Werte (außerhalb der App gespielt) speichern. */
+export function upsertPairingBaselines(entries: PairingBaselineEntry[]) {
+  return request<{ written: number; deleted: number }>(
+    "/stats/pairings/baseline",
+    {
+      method: "POST",
+      body: JSON.stringify({ entries }),
+    },
+  );
+}
+
 export async function getPairingDetail(key: string) {
   const { pairing } = await request<{ pairing: unknown }>(
     `/stats/pairing?key=${encodeURIComponent(key)}`,
