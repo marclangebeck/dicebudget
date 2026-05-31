@@ -608,7 +608,7 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
   - **Prob 2 — Stats-Zusammenführung bei Alias:** Paarungen mit gleichem Alias werden reihenfolge-unabhängig zusammengeführt (Alias-Vorrang vor „self"), rein clientseitig (`lib/pairingMerge.ts`)
   - **Prob 3 — Statistik serverseitig zurücksetzen (destruktiv):** in `/stats` Paarungen auswählen + endgültig löschen; Backend `resetPairings()` + `POST /stats/pairings/reset` löscht abgeschlossene 2-Spieler-Sessions inkl. Runs/Games/Fields/Rolls; Mehr-Spieler-Sessions geschützt. Hinweis: Liga-/Serien-Punkte (`LeagueStanding`) werden dabei nicht rückwirkend neu berechnet; Endpunkt ohne Auth
   - **Capacitor-Fix Paarungs-Detail:** Tippen auf Paarung sprang in der App zum Start (voller `<a>`-Reload → `index.html` → `NativeAppEntry`-Redirect) → jetzt `next/link`
-- **M35 (2026-05-31) — Paarungen bearbeiten (lokal umgesetzt, noch nicht committet/deployed):**
+- **M35 (2026-05-31) — Paarungen bearbeiten (deployed, Commit `68bd6eb`):**
   - „✏️ Paarung bearbeiten" auf `/stats/pairing`: Siege je Spieler + Netto-Punktedifferenz (Betrag + bevorzugte Seite) editierbar, um außerhalb der App gespielte Partien nachzutragen
   - Statistik zeigt **eine kombinierte Gesamtübersicht** (App + manuell zusammen); Differenz **netto** (Plus nur auf führender Seite)
   - Reaktiviert Tabelle `pairing_manual_baselines` (**keine neue Migration**); Backend `upsertPairingBaselines()` + `POST /stats/pairings/baseline`; App-Siege bleiben Untergrenze; „Statistik zurücksetzen" löscht manuelle Werte mit; ohne Auth, alle Geräte
