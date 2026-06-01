@@ -7,9 +7,9 @@ Leitfaden für **iOS (Capacitor)**, **TestFlight** und **App Store** — ergänz
 
 ---
 
-## 0. Aktueller Stand (2026-05-31, verbindlich)
+## 0. Aktueller Stand (2026-06-01, verbindlich)
 
-- **Branch:** `milestone-22-prep` · Commit **`164d2b1`**
+- **Branch:** `milestone-22-prep` · Commit **`a18f919`**
 - **Sync-Pflicht:** Nach jeder Änderung GitHub + Server + Mac gleichziehen — Ablauf in **`AGENT_RULES.md` Sektion 9** (nummerierte `[Server]`/`[Mac]`-Befehle, sudo nur durch Nutzer)
 - **M29 Punktwahl-Eintrag:** erledigt — Overlay oben, Zahlen statt Würfel-Icons, Auswahl-Highlight
 - **M30 Bonus-Delta-Anzeige:** erledigt — „Ergebnis 1“ zeigt Delta zur Soll-Marke „3 je Augenzahl“ (+ grün / − rot / ±0 grau)
@@ -17,11 +17,13 @@ Leitfaden für **iOS (Capacitor)**, **TestFlight** und **App Store** — ergänz
 - **M32 Topbar & Gegner-Pool:** erledigt — „Rest" entfernt; Multiplayer-Host-Toggle „Gegner-Pool sichtbar" (nur 2 Spieler); Backend-Flag `show_opponent_pool` deployed
 - **M33 Pool-Endspiel:** erledigt — Multiplayer-Host-Toggle „Pool-Endspiel"; Sieger mit eindeutig größtem Pool verbessert am Ende 1 Feld; Backend-Flags `pool_endgame_*` deployed. Würfe-Standard Strategy 2→3
 - **M34 Bugfixes + Stats-Reset (2026-05-31):** erledigt (Web/Backend deployed) — Bonus-Konfetti, Support-Link, M32-Fix (Gegner-Pool-Refresh), M33-Fix (Pool-Endspiel ausführbar), Stats-Alias-Merge (Prob 2), Stats serverseitig zurücksetzen (Prob 3, destruktiv, `POST /stats/pairings/reset`), Capacitor-Fix Paarungs-Detail (`next/link`). **Noch nicht in iOS-Build**
+- **M35 Paarungen bearbeiten (2026-05-31):** erledigt (Web/Backend deployed) — „✏️ Paarung bearbeiten" auf `/stats/pairing`: Siege je Spieler + Netto-Punktedifferenz editierbar (außerhalb der App gespielte Partien nachtragen). Kombinierte Gesamtübersicht, Differenz netto. Reaktiviert `pairing_manual_baselines` (keine neue Migration), `POST /stats/pairings/baseline`. **Noch nicht in iOS-Build**
+- **UI-Politur (2026-06-01):** erledigt (Web deployed) — gewählter Punktwert im Eintrags-Overlay gelb ausgefüllt; Spielzettel füllt die volle Bildschirmhöhe (Zeilen wachsen, Ergebnis-Zeilen größer), adaptiv zum iPhone-Format. **Noch nicht in iOS-Build**
 - **iOS im Repo:** Version **2.0** (Build-Nummer wird in Xcode gesetzt)
-- **TestFlight:** **2.0 (6)** (Upload durch Nutzer); nächster Upload **2.0 (7)** mit M34-Fixes (Capacitor-Fix nötig, damit Paarungs-Detail in der App funktioniert)
+- **TestFlight:** **2.0 (6)** (Upload durch Nutzer); nächster Upload **2.0 (7)** enthält **M34 + M35 + UI-Politur** (Capacitor-Fix nötig, damit Paarungs-Detail in der App funktioniert)
 - **`Copy failed` / rsync:** `brew unlink rsync`, Xcode mit System-PATH (Abschnitt 6)
 - **Signing:** `DEVELOPMENT_TEAM` **nicht** im Git — nach `git pull`/`reset` Team in Xcode setzen
-- **Web:** https://dicebudget.bottle-trade.de — nach UI-Änderungen `npm run build` auf Server; Backend-Änderungen via `sudo bash infra/scripts/deploy-backend-prod.sh`
+- **Web:** https://dicebudget.bottle-trade.de — nach reinen UI-Änderungen `npm run build` auf Server (sofort live, **kein sudo**); Backend-Änderungen via `sudo bash infra/scripts/deploy-backend-prod.sh`
 - **Nächster Schritt:** iOS-Build 2.0 (7) hochladen → App Store Connect (Paid Agreement, Preis, Store-Metadaten, Datenschutzfragebogen)
 
 ---
@@ -238,10 +240,12 @@ Du setzt **dice.budget** (iOS + App Store) fort. Lies zuerst:
 
 ### Ist-Stand (Mai 2026)
 
-- Branch: **`milestone-22-prep`** · Commit **`164d2b1`** · GitHub synchron
+- Branch: **`milestone-22-prep`** · Commit **`a18f919`** · GitHub synchron
 - Web live: https://dicebudget.bottle-trade.de
-- iOS: Capacitor, Bundle **`de.bottletrade.dicebudget`**, Version **2.0**, TestFlight **2.0 (6)** (Upload durch Nutzer; nächster Upload **2.0 (7)** mit M34-Fixes)
+- iOS: Capacitor, Bundle **`de.bottletrade.dicebudget`**, Version **2.0**, TestFlight **2.0 (6)** (Upload durch Nutzer; nächster Upload **2.0 (7)** mit M34 + M35 + UI-Politur)
 - M34: Bugfixes + Stats-Reset (Bonus-Konfetti, Support-Link, M32/M33-Fixes, Stats-Alias-Merge, serverseitiges Stats-Zurücksetzen, Capacitor-Link-Fix)
+- M35: Paarungen bearbeiten (Siege + Netto-Punktedifferenz, `pairing_manual_baselines`, `POST /stats/pairings/baseline`)
+- UI-Politur: Punktwahl gelb gefüllt; Spielzettel füllt volle Höhe (Ergebnis-Zeilen größer)
 - Sync-Pflicht: nach jeder Änderung GitHub+Server+Mac gleichziehen — **AGENT_RULES.md Sektion 9**
 - M29: Punktwahl-Eintrag (`PlayBoard`, `ScoreEntryPanel`, `FieldScoreChoiceGrid`)
 - M30: Bonus-Delta-Anzeige (`gameScoring.upperBonusDelta`, `ScoreSheetTable`)

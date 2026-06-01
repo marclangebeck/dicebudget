@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **GitHub:** `marclangebeck/dicebudget` · Branch **`milestone-22-prep`**  
 **Sprache:** Deutsch  
-**Stand:** 2026-05-31 · Commit `164d2b1`
+**Stand:** 2026-06-01 · Commit `a18f919`
 
 > **Sync-Pflicht:** Nach jeder Code-Änderung müssen **GitHub, Server und Mac** auf demselben Stand sein. Der genaue Ablauf (nummerierte `[Server]`/`[Mac]`-Befehle, sudo nur durch Nutzer) steht in **`AGENT_RULES.md` Sektion 9**. Immer so kommunizieren.
 >
@@ -23,14 +23,16 @@
 | **M31 Bonus-Einblendung** | **Erledigt** — Overlay bei 6/6 & ≥63, Auto-Close 2,5 s, Geräte-Toggle |
 | **M32 Topbar & Gegner-Pool** | **Erledigt** — „Rest" entfernt; Multiplayer-Host-Toggle „Gegner-Pool sichtbar" (2 Spieler) |
 | **M33 Pool-Endspiel** | **Erledigt + deployed** — Multiplayer-Host-Toggle „Pool-Endspiel": Sieger mit eindeutig größtem Pool verbessert am Ende 1 Feld (neuer Wert oder behalten). Würfe-Standard 2→3 |
-| **M34 Bugfixes + Stats-Reset** | **Erledigt + deployed (Web/Backend)** — Bonus-Konfetti, Support-Link, M32-Fix (Gegner-Pool-Refresh), M33-Fix (Pool-Endspiel ausführbar), Prob 2 (Stats-Alias-Merge), Prob 3 (Stats serverseitig zurücksetzen), Capacitor-Fix (Paarungs-Detail via `next/link`). **Noch nicht in iOS-Build** → neuer Upload 2.0 (7) nötig |
-| Frontend Deploy (Server) | Nach Pull: `cd frontend && npm run build` (Nginx aus `out/`) — **deployed** (Stand `164d2b1`) |
-| Backend Deploy (Server) | `sudo bash infra/scripts/deploy-backend-prod.sh` (Migration + Restart) — **deployed** (Reset-Endpunkt aktiv, kein neues Schema) |
+| **M34 Bugfixes + Stats-Reset** | **Erledigt + deployed (Web/Backend)** — Bonus-Konfetti, Support-Link, M32-Fix (Gegner-Pool-Refresh), M33-Fix (Pool-Endspiel ausführbar), Prob 2 (Stats-Alias-Merge), Prob 3 (Stats serverseitig zurücksetzen), Capacitor-Fix (Paarungs-Detail via `next/link`). **Noch nicht in iOS-Build** |
+| **M35 Paarungen bearbeiten** | **Erledigt + deployed (Web/Backend)** — „✏️ Paarung bearbeiten" auf `/stats/pairing`: Siege je Spieler + Netto-Punktedifferenz editierbar (außerhalb der App gespielte Partien nachtragen). Kombinierte Gesamtübersicht, Differenz netto. Tabelle `pairing_manual_baselines` reaktiviert (**keine neue Migration**), `POST /stats/pairings/baseline`. **Noch nicht in iOS-Build** |
+| **UI-Politur (2026-06-01)** | **Erledigt + deployed (Web)** — gewählter Punktwert im Eintrags-Overlay **gelb ausgefüllt** (statt schwacher Rahmen); Spielzettel **füllt die volle Bildschirmhöhe** (Zeilen wachsen, Ergebnis-Zeilen größer, adaptiv zum iPhone-Format). **Noch nicht in iOS-Build** |
+| Frontend Deploy (Server) | Nach Pull: `cd frontend && npm run build` (Nginx aus `out/`, **kein sudo**, sofort live) — **deployed** (Stand `a18f919`) |
+| Backend Deploy (Server) | `sudo bash infra/scripts/deploy-backend-prod.sh` (Migration + Restart) — **deployed** (Reset- + Baseline-Endpunkt aktiv, kein neues Schema) |
 | iOS im Repo | Version **2.0** (Build-Nr. in Xcode setzen) |
-| TestFlight | **2.0 (6)** (Upload durch Nutzer). M34-Fixes erfordern neuen Upload **2.0 (7)** |
-| Sync Mac/Server/GitHub | Commit **`164d2b1`** auf `origin/milestone-22-prep` (alle gleichauf) |
+| TestFlight | **2.0 (6)** (Upload durch Nutzer). **M34 + M35 + UI-Politur** erfordern neuen Upload **2.0 (7)** |
+| Sync Mac/Server/GitHub | Commit **`a18f919`** auf `origin/milestone-22-prep` (alle gleichauf) |
 
-**Nächste Priorität (typisch):** App Store Connect (Paid Agreement, Bank/Steuer, 1,19 €, Screenshots, Datenschutzfragebogen, Review) → neuen iOS-Build **2.0 (7)** mit M34-Fixes hochladen.
+**Nächste Priorität (typisch):** neuen iOS-Build **2.0 (7)** mit **M34 + M35 + UI-Politur** hochladen → App Store Connect (Paid Agreement, Bank/Steuer, 1,19 €, Screenshots, Datenschutzfragebogen, Review).
 
 ---
 
@@ -57,8 +59,8 @@ Web + iOS: Next.js static export + Capacitor 7.
 ─── PFADE ───
 Prod:     https://dicebudget.bottle-trade.de
 App:      /app (iOS-Start) · Legal: /datenschutz, /impressum
-Branch:   milestone-22-prep · Commit: 164d2b1
-iOS:      Version 2.0 · aktueller TestFlight-Build 2.0 (6) · nächster Upload 2.0 (7)
+Branch:   milestone-22-prep · Commit: a18f919
+iOS:      Version 2.0 · aktueller TestFlight-Build 2.0 (6) · nächster Upload 2.0 (7) (M34 + M35 + UI-Politur)
 Server:   /home/bottleadmin/projects/kniffel
 Mac:      /Users/marclangebeck/projects/kniffel
 Xcode:    /Users/marclangebeck/projects/kniffel/frontend/ios/App/App.xcworkspace
@@ -133,6 +135,37 @@ Kontakt:  info@bottle-trade.de (Marc Langebeck, Kiel — frontend/lib/legal.ts)
   (voller Reload fiel in der App auf index.html → NativeAppEntry-Redirect zum Start).
   Datei: components/PairingSummaryCard.tsx
 
+─── M35 PAARUNGEN BEARBEITEN (2026-05-31) ───
+• „✏️ Paarung bearbeiten" auf /stats/pairing: Siege je Spieler + EINE Netto-
+  Punktedifferenz (Betrag + bevorzugte Seite) editierbar → außerhalb der App
+  gespielte Partien nachtragen
+• Statistik = EINE kombinierte Gesamtübersicht (App-Runden + manuelle Werte);
+  Differenz wird NETTO angezeigt (Plus nur auf der führenden Seite, andere leer)
+• Reaktiviert Tabelle pairing_manual_baselines (KEINE neue Migration; Tabelle
+  bestand seit 20260523, war seit M22 nur geleert). Backend rechnet sie in
+  accumulatePairings() ein (nur Gesamt; App-Werte = Untergrenze). Neuer Endpunkt
+  POST /stats/pairings/baseline (upsertPairingBaselines); „Statistik zurücksetzen"
+  löscht zugehörige Baselines mit. OHNE Auth, wirkt auf allen Geräten
+• buildBaselineWrites() in lib/pairingMerge.ts übersetzt Gesamtwerte → Baseline-
+  Writes (richtige A/B-Orientierung bei Alias-Zusammenführung, ein Repräsentanten-
+  Quell-Key, andere auf 0)
+• Dateien: backend pairingStats.ts + routes/stats.ts (+ pairingStats.test.ts),
+  frontend lib/{pairingTypes,normalizePairing,pairingMerge,api}.ts,
+  components/PairingEditOverlay.tsx (NEU), app/stats/pairing/page.tsx,
+  components/PairingSummaryCard.tsx
+
+─── UI-POLITUR (2026-06-01) ───
+• Punktwahl gelb gefüllt: Im Eintrags-Overlay war der gewählte Punktwert nur
+  schwach umrandet (die weiße Grundfläche der .field-score-*-btn überschrieb bei
+  gleicher CSS-Spezifität die gelbe Füllung von .play-score-btn--selected) →
+  jetzt höher spezifische Regel, gelb ausgefüllt wie die Würfe-Auswahl. globals.css
+• Spielzettel füllt die volle Höhe: FitScoreSheet kappte den Zettel auf seine
+  kurze Inhaltshöhe (16 Zeilen sind KONSTANT, Spiele = Spalten). Jetzt füllt der
+  Zettel die volle verfügbare Höhe (Zeilen wachsen), Ergebnis-Zeilen ~1,4× höher
+  als Feld-Zeilen, adaptiv zum iPhone-Format; bei zu wenig Platz weiter Skalierung
+  (kein Seiten-Scroll, M20). Dateien: FitScoreSheet.tsx, ScoreSheetTable.tsx,
+  globals.css (.play-score-table Höhen 6% / 8.6%)
+
 ─── ERLEDIGT (nicht neu erfinden) ───
 • M1–22, M23–27 (UI iOS abgenommen)
 • M29 Punktwahl-Eintrag (Commits 087d5d9 … 2e68f53)
@@ -140,21 +173,23 @@ Kontakt:  info@bottle-trade.de (Marc Langebeck, Kiel — frontend/lib/legal.ts)
 • M31 Bonus-Einblendung + M32 Topbar/Gegner-Pool (Commit 86637df)
 • M33 Pool-Endspiel + Würfe-Standard 3 (Commit dade49d)
 • M34 Bugfixes + Stats-Reset (Commits dec2bc0, 8bde575, ad64746)
+• M35 Paarungen bearbeiten (Commit 68bd6eb)
+• UI-Politur: Punktwahl gelb + Zettel füllt Höhe (Commit a18f919)
 • Legal dice.budget + bottle-trade.de (live)
 • Legal-Daten: frontend/lib/legal.ts + branding.ts
 • rsync-Fix: brew unlink rsync vor Xcode-Upload
 • Spiel beenden: ✕ in PlayTopBar (ABANDON_RUN_CONFIRM)
-• Backend deployed (Migrationen show_opponent_pool + pool_endgame; Reset-Endpunkt, Service läuft)
-• Web deployed (frontend/out/ nach M34 neu gebaut, Stand 164d2b1)
-• TestFlight 2.0 (6) (Upload durch Nutzer); M34-Fixes NOCH NICHT im Build
+• Backend deployed (Migrationen show_opponent_pool + pool_endgame; Reset- + Baseline-Endpunkt, Service läuft)
+• Web deployed (frontend/out/ nach M35 + UI-Politur neu gebaut, Stand a18f919)
+• TestFlight 2.0 (6) (Upload durch Nutzer); M34 + M35 + UI-Politur NOCH NICHT im Build
 
 ─── OFFEN (typische nächste Themen) ───
-1. iOS-Build 2.0 (7) mit M34-Fixes hochladen (Capacitor-Fix nötig für Paarungs-Detail in App!)
+1. iOS-Build 2.0 (7) mit M34 + M35 + UI-Politur hochladen (Capacitor-Fix nötig für Paarungs-Detail in App!)
 2. App Store Connect: Paid Agreement, Bank/Steuer, Preis 1,19 €
 3. Store: Screenshots 6.7", Beschreibung DE, Datenschutzfragebogen
-4. Web auf Server deployen nach UI-Änderungen (npm run build)
+4. Web auf Server deployen nach UI-Änderungen (npm run build; reines Frontend = kein sudo)
 5. Bei Backend-Änderungen: sudo bash infra/scripts/deploy-backend-prod.sh (Migration + Restart)
-6. Optional: Stats-Reset auf eigene Paarungen einschränken (aktuell ohne Auth)
+6. Optional: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschränken (aktuell ohne Auth)
 7. Optional: milestone-22-prep → main (nur nach Nutzer-Freigabe)
 
 ─── SYNC GITHUB + SERVER + MAC (PFLICHT) ───
@@ -189,15 +224,19 @@ sudo bash infra/scripts/deploy-backend-prod.sh   # npm install + prisma migrate 
 frontend/components/PlayBoard.tsx
 frontend/components/ScoreEntryPanel.tsx
 frontend/components/FieldScoreChoiceGrid.tsx
-frontend/components/ScoreSheetTable.tsx
+frontend/components/ScoreSheetTable.tsx ← Zettel-Zellen/Höhe (UI-Politur 2026-06-01)
+frontend/components/FitScoreSheet.tsx  ← Zettel füllt volle Höhe / skaliert (UI-Politur)
 frontend/components/PlayTopBar.tsx     ← Pool/Gegner-Pool-Chips (M32)
 frontend/components/BonusOverlay.tsx   ← Bonus-Einblendung (M31)
 frontend/lib/labels.ts              ← fieldScoreChoices, upperFieldDieCount
 frontend/lib/gameScoring.ts         ← upperBonusDelta (M30), upperBonusAchieved (M31)
 frontend/lib/uiPrefs.ts             ← Bonus-Einblendung-Toggle (M31)
 frontend/lib/legal.ts
-frontend/app/globals.css              ← .field-entry-*, .bonus-overlay-* (M31)
+frontend/app/globals.css              ← .field-entry-*, .play-score-table (UI-Politur), .bonus-overlay-* (M31)
 backend/src/services/sessionService.ts ← show_opponent_pool/rollsInPool (M32), Pool-Endspiel (M33)
+backend/src/services/pairingStats.ts ← Paarungsstatistik + manuelle Baselines (M34/M35)
+frontend/components/PairingEditOverlay.tsx ← Paarung bearbeiten: Siege + Netto-Differenz (M35)
+frontend/lib/pairingMerge.ts        ← Alias-Merge + buildBaselineWrites (M34/M35)
 frontend/components/PoolEndgamePanel.tsx ← Pool-Endspiel: Feld verbessern (M33)
 
 ─── STOLPERSTEINE ───
@@ -270,9 +309,9 @@ frontend/ios/App/App.xcworkspace
 
 ### Bereits erledigt
 
-- Milestones **1–22**, **23–27**, **M29** (Punktwahl-Eintrag), **M30** (Bonus-Delta), **M31** (Bonus-Einblendung), **M32** (Topbar/Gegner-Pool), **M33** (Pool-Endspiel), **M34** (Bugfixes + Stats-Reset)
-- TestFlight **2.0 (6)** (Upload durch Nutzer); M34-Fixes erfordern neuen Upload **2.0 (7)**
-- Backend deployed: Migrationen `show_opponent_pool` + `pool_endgame`, Reset-Endpunkt, Service läuft
+- Milestones **1–22**, **23–27**, **M29** (Punktwahl-Eintrag), **M30** (Bonus-Delta), **M31** (Bonus-Einblendung), **M32** (Topbar/Gegner-Pool), **M33** (Pool-Endspiel), **M34** (Bugfixes + Stats-Reset), **M35** (Paarungen bearbeiten), **UI-Politur** (Punktwahl gelb + Zettel füllt Höhe)
+- TestFlight **2.0 (6)** (Upload durch Nutzer); **M34 + M35 + UI-Politur** erfordern neuen Upload **2.0 (7)**
+- Backend deployed: Migrationen `show_opponent_pool` + `pool_endgame`, Reset- + Baseline-Endpunkt, Service läuft
 - Legal-Seiten live
 - Backend-Tests: `cd backend && npm test`
 
@@ -302,7 +341,7 @@ cd /Users/marclangebeck/projects/kniffel/frontend && npm run build:ios
 cd /home/bottleadmin/projects/kniffel/backend && npm test
 cd /home/bottleadmin/projects/kniffel/frontend && npm run build
 curl -s https://dicebudget.bottle-trade.de/api/health
-git log -1 --oneline   # erwartet: 164d2b1 (oder neuer)
+git log -1 --oneline   # erwartet: a18f919 (oder neuer)
 grep CURRENT_PROJECT_VERSION frontend/ios/App/App.xcodeproj/project.pbxproj | head -1   # Build-Nr. wird in Xcode gesetzt (Version 2.0)
 ```
 

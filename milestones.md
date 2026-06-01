@@ -584,9 +584,9 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
 
 ---
 
-## Aktueller Arbeitsstand (2026-05-31)
+## Aktueller Arbeitsstand (2026-06-01)
 
-**Commit:** `164d2b1` · Branch `milestone-22-prep` · GitHub synchron · Server/Mac/GitHub gleichauf
+**Commit:** `a18f919` · Branch `milestone-22-prep` · GitHub synchron · Server/Mac/GitHub gleichauf
 
 **Wichtig — Versionierung iOS:** App Store Connect ist bei **Version 2.0**, aktueller Build **2.0 (6)**. Die früher genannten „1.0 / Build 18/19" sind überholt. Build-Nummern zählen **pro Versionsstring** — der nächste Upload nach 2.0 (6) ist 2.0 (7).
 
@@ -613,19 +613,22 @@ Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral lieg
   - Statistik zeigt **eine kombinierte Gesamtübersicht** (App + manuell zusammen); Differenz **netto** (Plus nur auf führender Seite)
   - Reaktiviert Tabelle `pairing_manual_baselines` (**keine neue Migration**); Backend `upsertPairingBaselines()` + `POST /stats/pairings/baseline`; App-Siege bleiben Untergrenze; „Statistik zurücksetzen" löscht manuelle Werte mit; ohne Auth, alle Geräte
   - Dateien: `backend/src/services/pairingStats.ts`, `backend/src/routes/stats.ts`, `frontend/lib/{pairingTypes,normalizePairing,pairingMerge,api}.ts`, `frontend/components/PairingEditOverlay.tsx` (neu), `frontend/app/stats/pairing/page.tsx`, `frontend/components/PairingSummaryCard.tsx`
-- Backend: Session-Flags `show_opponent_pool` + `pool_endgame_*` (Migrationen angewandt + deployed, Service läuft); Reset-Endpunkt deployed (kein neues Schema)
-- iOS: TestFlight **2.0 (6)** (Upload durch Nutzer); M34-Fixes erfordern neuen Upload (2.0 (7))
-- Web + Backend auf Server deployed (Stand `164d2b1`)
+- **UI-Politur (2026-06-01, deployed, Commit `a18f919`):**
+  - **Punktwahl gelb gefüllt:** Im Eintrags-Overlay ist der gewählte Punktwert jetzt gelb ausgefüllt (war nur schwach umrandet) – wie die Würfe-Auswahl. Ursache war eine CSS-Spezifitäts-Überschreibung. Datei: `frontend/app/globals.css`
+  - **Spielzettel füllt volle Höhe:** Der Zettel nutzt jetzt die ganze Bildschirmhöhe; Zeilen wachsen mit, Ergebnis-Zeilen (Ergebnis 1, Zwischensumme, Ergebnis Spiel) ~1,4× höher als Feld-Zeilen. Passt sich an das iPhone-Format an; bei zu wenig Platz weiterhin Herunterskalieren (kein Seiten-Scroll). Dateien: `frontend/components/FitScoreSheet.tsx`, `frontend/components/ScoreSheetTable.tsx`, `frontend/app/globals.css` (`.play-score-table`-Höhenverteilung `6%`/`8.6%`)
+- Backend: Session-Flags `show_opponent_pool` + `pool_endgame_*` (Migrationen angewandt + deployed, Service läuft); Reset- **und Baseline-Endpunkt** (`POST /stats/pairings/baseline`) deployed (kein neues Schema, Tabelle `pairing_manual_baselines` bestand bereits)
+- iOS: TestFlight **2.0 (6)** (Upload durch Nutzer); **M34 + M35 + UI-Politur sind NOCH NICHT im Build** → nächster Upload **2.0 (7)** nötig
+- Web + Backend auf Server deployed (Stand `a18f919`)
 
 **Sync-Workflow (Pflicht):** siehe **`AGENT_RULES.md` Sektion 9** — nach jeder Änderung GitHub + Server + Mac gleichziehen, nummerierte `[Server]`/`[Mac]`-Befehle, sudo nur durch Nutzer.
 
 **Nächste Schritte (Priorität):**
 
-1. **App Store Connect:** Paid Applications Agreement, Bank/Steuer
-2. **Store-Metadaten:** Preis 1,19 €, Screenshots 6.7", Beschreibung DE
-3. **App-Datenschutzfragebogen** (URL: https://dicebudget.bottle-trade.de/datenschutz)
-4. Neuen iOS-Build 2.0 (7) mit M34-Fixes hochladen; TestFlight weiter testen
-5. Optional: Stats-Reset-Endpunkt auf „nur eigene Paarungen" einschränken (aktuell ohne Auth)
+1. Neuen iOS-Build **2.0 (7)** mit **M34 + M35 + UI-Politur** hochladen; TestFlight weiter testen
+2. **App Store Connect:** Paid Applications Agreement, Bank/Steuer
+3. **Store-Metadaten:** Preis 1,19 €, Screenshots 6.7", Beschreibung DE
+4. **App-Datenschutzfragebogen** (URL: https://dicebudget.bottle-trade.de/datenschutz)
+5. Optional: Stats-Reset-/Baseline-Endpunkte auf „nur eigene Paarungen" einschränken (aktuell ohne Auth)
 6. Optional: Branch `milestone-22-prep` → `main` (nur nach Nutzer-Freigabe)
 
 ---
