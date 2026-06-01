@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useLayoutEffect, useRef, type ReactNode } from "react";
 
 type Props = {
   children: ReactNode;
@@ -9,13 +9,15 @@ type Props = {
 };
 
 /**
- * Skaliert den Zettel auf die verfügbare Fläche (max. 100 %, nie größer als der Screen).
+ * Spielzettel an die verfügbare Fläche anpassen:
+ * - Passt der Zettel in seiner Mindesthöhe hinein, **füllt** er die volle Höhe
+ *   (die Zeilen wachsen; siehe `.play-score-table` in `globals.css`).
+ * - Ist er zu groß (sehr kleine/quere Screens), wird **herunterskaliert**, damit
+ *   nichts scrollt (Milestone-20-Garantie „ohne Seiten-Scroll").
  */
 export function FitScoreSheet({ children, layoutKey }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
-  const [hostHeight, setHostHeight] = useState<number | undefined>(undefined);
-  const [scale, setScale] = useState(1);
 
   useLayoutEffect(() => {
     const host = hostRef.current;
@@ -23,8 +25,10 @@ export function FitScoreSheet({ children, layoutKey }: Props) {
     if (!host || !inner) return;
 
     const fit = () => {
+      // Auf natürliche Mindestgröße zurücksetzen, um auszumessen.
       inner.style.transform = "none";
       inner.style.width = "100%";
+      inner.style.height = "auto";
 
       const cw = host.clientWidth;
       const ch = host.clientHeight;
@@ -34,16 +38,24 @@ export function FitScoreSheet({ children, layoutKey }: Props) {
       const th = inner.scrollHeight;
       if (tw <= 0 || th <= 0) return;
 
-      const s = Math.min(1, cw / tw, ch / th);
-      setScale(s);
-      setHostHeight(Math.floor(th * s));
+      if (th > ch || tw > cw) {
+        // Zu groß → herunterskalieren (kein Scroll).
+        const s = Math.min(1, cw / tw, ch / th);
+        inner.style.transform = s < 1 ? `scale(${s})` : "none";
+        inner.style.width = s < 1 ? `${100 / s}%` : "100%";
+        inner.style.height = "auto";
+      } else {
+        // Platz übrig → volle Höhe füllen, Zeilen wachsen lassen.
+        inner.style.transform = "none";
+        inner.style.width = "100%";
+        inner.style.height = "100%";
+      }
     };
 
     fit();
 
     const ro = new ResizeObserver(fit);
     ro.observe(host);
-    ro.observe(inner);
 
     const onOrientation = () => window.setTimeout(fit, 100);
     window.addEventListener("orientationchange", onOrientation);
@@ -60,15 +72,10 @@ export function FitScoreSheet({ children, layoutKey }: Props) {
     <div
       ref={hostRef}
       className="score-sheet-fit-host min-h-0 w-full flex-1 touch-none select-none"
-      style={hostHeight !== undefined ? { height: hostHeight, flex: "none" } : undefined}
     >
       <div
         ref={innerRef}
-        className="score-sheet-fit-inner w-full origin-top"
-        style={{
-          transform: scale < 1 ? `scale(${scale})` : undefined,
-          width: scale < 1 ? `${100 / scale}%` : "100%",
-        }}
+        className="score-sheet-fit-inner h-full w-full origin-top"
       >
         {children}
       </div>

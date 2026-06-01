@@ -182,7 +182,7 @@ function ScoreTile({
           ? `${label}: ${field.score} Punkte · ${field.rollsUsed} Würfe – tippen zum Korrigieren`
           : previewTitle ?? `${label} – tippen zum Eintragen`
       }
-      className={`play-cell flex h-8 w-full items-center justify-center text-[11px] font-semibold tabular-nums md:h-7 md:text-[10px] ${
+      className={`play-cell flex h-full min-h-[1.9rem] w-full items-center justify-center text-[11px] font-semibold tabular-nums md:min-h-[1.6rem] md:text-[10px] ${
         done
           ? "play-cell--done"
           : isActive
@@ -233,7 +233,7 @@ function SummaryTile({
 
   return (
     <div
-      className={`play-summary flex h-7 w-full flex-col items-center justify-center px-0.5 text-[11px] tabular-nums md:h-6 md:text-[10px] ${
+      className={`play-summary flex h-full min-h-[2.2rem] w-full flex-col items-center justify-center px-0.5 text-[11px] tabular-nums md:min-h-[1.9rem] md:text-[10px] ${
         highlight ? "play-summary--highlight" : ""
       }`}
       title={
@@ -277,8 +277,8 @@ export function ScoreSheetTable({
   const gameColPct = (100 - labelColPct) / gameColCount;
 
   return (
-    <div className="play-score-board score-sheet-fixed w-full max-w-full overflow-hidden">
-      <table className="play-score-table w-full table-fixed border-collapse text-[11px] md:text-[10px]">
+    <div className="play-score-board score-sheet-fixed h-full w-full max-w-full overflow-hidden">
+      <table className="play-score-table h-full w-full table-fixed border-collapse text-[11px] md:text-[10px]">
         <colgroup>
           <col style={{ width: `${labelColPct}%` }} />
           {games.map((game) => (
@@ -337,7 +337,7 @@ export function ScoreSheetTable({
                     {row.kind === "field" ? (
                       (() => {
                         const field = fieldForGame(game, row.fieldType);
-                        if (!field) return <div className="h-8 md:h-7" />;
+                        if (!field) return <div className="h-full min-h-[1.9rem] md:min-h-[1.6rem]" />;
                         return (
                           <ScoreTile
                             field={field}
