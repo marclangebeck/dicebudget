@@ -1,3 +1,94 @@
+# Übergabe - dice.budget
+
+**Workspace:** `/home/bottleadmin/projects/kniffel`  
+**Repository:** `marclangebeck/dicebudget`  
+**Branch:** `milestone-22-prep`  
+**Aktueller Git-HEAD:** `549e8a7`  
+**Sprache:** Deutsch  
+
+Diese Datei ist absichtlich kurz. Aktiver Arbeitsstand: `docs/milestones_active.md`. iOS/App Store: `docs/ios_current.md`. Dauerhafte Projektentscheidungen: `docs/decisions.md`.
+
+## Deployment-Status
+
+| Bereich | Status |
+|---------|--------|
+| Web | Live: https://dicebudget.bottle-trade.de |
+| Backend/API | Live ueber https://dicebudget.bottle-trade.de/api |
+| Legal dice.budget | Impressum + Datenschutz live |
+| Git/Server | Branch `milestone-22-prep`, HEAD `549e8a7` |
+| Produktivcode | M34 + M35 + UI-Politur sind Web/Backend-seitig deployed |
+| iOS/TestFlight | Aktuell `2.0 (6)`; M34 + M35 + UI-Politur noch nicht im Build |
+
+## Offene Aufgaben
+
+1. iOS-Build `2.0 (7)` mit M34 + M35 + UI-Politur auf dem Mac bauen und hochladen.
+2. App Store Connect: Paid Applications Agreement, Bank/Steuer, Preis `1,19 EUR`.
+3. Store-Metadaten: Screenshots, Beschreibung DE, Datenschutzfragebogen.
+4. Optional: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschraenken (aktuell ohne Auth).
+5. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
+
+## Pflicht-Workflow
+
+- Keine Commits ohne ausdrueckliche Nutzer-Anweisung.
+- Nach jeder Code-Aenderung muessen GitHub, Server und Mac synchronisiert werden.
+- Der verbindliche Ablauf steht in `AGENT_RULES.md` Sektion 9 und darf nicht abgekuerzt werden.
+- Der Agent arbeitet nur auf dem Server und hat keinen Mac- oder sudo-Zugriff.
+- Reine Frontend-Aenderungen: auf dem Server genuegt `cd frontend && npm run build`; Nginx liefert `frontend/out/` direkt aus.
+- Backend- oder Nginx-Neustarts mit `sudo` sind immer Nutzer-Aufgabe.
+
+## Standard-Lesereihenfolge
+
+Bei jeder Uebergabe lesen:
+
+1. `AGENT_RULES.md`
+2. `HANDOVER.md`
+3. `docs/milestones_active.md`
+
+Nur bei Bedarf:
+
+4. `docs/ios_current.md`
+5. `docs/decisions.md`
+6. `docs/milestones_archive.md`
+7. `docs/ios_archive.md`
+
+## Uebergabeprompt Fuer Neuen Agent
+
+Kopiere diesen Block in einen neuen Chat und ergaenze unter "Auftrag" die konkrete Aufgabe.
+
+```text
+Du arbeitest am Projekt dice.budget weiter (Repo: kniffel).
+
+Antworten auf Deutsch. Keine Commits ohne explizite Nutzer-Anweisung.
+
+LIES ZUERST in dieser Reihenfolge:
+1. AGENT_RULES.md
+2. HANDOVER.md
+3. docs/milestones_active.md
+
+LIES NUR BEI BEDARF:
+4. docs/ios_current.md
+5. docs/decisions.md
+6. docs/milestones_archive.md
+7. docs/ios_archive.md
+
+Wichtig:
+- AGENT_RULES.md hat Vorrang vor allen anderen Dokumenten.
+- Sektion 9 in AGENT_RULES.md ist Pflicht: Nach jeder Code-Aenderung GitHub + Server + Mac synchronisieren und dem Nutzer immer nummerierte [Server]/[Mac]-Befehle geben.
+- Keine sudo-Befehle ausfuehren; sudo-Schritte sind Nutzer-Aufgabe.
+- Keine Watcher, kein Polling, keine Dauerprozesse, kein Auto-Deploy.
+- Der Agent arbeitet direkt auf dem Server unter /home/bottleadmin/projects/kniffel.
+- Der Mac-Pfad des Nutzers ist /Users/marclangebeck/projects/kniffel.
+
+Aktueller Stand:
+- Branch: milestone-22-prep
+- Git-HEAD: 549e8a7
+- Web/API live: https://dicebudget.bottle-trade.de
+- iOS: Version 2.0, TestFlight 2.0 (6), naechster Upload 2.0 (7)
+- M34 + M35 + UI-Politur sind Web/Backend-seitig erledigt und deployed, aber noch nicht im iOS-Build.
+
+Auftrag:
+<hier konkrete Aufgabe einfuegen>
+```
 # Übergabe – dice.budget (Kniffel Strategy Edition)
 
 **Workspace:** `/home/bottleadmin/projects/kniffel`  

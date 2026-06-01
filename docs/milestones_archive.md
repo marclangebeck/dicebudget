@@ -1,0 +1,763 @@
+# Milestones Archiv - DiceBudget Strategy Edition
+
+Archivierter Originalinhalt aus `milestones.md` vor der Dokumentations-Reorganisation vom 2026-06-01. Fuer aktuelle Agent-Uebergaben `docs/milestones_active.md` lesen.
+
+---
+
+# Milestones – DiceBudget Strategy Edition
+
+## Übersicht
+
+| Block | Milestones | Status |
+|-------|------------|--------|
+| MVP | 1–10 | erledigt |
+| UX & Modi | 11–14 | erledigt |
+| Liga & Statistik | 15–19 | erledigt |
+| UI-Modernisierung | 20 | erledigt |
+| iOS (Capacitor) | 21 | in Arbeit |
+| Datenschutz-Umbau | 22 | erledigt |
+| UI/Branding-Folgepaket | 23–27 | erledigt |
+| Eintrag & Bonus-Hilfe | 29–30 | erledigt |
+| Spielfluss & Gegner-Pool | 31–32 | erledigt |
+| Pool-Endspiel | 33 | erledigt |
+
+*(Variante D „echtes Online-Spiel“ / Live-Sync bewusst nicht Teil dieser Milestones.)*
+
+---
+
+## Milestone 1: Basis-Projektstruktur
+
+**Status:** erledigt
+
+---
+
+## Milestone 2: Datenmodell (Singleplayer)
+
+- `game_count` 1–6, Run/Game/Field/Roll  
+- Felder = `game_count × 13`, Max-Würfe (Strategy) = `game_count × 39`
+
+**Status:** erledigt
+
+---
+
+## Milestone 3: Backend-API (Singleplayer)
+
+- Runs, Complete, Finish, optional Rolls  
+- Scoring, `rolls_in_pool`
+
+**Status:** erledigt
+
+---
+
+## Milestone 4: Frontend-Grund-UI
+
+- Setup, Play, Zettel, API-Client  
+- Produktion: statischer Export + Nginx `/api`
+
+**Status:** erledigt
+
+---
+
+## Milestone 5: Wurf-Pool-Mechanik
+
+- Nur bei `useStrategyRules: true`  
+- 1–3 Würfe → Rest in Pool; 4+ aus Pool; globales Limit `game_count × 39`
+
+**Status:** erledigt (Strategy); Klassisch ohne Pool siehe Milestone 11
+
+---
+
+## Milestone 6: Scoring & Abschluss
+
+- `computeGameBreakdown`, Zettel-Summen, `RunFinishScreen`  
+- Overlay nach letztem Feld mit Gesamtpunktzahl (vor Finish-Screen)
+
+**Status:** erledigt
+
+---
+
+## Milestone 7: Statistiken
+
+- `GET /stats`  
+- Startseite (heute Bento): **bester Gesamtscore** in der Statistik-Kachel; ausführliche Paarungsstatistik auf `/stats` (Milestone 16)
+
+**Status:** erledigt (vereinfacht, später um Paarungen erweitert)
+
+---
+
+## Milestone 8: Multiplayer-Datenmodell & API
+
+- `GameSession`, `Player`, `use_strategy_rules`  
+- `/sessions`, Join, `X-Player-Secret`
+
+**Status:** erledigt
+
+---
+
+## Milestone 9: Multiplayer-Frontend
+
+- `/multi` Host, `/multi/join?code=…`, `/play`  
+- Code auf Startseite, Resume-Banner
+
+**Status:** erledigt
+
+---
+
+## Milestone 10: Rangliste & Gewinner
+
+- `GET …/ranking`, Lobby-Tab, Finish-Links
+
+**Status:** erledigt
+
+---
+
+## Milestone 11: UX, Modi & Produktionsreife (laufend)
+
+Ziel:
+
+- Zwei Spielmodi: **Strategy Edition** (Default) vs. **Klassisches Kniffel**
+- Klare UI, PWA, sinnvoller Abschluss-Flow
+
+Deliverables (Stand):
+
+| Thema | Status |
+|--------|--------|
+| Toggle Raum erstellen (`useStrategyRules`) | erledigt |
+| Backend-Regeln Klassisch (max. 3 Würfe/Feld, kein Pool) | erledigt |
+| UI ohne Pool/Würfe bei Klassisch | erledigt |
+| Overlay „X Punkte erzielt“ nach letztem Feld | erledigt |
+| `abandon` Run | erledigt |
+| Helles UI + Kontrast | erledigt (Feintuning möglich) |
+| PWA Manifest/Icons | erledigt |
+| Solo: gleicher Modus-Toggle | → **Milestone 12** |
+| Server-Validierung Score pro Feldtyp | → **Milestone 13** |
+| Tests (Unit) | → **Milestone 14** |
+
+Akzeptanzkriterien (für Milestone 11 erfüllt):
+
+- Host wählt Modus vor Raumerstellung; Gäste sehen Modus in Lobby
+- Klassisch: keine Pool-Anzeige, kein Wurfzähler im Eintrag
+- Strategy: unverändert zur Spezifikation in `projektbeschreibung.md`
+
+**Status:** erledigt (offene Punkte in Milestones 12–14 ausgelagert)
+
+---
+
+## Milestone 12: Solo-Toggle Spielmodus
+
+**Ziel:** Singleplayer kann vor Start dieselbe Moduswahl treffen wie der MP-Host — **Strategy Edition** (Default) oder **Klassisches Kniffel**.
+
+**Abhängigkeiten:** Milestone 11 (MP-Toggle, Backend `POST /runs` mit `useStrategyRules`).
+
+### Deliverables
+
+| # | Aufgabe | Dateien (voraussichtlich) |
+|---|---------|---------------------------|
+| 12.1 | State `useStrategyRules` (Default `true`) in `GameSetup` | `frontend/components/GameSetup.tsx` |
+| 12.2 | Wiederverwendung `StrategyModeToggle` (wie `/multi`) | `frontend/components/StrategyModeToggle.tsx` |
+| 12.3 | `createRun(gameCount, useStrategyRules)` im API-Client | `frontend/lib/api.ts` |
+| 12.4 | Hilfstexte abhängig vom Modus (Felder/Würfe nur bei Strategy) | `GameSetup.tsx` |
+| 12.5 | Manueller Check: Solo Klassisch → kein Pool in `/play`; Solo Strategy unverändert | — |
+
+### Akzeptanzkriterien
+
+- [x] Toggle sichtbar auf der Startseite im Solo-Setup, **Standard: Strategy an**
+- [x] `POST /runs` sendet `{ gameCount, useStrategyRules }` entsprechend der Wahl
+- [x] Neuer Solo-Run verhält sich identisch zum MP-Run desselben Modus (Klassisch: `rollsUsed: 1`, kein Pool-UI)
+- [x] Keine Regression bei MP (`/multi` unverändert funktionsfähig)
+
+### Nicht im Scope
+
+- Server-Validierung der Scores (Milestone 13)
+- Automatisierte Tests (Milestone 14)
+- Änderungen an Scoring- oder Pool-Regeln
+
+### Geschätzter Aufwand
+
+**Klein** (ca. 0,5–1 Tag) — API und UI-Komponente existieren bereits.
+
+**Status:** erledigt (Mai 2026)
+
+---
+
+## Milestone 13: Server-Validierung Punktwerte
+
+**Ziel:** `POST …/complete` akzeptiert nur Scores, die zum `fieldType` passen — unabhängig vom Client (Schutz vor manipulierten Requests, konsistent mit UI-Buttons).
+
+**Abhängigkeiten:** Milestone 12 empfohlen (beide Modi manuell prüfbar), technisch unabhängig umsetzbar.
+
+### Ausgangslage
+
+- Frontend: `fieldScoreChoices()` in `frontend/lib/labels.ts` definiert erlaubte Werte pro Feldtyp
+- Backend: `completeField()` prüft Rolls/Pool/Status, **nicht** ob `score` zum Feldtyp passt
+
+### Deliverables
+
+| # | Aufgabe | Dateien (voraussichtlich) |
+|---|---------|---------------------------|
+| 13.1 | Domain-Funktion `assertValidScoreForField(fieldType, score)` mit gleicher Logik wie UI | `backend/src/domain/fieldScores.ts` (neu) oder Port der Choice-Tabellen |
+| 13.2 | Aufruf in `completeField()` vor Persistenz | `backend/src/services/playField.ts` |
+| 13.3 | HTTP 400 + klare Fehlermeldung bei ungültigem Score | `backend/src/routes/…`, `errorHandler` |
+| 13.4 | Optional: gemeinsame Konstanten dokumentieren (Frontend/Backend-Duplikat akzeptiert, kein Shared-Package nötig) | Kommentar in beiden Dateien |
+| 13.5 | Manueller Negativtest: `curl` mit falschem `score` → 400 | — |
+
+### Regeln (Referenz, identisch zu `labels.ts`)
+
+| Feldgruppe | Erlaubte Scores |
+|------------|-----------------|
+| ONES … SIXES | `0`, `n×Augenzahl` für `n ∈ 1..5` |
+| THREE_OF_A_KIND, FOUR_OF_A_KIND, CHANCE | `0..30` |
+| FULL_HOUSE, SMALL_STRAIGHT, LARGE_STRAIGHT, KNIFFEL | feste Regelpunkte oder `0` (streichen) |
+
+### Akzeptanzkriterien
+
+- [x] Jeder gültige UI-Button-Wert wird vom Server akzeptiert (beide Modi)
+- [x] Ungültige Werte (z. B. `7` bei ONES, `99` bei KNIFFEL) → **400**, Feld bleibt offen
+- [x] Bestehende Pool-/Rolls-Validierung unverändert
+- [x] Kein Schema-Migration nötig
+
+### Nicht im Scope
+
+- Validierung „passt der Score zu echten Würfeln“ (physikalische Kniffel-Logik) — nur **erlaubte Eintragsmenge**
+- Frontend-Änderung außer ggf. Anzeige der Server-Fehlermeldung
+
+### Geschätzter Aufwand
+
+**Klein–mittel** (ca. 1 Tag inkl. manueller Checks).
+
+**Status:** erledigt (Mai 2026)
+
+---
+
+## Milestone 14: Unit-Tests Kernlogik
+
+**Ziel:** Automatisierte Regressionstests für Scoring und Spiellogik (Strategy vs. Klassisch), ohne E2E-Browser-Setup.
+
+**Abhängigkeiten:** Milestone 13 abgeschlossen (Tests für Score-Validierung mit abdecken).
+
+### Deliverables
+
+| # | Aufgabe | Dateien (voraussichtlich) |
+|---|---------|---------------------------|
+| 14.1 | Test-Runner im Backend (z. B. **Node `node:test`** oder **Vitest** — eine Wahl, dokumentiert in README Backend) | `backend/package.json` |
+| 14.2 | Tests `gameScoring`: Bonus 63/35, `gameTotal`, Summen über Spiele | `backend/src/domain/gameScoring.test.ts` |
+| 14.3 | Tests `playField` / Hilfsfunktionen: Pool-Delta, Roll-Limits, Klassisch `rollsUsed === 1` | `backend/src/services/playField.test.ts` oder `domain/` |
+| 14.4 | Tests `assertValidScoreForField` (Milestone 13) | `backend/src/domain/fieldScores.test.ts` |
+| 14.5 | Script `npm test` im Backend; optional in CI-Vorbereitung dokumentiert | `backend/package.json`, Root-README kurz |
+| 14.6 | Keine Dauerprozesse / keine Netzwerk-Tests gegen Prod-Domain (`AGENT_RULES.md`) | — |
+
+### Akzeptanzkriterien
+
+- [x] `cd backend && npm test` läuft lokal grün ohne laufende API
+- [x] Mindestens je ein Testfall: Strategy-Pool (spare/cost), Klassisch ohne Pool, ungültiger Score abgewiesen
+- [x] `gameScoring`-Randfälle: genau 63 oben → Bonus; unter 63 → kein Bonus
+- [x] Tests nutzen In-Memory/Fixtures oder Prisma-Test-DB — **kein** Polling, **kein** paralleler Dev-Server nötig
+
+### Nicht im Scope (v1)
+
+- Playwright/Cypress E2E
+- Frontend-Unit-Tests
+- Load-Tests / Multiplayer-Sync-Tests
+
+### Geschätzter Aufwand
+
+**Mittel** (ca. 1–2 Tage, abhängig von Test-DB-Strategie für `playField`).
+
+**Status:** erledigt (Mai 2026)
+
+---
+
+## Reihenfolge & Definition of Done (12–14)
+
+```mermaid
+flowchart LR
+  M12[Milestone 12\nSolo-Toggle]
+  M13[Milestone 13\nScore-Validierung]
+  M14[Milestone 14\nUnit-Tests]
+  M12 --> M13 --> M14
+```
+
+| Milestone | DoD kurz |
+|-----------|----------|
+| **12** | Solo startet mit gewähltem Modus; MP unberührt |
+| **13** | API lehnt illegale Scores ab; UI-Fehler optional sichtbar |
+| **14** | `npm test` grün; Kernpfade Strategy/Klassisch abgedeckt |
+
+Nach Abschluss von 14: `HANDOVER.md` und `CHANGELOG.md` aktualisieren; Deploy-Hinweis nur bei Schema-Änderung (hier nicht erwartet).
+
+---
+
+## Milestone 15: Serien & Ligapunkte
+
+**Ziel:** Multiplayer-Runden zu einer **Serie** (`leagueCode`) bündeln; nach jeder abgeschlossenen Runde Siegpunkte und Differenz-Bonus fortschreiben.
+
+### Deliverables
+
+| Thema | Status |
+|--------|--------|
+| Prisma `League`, `LeagueStanding`, Session-Felder `leagueId`, `roundNumber`, `pointsAwarded` | erledigt |
+| `computeRoundPoints`, `awardSessionLeaguePoints` | erledigt |
+| Lobby: Serien-Rangliste, „Neue Runde in derselben Serie“ | erledigt |
+| Tests `leaguePoints` | erledigt |
+
+**Status:** erledigt (Mai 2026)
+
+---
+
+## Milestone 16: Paarungsstatistik
+
+**Ziel:** Direktvergleich zweier Spieler über abgeschlossene MP-Runden; eigene Statistik-Seite.
+
+### Deliverables
+
+| Thema | Status |
+|--------|--------|
+| `GET /stats/pairings`, `GET /stats/pairing?key=` | erledigt |
+| `/stats`, `/stats/pairing?key=…` (statischer Export) | erledigt |
+| Button „Statistik“ auf Startseite | erledigt |
+| Head-to-Head-Logik in `pairingStats.ts` | erledigt |
+
+**Status:** erledigt (Mai 2026)
+
+---
+
+## Milestone 17: Namen & manuelle Historie
+
+**Ziel:** Gleiche Person unter verschiedenen Namen zusammenführen; Spiele vor App-Start in Paarungszahlen einbeziehen.
+
+### Deliverables
+
+| Thema | Status |
+|--------|--------|
+| `player_name_aliases`, API `/stats/names` | erledigt |
+| `pairing_manual_baselines`, Aggregation in `pairingStats` | erledigt |
+| UI `NameMergePanel` auf `/stats` | erledigt |
+| Aliase in Ligapunkte-Aggregation | erledigt |
+
+**Status:** erledigt (Mai 2026)
+
+---
+
+## Milestone 18: Letzten Eintrag löschen
+
+**Ziel:** Nur das zuletzt eingetragene Feld zurücksetzen und anderes Feld wählen (Solo + MP).
+
+### Deliverables
+
+| Thema | Status |
+|--------|--------|
+| `scored_sequence` / `next_scored_sequence` | erledigt |
+| `POST …/fields/:fieldId/clear`, `lastScoredFieldId` im Run-DTO | erledigt |
+| UI „Eintrag löschen“ in `ScoreEntryPanel` | erledigt |
+| Backfill für alte Runs | erledigt |
+
+**Status:** erledigt (Mai 2026)
+
+---
+
+## Milestone 19: Zusatz-Yatzy & Produktionsreife Statistik
+
+**Ziel:** Ab 7. Yatzy +100 pro Klick; stabiler Produktions-Build der Statistik-UI.
+
+### Deliverables
+
+| Thema | Status |
+|--------|--------|
+| `extra_yatzy_count`, `extra_yatzy_bonus`, API `extra-yatzy` | erledigt |
+| UI `+`-Button, Anzeige auf Zettel | erledigt |
+| `.env.production`, defensive API-Normalisierung, `error.tsx` für Paarung | erledigt |
+
+**Status:** erledigt (Mai 2026)
+
+---
+
+## Milestone 20: UI-Modernisierung (Bento, Statistik, Setup, Spielzettel)
+
+**Ziel:** Einheitliches, übersichtliches Glass-UI; Spielzettel passt auf **einen Screen ohne Seiten-Scroll**, alle Funktionen bleiben erhalten.
+
+### Deliverables
+
+| Thema | Status |
+|--------|--------|
+| Start: `HomeBentoGrid` (Raum erstellen groß, Einzelspiel, Statistik, Code volle Breite) | erledigt |
+| `HomeModeButtons` entfernt | erledigt |
+| Statistik: `AppScreenHeader`, `PairingSummaryCard`, `.stats-*` | erledigt |
+| Setup `/solo`, `/multi`: `AppScreenHeader`, `SetupScreenLayout` | erledigt |
+| Spiel `/play`: `PlayTopBar`, `.play-*`, fixiertes `ScoreEntryPanel` | erledigt |
+| `FitScoreSheet` + `PlayScreenShell` — kein Scroll im aktiven Spiel | erledigt |
+| Finish-Ansicht scrollt bei Bedarf (mehr Inhalt) | erledigt |
+
+**Status:** erledigt (Mai 2026)
+
+---
+
+## Milestone 21: iOS-App (Capacitor)
+
+**Ziel:** **dice.budget** im Apple App Store (Zielpreis **1,19 €**); Web-Produktion parallel unverändert.
+
+**Leitfaden:** [GOiOS.md](./GOiOS.md) (Prozess, Sub-Milestones, Agent-Prompt).
+
+### Deliverables
+
+| Thema | Status |
+|--------|--------|
+| Capacitor 7, `ios/`, Bundle `de.bottletrade.dicebudget` | erledigt |
+| API nativ → `dicebudget.bottle-trade.de/api` | erledigt |
+| Native Start → `/app` (kein Landing in der App) | erledigt |
+| Developer App-ID `de.bottletrade.dicebudget` | erledigt |
+| GitHub `marclangebeck/dicebudget` | erledigt |
+| Mac: Simulator läuft | erledigt |
+| Doku (`docs/ios-*`, `GOiOS.md`) | erledigt |
+| App Store Connect App **dice.budget** (neu, nicht `com.mlangebeck.mobileapp`) | in Arbeit |
+| Geschäftliches: Paid-Vertrag, Bank, Steuer, EU-Compliance | offen |
+| Preis 1,19 €, Store-Metadaten | offen |
+| Archive → TestFlight → Review | offen |
+
+**Status:** in Arbeit (Mai 2026) — technische Basis erledigt; Store/Connect auf Mac durch Nutzer.
+
+---
+
+## Offene Ideen (kein Milestone)
+
+- Admin-UI für `pairing_manual_baselines`
+- Frontend- / E2E-Tests
+- Echte Würfel-UI
+
+---
+
+## Milestone 22: Datenschutz-Umbau (lokal Solo, pseudonymes Multi)
+
+**Zielbild (empfohlen):**
+
+- Solo: komplett lokal auf dem Gerät.
+- Multi: zentral nur pseudonyme Spiel-Daten, keine Klarnamen.
+- Vergleich zwischen zwei Spielern bleibt abrufbar, ohne Klarname auf dem Server.
+
+**Wichtiger Realitätscheck:**
+
+„Gar nichts auf dem Server speichern“ und gleichzeitig „dauerhafte Multiplayer-Vergleiche zwischen Geräten“ geht nicht gleichzeitig.  
+Für abrufbare Multi-Statistik muss irgendeine Form von Match-Daten zentral liegen — dann aber pseudonym statt personenbezogen.
+
+### Geplante Teilschritte
+
+| # | Teilschritt | Kurzinhalt | Status |
+|---|-------------|------------|--------|
+| 22.1 | Technisches Zielmodell festziehen | `playerId` pro Gerät (UUID, lokal gespeichert), Anzeigename nur lokal, Server speichert nur pseudonyme IDs + Matchdaten | erledigt |
+| 22.2 | Datenmodell Backend erweitern | Klarnamen aus kritischen Multi-Statistikpfaden herauslösen; Felder für pseudonyme IDs ergänzen | erledigt |
+| 22.3 | Migrationsstrategie Alt-Daten | Bestehende Klarnamen-Historie (inkl. Manual-Baselines) entfernen oder in nicht personenbezogene Form überführen | erledigt |
+| 22.4 | API für Multi anpassen | Multi-Endpunkte akzeptieren/liefern pseudonyme IDs; Vergleich `A vs B` basiert auf IDs statt Namen | erledigt |
+| 22.5 | Frontend iOS/Web anpassen | `playerId` lokal erzeugen/speichern/senden; lokales Mapping `playerId -> Anzeigename` nur auf Gerät | erledigt |
+| 22.6 | Solo vollständig lokal absichern | Solo-Stats/-Historie lokal speichern; kein personenbezogener Solo-Statistik-Write auf Server | erledigt |
+| 22.7 | Statistik-UI umstellen | Paarungsansichten aus pseudonymen Daten berechnen; lesbare Namen nur aus lokalem Mapping auflösen | erledigt |
+| 22.8 | Datenschutz-/Store-Doku aktualisieren | Datenschutzerklärung, App Privacy Angaben, technische Doku (`GOiOS.md`/`HANDOVER.md`) angleichen | erledigt |
+| 22.9 | Abnahme & Rollout | Regressionstests, iOS-Rebuild (`npm run build:ios` auf Mac), neues Archive/Upload für TestFlight | erledigt |
+
+### Akzeptanzkriterien (Definition of Done)
+
+- [x] Neuer App-Install startet mit leeren Solo-Stats auf dem Gerät.
+- [x] Server speichert in Multi-Statistik keine Klarnamen mehr.
+- [x] Vergleich zwischen zwei Spielern bleibt über pseudonyme IDs funktionsfähig.
+- [x] Alte personenbezogene Statistik-Baselines sind entfernt.
+- [x] Dokumentation/Store-Angaben sind konsistent zum neuen Datenschutzmodell.
+
+### Ergebnis (Sollzustand)
+
+- Malte kann gegen Nicole vergleichen (wenn beide gespielt haben).
+- Du als Betreiber speicherst keine Klarnamen.
+- Historie bleibt zwischen Spielern abrufbar.
+- Datenschutzrisiko ist deutlich kleiner als heute.
+
+**Status:** erledigt (Mai 2026)
+
+**Tag-1-Dokumentation:** `docs/milestone-22-preparation.md`
+
+### Startreihenfolge (nach aktuellem App-Store-Connect-Durchlauf)
+
+#### Tag 1 — Sicherheitsnetz + Datenbasis vorbereiten
+
+1. **Branch anlegen:** separater Arbeitsbranch nur für Milestone 22.
+2. **Ist-Zustand sichern:** aktuelles DB-Schema + relevante Tabellen (`players`, `game_sessions`, `pairing_manual_baselines`, `player_name_aliases`) dokumentieren.
+3. **Konzept fixieren:** endgültig festschreiben, welche Felder pseudonym bleiben dürfen (IDs, Scores, Zeitstempel) und welche entfallen (Klarnamen in Statistikpfaden).
+4. **Migration entwerfen:** Prisma-Migration für pseudonyme Multi-IDs vorbereiten; Umgang mit Alt-Daten (löschen/neutralisieren) festlegen.
+5. **Abbruchkriterium Tag 1:** Keine Codepfade geändert, aber Migrations-/Datenplan ist schriftlich final und freigegeben.
+
+#### Tag 2 — Backend pseudonym machen
+
+1. **Schema umsetzen:** neue pseudonyme ID-Felder für Multi-Flows einführen.
+2. **API umstellen:** Multi-/Statistik-Endpunkte intern auf IDs statt Klarnamen umstellen.
+3. **Alt-Baselines entfernen:** `pairing_manual_baselines` aus aktivem Statistikpfad entfernen; Alt-Klarnamen-Historie gemäß Plan bereinigen.
+4. **Regression prüfen:** bestehende Multiplayer-Kernflüsse lokal testen (Raum erstellen, beitreten, Runde beenden, Vergleich abrufen).
+5. **Abbruchkriterium Tag 2:** Backend liefert funktionsfähige Vergleichsdaten ohne Klarnamenpersistenz in den Zielpfaden.
+
+#### Tag 3 — Frontend/Client lokalisieren + Abnahme
+
+1. **`playerId` lokal einführen:** beim ersten Start UUID erzeugen und lokal speichern.
+2. **Lokales Namens-Mapping:** Anzeigename nur lokal halten (`playerId -> Anzeigename`), nicht serverseitig persistieren.
+3. **Solo lokal absichern:** Solo-Statistik ausschließlich lokal lesen/schreiben.
+4. **UI-Checks:** Statistikseiten mit pseudonymen Serverdaten + lokal aufgelösten Namen prüfen.
+5. **Doku & Release-Check:** Datenschutzerklärung/App-Privacy-Texte angleichen, dann iOS-Rebuild (`npm run build:ios` auf Mac), Buildnummer erhöhen, Archive/Upload.
+6. **Abbruchkriterium Tag 3:** DoD aus Milestone 22 vollständig erfüllt und testbar dokumentiert.
+
+#### Go/No-Go vor Produktionsstart
+
+- [x] Aktueller App-Store-Connect-Build ist abgeschlossen (kein offener Blocking-Status).
+- [ ] Milestone-22-Plan ist freigegeben.
+- [ ] Zeitfenster für Migration + Rebuild + Retest ist eingeplant.
+
+---
+
+## Milestone 23: Navigation-Polish (Startseite/Zurück)
+
+**Ziel:** „Startseite“/„Zurück“-Navigation im gesamten App-Flow moderner, klarer und konsistent im Glass-Design darstellen.
+
+### Deliverables
+
+| Thema | Status |
+|--------|--------|
+| Einheitliche Back/Home-Button-Komponente (Form, Größe, Kontrast, Fokuszustand) | erledigt |
+| Verwendung in `AppScreenHeader`, `PlayTopBar` und relevanten Detailseiten | erledigt |
+| Touch-optimierte Hit-Targets (iOS) | erledigt |
+
+**Status:** erledigt (Mai 2026; UI in TestFlight Build 16)
+
+---
+
+## Milestone 24: Eröffnungsscreen (Splash A)
+
+**Entscheidung:** Variante A (animierter Intro-Screen bei Start).
+
+**Ziel:** Schwarzer Intro-Screen mit `dice.budget`, zwei Würfeln und Fortschrittskreis 0–100%, danach weicher Übergang zur App-Startseite.
+
+### Deliverables
+
+| Thema | Status |
+|--------|--------|
+| Intro-Overlay mit Branding auf schwarzem Hintergrund | erledigt |
+| Progress-Ring 0–100% (visuelle Ladeführung) | erledigt |
+| Transition/Fade zum bestehenden Home-Screen | erledigt |
+
+**Status:** erledigt
+
+---
+
+## Milestone 25: Startseite Header/Hero präsenter
+
+**Ziel:** Logo + Schriftzug auf der Startseite sichtbar größer und mittiger/breiter positionieren.
+
+### Deliverables
+
+| Thema | Status |
+|--------|--------|
+| Header-Bereich über größere Breite aufziehen | erledigt |
+| Logo + Wortmarke visuell priorisieren (Spacing/Typo) | erledigt |
+| Responsives Feintuning für iPhone-Größen | erledigt |
+
+**Status:** erledigt
+
+---
+
+## Milestone 26: Kachel-Visuals (Icons vs. Bilder)
+
+**Entscheidung:** Icons bleiben als Primärsprache; keine vollständige Umstellung auf Bilder.
+
+**Ziel:** Klarheit der Navigation beibehalten, visuell aufwerten über subtile Hintergründe/Illustrationsakzente statt Foto-Kacheln.
+
+### Deliverables
+
+| Thema | Status |
+|--------|--------|
+| Bestehende Icons beibehalten (Solo/Multi/Stats) | erledigt |
+| Optionale Hintergrund-Illustrationsakzente je Kachel | erledigt |
+| Kontrast/Lesbarkeit im Bento-Grid sichern | erledigt |
+
+**Status:** erledigt (Mai 2026)
+
+---
+
+## Milestone 27: Datenschutzseite (App-zentriert)
+
+**Ziel:** Datenschutztext auf app-zentrierte Nutzung ausrichten (Spiel primär in der App, konsistent mit tatsächlichem Verhalten).
+
+### Deliverables
+
+| Thema | Status |
+|--------|--------|
+| Formulierungen auf App-first Nutzung anpassen | erledigt |
+| Technische Speicherung korrekt und verständlich beschreiben | erledigt |
+| Konsistenz mit App Store Angaben prüfen | erledigt (Legal live, Connect-Fragebogen offen) |
+
+**Status:** erledigt (Mai 2026)
+
+---
+
+## Aktueller Arbeitsstand (2026-06-01)
+
+**Commit:** `a18f919` · Branch `milestone-22-prep` · GitHub synchron · Server/Mac/GitHub gleichauf
+
+**Wichtig — Versionierung iOS:** App Store Connect ist bei **Version 2.0**, aktueller Build **2.0 (6)**. Die früher genannten „1.0 / Build 18/19" sind überholt. Build-Nummern zählen **pro Versionsstring** — der nächste Upload nach 2.0 (6) ist 2.0 (7).
+
+**Erledigt:**
+
+- Legal-Links, app-nav-btn, dunkler Slate-Verlauf, LegalScrollShell
+- Impressum + Datenschutz live (dice.budget + bottle-trade.de)
+- **M29 Punktwahl-Eintrag:** Feld antippen → Overlay (Punkte + Würfe) → Eintragen
+- **M30 Bonus-Delta-Anzeige:** „Ergebnis 1“ zeigt pro Block das Delta zur Soll-Marke „3 je Augenzahl“ (`+` grün / `−` rot / `±0` grau)
+- **M31 Bonus-Einblendung:** kurzes Glückwunsch-Overlay (Animation, Auto-Close 2,5 s) wenn eine obere Reihe 6/6 mit ≥63 abschließt; Geräte-Toggle auf `/solo` + `/multi`
+- **M32 Topbar & Gegner-Pool:** „Rest"-Chip entfernt; Multiplayer-Host kann „Gegner-Pool sichtbar" aktivieren → bei genau 2 Spielern zeigt die Topbar den Gegner-Pool (kein Polling: Nachladen nur bei Start + eigener Eintragung)
+- **M33 Pool-Endspiel:** Multiplayer-Host-Toggle „Pool-Endspiel"; nach Abschluss aller Runs darf der Spieler mit dem eindeutig größten Wurf-Pool ein Feld verbessern (neuer Wert oder behalten), erst danach Liga-Punkte
+- **Würfe-Standard:** Strategy-Eintrag-Voreinstellung von 2 auf **3** geändert
+- **M34 (2026-05-31) — Bugfixes + Stats-Reset:**
+  - **Bonus-Konfetti:** Konfetti-Regen hinter dem Bonus-Overlay (`BonusOverlay`, reines CSS, respektiert `prefers-reduced-motion`)
+  - **Support-Link:** „Support"-Link (`mailto:`) im Start-Footer (`HomeBentoGrid`)
+  - **M32-Fix Gegner-Pool:** Nachladen bei App-Rückkehr (`visibilitychange`/`focus`) + Aktualisieren-Tap in der Topbar (behebt, dass der Host den später beitretenden Gegner ohne Polling nie sah)
+  - **M33-Fix Pool-Endspiel ausführbar:** Beendete der Sieger seinen Run vor den Mitspielern, erschien die Verbesserungs-Phase nie → Abschluss-Screen zeigt „Pool-Endspiel läuft" + Aktualisieren; `ScoreSheetTable.allowSelectWhenFinished`
+  - **Prob 2 — Stats-Zusammenführung bei Alias:** Paarungen mit gleichem Alias werden reihenfolge-unabhängig zusammengeführt (Alias-Vorrang vor „self"), rein clientseitig (`lib/pairingMerge.ts`)
+  - **Prob 3 — Statistik serverseitig zurücksetzen (destruktiv):** in `/stats` Paarungen auswählen + endgültig löschen; Backend `resetPairings()` + `POST /stats/pairings/reset` löscht abgeschlossene 2-Spieler-Sessions inkl. Runs/Games/Fields/Rolls; Mehr-Spieler-Sessions geschützt. Hinweis: Liga-/Serien-Punkte (`LeagueStanding`) werden dabei nicht rückwirkend neu berechnet; Endpunkt ohne Auth
+  - **Capacitor-Fix Paarungs-Detail:** Tippen auf Paarung sprang in der App zum Start (voller `<a>`-Reload → `index.html` → `NativeAppEntry`-Redirect) → jetzt `next/link`
+- **M35 (2026-05-31) — Paarungen bearbeiten (deployed, Commit `68bd6eb`):**
+  - „✏️ Paarung bearbeiten" auf `/stats/pairing`: Siege je Spieler + Netto-Punktedifferenz (Betrag + bevorzugte Seite) editierbar, um außerhalb der App gespielte Partien nachzutragen
+  - Statistik zeigt **eine kombinierte Gesamtübersicht** (App + manuell zusammen); Differenz **netto** (Plus nur auf führender Seite)
+  - Reaktiviert Tabelle `pairing_manual_baselines` (**keine neue Migration**); Backend `upsertPairingBaselines()` + `POST /stats/pairings/baseline`; App-Siege bleiben Untergrenze; „Statistik zurücksetzen" löscht manuelle Werte mit; ohne Auth, alle Geräte
+  - Dateien: `backend/src/services/pairingStats.ts`, `backend/src/routes/stats.ts`, `frontend/lib/{pairingTypes,normalizePairing,pairingMerge,api}.ts`, `frontend/components/PairingEditOverlay.tsx` (neu), `frontend/app/stats/pairing/page.tsx`, `frontend/components/PairingSummaryCard.tsx`
+- **UI-Politur (2026-06-01, deployed, Commit `a18f919`):**
+  - **Punktwahl gelb gefüllt:** Im Eintrags-Overlay ist der gewählte Punktwert jetzt gelb ausgefüllt (war nur schwach umrandet) – wie die Würfe-Auswahl. Ursache war eine CSS-Spezifitäts-Überschreibung. Datei: `frontend/app/globals.css`
+  - **Spielzettel füllt volle Höhe:** Der Zettel nutzt jetzt die ganze Bildschirmhöhe; Zeilen wachsen mit, Ergebnis-Zeilen (Ergebnis 1, Zwischensumme, Ergebnis Spiel) ~1,4× höher als Feld-Zeilen. Passt sich an das iPhone-Format an; bei zu wenig Platz weiterhin Herunterskalieren (kein Seiten-Scroll). Dateien: `frontend/components/FitScoreSheet.tsx`, `frontend/components/ScoreSheetTable.tsx`, `frontend/app/globals.css` (`.play-score-table`-Höhenverteilung `6%`/`8.6%`)
+- Backend: Session-Flags `show_opponent_pool` + `pool_endgame_*` (Migrationen angewandt + deployed, Service läuft); Reset- **und Baseline-Endpunkt** (`POST /stats/pairings/baseline`) deployed (kein neues Schema, Tabelle `pairing_manual_baselines` bestand bereits)
+- iOS: TestFlight **2.0 (6)** (Upload durch Nutzer); **M34 + M35 + UI-Politur sind NOCH NICHT im Build** → nächster Upload **2.0 (7)** nötig
+- Web + Backend auf Server deployed (Stand `a18f919`)
+
+**Sync-Workflow (Pflicht):** siehe **`AGENT_RULES.md` Sektion 9** — nach jeder Änderung GitHub + Server + Mac gleichziehen, nummerierte `[Server]`/`[Mac]`-Befehle, sudo nur durch Nutzer.
+
+**Nächste Schritte (Priorität):**
+
+1. Neuen iOS-Build **2.0 (7)** mit **M34 + M35 + UI-Politur** hochladen; TestFlight weiter testen
+2. **App Store Connect:** Paid Applications Agreement, Bank/Steuer
+3. **Store-Metadaten:** Preis 1,19 €, Screenshots 6.7", Beschreibung DE
+4. **App-Datenschutzfragebogen** (URL: https://dicebudget.bottle-trade.de/datenschutz)
+5. Optional: Stats-Reset-/Baseline-Endpunkte auf „nur eigene Paarungen" einschränken (aktuell ohne Auth)
+6. Optional: Branch `milestone-22-prep` → `main` (nur nach Nutzer-Freigabe)
+
+---
+
+## Milestone 29 — Punktwahl-Eintrag (M29)
+
+**Ziel:** Analoger Wurf digital — schneller Eintrag ohne Würfel zählen.
+
+**Status:** erledigt (Mai 2026)
+
+**UX:**
+
+1. Leeres Feld auf Zettel antippen
+2. Overlay von oben: Punkte wählen (feldtypabhängig), Würfe wählen (Strategy, Default 2)
+3. **Eintragen**
+4. Korrektur: befülltes Feld antippen
+
+**Technik:**
+
+- `PlayBoard.tsx` — Feldwahl, Submit via `completeField` / `completeLocalSoloField`
+- `ScoreEntryPanel.tsx` — Overlay-UI
+- `FieldScoreChoiceGrid.tsx` — Punkt-Buttons
+- `fieldScoreChoices()` in `frontend/lib/labels.ts`
+
+**Entfernt (ersetzt):** `DiceThrowOverlay`, `DiceCountPicker`, `CommittedThrowBanner`, `FixedFieldChoiceBanner`
+
+---
+
+## Milestone 30 — Bonus-Delta-Anzeige (M30)
+
+**Ziel:** Den oberen Bonus (35 ab 63) während des Spiels sichtbar machen, ohne im Kopf zu rechnen.
+
+**Status:** erledigt (Mai 2026, in Build 16)
+
+**Idee:** Der Bonus bei 63 entspricht genau **3 Würfeln je Augenzahl** (`3 × (1+…+6) = 63`). Pro Feld ist die Soll-Marke `3 × Augenzahl`. Die Zeile **„Ergebnis 1“** zeigt pro Spielblock das **laufende Delta** über die bereits eingetragenen oberen Felder:
+
+```
+delta = obere Summe − 3 × (Summe der Augenzahlen der eingetragenen Felder)
+```
+
+- Beispiel: 1er = 1 → `−2`; danach vier 3er (12) → `+1`; danach vier 4er (16) → `+5`
+- Sind alle 6 oberen Felder gefüllt, gilt: `delta ≥ 0 ⇔ Bonus erreicht`
+
+**Anzeige (nur das Delta):**
+
+- `+N` in **Grün** (über Schnitt)
+- `−N` in **Rot** (unter Schnitt)
+- `±0` in **Grau** (genau auf Kurs)
+- Erscheint erst, sobald ein oberes Feld eingetragen ist; Tooltip mit Klartext
+
+**Technik:**
+
+- `upperBonusDelta()` in `frontend/lib/gameScoring.ts`
+- Anzeige in `ScoreSheetTable.tsx` (Zweitzeile in `SummaryTile` der `ergebnis1`-Zeile)
+- Reine UI-/Anzeige-Logik, kein Backend; gilt für Solo und Multiplayer
+
+---
+
+## Milestone 31 — Bonus-Einblendung (M31)
+
+**Ziel:** Den Moment feiern, in dem eine obere Reihe den Bonus erreicht.
+
+**Status:** erledigt (Mai 2026, in Build 17)
+
+**UX:**
+
+- Sobald eine obere Reihe **komplett (6/6)** mit **≥63** abgeschlossen wird, erscheint ein kurzes Overlay „Bonus erreicht! +35" mit Pop-/Spin-Animation.
+- **Schließt automatisch nach 2,5 s** (oder Tippen). Bei mehreren Spielen wird der Spielblock genannt.
+- Ist der Run dadurch komplett, erscheint nur das Abschluss-Overlay (keine Stapelung).
+- **Geräte-Einstellung** (pro Gerät, nicht serverseitig): Toggle „Bonus-Einblendung" auf `/solo` und `/multi`, Standard an.
+
+**Technik:**
+
+- `upperBonusAchieved()` in `frontend/lib/gameScoring.ts`
+- Erkennung des Übergangs in `PlayBoard.handleSubmit`
+- `BonusOverlay.tsx` (Anzeige + Animation in `globals.css`, respektiert `prefers-reduced-motion`)
+- `BonusCelebrationToggle.tsx` + `lib/uiPrefs.ts` (LocalStorage)
+
+---
+
+## Milestone 32 — Topbar-Umbau & Gegner-Pool (M32)
+
+**Ziel:** Spiel-Topbar verschlanken und im Multiplayer optional den Gegner-Pool zeigen.
+
+**Status:** erledigt (Mai 2026, in Build 17)
+
+**Änderungen:**
+
+- **„Rest"-Chip entfernt** (Restwürfe bis Spielende) — Topbar zeigt nur noch den eigenen **Pool**.
+- **Gegner-Pool (Multiplayer):** Host entscheidet beim Raum-Erstellen über Toggle „Gegner-Pool sichtbar".
+  - Anzeige nur bei **genau 2 Spielern** und Strategy-Modus.
+  - Topbar zeigt neben dem eigenen Pool den **Gegner-Pool**.
+- **Kein Polling:** Gegner-Pool wird nur **bei Spielstart** und **nach jeder eigenen Eintragung** einmalig nachgeladen (gezielte Einzel-Requests, gemäß `AGENT_RULES.md`).
+
+**Technik:**
+
+- Backend: Session-Flag `show_opponent_pool` (Prisma-Migration `20260530090000_session_show_opponent_pool`); Lobby-DTO liefert `rollsInPool` je Spieler **nur**, wenn das Flag an ist.
+- `sessionService.ts`, `routes/sessions.ts`
+- Frontend: `app/multi/page.tsx` (Host-Toggle), `PlayBoard.tsx` (Gegner-Pool laden, Selbst-Ausschluss über `playerId`), `PlayTopBar.tsx` (Chip), `lib/api.ts`, `lib/sessionTypes.ts`
+
+---
+
+## Milestone 33 — Pool-Endspiel (M33)
+
+**Ziel:** Effizientes Pool-Management am Spielende belohnen — der Spieler mit dem größten Wurf-Pool darf ein Feld verbessern.
+
+**Status:** erledigt (Mai 2026) — **nur Multiplayer**
+
+**UX:**
+
+- Host aktiviert beim Raum-Erstellen den Toggle „Pool-Endspiel" (nur Strategy-Modus).
+- Sobald **alle** Runs der Session beendet sind, bestimmt das Backend den Spieler mit dem **eindeutig größten** Wurf-Pool (`rollsInPool`).
+- Dieser Spieler sieht im Abschluss-Screen ein Banner „Pool-Sieger!" + den Spielzettel. Er tippt **ein** Feld an → wählt einen neuen Wert (frei aus den gültigen Feldwerten) und „Übernehmen", **oder** „Alten Wert behalten & beenden".
+- Erst danach werden die **Liga-Punkte vergeben** und die Session abgeschlossen (das verbesserte Ergebnis zählt für die Rangliste).
+- **Gleichstand** an der Spitze → niemand verbessert, Punkte werden sofort vergeben.
+- **Kein Polling:** Die Auflösung ist ereignisbasiert (beim Öffnen des Abschluss-Screens des Siegers), konform zu `AGENT_RULES.md`.
+
+**Technik:**
+
+- Backend: GameSession-Felder `pool_endgame_enabled`, `pool_endgame_improver_id`, `pool_endgame_resolved` (Prisma-Migration `20260530120000_session_pool_endgame`).
+- Sieger-Bestimmung `determinePoolEndgameImprover()`; Liga-Punkte werden in `maybeFinishSessionForRun` zurückgehalten, bis `resolvePoolEndgame()` greift.
+- Endpunkt `POST /sessions/invite/:code/pool-endgame` (`keep` oder `fieldId` + `score`), Auth via `X-Player-Secret` des Siegers.
+- `sessionService.ts`, `routes/sessions.ts`, `errorHandler.ts`, Test `services/poolEndgame.test.ts`.
+- Frontend: `app/multi/page.tsx` (Host-Toggle), `PlayBoard.tsx` (Improver-Phase), neue `PoolEndgamePanel.tsx`, `lib/api.ts`, `lib/sessionTypes.ts`, `app/globals.css` (`.play-endgame-*`).
+
+**Begleitänderung:** Würfe-Voreinstellung im Strategy-Eintrag von 2 → **3** (`PlayBoard.defaultRollsUsed`).

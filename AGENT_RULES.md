@@ -8,8 +8,20 @@ Auf dem produktiven Debian-Server (Netcup) laufen mehrere Anwendungen (u. a. bot
 
 Diese Regeln haben **immer Vorrang** vor Geschwindigkeit, Komfort und Automatisierung.
 
-Neue Agents lesen zuerst diese Datei, dann **`HANDOVER.md`** und **`GOiOS.md`** (iOS/TestFlight), danach `projektbeschreibung.md` und `milestones.md`.  
-Frontend-Details: `frontend/README.md`. Bei Widersprüchen gilt **`AGENT_RULES.md`**.
+Neue Agents lesen standardmäßig nur:
+
+1. **`AGENT_RULES.md`**
+2. **`HANDOVER.md`**
+3. **`docs/milestones_active.md`**
+
+Nur bei Bedarf zusätzlich:
+
+4. **`docs/ios_current.md`** (iOS/TestFlight/App Store)
+5. **`docs/decisions.md`** (dauerhaft gültige Architektur- und Betriebsentscheidungen)
+6. **`docs/milestones_archive.md`** (ältere Milestone-Historie)
+7. **`docs/ios_archive.md`** (ältere iOS-/TestFlight-Historie)
+
+Frontend-Details: `frontend/README.md`. Fachliche Spezifikation: `projektbeschreibung.md`. Bei Widersprüchen gilt **`AGENT_RULES.md`**.
 
 **Aktiver Git-Branch (Mai 2026):** `milestone-22-prep` auf `github.com/marclangebeck/dicebudget`
 
@@ -73,14 +85,20 @@ kniffel/
 ├── infra/        # Nginx, Deploy-Skripte
 ├── HANDOVER.md
 ├── projektbeschreibung.md
-├── milestones.md
-└── CHANGELOG.md
+├── milestones.md          # Kompatibilitäts-Index
+├── CHANGELOG.md
+└── docs/
+    ├── milestones_active.md
+    ├── milestones_archive.md
+    ├── ios_current.md
+    ├── ios_archive.md
+    └── decisions.md
 ```
 
 - Keine Drive-by-Refactors in fremden Ordnern
 - Jede Änderung in `CHANGELOG.md` dokumentieren
 - Bestehende Dateien nicht blind überschreiben
-- UI-Stand (Mai 2026): Bento-Start (`HomeBentoGrid`), Spielzettel ohne Seiten-Scroll (`/play` + `FitScoreSheet`) — siehe Milestone 20 in `milestones.md`
+- UI-Stand (Mai 2026): Bento-Start (`HomeBentoGrid`), Spielzettel ohne Seiten-Scroll (`/play` + `FitScoreSheet`) — aktueller Stand in `docs/milestones_active.md`, Historie in `docs/milestones_archive.md`
 
 ---
 
