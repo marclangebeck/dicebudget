@@ -2,17 +2,27 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { BonusCelebrationToggle } from "@/components/BonusCelebrationToggle";
 import { StrategyModeToggle } from "@/components/StrategyModeToggle";
-import { createGameSession } from "@/lib/api";
+import { createGameSession, joinSession } from "@/lib/api";
+import { saveActiveGame } from "@/lib/activeGame";
+import { setPlayerAlias } from "@/lib/playerAliases";
+import {
+  createTableModePlayerId,
+  saveTableModeSession,
+  type TableModePlayer,
+} from "@/lib/tableMode";
 
 export default function MultiHostPage() {
+  const router = useRouter();
   const [gameCount, setGameCount] = useState(6);
   const [maxPlayers, setMaxPlayers] = useState(2);
   const [useStrategyRules, setUseStrategyRules] = useState(true);
   const [showOpponentPool, setShowOpponentPool] = useState(false);
   const [poolEndgameEnabled, setPoolEndgameEnabled] = useState(false);
+  const [tableModeEnabled, setTableModeEnabled] = useState(false);
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [leagueCode, setLeagueCode] = useState<string | null>(null);
   const [createdStrategyMode, setCreatedStrategyMode] = useState<boolean | null>(null);
@@ -27,14 +37,45 @@ export default function MultiHostPage() {
     setLoading(true);
     setError(null);
     try {
+      const effectiveMaxPlayers = tableModeEnabled ? 2 : maxPlayers;
       const { session } = await createGameSession(
         gameCount,
-        maxPlayers,
+        effectiveMaxPlayers,
         useStrategyRules,
         undefined,
-        showOpponentPool,
-        poolEndgameEnabled,
+        tableModeEnabled ? false : showOpponentPool,
+        tableModeEnabled ? false : poolEndgameEnabled,
       );
+      if (tableModeEnabled) {
+        const leftPlayerId = createTableModePlayerId("left");
+        const rightPlayerId = createTableModePlayerId("right");
+        const leftJoin = await joinSession(session.inviteCode, leftPlayerId);
+        const rightJoin = await joinSession(session.inviteCode, rightPlayerId);
+        const players: [TableModePlayer, TableModePlayer] = [
+          {
+            side: "left",
+            label: "Links",
+            playerId: leftPlayerId,
+            runId: leftJoin.player.runId,
+            playerSecret: leftJoin.player.secretToken,
+          },
+          {
+            side: "right",
+            label: "Rechts",
+            playerId: rightPlayerId,
+            runId: rightJoin.player.runId,
+            playerSecret: rightJoin.player.secretToken,
+          },
+        ];
+        saveTableModeSession({ inviteCode: session.inviteCode, players });
+        saveActiveGame({ type: "table", inviteCode: session.inviteCode });
+        setPlayerAlias(leftPlayerId, "Links");
+        setPlayerAlias(rightPlayerId, "Rechts");
+        router.push(
+          `/play?table=1&invite=${encodeURIComponent(session.inviteCode)}`,
+        );
+        return;
+      }
       setInviteCode(session.inviteCode);
       setLeagueCode(session.leagueCode);
       setCreatedStrategyMode(session.useStrategyRules);
@@ -95,7 +136,7 @@ export default function MultiHostPage() {
                   aria-label={
                     showOpponentPool ? "Gegner-Pool ausblenden" : "Gegner-Pool anzeigen"
                   }
-                  disabled={roomLocked}
+                  disabled={roomLocked || tableModeEnabled}
                   onClick={() => setShowOpponentPool((v) => !v)}
                   className={`relative h-8 w-14 shrink-0 rounded-full border-2 transition disabled:opacity-50 ${
                     showOpponentPool
@@ -131,7 +172,7 @@ export default function MultiHostPage() {
                   aria-label={
                     poolEndgameEnabled ? "Pool-Endspiel deaktivieren" : "Pool-Endspiel aktivieren"
                   }
-                  disabled={roomLocked}
+                  disabled={roomLocked || tableModeEnabled}
                   onClick={() => setPoolEndgameEnabled((v) => !v)}
                   className={`relative h-8 w-14 shrink-0 rounded-full border-2 transition disabled:opacity-50 ${
                     poolEndgameEnabled
@@ -149,6 +190,51 @@ export default function MultiHostPage() {
             </div>
           </div>
         )}
+
+        <div className="setup-host-card setup-host-card--mode">
+          <div className="setup-mode-toggle">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-strong text-sm font-semibold">iPad-Tischmodus</p>
+                <p className="text-muted mt-0.5 text-xs leading-snug">
+                  Erstellt ein 2-Spieler-Spiel für ein iPad im Querformat: links und rechts
+                  sind beide Zettel auf diesem Gerät antippbar.
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={tableModeEnabled}
+                aria-label={
+                  tableModeEnabled ? "iPad-Tischmodus deaktivieren" : "iPad-Tischmodus aktivieren"
+                }
+                disabled={roomLocked}
+                onClick={() => {
+                  setTableModeEnabled((v) => {
+                    const next = !v;
+                    if (next) {
+                      setMaxPlayers(2);
+                      setShowOpponentPool(false);
+                      setPoolEndgameEnabled(false);
+                    }
+                    return next;
+                  });
+                }}
+                className={`relative h-8 w-14 shrink-0 rounded-full border-2 transition disabled:opacity-50 ${
+                  tableModeEnabled
+                    ? "border-emerald-800 bg-emerald-600"
+                    : "border-slate-500 bg-slate-400"
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 block h-6 w-6 rounded-full bg-white shadow-md transition-transform ${
+                    tableModeEnabled ? "translate-x-6" : "translate-x-0.5"
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+        </div>
 
         <div className="setup-host-sliders">
           <label className="setup-slider-card setup-slider-card--sky">
@@ -177,13 +263,15 @@ export default function MultiHostPage() {
           <label className="setup-slider-card setup-slider-card--emerald">
             <span className="setup-slider-label">Mitspieler max.</span>
             <span className="setup-slider-value tabular-nums">{maxPlayers}</span>
-            <span className="setup-slider-hint">2–6 Spieler</span>
+            <span className="setup-slider-hint">
+              {tableModeEnabled ? "Tischmodus: 2 Spieler" : "2–6 Spieler"}
+            </span>
             <input
               type="range"
               min={2}
               max={6}
               value={maxPlayers}
-              disabled={roomLocked}
+              disabled={roomLocked || tableModeEnabled}
               onChange={(e) => setMaxPlayers(Number(e.target.value))}
               className="setup-host-range"
             />
@@ -198,7 +286,7 @@ export default function MultiHostPage() {
             disabled={loading}
             className="setup-host-submit w-full disabled:opacity-50"
           >
-            {loading ? "Erstelle …" : "Raum anlegen"}
+            {loading ? "Erstelle …" : tableModeEnabled ? "Tischspiel starten" : "Raum anlegen"}
           </button>
         ) : (
           <div className="setup-host-success">

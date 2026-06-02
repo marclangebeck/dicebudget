@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { abandonRun, getRun } from "@/lib/api";
 import { clearActiveGame, loadActiveGame, playPath, type ActiveGameState } from "@/lib/activeGame";
 import { ABANDON_RUN_CONFIRM } from "@/lib/runUtils";
+import { loadTableModeSession } from "@/lib/tableMode";
 
 type Props = {
   variant?: "default" | "bento";
@@ -21,6 +22,11 @@ export function ResumeActiveGame({ variant = "default" }: Props) {
 
     void (async () => {
       try {
+        if (stored.type === "table") {
+          setGame(stored);
+          setLabel(`iPad-Tischmodus · Code ${stored.inviteCode}`);
+          return;
+        }
         const secret = stored.type === "multi" ? stored.playerSecret : undefined;
         const { run } = await getRun(stored.runId, secret);
         if (run.status !== "ACTIVE") {
@@ -43,6 +49,18 @@ export function ResumeActiveGame({ variant = "default" }: Props) {
     if (!game || !window.confirm(ABANDON_RUN_CONFIRM)) return;
     setBusy(true);
     try {
+      if (game.type === "table") {
+        const table = loadTableModeSession(game.inviteCode);
+        if (table) {
+          for (const player of table.players) {
+            await abandonRun(player.runId, player.playerSecret);
+          }
+        }
+        clearActiveGame();
+        setGame(null);
+        setLabel(null);
+        return;
+      }
       const secret = game.type === "multi" ? game.playerSecret : undefined;
       await abandonRun(game.runId, secret);
       clearActiveGame();

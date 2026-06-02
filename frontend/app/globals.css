@@ -1029,6 +1029,127 @@ html.legal-route body {
   color: #fff;
 }
 
+.play-table-mode-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.play-table-mode-kicker {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--chrome-text-secondary);
+}
+
+.play-table-mode-title {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--chrome-foreground);
+}
+
+.play-table-mode-needs-landscape {
+  border-radius: 0.85rem;
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  background: #fffbeb;
+  padding: 0.85rem 0.9rem;
+  text-align: center;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #92400e;
+}
+
+.play-table-mode-grid {
+  display: none;
+}
+
+.play-table-player {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  border-radius: 1rem;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.14);
+  padding: 0.35rem;
+}
+
+.play-table-player--active {
+  border-color: #fbbf24;
+  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.28);
+}
+
+.play-table-player-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  padding: 0 0.15rem;
+}
+
+.play-table-player-label {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--chrome-foreground);
+}
+
+.play-table-player-meta {
+  margin-top: 0.05rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--chrome-text-secondary);
+}
+
+.play-table-sheet-wrap {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 0;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: #fff;
+}
+
+.play-table-finish-btn,
+.play-table-ranking-link {
+  border-radius: 0.6rem;
+  border: 1px solid #047857;
+  background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.play-table-finish-btn {
+  padding: 0.35rem 0.65rem;
+}
+
+.play-table-ranking-link {
+  align-self: center;
+  flex-shrink: 0;
+  padding: 0.45rem 0.9rem;
+}
+
+@media (orientation: landscape) and (min-width: 768px) {
+  .play-table-mode-needs-landscape {
+    display: none;
+  }
+
+  .play-table-mode-grid {
+    display: grid;
+    min-height: 0;
+    flex: 1 1 0;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.55rem;
+    overflow: hidden;
+  }
+}
+
 .play-score-board {
   border-radius: 0.75rem;
   background: #fff;

@@ -3,7 +3,8 @@ const LEGACY_MP_KEY = "kniffel-mp-session";
 
 export type ActiveGameState =
   | { type: "solo"; runId: string }
-  | { type: "multi"; runId: string; playerSecret: string; inviteCode: string };
+  | { type: "multi"; runId: string; playerSecret: string; inviteCode: string }
+  | { type: "table"; inviteCode: string };
 
 export function saveActiveGame(state: ActiveGameState): void {
   if (typeof window === "undefined") return;
@@ -64,6 +65,9 @@ function parseActiveGame(raw: string): ActiveGameState | null {
     ) {
       return data;
     }
+    if (data.type === "table" && typeof data.inviteCode === "string") {
+      return { type: "table", inviteCode: data.inviteCode };
+    }
   } catch {
     /* ignore */
   }
@@ -79,6 +83,9 @@ export function clearActiveGame(): void {
 export function playPath(game: ActiveGameState): string {
   if (game.type === "multi") {
     return `/play?runId=${encodeURIComponent(game.runId)}&invite=${encodeURIComponent(game.inviteCode)}`;
+  }
+  if (game.type === "table") {
+    return `/play?table=1&invite=${encodeURIComponent(game.inviteCode)}`;
   }
   return `/play?runId=${encodeURIComponent(game.runId)}`;
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PlayBoard } from "@/components/PlayBoard";
+import { TableModePlayBoard } from "@/components/TableModePlayBoard";
 import { APP_HOME_PATH } from "@/lib/branding";
 import {
   loadActiveGame,
@@ -18,12 +19,18 @@ function PlayContent() {
   const runId = searchParams.get("runId");
   const inviteFromUrl = searchParams.get("invite")?.trim() || undefined;
   const secretFromUrl = searchParams.get("playerSecret")?.trim() || undefined;
+  const tableMode = searchParams.get("table") === "1";
 
   const [playerSecret, setPlayerSecret] = useState<string | undefined>(undefined);
   const [inviteCode, setInviteCode] = useState<string | undefined>(inviteFromUrl);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    if (tableMode) {
+      setReady(true);
+      return;
+    }
+
     if (!runId) {
       const stored = loadActiveGame();
       if (stored) {
@@ -53,7 +60,7 @@ function PlayContent() {
     }
 
     const stored = loadActiveGame();
-    if (stored?.runId === runId) {
+    if (stored?.type !== "table" && stored?.runId === runId) {
       if (stored.type === "multi") {
         setPlayerSecret(stored.playerSecret);
         setInviteCode(inviteFromUrl ?? stored.inviteCode);
@@ -63,10 +70,24 @@ function PlayContent() {
       }
     }
     setReady(true);
-  }, [runId, secretFromUrl, inviteFromUrl, router]);
+  }, [runId, secretFromUrl, inviteFromUrl, router, tableMode]);
 
   if (!ready) {
     return <p className="play-empty-state">Lade …</p>;
+  }
+
+  if (tableMode) {
+    if (!inviteFromUrl) {
+      return (
+        <div className="play-message-card">
+          <p className="text-muted text-sm">Kein Tischspiel geladen.</p>
+          <Link href="/multi" className="play-top-link mt-2 inline-block">
+            Raum erstellen
+          </Link>
+        </div>
+      );
+    }
+    return <TableModePlayBoard inviteCode={inviteFromUrl} />;
   }
 
   if (!runId) {

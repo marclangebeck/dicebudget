@@ -1,0 +1,367 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { FitScoreSheet } from "@/components/FitScoreSheet";
+import { ScoreEntryPanel } from "@/components/ScoreEntryPanel";
+import { ScoreSheetTable } from "@/components/ScoreSheetTable";
+import {
+  clearLastField,
+  completeField,
+  finishRun,
+  getRun,
+  getSessionLobby,
+  incrementExtraYatzy,
+} from "@/lib/api";
+import { APP_HOME_PATH } from "@/lib/branding";
+import { poolDeltaForComplete } from "@/lib/gameRules";
+import { upperBonusAchieved } from "@/lib/gameScoring";
+import { getBonusCelebrationEnabled } from "@/lib/uiPrefs";
+import { allFieldsScored, getLastScoredFieldId } from "@/lib/runUtils";
+import {
+  loadTableModeSession,
+  type TableModePlayer,
+  type TableModeSide,
+} from "@/lib/tableMode";
+import type { SessionLobbyDto } from "@/lib/sessionTypes";
+import type { FieldDto, RunDto } from "@/lib/types";
+import { BonusOverlay } from "@/components/BonusOverlay";
+
+type Props = {
+  inviteCode: string;
+};
+
+type RunMap = Record<TableModeSide, RunDto | null>;
+
+function defaultRollsUsed(run: RunDto): number {
+  return run.useStrategyRules ? 3 : 1;
+}
+
+function playerCardClass(side: TableModeSide, activeSide: TableModeSide | null): string {
+  return side === activeSide ? "play-table-player play-table-player--active" : "play-table-player";
+}
+
+export function TableModePlayBoard({ inviteCode }: Props) {
+  const [players, setPlayers] = useState<[TableModePlayer, TableModePlayer] | null>(null);
+  const [runs, setRuns] = useState<RunMap>({ left: null, right: null });
+  const [lobby, setLobby] = useState<SessionLobbyDto | null>(null);
+  const [activeSide, setActiveSide] = useState<TableModeSide | null>(null);
+  const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
+  const [scoreInput, setScoreInput] = useState("");
+  const [rollsUsed, setRollsUsed] = useState<number | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [bonusOverlay, setBonusOverlay] = useState<{
+    side: TableModeSide;
+    gameIndex: number | null;
+  } | null>(null);
+
+  const load = useCallback(async () => {
+    const stored = loadTableModeSession(inviteCode);
+    if (!stored) {
+      setPlayers(null);
+      setError("Für diesen Raum ist auf diesem Gerät kein iPad-Tischmodus gespeichert.");
+      return;
+    }
+    setPlayers(stored.players);
+    const [leftRun, rightRun, lobbyResult] = await Promise.all([
+      getRun(stored.players[0].runId, stored.players[0].playerSecret),
+      getRun(stored.players[1].runId, stored.players[1].playerSecret),
+      getSessionLobby(inviteCode),
+    ]);
+    setRuns({ left: leftRun.run, right: rightRun.run });
+    setLobby(lobbyResult.session);
+  }, [inviteCode]);
+
+  useEffect(() => {
+    void load().catch((e) =>
+      setError(e instanceof Error ? e.message : "Tischspiel konnte nicht geladen werden"),
+    );
+  }, [load]);
+
+  useEffect(() => {
+    if (!bonusOverlay) return;
+    const timer = window.setTimeout(() => setBonusOverlay(null), 2500);
+    return () => window.clearTimeout(timer);
+  }, [bonusOverlay]);
+
+  const activeRun = activeSide ? runs[activeSide] : null;
+  const activePlayer = useMemo(
+    () => players?.find((p) => p.side === activeSide) ?? null,
+    [players, activeSide],
+  );
+  const activeField: FieldDto | undefined = activeRun?.games
+    .flatMap((g) => g.fields)
+    .find((f) => f.id === activeFieldId);
+  const activeGameIndex =
+    activeRun?.games.find((g) => g.fields.some((f) => f.id === activeFieldId))?.index ?? null;
+  const isCorrection = !!activeField && activeField.score !== null;
+  const canClearLast =
+    !!activeField &&
+    !!activeRun &&
+    isCorrection &&
+    activeField.id === getLastScoredFieldId(activeRun);
+  const showEntryPanel = !!activeRun && !!activeField;
+
+  const rollsInPoolForEntry =
+    isCorrection && activeField && activeRun?.useStrategyRules
+      ? (() => {
+          const oldDelta = poolDeltaForComplete(activeField.rollsUsed, true);
+          return activeRun.rollsInPool + oldDelta.poolCost - oldDelta.spareToPool;
+        })()
+      : activeRun?.rollsInPool;
+
+  function resetEntry() {
+    setActiveSide(null);
+    setActiveFieldId(null);
+    setScoreInput("");
+    setRollsUsed(null);
+  }
+
+  function selectField(side: TableModeSide, fieldId: string) {
+    const run = runs[side];
+    if (!run || run.status !== "ACTIVE") return;
+    const field = run.games.flatMap((g) => g.fields).find((f) => f.id === fieldId);
+    if (!field) return;
+    setActiveSide(side);
+    setActiveFieldId(fieldId);
+    if (field.score !== null) {
+      setScoreInput(String(field.score));
+      setRollsUsed(run.useStrategyRules ? field.rollsUsed : 1);
+      return;
+    }
+    setScoreInput("");
+    setRollsUsed(defaultRollsUsed(run));
+  }
+
+  async function refreshAfterChange(side: TableModeSide, updated: RunDto) {
+    setRuns((current) => ({ ...current, [side]: updated }));
+    const { session } = await getSessionLobby(inviteCode);
+    setLobby(session);
+  }
+
+  async function handleSubmit() {
+    if (!activeSide || !activePlayer || !activeRun || !activeFieldId || scoreInput === "") return;
+    const effectiveRolls = activeRun.useStrategyRules ? (rollsUsed ?? 0) : (rollsUsed ?? 1);
+    if (activeRun.useStrategyRules && rollsUsed === null) return;
+    if (effectiveRolls < 1) return;
+    const score = Number(scoreInput);
+    if (Number.isNaN(score)) return;
+
+    setBusy(true);
+    setError(null);
+    try {
+      const gameBefore = activeRun.games.find((g) =>
+        g.fields.some((f) => f.id === activeFieldId),
+      );
+      const { run: updated } = await completeField(
+        activeRun.id,
+        activeFieldId,
+        score,
+        effectiveRolls,
+        activePlayer.playerSecret,
+      );
+      const gameAfter = updated.games.find((g) =>
+        g.fields.some((f) => f.id === activeFieldId),
+      );
+      const bonusJustAchieved =
+        !!gameBefore &&
+        !!gameAfter &&
+        !upperBonusAchieved(gameBefore.fields) &&
+        upperBonusAchieved(gameAfter.fields);
+      await refreshAfterChange(activeSide, updated);
+      if (bonusJustAchieved && getBonusCelebrationEnabled()) {
+        setBonusOverlay({
+          side: activeSide,
+          gameIndex: updated.gameCount > 1 ? gameAfter?.index ?? null : null,
+        });
+      }
+      resetEntry();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Eintrag fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleClearLast() {
+    if (!activeSide || !activePlayer || !activeRun || !activeFieldId) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const { run: updated } = await clearLastField(
+        activeRun.id,
+        activeFieldId,
+        activePlayer.playerSecret,
+      );
+      await refreshAfterChange(activeSide, updated);
+      resetEntry();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Löschen fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleExtraYatzy(side: TableModeSide) {
+    const player = players?.find((p) => p.side === side);
+    const run = runs[side];
+    if (!player || !run || run.status !== "ACTIVE") return;
+    setBusy(true);
+    setError(null);
+    try {
+      const { run: updated } = await incrementExtraYatzy(run.id, player.playerSecret);
+      await refreshAfterChange(side, updated);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Zusatz-Yatzy fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleFinish(side: TableModeSide) {
+    const player = players?.find((p) => p.side === side);
+    const run = runs[side];
+    if (!player || !run) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const { run: updated } = await finishRun(run.id, player.playerSecret);
+      await refreshAfterChange(side, updated);
+      if (activeSide === side) resetEntry();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Abschluss fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!players) {
+    return (
+      <div className="play-message-card">
+        <p className="text-secondary text-sm">
+          {error ?? "Lade iPad-Tischmodus …"}
+        </p>
+        <Link href="/multi" className="play-top-link mt-3 inline-block">
+          Raum erstellen
+        </Link>
+      </div>
+    );
+  }
+
+  const allFinished = players.every((p) => runs[p.side]?.status === "FINISHED");
+
+  return (
+    <div className="play-table-mode relative flex min-h-0 flex-1 flex-col gap-1.5 overflow-hidden">
+      <div className="play-table-mode-header">
+        <div>
+          <p className="play-table-mode-kicker">iPad-Tischmodus · Code {inviteCode}</p>
+          <p className="play-table-mode-title">
+            Zwei Zettel auf einem iPad im Querformat
+            {lobby ? ` · Runde ${lobby.roundNumber}` : ""}
+          </p>
+        </div>
+        <Link href={APP_HOME_PATH} className="play-top-link">
+          Start
+        </Link>
+      </div>
+
+      <div className="play-table-mode-needs-landscape">
+        Bitte drehe das iPad ins Querformat. Der normale iPhone-Spielmodus bleibt unverändert.
+      </div>
+
+      {error && <p className="glass-alert-error shrink-0 px-3 py-2 text-sm">{error}</p>}
+
+      <div className="play-table-mode-grid">
+        {players.map((player) => {
+          const run = runs[player.side];
+          const completed = !!run && allFieldsScored(run);
+          return (
+            <section
+              key={player.side}
+              className={playerCardClass(player.side, activeSide)}
+            >
+              <div className="play-table-player-head">
+                <div>
+                  <p className="play-table-player-label">{player.label}</p>
+                  {run && (
+                    <p className="play-table-player-meta tabular-nums">
+                      {run.status === "FINISHED"
+                        ? `${run.totalScore} Punkte · fertig`
+                        : run.useStrategyRules
+                          ? `Pool ${run.rollsInPool}`
+                          : "Klassisch"}
+                    </p>
+                  )}
+                </div>
+                {completed && run?.status !== "FINISHED" && (
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void handleFinish(player.side)}
+                    className="play-table-finish-btn disabled:opacity-50"
+                  >
+                    {busy ? "…" : "Ergebnis"}
+                  </button>
+                )}
+              </div>
+              <div className="play-table-sheet-wrap">
+                {run ? (
+                  <FitScoreSheet
+                    layoutKey={`${player.side}-${run.gameCount}-${run.status}-${activeSide === player.side ? activeFieldId ?? "active" : "idle"}`}
+                  >
+                    <ScoreSheetTable
+                      run={run}
+                      activeFieldId={activeSide === player.side ? activeFieldId : null}
+                      onSelectField={(fieldId) => selectField(player.side, fieldId)}
+                      onIncrementExtraYatzy={() => void handleExtraYatzy(player.side)}
+                      extraYatzyBusy={busy}
+                    />
+                  </FitScoreSheet>
+                ) : (
+                  <p className="play-empty-state">Lade Zettel …</p>
+                )}
+              </div>
+            </section>
+          );
+        })}
+      </div>
+
+      {allFinished && (
+        <Link
+          href={`/multi/join?code=${encodeURIComponent(inviteCode)}`}
+          className="play-table-ranking-link"
+        >
+          Zur Rangliste
+        </Link>
+      )}
+
+      {bonusOverlay && (
+        <BonusOverlay
+          gameIndex={bonusOverlay.gameIndex}
+          onClose={() => setBonusOverlay(null)}
+        />
+      )}
+
+      {showEntryPanel && activeRun && activeField && (
+        <ScoreEntryPanel
+          id="score-entry-panel"
+          run={activeRun}
+          gameIndex={activeGameIndex}
+          field={activeField}
+          scoreInput={scoreInput}
+          rollsUsed={rollsUsed}
+          busy={busy}
+          isCorrection={isCorrection}
+          canClearLast={canClearLast}
+          rollsInPoolOverride={rollsInPoolForEntry}
+          onPickScoreValue={(v) => setScoreInput(String(v))}
+          onRollsUsed={setRollsUsed}
+          onSubmit={() => void handleSubmit()}
+          onClearLast={() => void handleClearLast()}
+          onCancel={resetEntry}
+        />
+      )}
+    </div>
+  );
+}
