@@ -1,8 +1,8 @@
 # iOS Aktuell - dice.budget
 
-**Stand:** 2026-06-01  
+**Stand:** 2026-06-02  
 **Branch:** `milestone-22-prep`  
-**Git-HEAD:** `549e8a7`  
+**Produktcode-HEAD:** `0b2e25c`  
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-/App-Store-Stand. Aeltere iOS-Historie steht in `docs/ios_archive.md`.
@@ -12,8 +12,8 @@ Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-
 - App Store Connect ist bei **Version 2.0**.
 - Aktueller TestFlight-Build ist **2.0 (6)**.
 - Naechster Upload ist **2.0 (7)**.
-- M34 + M35 + UI-Politur sind **noch nicht** in TestFlight `2.0 (6)`.
-- Der Upload `2.0 (7)` muss M34 + M35 + UI-Politur enthalten.
+- M34 + M35 + UI-Politur + iPad-Tischmodus sind **noch nicht** in TestFlight `2.0 (6)`.
+- Der Upload `2.0 (7)` muss M34 + M35 + UI-Politur + iPad-Tischmodus enthalten.
 - Web/API sind live unter https://dicebudget.bottle-trade.de.
 
 ## Was In 2.0 (7) Enthalten Sein Muss
@@ -33,6 +33,15 @@ Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-
 - UI-Politur:
   - Punktwahl gelb gefuellt
   - Spielzettel fuellt volle Bildschirmhoehe
+  - Ergebnis-Zeilen moderater; `Ergebnis 1` mit besser lesbarem `+/-`-Delta
+- iPad-Tischmodus:
+  - Host-Option auf `/multi`
+  - genau 2 Spieler auf einem iPad im Querformat
+  - Namen fuer linken/rechten Spieler eingebbar
+  - technische Spieler-IDs sind gueltige UUIDs
+  - lokale Aliase sorgen fuer Anzeige/Statistik-Zuordnung
+  - Gegner-Pool sichtbar und Pool-Endspiel bleiben waehlbar
+  - Pool-Endspiel im Zwei-Zettel-Screen aufloesbar
 
 ## Mac-Workflow Fuer Naechsten Upload
 
@@ -64,6 +73,14 @@ In Xcode:
 5. Ziel `Any iOS Device`.
 6. `Product -> Archive`.
 7. Upload zu App Store Connect.
+
+## TestFlight-Pruefung Fuer 2.0 (7)
+
+- iPhone: bestehender Solo-/Multiplayer-Flow unveraendert.
+- iPad Hochformat: Tischmodus zeigt Dreh-Hinweis.
+- iPad Querformat: Tischmodus zeigt zwei anklickbare Zettel nebeneinander.
+- Tischmodus: Namen links/rechts eingeben und pruefen, ob Statistik/Paarung diese Aliase nutzt.
+- Tischmodus Strategy: Gegner-Pool sichtbar und Pool-Endspiel pruefen.
 
 ## App Store Connect Offen
 

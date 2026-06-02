@@ -23,16 +23,17 @@ Nur bei Bedarf:
 ## Aktueller Kurzstand
 
 - Branch: `milestone-22-prep`
-- Git-HEAD: `549e8a7`
+- Produktcode-HEAD: `0b2e25c`
 - Web/API live: https://dicebudget.bottle-trade.de
 - iOS: TestFlight `2.0 (6)`, naechster Upload `2.0 (7)`
-- M34 + M35 + UI-Politur sind Web/Backend-seitig erledigt und deployed.
-- M34 + M35 + UI-Politur sind noch nicht im iOS-Build.
+- M34 + M35 + UI-Politur + iPad-Tischmodus sind Web-seitig erledigt.
+- M34 + M35 + UI-Politur + iPad-Tischmodus sind noch nicht im iOS-Build.
 
 ## Offene Prioritaeten
 
-1. iOS-Build `2.0 (7)` mit M34 + M35 + UI-Politur hochladen.
+1. iOS-Build `2.0 (7)` mit M34 + M35 + UI-Politur + iPad-Tischmodus hochladen.
 2. App Store Connect: Paid Agreement, Bank/Steuer, Preis `1,19 EUR`.
 3. Store-Metadaten und Datenschutzfragebogen abschliessen.
-4. Optional: Stats-Reset-/Baseline-Endpunkte absichern.
-5. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main`.
+4. TestFlight auf iPhone und iPad pruefen.
+5. Optional: Stats-Reset-/Baseline-Endpunkte absichern.
+6. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main`.

@@ -1,8 +1,8 @@
 # Aktive Milestones - dice.budget
 
-**Stand:** 2026-06-01  
+**Stand:** 2026-06-02  
 **Branch:** `milestone-22-prep`  
-**Git-HEAD:** `549e8a7`  
+**Produktcode-HEAD:** `0b2e25c`  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -19,11 +19,12 @@ Technische Basis ist erledigt:
 - Native App startet direkt auf `/app`.
 - Native API-Basis zeigt auf `https://dicebudget.bottle-trade.de/api`.
 - TestFlight ist aktiv, aktueller Build ist `2.0 (6)`.
-- Naechster Upload ist `2.0 (7)` und muss M34 + M35 + UI-Politur enthalten.
+- Naechster Upload ist `2.0 (7)` und muss M34 + M35 + UI-Politur + iPad-Tischmodus enthalten.
 
 Offen:
 
 - iOS-Build `2.0 (7)` auf dem Mac bauen und hochladen.
+- iPad-Tischmodus in TestFlight auf iPad Querformat testen; iPhone-Flow muss unveraendert bleiben.
 - TestFlight nach Upload erneut testen.
 - App Store Connect fuer kostenpflichtigen Release fertigstellen.
 
@@ -69,7 +70,8 @@ Technische Hinweise:
 
 - Gewaehlter Punktwert im Eintrags-Overlay ist gelb gefuellt.
 - Spielzettel fuellt die volle Bildschirmhoehe.
-- Ergebnis-Zeilen sind groesser und passen sich an das iPhone-Format an.
+- Ergebnis-Zeilen sind nur moderat hoeher als Eintragsfelder.
+- `Ergebnis 1` hebt Hauptwert und Bonus-Delta (`+/-`) deutlicher hervor.
 
 Dateien:
 
@@ -77,13 +79,36 @@ Dateien:
 - `frontend/components/FitScoreSheet.tsx`
 - `frontend/components/ScoreSheetTable.tsx`
 
+### iPad-Tischmodus 2026-06-02
+
+**Status:** erledigt und Web deployed, noch nicht in iOS `2.0 (6)`.
+
+- Host-Option auf `/multi`: `iPad-Tischmodus`.
+- Erstellt ein 2-Spieler-Spiel auf einem iPad und oeffnet `/play?table=1&invite=...`.
+- Zwei Zettel werden im iPad-Querformat nebeneinander angezeigt und sind beide antippbar.
+- Spielernamen fuer links/rechts sind beim Erstellen eingebbar.
+- Technische `playerId`s sind gueltige UUIDs; Namen werden lokal als Aliase gespeichert und fuer Anzeige/Statistik-Zuordnung genutzt.
+- Gegner-Pool sichtbar und Pool-Endspiel bleiben im Tischmodus waehlbar.
+- Pool-Endspiel wird im Zwei-Zettel-Screen aufgeloest.
+- Kein Backend-Schema und keine neue Migration.
+
+Dateien:
+
+- `frontend/app/multi/page.tsx`
+- `frontend/app/play/page.tsx`
+- `frontend/components/TableModePlayBoard.tsx`
+- `frontend/lib/tableMode.ts`
+- `frontend/lib/activeGame.ts`
+- `frontend/app/globals.css`
+
 ## Offene Aufgaben
 
-1. iOS-Build `2.0 (7)` mit M34 + M35 + UI-Politur hochladen.
+1. iOS-Build `2.0 (7)` mit M34 + M35 + UI-Politur + iPad-Tischmodus hochladen.
 2. App Store Connect: Paid Applications Agreement, Bank/Steuer.
 3. Preis `1,19 EUR`, Screenshots, Beschreibung DE, Datenschutzfragebogen.
-4. Optional: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschraenken.
-5. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
+4. TestFlight auf iPhone und iPad pruefen.
+5. Optional: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschraenken.
+6. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
 
 ## Bekannte Technische Schulden
 
@@ -91,14 +116,15 @@ Dateien:
 - `POST /stats/pairings/baseline` ist ohne Auth und global wirksam.
 - `LeagueStanding` wird nach Statistik-Reset nicht rueckwirkend neu berechnet.
 - Next.js Security-Upgrade ist als spaeteres Thema notiert.
-- Frontend-/E2E-Tests fehlen.
+- Frontend-/E2E-Tests fehlen, insbesondere fuer iPad-Tischmodus.
 - Admin-UI fuer manuelle Paarungs-Baselines fehlt.
 
 ## Aktuelle Prioritaeten
 
 1. iOS/TestFlight `2.0 (7)` bereitstellen.
-2. Store-Connect-Freigaben und Metadaten abschliessen.
-3. Danach erst optionale Sicherheits-/Auth-Verfeinerung der Stats-Endpunkte planen.
+2. iPad-Tischmodus auf iPad Querformat und iPhone-Regression testen.
+3. Store-Connect-Freigaben und Metadaten abschliessen.
+4. Danach erst optionale Sicherheits-/Auth-Verfeinerung der Stats-Endpunkte planen.
 
 ## Wichtige Dateien Fuer Aktuelle Arbeit
 
@@ -111,9 +137,12 @@ Dateien:
 - `frontend/components/FieldScoreChoiceGrid.tsx`
 - `frontend/components/ScoreSheetTable.tsx`
 - `frontend/components/FitScoreSheet.tsx`
+- `frontend/components/TableModePlayBoard.tsx`
 - `frontend/components/PairingEditOverlay.tsx`
 - `frontend/components/PairingSummaryCard.tsx`
 - `frontend/lib/pairingMerge.ts`
 - `frontend/lib/api.ts`
+- `frontend/lib/tableMode.ts`
+- `frontend/lib/activeGame.ts`
 - `backend/src/services/pairingStats.ts`
 - `backend/src/routes/stats.ts`

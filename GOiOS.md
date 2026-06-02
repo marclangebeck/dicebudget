@@ -15,7 +15,7 @@ Diese Datei ist ein Kompatibilitaets-Index. Fuer aktuellen iOS-/TestFlight-/App-
 - Version in App Store Connect: `2.0`
 - Aktueller TestFlight-Build: `2.0 (6)`
 - Naechster Upload: `2.0 (7)`
-- M34 + M35 + UI-Politur sind noch nicht im aktuellen TestFlight-Build.
+- M34 + M35 + UI-Politur + iPad-Tischmodus sind noch nicht im aktuellen TestFlight-Build.
 
 ## Wichtig
 

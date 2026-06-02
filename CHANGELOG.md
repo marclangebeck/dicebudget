@@ -37,7 +37,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - (zuvor, Version 1.0) Build **18** — M33 + Würfe-Standard 3 · **17** — M31 + M32 · **16** — M29 + M30 · **15** — M29
 
 ### Docs
-- HANDOVER, GOiOS, milestones, CHANGELOG: Stand **Commit `a18f919`** (Version 2.0) — M34 Bugfixes + Stats-Reset, **M35 Paarungen bearbeiten**, **UI-Politur** (Punktwahl gelb, Spielzettel füllt volle Höhe); iOS-Upload 2.0 (7) enthält M34 + M35 + UI-Politur
+- HANDOVER, docs/milestones_active, docs/ios_current, GOiOS, milestones, CHANGELOG: Stand Produktcode **`0b2e25c`** — M34 Bugfixes + Stats-Reset, **M35 Paarungen bearbeiten**, **UI-Politur** und **iPad-Tischmodus**; iOS-Upload 2.0 (7) enthält M34 + M35 + UI-Politur + iPad-Tischmodus
 - AGENT_RULES (Sektion 9: Abgleich-Workflow git+server+lokal) unverändert gültig
 
 ---
