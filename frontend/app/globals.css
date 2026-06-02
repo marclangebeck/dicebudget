@@ -1117,6 +1117,27 @@ html.legal-route body {
   font-weight: 500;
 }
 
+.play-summary-value {
+  line-height: 1;
+}
+
+.play-summary-bonus-delta {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  line-height: 0.95;
+}
+
+.play-summary--ergebnis1 .play-summary-value {
+  font-size: 0.8125rem;
+  font-weight: 800;
+}
+
+.play-summary--ergebnis1 .play-summary-bonus-delta {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
 .play-summary--highlight {
   border-color: #059669;
   background: linear-gradient(180deg, #d1fae5 0%, #a7f3d0 100%);
@@ -1683,8 +1704,7 @@ html.legal-route body {
 }
 
 /* Zettel füllt die volle verfügbare Höhe: die Zeilen wachsen mit, die
-   Ergebnis-Zeilen (Ergebnis 1, Zwischensumme, Ergebnis Spiel) etwas höher als
-   die Würfe-/Feld-Zeilen. Passt sich automatisch an die iPhone-Höhe an. */
+   Ergebnis-Zeilen bleiben nur moderat höher als die Würfe-/Feld-Zeilen. */
 .play-score-table {
   height: 100%;
 }
@@ -1694,7 +1714,7 @@ html.legal-route body {
 }
 
 .play-score-table > tbody > tr.play-row--summary {
-  height: 8.6%;
+  height: 7.2%;
 }
 
 /* —— App-Screens (Statistik, Multi, … — wie Home-Bento) —— */

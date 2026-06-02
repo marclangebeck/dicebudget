@@ -222,11 +222,13 @@ function SummaryTile({
   highlight,
   extraYatzyBonus,
   bonusDelta,
+  isErgebnis1,
 }: {
   value: string | number | null;
   highlight?: boolean;
   extraYatzyBonus?: number;
   bonusDelta?: number;
+  isErgebnis1?: boolean;
 }) {
   const display = value === null ? "" : value;
   const hint = bonusDelta !== undefined && value !== null ? bonusHint(bonusDelta) : null;
@@ -235,6 +237,8 @@ function SummaryTile({
     <div
       className={`play-summary flex h-full min-h-[2.2rem] w-full flex-col items-center justify-center px-0.5 text-[11px] tabular-nums md:min-h-[1.9rem] md:text-[10px] ${
         highlight ? "play-summary--highlight" : ""
+      } ${
+        isErgebnis1 ? "play-summary--ergebnis1" : ""
       }`}
       title={
         extraYatzyBonus && extraYatzyBonus > 0
@@ -242,10 +246,10 @@ function SummaryTile({
           : undefined
       }
     >
-      <span>{display}</span>
+      <span className="play-summary-value">{display}</span>
       {hint && (
         <span
-          className={`whitespace-nowrap text-[8px] font-semibold leading-none ${hint.cls}`}
+          className={`play-summary-bonus-delta whitespace-nowrap ${hint.cls}`}
           title={hint.title}
         >
           {hint.text}
@@ -366,6 +370,7 @@ export function ScoreSheetTable({
                             ? upperBonusDelta(game.fields)
                             : undefined
                         }
+                        isErgebnis1={row.kind === "summary" && row.key === "ergebnis1"}
                       />
                     )}
                   </td>
