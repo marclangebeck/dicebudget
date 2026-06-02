@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { FitScoreSheet } from "@/components/FitScoreSheet";
+import { PoolEndgamePanel } from "@/components/PoolEndgamePanel";
 import { ScoreEntryPanel } from "@/components/ScoreEntryPanel";
 import { ScoreSheetTable } from "@/components/ScoreSheetTable";
 import {
@@ -12,6 +13,7 @@ import {
   getRun,
   getSessionLobby,
   incrementExtraYatzy,
+  resolvePoolEndgame,
 } from "@/lib/api";
 import { APP_HOME_PATH } from "@/lib/branding";
 import { poolDeltaForComplete } from "@/lib/gameRules";
@@ -23,6 +25,7 @@ import {
   type TableModePlayer,
   type TableModeSide,
 } from "@/lib/tableMode";
+import { normalizePublicPlayerId } from "@/lib/playerIdentity";
 import type { SessionLobbyDto } from "@/lib/sessionTypes";
 import type { FieldDto, RunDto } from "@/lib/types";
 import { BonusOverlay } from "@/components/BonusOverlay";
@@ -51,6 +54,8 @@ export function TableModePlayBoard({ inviteCode }: Props) {
   const [rollsUsed, setRollsUsed] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [endgameFieldId, setEndgameFieldId] = useState<string | null>(null);
+  const [endgameScoreInput, setEndgameScoreInput] = useState("");
   const [bonusOverlay, setBonusOverlay] = useState<{
     side: TableModeSide;
     gameIndex: number | null;
@@ -103,6 +108,25 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     activeField.id === getLastScoredFieldId(activeRun);
   const showEntryPanel = !!activeRun && !!activeField;
 
+  const endgamePlayer =
+    lobby?.poolEndgameImproverPlayerId && players
+      ? players.find(
+          (p) =>
+            normalizePublicPlayerId(p.playerId) ===
+            normalizePublicPlayerId(lobby.poolEndgameImproverPlayerId ?? ""),
+        ) ?? null
+      : null;
+  const endgameSide = endgamePlayer?.side ?? null;
+  const endgameRun = endgameSide ? runs[endgameSide] : null;
+  const endgameField: FieldDto | undefined = endgameRun?.games
+    .flatMap((g) => g.fields)
+    .find((f) => f.id === endgameFieldId);
+  const endgameGameIndex =
+    endgameRun?.games.find((g) => g.fields.some((f) => f.id === endgameFieldId))?.index ??
+    null;
+  const poolEndgamePending =
+    !!lobby?.poolEndgameEnabled && !lobby.poolEndgameResolved && !!endgamePlayer;
+
   const rollsInPoolForEntry =
     isCorrection && activeField && activeRun?.useStrategyRules
       ? (() => {
@@ -132,6 +156,15 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     }
     setScoreInput("");
     setRollsUsed(defaultRollsUsed(run));
+  }
+
+  function selectEndgameField(side: TableModeSide, fieldId: string) {
+    if (side !== endgameSide) return;
+    const run = runs[side];
+    const field = run?.games.flatMap((g) => g.fields).find((f) => f.id === fieldId);
+    if (!field || field.score === null) return;
+    setEndgameFieldId(fieldId);
+    setEndgameScoreInput(String(field.score));
   }
 
   async function refreshAfterChange(side: TableModeSide, updated: RunDto) {
@@ -236,6 +269,55 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     }
   }
 
+  async function refreshAllRuns(currentPlayers = players) {
+    if (!currentPlayers) return;
+    const [leftRun, rightRun, lobbyResult] = await Promise.all([
+      getRun(currentPlayers[0].runId, currentPlayers[0].playerSecret),
+      getRun(currentPlayers[1].runId, currentPlayers[1].playerSecret),
+      getSessionLobby(inviteCode),
+    ]);
+    setRuns({ left: leftRun.run, right: rightRun.run });
+    setLobby(lobbyResult.session);
+  }
+
+  async function handleEndgameSubmit() {
+    if (!endgamePlayer || !endgameFieldId || endgameScoreInput === "") return;
+    const score = Number(endgameScoreInput);
+    if (Number.isNaN(score)) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await resolvePoolEndgame(
+        inviteCode,
+        { fieldId: endgameFieldId, score },
+        endgamePlayer.playerSecret,
+      );
+      setEndgameFieldId(null);
+      setEndgameScoreInput("");
+      await refreshAllRuns();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Pool-Endspiel fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleEndgameKeep() {
+    if (!endgamePlayer) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await resolvePoolEndgame(inviteCode, { keep: true }, endgamePlayer.playerSecret);
+      setEndgameFieldId(null);
+      setEndgameScoreInput("");
+      await refreshAllRuns();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Pool-Endspiel fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   if (!players) {
     return (
       <div className="play-message-card">
@@ -250,6 +332,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
   }
 
   const allFinished = players.every((p) => runs[p.side]?.status === "FINISHED");
+  const sessionFinished = allFinished && lobby?.status === "FINISHED";
 
   return (
     <div className="play-table-mode relative flex min-h-0 flex-1 flex-col gap-1.5 overflow-hidden">
@@ -271,6 +354,24 @@ export function TableModePlayBoard({ inviteCode }: Props) {
       </div>
 
       {error && <p className="glass-alert-error shrink-0 px-3 py-2 text-sm">{error}</p>}
+
+      {poolEndgamePending && endgamePlayer && (
+        <div className="play-endgame-banner shrink-0">
+          <p className="play-endgame-banner-title">Pool-Endspiel: {endgamePlayer.label}</p>
+          <p className="play-endgame-banner-text">
+            {endgamePlayer.label} hatte den größten Wurf-Pool und darf ein Feld verbessern
+            oder den alten Wert behalten.
+          </p>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => void handleEndgameKeep()}
+            className="play-endgame-keep-btn disabled:opacity-50"
+          >
+            {busy ? "…" : "Alten Wert behalten & beenden"}
+          </button>
+        </div>
+      )}
 
       <div className="play-table-mode-grid">
         {players.map((player) => {
@@ -312,10 +413,21 @@ export function TableModePlayBoard({ inviteCode }: Props) {
                   >
                     <ScoreSheetTable
                       run={run}
-                      activeFieldId={activeSide === player.side ? activeFieldId : null}
-                      onSelectField={(fieldId) => selectField(player.side, fieldId)}
+                      activeFieldId={
+                        endgameSide === player.side && endgameFieldId
+                          ? endgameFieldId
+                          : activeSide === player.side
+                            ? activeFieldId
+                            : null
+                      }
+                      onSelectField={(fieldId) =>
+                        poolEndgamePending
+                          ? selectEndgameField(player.side, fieldId)
+                          : selectField(player.side, fieldId)
+                      }
                       onIncrementExtraYatzy={() => void handleExtraYatzy(player.side)}
                       extraYatzyBusy={busy}
+                      allowSelectWhenFinished={poolEndgamePending && endgameSide === player.side}
                     />
                   </FitScoreSheet>
                 ) : (
@@ -327,7 +439,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
         })}
       </div>
 
-      {allFinished && (
+      {sessionFinished && (
         <Link
           href={`/multi/join?code=${encodeURIComponent(inviteCode)}`}
           className="play-table-ranking-link"
@@ -360,6 +472,21 @@ export function TableModePlayBoard({ inviteCode }: Props) {
           onSubmit={() => void handleSubmit()}
           onClearLast={() => void handleClearLast()}
           onCancel={resetEntry}
+        />
+      )}
+
+      {endgameField && (
+        <PoolEndgamePanel
+          field={endgameField}
+          gameIndex={endgameGameIndex}
+          scoreInput={endgameScoreInput}
+          busy={busy}
+          onPickScoreValue={(v) => setEndgameScoreInput(String(v))}
+          onSubmit={() => void handleEndgameSubmit()}
+          onCancel={() => {
+            setEndgameFieldId(null);
+            setEndgameScoreInput("");
+          }}
         />
       )}
     </div>

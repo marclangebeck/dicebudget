@@ -23,6 +23,8 @@ export default function MultiHostPage() {
   const [showOpponentPool, setShowOpponentPool] = useState(false);
   const [poolEndgameEnabled, setPoolEndgameEnabled] = useState(false);
   const [tableModeEnabled, setTableModeEnabled] = useState(false);
+  const [tableLeftName, setTableLeftName] = useState("Links");
+  const [tableRightName, setTableRightName] = useState("Rechts");
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [leagueCode, setLeagueCode] = useState<string | null>(null);
   const [createdStrategyMode, setCreatedStrategyMode] = useState<boolean | null>(null);
@@ -43,25 +45,27 @@ export default function MultiHostPage() {
         effectiveMaxPlayers,
         useStrategyRules,
         undefined,
-        tableModeEnabled ? false : showOpponentPool,
-        tableModeEnabled ? false : poolEndgameEnabled,
+        showOpponentPool,
+        poolEndgameEnabled,
       );
       if (tableModeEnabled) {
-        const leftPlayerId = createTableModePlayerId("left");
-        const rightPlayerId = createTableModePlayerId("right");
+        const leftPlayerId = createTableModePlayerId();
+        const rightPlayerId = createTableModePlayerId();
         const leftJoin = await joinSession(session.inviteCode, leftPlayerId);
         const rightJoin = await joinSession(session.inviteCode, rightPlayerId);
+        const leftLabel = tableLeftName.trim() || "Links";
+        const rightLabel = tableRightName.trim() || "Rechts";
         const players: [TableModePlayer, TableModePlayer] = [
           {
             side: "left",
-            label: "Links",
+            label: leftLabel,
             playerId: leftPlayerId,
             runId: leftJoin.player.runId,
             playerSecret: leftJoin.player.secretToken,
           },
           {
             side: "right",
-            label: "Rechts",
+            label: rightLabel,
             playerId: rightPlayerId,
             runId: rightJoin.player.runId,
             playerSecret: rightJoin.player.secretToken,
@@ -69,8 +73,8 @@ export default function MultiHostPage() {
         ];
         saveTableModeSession({ inviteCode: session.inviteCode, players });
         saveActiveGame({ type: "table", inviteCode: session.inviteCode });
-        setPlayerAlias(leftPlayerId, "Links");
-        setPlayerAlias(rightPlayerId, "Rechts");
+        setPlayerAlias(leftPlayerId, leftLabel);
+        setPlayerAlias(rightPlayerId, rightLabel);
         router.push(
           `/play?table=1&invite=${encodeURIComponent(session.inviteCode)}`,
         );
@@ -136,7 +140,7 @@ export default function MultiHostPage() {
                   aria-label={
                     showOpponentPool ? "Gegner-Pool ausblenden" : "Gegner-Pool anzeigen"
                   }
-                  disabled={roomLocked || tableModeEnabled}
+                  disabled={roomLocked}
                   onClick={() => setShowOpponentPool((v) => !v)}
                   className={`relative h-8 w-14 shrink-0 rounded-full border-2 transition disabled:opacity-50 ${
                     showOpponentPool
@@ -172,7 +176,7 @@ export default function MultiHostPage() {
                   aria-label={
                     poolEndgameEnabled ? "Pool-Endspiel deaktivieren" : "Pool-Endspiel aktivieren"
                   }
-                  disabled={roomLocked || tableModeEnabled}
+                  disabled={roomLocked}
                   onClick={() => setPoolEndgameEnabled((v) => !v)}
                   className={`relative h-8 w-14 shrink-0 rounded-full border-2 transition disabled:opacity-50 ${
                     poolEndgameEnabled
@@ -214,8 +218,6 @@ export default function MultiHostPage() {
                     const next = !v;
                     if (next) {
                       setMaxPlayers(2);
-                      setShowOpponentPool(false);
-                      setPoolEndgameEnabled(false);
                     }
                     return next;
                   });
@@ -235,6 +237,39 @@ export default function MultiHostPage() {
             </div>
           </div>
         </div>
+
+        {tableModeEnabled && (
+          <div className="setup-host-card setup-host-card--mode">
+            <div className="grid grid-cols-2 gap-2">
+              <label className="flex min-w-0 flex-col gap-1">
+                <span className="setup-slider-label text-left">Spieler links</span>
+                <input
+                  type="text"
+                  value={tableLeftName}
+                  disabled={roomLocked}
+                  maxLength={24}
+                  onChange={(e) => setTableLeftName(e.target.value)}
+                  className="glass-input min-h-10 px-3 text-sm font-semibold"
+                />
+              </label>
+              <label className="flex min-w-0 flex-col gap-1">
+                <span className="setup-slider-label text-left">Spieler rechts</span>
+                <input
+                  type="text"
+                  value={tableRightName}
+                  disabled={roomLocked}
+                  maxLength={24}
+                  onChange={(e) => setTableRightName(e.target.value)}
+                  className="glass-input min-h-10 px-3 text-sm font-semibold"
+                />
+              </label>
+            </div>
+            <p className="text-muted mt-2 text-xs leading-snug">
+              Diese Namen werden lokal gespeichert und in Statistik/Paarungen zur Anzeige
+              und Zuordnung verwendet.
+            </p>
+          </div>
+        )}
 
         <div className="setup-host-sliders">
           <label className="setup-slider-card setup-slider-card--sky">

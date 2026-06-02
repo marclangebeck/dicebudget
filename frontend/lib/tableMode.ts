@@ -19,12 +19,18 @@ function storageKey(inviteCode: string): string {
   return `${STORAGE_PREFIX}${inviteCode.trim().toUpperCase()}`;
 }
 
-export function createTableModePlayerId(side: TableModeSide): string {
-  const suffix =
-    typeof window !== "undefined" && typeof window.crypto?.randomUUID === "function"
-      ? window.crypto.randomUUID()
-      : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
-  return `table-${side}-${suffix}`;
+export function createTableModePlayerId(): string {
+  if (typeof window !== "undefined" && typeof window.crypto?.randomUUID === "function") {
+    return window.crypto.randomUUID();
+  }
+
+  // RFC-4122-v4-Fallback fuer Browser ohne randomUUID; Backend validiert UUIDs.
+  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) =>
+    (
+      Number(c) ^
+      (Math.random() * 16) >> (Number(c) / 4)
+    ).toString(16),
+  );
 }
 
 export function saveTableModeSession(session: TableModeSession): void {
