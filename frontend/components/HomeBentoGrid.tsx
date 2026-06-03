@@ -8,57 +8,82 @@ import { normalizeInviteCode } from "@/lib/activeGame";
 import { APP_SHORT, CONTACT_EMAIL, IMPRESSUM_PATH, PRIVACY_PATH } from "@/lib/branding";
 import type { StatsDto } from "@/lib/statsTypes";
 
-function IconSolo({ className }: { className?: string }) {
+function SoloMotif({ className }: { className?: string }) {
   return (
-    <svg aria-hidden className={className} viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="2" />
-      <path
-        d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
+    <svg aria-hidden className={className} viewBox="0 0 160 120" fill="none">
+      <rect x="38" y="17" width="72" height="88" rx="14" fill="rgba(255,255,255,0.9)" />
+      <path d="M53 39h40M53 54h40M53 69h30" stroke="#0F766E" strokeWidth="6" strokeLinecap="round" />
+      <rect x="92" y="54" width="42" height="42" rx="12" fill="url(#soloDie)" />
+      <circle cx="105" cy="67" r="3.5" fill="white" />
+      <circle cx="121" cy="67" r="3.5" fill="white" />
+      <circle cx="105" cy="83" r="3.5" fill="white" />
+      <circle cx="121" cy="83" r="3.5" fill="white" />
+      <path d="M32 93c21-14 42-14 63 0" stroke="rgba(255,255,255,0.55)" strokeWidth="5" strokeLinecap="round" />
+      <defs>
+        <linearGradient id="soloDie" x1="92" y1="54" x2="134" y2="96" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#34D399" />
+          <stop offset="1" stopColor="#0F766E" />
+        </linearGradient>
+      </defs>
     </svg>
   );
 }
 
-function IconMulti({ className }: { className?: string }) {
+function MultiMotif({ className }: { className?: string }) {
   return (
-    <svg aria-hidden className={className} viewBox="0 0 24 24" fill="none">
-      <circle cx="9" cy="9" r="2.75" stroke="currentColor" strokeWidth="2" />
-      <circle cx="16" cy="10" r="2.25" stroke="currentColor" strokeWidth="2" />
-      <path
-        d="M4 19c0-2.8 2.2-5 5-5M15 19c0-2.2 1.8-4 4-4"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
+    <svg aria-hidden className={className} viewBox="0 0 160 120" fill="none">
+      <path d="M28 64c20-30 84-30 104 0" stroke="rgba(255,255,255,0.35)" strokeWidth="6" strokeLinecap="round" />
+      <circle cx="44" cy="47" r="15" fill="#67E8F9" />
+      <circle cx="116" cy="47" r="15" fill="#C4B5FD" />
+      <path d="M19 92c2-20 16-31 35-31s33 11 35 31" fill="rgba(103,232,249,0.86)" />
+      <path d="M71 92c2-20 16-31 35-31s33 11 35 31" fill="rgba(196,181,253,0.86)" />
+      <rect x="62" y="34" width="38" height="38" rx="11" fill="url(#multiDie)" />
+      <circle cx="73" cy="45" r="3.2" fill="white" />
+      <circle cx="89" cy="45" r="3.2" fill="white" />
+      <circle cx="81" cy="53" r="3.2" fill="white" />
+      <circle cx="73" cy="61" r="3.2" fill="white" />
+      <circle cx="89" cy="61" r="3.2" fill="white" />
+      <defs>
+        <linearGradient id="multiDie" x1="62" y1="34" x2="100" y2="72" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#22D3EE" />
+          <stop offset="1" stopColor="#2563EB" />
+        </linearGradient>
+      </defs>
     </svg>
   );
 }
 
-function IconStats({ className }: { className?: string }) {
+function StatsMotif({ className }: { className?: string }) {
   return (
-    <svg aria-hidden className={className} viewBox="0 0 24 24" fill="none">
-      <path
-        d="M5 18V10M10 18V6M15 18v-5M20 18V8"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
+    <svg aria-hidden className={className} viewBox="0 0 160 120" fill="none">
+      <path d="M52 30h56v17c0 20-12 35-28 35S52 67 52 47V30Z" fill="url(#statsCup)" />
+      <path d="M52 39H36c1 19 10 29 24 31M108 39h16c-1 19-10 29-24 31" stroke="#FDE68A" strokeWidth="8" strokeLinecap="round" />
+      <rect x="67" y="80" width="26" height="10" rx="5" fill="#F59E0B" />
+      <rect x="55" y="90" width="50" height="10" rx="5" fill="#92400E" />
+      <rect x="21" y="70" width="14" height="26" rx="5" fill="rgba(251,191,36,0.72)" />
+      <rect x="125" y="58" width="14" height="38" rx="5" fill="rgba(251,191,36,0.54)" />
+      <path d="M80 40l4.5 9 10 1.5-7.2 7 1.7 9.8-9-4.7-9 4.7 1.7-9.8-7.2-7 10-1.5L80 40Z" fill="#FFFBEB" />
+      <defs>
+        <linearGradient id="statsCup" x1="52" y1="30" x2="108" y2="82" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#FDE68A" />
+          <stop offset="0.48" stopColor="#F59E0B" />
+          <stop offset="1" stopColor="#B45309" />
+        </linearGradient>
+      </defs>
     </svg>
   );
 }
 
-function IconJoin({ className }: { className?: string }) {
+function JoinMotif({ className }: { className?: string }) {
   return (
-    <svg aria-hidden className={className} viewBox="0 0 24 24" fill="none">
-      <path
-        d="M8 11h8M12 8v6M7 5h10a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
+    <svg aria-hidden className={className} viewBox="0 0 160 120" fill="none">
+      <rect x="23" y="27" width="114" height="66" rx="18" fill="rgba(255,255,255,0.16)" />
+      <rect x="34" y="42" width="92" height="36" rx="12" fill="rgba(15,23,42,0.58)" stroke="rgba(255,255,255,0.25)" />
+      <path d="M50 61h14M73 61h14M96 61h14" stroke="#F0ABFC" strokeWidth="7" strokeLinecap="round" />
+      <circle cx="42" cy="93" r="8" fill="#A855F7" />
+      <circle cx="80" cy="101" r="8" fill="#EC4899" />
+      <circle cx="118" cy="93" r="8" fill="#60A5FA" />
+      <path d="M50 92c14-11 46-11 60 0" stroke="rgba(255,255,255,0.35)" strokeWidth="4" strokeLinecap="round" />
     </svg>
   );
 }
@@ -91,10 +116,11 @@ function HomeLegalFooter() {
 type NavTileProps = {
   href: string;
   area: string;
-  tone: "sky" | "primary" | "neutral" | "violet";
-  iconSize?: "lg" | "md";
+  tone: "multi" | "stats" | "solo";
   title: string;
   subtitle: string;
+  badge: string;
+  cta: string;
   icon: (props: { className: string }) => ReactNode;
   footer?: ReactNode;
 };
@@ -103,31 +129,31 @@ function NavTile({
   href,
   area,
   tone,
-  iconSize = "md",
   title,
   subtitle,
+  badge,
+  cta,
   icon,
   footer,
 }: NavTileProps) {
-  const iconClass =
-    iconSize === "lg" ? "home-bento-icon home-bento-icon--lg" : "home-bento-icon home-bento-icon--md";
-
   return (
     <Link
       href={href}
       className={`home-bento-tile home-bento-tile--${tone} flex min-h-0 flex-col no-underline`}
       style={{ gridArea: area }}
     >
+      <span className="home-bento-badge">{badge}</span>
       <span className="home-bento-tile-arrow" aria-hidden>
         →
       </span>
-      <div className="home-bento-icon-wrap">
-        {icon({ className: iconClass })}
+      <div className="home-bento-poster-art">
+        {icon({ className: "home-bento-motif" })}
       </div>
-      <div className="home-bento-tile-footer shrink-0 text-center">
-        <p className="text-strong text-base font-semibold leading-tight">{title}</p>
-        <p className="text-muted mt-0.5 text-[11px] leading-snug">{subtitle}</p>
+      <div className="home-bento-tile-footer shrink-0">
+        <p className="home-bento-title">{title}</p>
+        <p className="home-bento-subtitle">{subtitle}</p>
         {footer}
+        <p className="home-bento-cta">{cta}</p>
       </div>
     </Link>
   );
@@ -152,8 +178,11 @@ function JoinTile() {
   return (
     <div className="home-bento-join-bar">
       <div className="home-bento-join-head">
-        <IconJoin className="home-bento-icon home-bento-icon--md" />
-        <p className="text-strong text-sm font-semibold">Raum beitreten</p>
+        <div>
+          <p className="home-bento-join-kicker">Live-Lobby</p>
+          <p className="home-bento-join-title">Raum beitreten</p>
+        </div>
+        <JoinMotif className="home-bento-join-motif" />
       </div>
       <form onSubmit={handleSubmit} className="home-bento-join-form">
         <input
@@ -175,9 +204,9 @@ function JoinTile() {
           type="submit"
           className="home-bento-submit home-bento-submit--lg w-full font-semibold"
         >
-          Zur Lobby
+          Beitreten
         </button>
-        {error && <p className="text-center text-xs font-medium text-red-800">{error}</p>}
+        {error && <p className="home-bento-join-error">{error}</p>}
       </form>
     </div>
   );
@@ -199,28 +228,46 @@ export function HomeBentoGrid() {
     statsError !== null ? (
       <p className="text-[10px] font-medium text-red-800 mt-1">—</p>
     ) : stats === null ? (
-      <p className="text-muted mt-2 text-[10px]">Lade …</p>
+      <p className="home-bento-mini-stat">Lade...</p>
     ) : stats.finishedRuns === 0 ? (
-      <p className="text-muted mt-2 text-xs">Noch kein Rekord</p>
+      <p className="home-bento-mini-stat">Noch kein Rekord</p>
     ) : (
       <p className="home-bento-stat-value mt-1 tabular-nums">{stats.bestTotalScore}</p>
     );
 
+  const playedLabel = stats === null ? "..." : String(stats.finishedRuns);
+  const bestLabel = stats?.bestTotalScore == null ? "Offen" : String(stats.bestTotalScore);
+  const avgLabel =
+    stats?.averageTotalScore == null ? "Bereit" : `${Math.round(stats.averageTotalScore)} Ø`;
+  const levelProgress = stats?.bestTotalScore == null ? 18 : Math.min(96, Math.max(18, stats.bestTotalScore / 4));
+
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2.5">
       <header className="home-hero-banner shrink-0">
-        <img
-          src="/apple-touch-icon.png"
-          alt=""
-          width={64}
-          height={64}
-          className="home-hero-logo"
-          decoding="async"
-        />
-        <div className="home-hero-copy min-w-0">
-          <p className="home-hero-kicker">Willkommen bei</p>
-          <h1 className="text-strong text-2xl font-bold tracking-tight">{APP_SHORT}</h1>
-          <p className="text-muted text-sm">Strategy Edition</p>
+        <div className="home-hero-copy">
+          <p className="home-hero-kicker">{APP_SHORT} · Strategy Edition</p>
+          <h1 className="home-hero-title">Bereit für die nächste Runde?</h1>
+          <p className="home-hero-subtitle">Risiko, Timing und Rivalität in jedem Wurf.</p>
+        </div>
+        <div className="home-hero-stats" aria-label="Spielübersicht">
+          <span>
+            <strong>{playedLabel}</strong>
+            Partien
+          </span>
+          <span>
+            <strong>{bestLabel}</strong>
+            Bestwert
+          </span>
+          <span>
+            <strong>{avgLabel}</strong>
+            Saison
+          </span>
+        </div>
+        <div className="home-hero-progress" aria-label="Saisonfortschritt">
+          <span>Level-Fortschritt</span>
+          <div className="home-hero-progress-track">
+            <div style={{ width: `${levelProgress}%` }} />
+          </div>
         </div>
       </header>
 
@@ -228,28 +275,33 @@ export function HomeBentoGrid() {
         <NavTile
           href="/multi"
           area="multi"
-          tone="primary"
-          iconSize="lg"
+          tone="multi"
           title="Raum erstellen"
-          subtitle="Host · Code für Gäste"
-          icon={(p) => <IconMulti {...p} />}
+          subtitle="Starte eine Lobby und lade Mitspieler an den Tisch."
+          badge="Multiplayer"
+          cta="Neue Runde öffnen"
+          icon={(p) => <MultiMotif {...p} />}
         />
         <NavTile
           href="/stats"
           area="stats"
-          tone="violet"
+          tone="stats"
           title="Statistik"
-          subtitle="Paarungen & Rekorde"
-          icon={(p) => <IconStats {...p} />}
+          subtitle="Rekorde, Duelle und Erfolge auf einen Blick."
+          badge="Rangliste"
+          cta="Erfolge ansehen"
+          icon={(p) => <StatsMotif {...p} />}
           footer={statsFooter}
         />
         <NavTile
           href="/solo"
           area="solo"
-          tone="sky"
+          tone="solo"
           title="Einzelspiel"
-          subtitle="Spielanzahl & Modus wählen"
-          icon={(p) => <IconSolo {...p} />}
+          subtitle="Trainiere deinen Run mit taktischem Fokus."
+          badge="Solo"
+          cta="Run starten"
+          icon={(p) => <SoloMotif {...p} />}
         />
         <JoinTile />
       </div>
