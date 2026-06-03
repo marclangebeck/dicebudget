@@ -458,10 +458,10 @@ html.play-route body {
 
 html.home-route,
 html.home-route body {
-  min-height: 100%;
+  height: 100%;
   overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
+  overflow-y: hidden;
+  overscroll-behavior: none;
   touch-action: pan-y manipulation;
 }
 
@@ -496,11 +496,18 @@ html.legal-route body {
 }
 
 .home-screen {
+  height: 100dvh;
+  max-height: 100dvh;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y manipulation;
 }
 
 .home-screen-main {
-  min-height: 100dvh;
+  min-height: min-content;
   overflow: visible;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y manipulation;
@@ -795,13 +802,18 @@ html.legal-route body {
   max-height: 3.8rem;
 }
 
+.home-bento-tile--stats .home-bento-poster-art,
+.home-bento-tile--solo .home-bento-poster-art {
+  padding: 0.35rem 0 0.75rem;
+}
+
 .home-bento-tile-footer {
   padding-top: 0.45rem;
 }
 
 .home-bento-tile--stats .home-bento-tile-footer,
 .home-bento-tile--solo .home-bento-tile-footer {
-  padding-top: 0.65rem;
+  padding-top: 0.85rem;
 }
 
 .home-bento-badge {
