@@ -1,8 +1,8 @@
 # iOS Aktuell - dice.budget
 
-**Stand:** 2026-06-02  
+**Stand:** 2026-06-03  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `0b2e25c`  
+**Produktcode-HEAD:** `cfc2819`  
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-/App-Store-Stand. Aeltere iOS-Historie steht in `docs/ios_archive.md`.
@@ -12,8 +12,8 @@ Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-
 - App Store Connect ist bei **Version 2.0**.
 - Aktueller TestFlight-Build ist **2.0 (6)**.
 - Naechster Upload ist **2.0 (7)**.
-- M34 + M35 + UI-Politur + iPad-Tischmodus sind **noch nicht** in TestFlight `2.0 (6)`.
-- Der Upload `2.0 (7)` muss M34 + M35 + UI-Politur + iPad-Tischmodus enthalten.
+- M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-Design sind **noch nicht** in TestFlight `2.0 (6)`.
+- Der Upload `2.0 (7)` muss M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-Design enthalten.
 - Web/API sind live unter https://dicebudget.bottle-trade.de.
 
 ## Was In 2.0 (7) Enthalten Sein Muss
@@ -42,6 +42,13 @@ Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-
   - lokale Aliase sorgen fuer Anzeige/Statistik-Zuordnung
   - Gegner-Pool sichtbar und Pool-Endspiel bleiben waehlbar
   - Pool-Endspiel im Zwei-Zettel-Screen aufloesbar
+- Game-Dashboard-Design:
+  - Startscreen mit dunklem Strategiespiel-/Premium-Look
+  - Hauptfunktionen bleiben: Raum erstellen, Statistik, Einzelspiel, Raum beitreten
+  - `/solo`, `/multi` und `/multi/join` optisch modernisiert
+  - Spielzettel zum Eintragen bewusst unveraendert
+  - Startscreen zaehlt Paarungs-Spiele aus `/stats/pairings`
+  - Startscreen-Bilanz zeigt gewonnen/verloren aus lokal zusammengefuehrten Paarungsdaten
 
 ## Mac-Workflow Fuer Naechsten Upload
 
@@ -77,6 +84,7 @@ In Xcode:
 ## TestFlight-Pruefung Fuer 2.0 (7)
 
 - iPhone: bestehender Solo-/Multiplayer-Flow unveraendert.
+- iPhone: Startscreen, `/solo`, `/multi` und `/multi/join` im neuen Design pruefen.
 - iPad Hochformat: Tischmodus zeigt Dreh-Hinweis.
 - iPad Querformat: Tischmodus zeigt zwei anklickbare Zettel nebeneinander.
 - Tischmodus: Namen links/rechts eingeben und pruefen, ob Statistik/Paarung diese Aliase nutzt.

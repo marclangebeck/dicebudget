@@ -1,8 +1,8 @@
 # Aktive Milestones - dice.budget
 
-**Stand:** 2026-06-02  
+**Stand:** 2026-06-03  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `0b2e25c`  
+**Produktcode-HEAD:** `cfc2819`  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -19,7 +19,7 @@ Technische Basis ist erledigt:
 - Native App startet direkt auf `/app`.
 - Native API-Basis zeigt auf `https://dicebudget.bottle-trade.de/api`.
 - TestFlight ist aktiv, aktueller Build ist `2.0 (6)`.
-- Naechster Upload ist `2.0 (7)` und muss M34 + M35 + UI-Politur + iPad-Tischmodus enthalten.
+- Naechster Upload ist `2.0 (7)` und muss M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-Design enthalten.
 
 Offen:
 
@@ -101,9 +101,28 @@ Dateien:
 - `frontend/lib/activeGame.ts`
 - `frontend/app/globals.css`
 
+### Game-Dashboard-Design 2026-06-03
+
+**Status:** erledigt und Frontend gebaut, noch nicht in iOS `2.0 (6)`.
+
+- Startscreen wirkt als modernes Game-Dashboard mit dunklem Premium-/Strategiespiel-Look.
+- Hauptfunktionen bleiben erhalten und unveraendert benannt: Raum erstellen, Statistik, Einzelspiel, Raum beitreten.
+- Jede Hauptfunktion hat eine eigene Farbwelt und eigene SVG-Mini-Poster-Motive.
+- `/solo`, `/multi` und `/multi/join` wurden visuell an den Startscreen angepasst; Formularlogik, Routen und API-Aufrufe bleiben unveraendert.
+- Der eigentliche Spielzettel zum Eintragen wurde bewusst nicht umgestaltet.
+- Startscreen zeigt `Paarungs-Spiele` aus `/stats/pairings` statt globaler App-Runs.
+- Startscreen-Bilanz ersetzt den alten Platzhalter-Fortschrittsbalken: gewonnen/verloren aus lokal zusammengefuehrten Paarungsdaten, inkl. Fallback auf lokal benannte Statistikspieler.
+
+Dateien:
+
+- `frontend/components/HomeBentoGrid.tsx`
+- `frontend/components/AppScreenHeader.tsx`
+- `frontend/app/multi/join/page.tsx`
+- `frontend/app/globals.css`
+
 ## Offene Aufgaben
 
-1. iOS-Build `2.0 (7)` mit M34 + M35 + UI-Politur + iPad-Tischmodus hochladen.
+1. iOS-Build `2.0 (7)` mit M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-Design hochladen.
 2. App Store Connect: Paid Applications Agreement, Bank/Steuer.
 3. Preis `1,19 EUR`, Screenshots, Beschreibung DE, Datenschutzfragebogen.
 4. TestFlight auf iPhone und iPad pruefen.
@@ -116,13 +135,13 @@ Dateien:
 - `POST /stats/pairings/baseline` ist ohne Auth und global wirksam.
 - `LeagueStanding` wird nach Statistik-Reset nicht rueckwirkend neu berechnet.
 - Next.js Security-Upgrade ist als spaeteres Thema notiert.
-- Frontend-/E2E-Tests fehlen, insbesondere fuer iPad-Tischmodus.
+- Frontend-/E2E-Tests fehlen, insbesondere fuer iPad-Tischmodus und neue Game-Dashboard-Optik.
 - Admin-UI fuer manuelle Paarungs-Baselines fehlt.
 
 ## Aktuelle Prioritaeten
 
 1. iOS/TestFlight `2.0 (7)` bereitstellen.
-2. iPad-Tischmodus auf iPad Querformat und iPhone-Regression testen.
+2. iPad-Tischmodus auf iPad Querformat, neue Start-/Setup-/Lobby-Optik und iPhone-Regression testen.
 3. Store-Connect-Freigaben und Metadaten abschliessen.
 4. Danach erst optionale Sicherheits-/Auth-Verfeinerung der Stats-Endpunkte planen.
 
@@ -138,6 +157,9 @@ Dateien:
 - `frontend/components/ScoreSheetTable.tsx`
 - `frontend/components/FitScoreSheet.tsx`
 - `frontend/components/TableModePlayBoard.tsx`
+- `frontend/components/HomeBentoGrid.tsx`
+- `frontend/components/AppScreenHeader.tsx`
+- `frontend/app/multi/join/page.tsx`
 - `frontend/components/PairingEditOverlay.tsx`
 - `frontend/components/PairingSummaryCard.tsx`
 - `frontend/lib/pairingMerge.ts`
