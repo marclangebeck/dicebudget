@@ -721,7 +721,7 @@ html.legal-route body {
   display: grid;
   min-height: 0;
   grid-template-columns: 1.12fr 0.88fr;
-  grid-template-rows: minmax(11.5rem, auto) minmax(9.5rem, auto) minmax(8rem, auto);
+  grid-template-rows: minmax(12rem, auto) minmax(11rem, auto) minmax(8.5rem, auto);
   grid-template-areas:
     "multi stats"
     "multi solo"
@@ -732,7 +732,7 @@ html.legal-route body {
 .home-bento-tile {
   position: relative;
   isolation: isolate;
-  min-height: 9.5rem;
+  min-height: 11rem;
   overflow: hidden;
   border-radius: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.16);
@@ -791,12 +791,17 @@ html.legal-route body {
 
 .home-bento-tile--stats .home-bento-motif,
 .home-bento-tile--solo .home-bento-motif {
-  width: min(100%, 6.4rem);
-  max-height: 4.2rem;
+  width: min(100%, 5.8rem);
+  max-height: 3.8rem;
 }
 
 .home-bento-tile-footer {
-  padding-top: 0.15rem;
+  padding-top: 0.45rem;
+}
+
+.home-bento-tile--stats .home-bento-tile-footer,
+.home-bento-tile--solo .home-bento-tile-footer {
+  padding-top: 0.65rem;
 }
 
 .home-bento-badge {
@@ -877,7 +882,7 @@ html.legal-route body {
     radial-gradient(circle at 12% 10%, rgba(34, 211, 238, 0.82), transparent 34%),
     linear-gradient(150deg, #172554 0%, #2563eb 50%, #4c1d95 100%);
   border-color: rgba(125, 211, 252, 0.36);
-  min-height: 21.65rem;
+  min-height: 23.65rem;
 }
 
 .home-bento-tile--multi::before {
@@ -1143,18 +1148,18 @@ html.legal-route body {
   }
 
   .home-bento-grid {
-    grid-template-rows: minmax(10rem, auto) minmax(8.4rem, auto) minmax(7.7rem, auto);
+    grid-template-rows: minmax(11rem, auto) minmax(10rem, auto) minmax(8.2rem, auto);
     gap: 0.5rem;
   }
 
   .home-bento-tile {
     border-radius: 1.05rem;
-    min-height: 8.4rem;
+    min-height: 10rem;
     padding: 0.5rem 0.58rem 0.55rem;
   }
 
   .home-bento-tile--multi {
-    min-height: 19rem;
+    min-height: 21.5rem;
   }
 
   .home-bento-poster-art {
@@ -1169,8 +1174,13 @@ html.legal-route body {
 
   .home-bento-tile--stats .home-bento-motif,
   .home-bento-tile--solo .home-bento-motif {
-    width: min(100%, 5.1rem);
-    max-height: 3.25rem;
+    width: min(100%, 4.8rem);
+    max-height: 3rem;
+  }
+
+  .home-bento-tile--stats .home-bento-tile-footer,
+  .home-bento-tile--solo .home-bento-tile-footer {
+    padding-top: 0.55rem;
   }
 
   .home-bento-title {
