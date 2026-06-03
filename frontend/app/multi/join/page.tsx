@@ -98,16 +98,16 @@ function MultiJoinInner() {
 
   if (!code) {
     return (
-      <div className="flex flex-col gap-6">
-        <header className="flex flex-col gap-2">
-          <p className="text-link text-sm font-semibold">Multiplayer</p>
-          <h1 className="text-2xl font-bold">Raum beitreten</h1>
-          <p className="text-secondary text-sm">
+      <div className="join-lobby-shell">
+        <header className="join-lobby-hero join-lobby-hero--code">
+          <p className="join-lobby-kicker">Multiplayer</p>
+          <h1 className="join-lobby-title">Raum beitreten</h1>
+          <p className="join-lobby-subtitle">
             Code vom Host eingeben – du bleibst in der App.
           </p>
         </header>
         <JoinByCodeForm variant="inline" />
-        <Link href="/multi" className="text-link text-sm">
+        <Link href="/multi" className="join-lobby-host-link">
           Stattdessen: Raum erstellen (Host)
         </Link>
       </div>
@@ -115,14 +115,14 @@ function MultiJoinInner() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <header className="flex flex-col gap-2">
-        <p className="text-link text-sm font-semibold">Multiplayer · Code {code}</p>
-        <h1 className="text-2xl font-bold">Lobby</h1>
+    <div className="join-lobby-shell">
+      <header className="join-lobby-hero">
+        <p className="join-lobby-kicker">Multiplayer · Code {code}</p>
+        <h1 className="join-lobby-title">Lobby</h1>
         <button
           type="button"
           onClick={() => void refresh()}
-          className="btn-secondary w-fit px-3 py-1.5 text-sm"
+          className="join-lobby-refresh"
         >
           Aktualisieren
         </button>
@@ -136,22 +136,31 @@ function MultiJoinInner() {
 
       {lobby && (
         <>
-          <p className="text-secondary text-sm">
-            {lobby.useStrategyRules ? "Strategy Edition" : "DiceBudget Klassisch"} ·{" "}
-            {lobby.gameCount} Spiele · max. {lobby.maxPlayers} Spieler ·{" "}
-            <span className="text-strong">{lobby.playerCount}</span> dabei · Runde{" "}
-            <span className="text-accent tabular-nums font-medium">{lobby.roundNumber}</span> ·
-            Status{" "}
-            <span className="text-accent tabular-nums font-medium">{lobby.status}</span>
-          </p>
+          <section className="join-lobby-status">
+            <span>
+              <strong>{lobby.useStrategyRules ? "Strategy" : "Klassisch"}</strong>
+              Modus
+            </span>
+            <span>
+              <strong>{lobby.gameCount}</strong>
+              Spiele
+            </span>
+            <span>
+              <strong>{lobby.playerCount}/{lobby.maxPlayers}</strong>
+              Dabei
+            </span>
+            <span>
+              <strong>{lobby.roundNumber}</strong>
+              Runde
+            </span>
+          </section>
 
-          <p className="text-muted text-xs">
-            Serie <strong className="text-strong font-mono">{lobby.leagueCode}</strong> · Gäste:
-            Code <strong className="text-strong font-mono">{code}</strong> auf der Startseite
+          <p className="join-lobby-note">
+            Serie <strong>{lobby.leagueCode}</strong> · Gäste: Code <strong>{code}</strong> auf der Startseite
             eingeben.
           </p>
 
-          <div className="flex gap-2 text-sm">
+          <div className="join-lobby-tabs">
             <button
               type="button"
               onClick={() => setTab("lobby")}
@@ -174,7 +183,7 @@ function MultiJoinInner() {
                 {lobby.players.map((p) => (
                   <li
                     key={p.id}
-                    className="glass-stat flex justify-between px-3 py-2 text-sm"
+                    className="join-player-row"
                   >
                     <span className="flex items-center gap-2">
                       {playerLabel(p.playerId, playerId, aliases)}
@@ -187,7 +196,7 @@ function MultiJoinInner() {
                         ✏️
                       </button>
                     </span>
-                    <span className="text-muted tabular-nums">
+                    <span className="join-player-state tabular-nums">
                       {p.runFinished ? `${p.totalScore} ✓` : "spielt"}
                     </span>
                   </li>
@@ -195,7 +204,7 @@ function MultiJoinInner() {
               </ul>
 
               {lobby.playerCount < lobby.maxPlayers && lobby.status !== "FINISHED" && (
-                <form onSubmit={(e) => void handleJoin(e)} className="glass-panel flex flex-col gap-3 p-4">
+                <form onSubmit={(e) => void handleJoin(e)} className="join-action-card">
                   <p className="text-secondary text-sm">
                     Du trittst pseudonym bei als{" "}
                     <strong className="text-strong">{playerLabel(playerId, playerId, aliases)}</strong>.
@@ -211,7 +220,7 @@ function MultiJoinInner() {
               )}
 
               {lobby.playerCount >= lobby.maxPlayers && (
-                <p className="text-sm font-medium text-amber-800">Alle Plätze belegt.</p>
+                <p className="join-lobby-full">Alle Plätze belegt.</p>
               )}
             </>
           )}
@@ -219,7 +228,7 @@ function MultiJoinInner() {
           {tab === "rank" && ranking && (
             <>
               {ranking.winner && ranking.allRunsFinished && (
-                <div className="glass-panel-emerald px-3 py-2 text-center text-sm">
+                <div className="join-winner-card">
                   <p className="text-accent font-semibold">
                     Gewinner Runde {ranking.roundNumber}: {playerLabel(ranking.winner.playerId, playerId, aliases)} (
                     {ranking.winner.totalScore} Punkte)
@@ -236,7 +245,7 @@ function MultiJoinInner() {
                   {ranking.ranking.map((row) => (
                     <li
                       key={row.playerId + String(row.rank)}
-                      className="glass-stat flex items-center justify-between px-3 py-2 text-sm"
+                    className="join-player-row"
                     >
                       <span>
                         <span className="mr-2 text-slate-500">{row.rank}.</span>
@@ -270,7 +279,7 @@ function MultiJoinInner() {
                     {ranking.leagueStandings.map((row) => (
                       <li
                         key={row.playerId + String(row.rank)}
-                        className="glass-stat flex items-center justify-between px-3 py-2 text-sm"
+                        className="join-player-row"
                       >
                         <span>
                           <span className="mr-2 text-slate-500">{row.rank}.</span>
@@ -309,7 +318,7 @@ function MultiJoinInner() {
         </>
       )}
 
-      <Link href="/multi" className="text-link text-sm">
+      <Link href="/multi" className="join-lobby-host-link">
         Neuer Raum (Host)
       </Link>
 
@@ -333,7 +342,7 @@ function MultiJoinInner() {
 export default function MultiJoinPage() {
   return (
     <Suspense fallback={<p className="text-muted">Lade …</p>}>
-      <div className="flex flex-col gap-3">
+      <div className="join-page-wrap">
         <BackToHome className="shrink-0" />
         <MultiJoinInner />
       </div>

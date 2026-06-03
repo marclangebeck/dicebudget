@@ -12,8 +12,15 @@ export function AppScreenHeader({
   title,
   subtitle,
 }: Props) {
+  const tone =
+    section === "Einzelspiel"
+      ? "solo"
+      : section === "Statistik"
+        ? "stats"
+        : "multi";
+
   return (
-    <header className="app-screen-header shrink-0">
+    <header className={`app-screen-header app-screen-header--${tone} shrink-0`}>
       <Link href={APP_HOME_PATH} className="app-nav-btn app-nav-btn--header">
         <span aria-hidden className="app-nav-btn-icon">
           ←
@@ -30,12 +37,12 @@ export function AppScreenHeader({
           decoding="async"
         />
         <div className="min-w-0">
-          <p className="text-muted text-xs">
+          <p className="app-screen-kicker">
             {APP_SHORT} · {section}
           </p>
-          <h1 className="text-strong text-xl font-bold tracking-tight">{title}</h1>
+          <h1 className="app-screen-title">{title}</h1>
           {subtitle && (
-            <p className="text-muted mt-0.5 text-xs leading-snug">{subtitle}</p>
+            <p className="app-screen-subtitle">{subtitle}</p>
           )}
         </div>
       </div>
