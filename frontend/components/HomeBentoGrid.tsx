@@ -3,9 +3,13 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
-import { getStats } from "@/lib/api";
+import { getPairingSummaries, getStats } from "@/lib/api";
 import { normalizeInviteCode } from "@/lib/activeGame";
 import { APP_SHORT, CONTACT_EMAIL, IMPRESSUM_PATH, PRIVACY_PATH } from "@/lib/branding";
+import { mergePairingSummaries } from "@/lib/pairingMerge";
+import type { PairingSummaryDto } from "@/lib/pairingTypes";
+import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
+import { loadPlayerAliases, type PlayerAliasMap } from "@/lib/playerAliases";
 import type { StatsDto } from "@/lib/statsTypes";
 
 function SoloMotif({ className }: { className?: string }) {
@@ -215,12 +219,29 @@ function JoinTile() {
 export function HomeBentoGrid() {
   const [stats, setStats] = useState<StatsDto | null>(null);
   const [statsError, setStatsError] = useState<string | null>(null);
+  const [pairings, setPairings] = useState<PairingSummaryDto[] | null>(null);
+  const [pairingsError, setPairingsError] = useState<string | null>(null);
+  const [ownPlayerId, setOwnPlayerId] = useState("");
+  const [aliases, setAliases] = useState<PlayerAliasMap>({});
+
+  useEffect(() => {
+    setOwnPlayerId(getOrCreatePlayerId());
+    setAliases(loadPlayerAliases());
+  }, []);
 
   useEffect(() => {
     void getStats()
       .then(({ stats: data }) => setStats(data))
       .catch((e) =>
         setStatsError(e instanceof Error ? e.message : "Statistik nicht geladen"),
+      );
+  }, []);
+
+  useEffect(() => {
+    void getPairingSummaries()
+      .then(({ pairings: data }) => setPairings(data))
+      .catch((e) =>
+        setPairingsError(e instanceof Error ? e.message : "Paarungen nicht geladen"),
       );
   }, []);
 
@@ -235,11 +256,48 @@ export function HomeBentoGrid() {
       <p className="home-bento-stat-value mt-1 tabular-nums">{stats.bestTotalScore}</p>
     );
 
-  const playedLabel = stats === null ? "..." : String(stats.finishedRuns);
+  const mergedPairings =
+    pairings === null ? null : mergePairingSummaries(pairings, aliases, ownPlayerId);
+  const totalPairingRounds =
+    mergedPairings === null
+      ? null
+      : mergedPairings.reduce((sum, pairing) => sum + pairing.roundsPlayed, 0);
+
+  const playedLabel =
+    pairingsError !== null ? "—" : totalPairingRounds === null ? "..." : String(totalPairingRounds);
   const bestLabel = stats?.bestTotalScore == null ? "Offen" : String(stats.bestTotalScore);
   const avgLabel =
     stats?.averageTotalScore == null ? "Bereit" : `${Math.round(stats.averageTotalScore)} Ø`;
-  const levelProgress = stats?.bestTotalScore == null ? 18 : Math.min(96, Math.max(18, stats.bestTotalScore / 4));
+  const ownPlayerNorm = ownPlayerId ? normalizePublicPlayerId(ownPlayerId) : "";
+  const ownRecord =
+    mergedPairings === null || ownPlayerNorm === ""
+      ? null
+      : mergedPairings.reduce(
+          (record, pairing) => {
+            if (normalizePublicPlayerId(pairing.playerA) === ownPlayerNorm) {
+              record.wins += pairing.playerAWins;
+              record.losses += pairing.playerBWins;
+              record.ties += pairing.ties;
+            } else if (normalizePublicPlayerId(pairing.playerB) === ownPlayerNorm) {
+              record.wins += pairing.playerBWins;
+              record.losses += pairing.playerAWins;
+              record.ties += pairing.ties;
+            }
+            return record;
+          },
+          { wins: 0, losses: 0, ties: 0 },
+        );
+  const decidedRecordGames =
+    ownRecord === null ? 0 : ownRecord.wins + ownRecord.losses;
+  const winShare =
+    ownRecord === null || decidedRecordGames === 0
+      ? 50
+      : Math.round((ownRecord.wins / decidedRecordGames) * 100);
+  const hasOwnRecord = ownRecord !== null && ownRecord.wins + ownRecord.losses + ownRecord.ties > 0;
+  const recordSummaryLabel =
+    hasOwnRecord && ownRecord !== null ? `${ownRecord.wins}:${ownRecord.losses}` : "Offen";
+  const recordWinsLabel = hasOwnRecord && ownRecord !== null ? String(ownRecord.wins) : "—";
+  const recordLossesLabel = hasOwnRecord && ownRecord !== null ? String(ownRecord.losses) : "—";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2.5">
@@ -252,7 +310,7 @@ export function HomeBentoGrid() {
         <div className="home-hero-stats" aria-label="Spielübersicht">
           <span>
             <strong>{playedLabel}</strong>
-            Partien
+            Paarungs-Spiele
           </span>
           <span>
             <strong>{bestLabel}</strong>
@@ -263,10 +321,24 @@ export function HomeBentoGrid() {
             Saison
           </span>
         </div>
-        <div className="home-hero-progress" aria-label="Saisonfortschritt">
-          <span>Level-Fortschritt</span>
-          <div className="home-hero-progress-track">
-            <div style={{ width: `${levelProgress}%` }} />
+        <div className="home-hero-record" aria-label="Persönliche Bilanz">
+          <div className="home-hero-record-head">
+            <span>Deine Bilanz</span>
+            <strong>{recordSummaryLabel}</strong>
+          </div>
+          <div className="home-hero-record-metrics">
+            <span className="home-hero-record-win">
+              <strong>{recordWinsLabel}</strong>
+              Gewonnen
+            </span>
+            <span className="home-hero-record-loss">
+              <strong>{recordLossesLabel}</strong>
+              Verloren
+            </span>
+          </div>
+          <div className="home-hero-record-track" aria-hidden>
+            <div className="home-hero-record-track-win" style={{ width: `${winShare}%` }} />
+            <div className="home-hero-record-track-loss" style={{ width: `${100 - winShare}%` }} />
           </div>
         </div>
       </header>
