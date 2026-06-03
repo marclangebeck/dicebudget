@@ -446,8 +446,6 @@ body {
   font-weight: 500;
 }
 
-html.home-route,
-html.home-route body,
 html.setup-route,
 html.setup-route body,
 html.play-route,
@@ -456,6 +454,15 @@ html.play-route body {
   overflow: hidden;
   overscroll-behavior: none;
   touch-action: manipulation;
+}
+
+html.home-route,
+html.home-route body {
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y manipulation;
 }
 
 html.legal-route,
@@ -486,6 +493,17 @@ html.legal-route body {
 .setup-screen-main,
 .setup-screen-body {
   touch-action: manipulation;
+}
+
+.home-screen {
+  -webkit-overflow-scrolling: touch;
+}
+
+.home-screen-main {
+  min-height: 100dvh;
+  overflow: visible;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y manipulation;
 }
 
 /* —— Startscreen Bento (nur home-route) —— */
@@ -702,9 +720,8 @@ html.legal-route body {
 .home-bento-grid {
   display: grid;
   min-height: 0;
-  flex: 1 1 0;
   grid-template-columns: 1.12fr 0.88fr;
-  grid-template-rows: minmax(0, 1.02fr) minmax(0, 0.9fr) minmax(6.8rem, 0.9fr);
+  grid-template-rows: minmax(11.5rem, auto) minmax(9.5rem, auto) minmax(8rem, auto);
   grid-template-areas:
     "multi stats"
     "multi solo"
@@ -715,7 +732,7 @@ html.legal-route body {
 .home-bento-tile {
   position: relative;
   isolation: isolate;
-  min-height: 0;
+  min-height: 9.5rem;
   overflow: hidden;
   border-radius: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.16);
@@ -860,6 +877,7 @@ html.legal-route body {
     radial-gradient(circle at 12% 10%, rgba(34, 211, 238, 0.82), transparent 34%),
     linear-gradient(150deg, #172554 0%, #2563eb 50%, #4c1d95 100%);
   border-color: rgba(125, 211, 252, 0.36);
+  min-height: 21.65rem;
 }
 
 .home-bento-tile--multi::before {
@@ -886,7 +904,7 @@ html.legal-route body {
   position: relative;
   isolation: isolate;
   display: flex;
-  min-height: 0;
+  min-height: 8rem;
   min-width: 0;
   flex-direction: column;
   justify-content: center;
@@ -1125,13 +1143,18 @@ html.legal-route body {
   }
 
   .home-bento-grid {
-    grid-template-rows: minmax(0, 0.96fr) minmax(0, 0.82fr) minmax(6.6rem, 0.9fr);
+    grid-template-rows: minmax(10rem, auto) minmax(8.4rem, auto) minmax(7.7rem, auto);
     gap: 0.5rem;
   }
 
   .home-bento-tile {
     border-radius: 1.05rem;
+    min-height: 8.4rem;
     padding: 0.5rem 0.58rem 0.55rem;
+  }
+
+  .home-bento-tile--multi {
+    min-height: 19rem;
   }
 
   .home-bento-poster-art {
@@ -1174,6 +1197,7 @@ html.legal-route body {
 
   .home-bento-join-bar {
     border-radius: 1.05rem;
+    min-height: 7.7rem;
     padding: 0.48rem 0.62rem 0.54rem;
   }
 

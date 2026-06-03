@@ -318,7 +318,7 @@ export function HomeBentoGrid() {
   const recordLossesLabel = hasOwnRecord && ownRecord !== null ? String(ownRecord.losses) : "—";
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-2.5">
+    <div className="flex min-h-0 flex-col gap-2.5">
       <header className="home-hero-banner shrink-0">
         <div className="home-hero-copy">
           <p className="home-hero-kicker">{APP_SHORT} · Strategy Edition</p>
@@ -361,7 +361,7 @@ export function HomeBentoGrid() {
         </div>
       </header>
 
-      <div className="home-bento-grid min-h-0 flex-1">
+      <div className="home-bento-grid min-h-0">
         <NavTile
           href="/multi"
           area="multi"
