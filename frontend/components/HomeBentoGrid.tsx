@@ -8,7 +8,7 @@ import { normalizeInviteCode } from "@/lib/activeGame";
 import { APP_SHORT, CONTACT_EMAIL, IMPRESSUM_PATH, PRIVACY_PATH } from "@/lib/branding";
 import { mergePairingSummaries } from "@/lib/pairingMerge";
 import type { PairingSummaryDto } from "@/lib/pairingTypes";
-import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
+import { getOrCreatePlayerId, normalizePublicPlayerId, playerLabel } from "@/lib/playerIdentity";
 import { loadPlayerAliases, type PlayerAliasMap } from "@/lib/playerAliases";
 import type { StatsDto } from "@/lib/statsTypes";
 
@@ -269,16 +269,34 @@ export function HomeBentoGrid() {
   const avgLabel =
     stats?.averageTotalScore == null ? "Bereit" : `${Math.round(stats.averageTotalScore)} Ø`;
   const ownPlayerNorm = ownPlayerId ? normalizePublicPlayerId(ownPlayerId) : "";
+  const ownPlayerInPairings =
+    mergedPairings?.some(
+      (pairing) =>
+        normalizePublicPlayerId(pairing.playerA) === ownPlayerNorm ||
+        normalizePublicPlayerId(pairing.playerB) === ownPlayerNorm,
+    ) ?? false;
+  const fallbackPerspective =
+    mergedPairings
+      ?.flatMap((pairing) => [pairing.playerA, pairing.playerB])
+      .find((playerId) => aliases[normalizePublicPlayerId(playerId)]?.trim()) ?? "";
+  const recordPerspectiveId = ownPlayerInPairings ? ownPlayerId : fallbackPerspective;
+  const recordPerspectiveNorm = recordPerspectiveId
+    ? normalizePublicPlayerId(recordPerspectiveId)
+    : "";
+  const recordTitle =
+    recordPerspectiveId && !ownPlayerInPairings
+      ? `${playerLabel(recordPerspectiveId, ownPlayerId, aliases)} Bilanz`
+      : "Deine Bilanz";
   const ownRecord =
-    mergedPairings === null || ownPlayerNorm === ""
+    mergedPairings === null || recordPerspectiveNorm === ""
       ? null
       : mergedPairings.reduce(
           (record, pairing) => {
-            if (normalizePublicPlayerId(pairing.playerA) === ownPlayerNorm) {
+            if (normalizePublicPlayerId(pairing.playerA) === recordPerspectiveNorm) {
               record.wins += pairing.playerAWins;
               record.losses += pairing.playerBWins;
               record.ties += pairing.ties;
-            } else if (normalizePublicPlayerId(pairing.playerB) === ownPlayerNorm) {
+            } else if (normalizePublicPlayerId(pairing.playerB) === recordPerspectiveNorm) {
               record.wins += pairing.playerBWins;
               record.losses += pairing.playerAWins;
               record.ties += pairing.ties;
@@ -323,7 +341,7 @@ export function HomeBentoGrid() {
         </div>
         <div className="home-hero-record" aria-label="Persönliche Bilanz">
           <div className="home-hero-record-head">
-            <span>Deine Bilanz</span>
+            <span>{recordTitle}</span>
             <strong>{recordSummaryLabel}</strong>
           </div>
           <div className="home-hero-record-metrics">
