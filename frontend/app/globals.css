@@ -704,7 +704,7 @@ html.legal-route body {
   min-height: 0;
   flex: 1 1 0;
   grid-template-columns: 1.12fr 0.88fr;
-  grid-template-rows: minmax(0, 1.1fr) minmax(0, 0.92fr) minmax(6rem, 0.86fr);
+  grid-template-rows: minmax(0, 1.02fr) minmax(0, 0.9fr) minmax(6.8rem, 0.9fr);
   grid-template-areas:
     "multi stats"
     "multi solo"
@@ -767,9 +767,15 @@ html.legal-route body {
 }
 
 .home-bento-motif {
-  width: min(100%, 8.7rem);
+  width: min(100%, 7.9rem);
   height: auto;
   filter: drop-shadow(0 16px 20px rgba(0, 0, 0, 0.28));
+}
+
+.home-bento-tile--stats .home-bento-motif,
+.home-bento-tile--solo .home-bento-motif {
+  width: min(100%, 6.4rem);
+  max-height: 4.2rem;
 }
 
 .home-bento-tile-footer {
@@ -793,7 +799,7 @@ html.legal-route body {
 
 .home-bento-title {
   color: #ffffff;
-  font-size: 1rem;
+  font-size: 0.96rem;
   font-weight: 850;
   line-height: 1.05;
   letter-spacing: -0.035em;
@@ -802,14 +808,14 @@ html.legal-route body {
 .home-bento-subtitle {
   margin-top: 0.22rem;
   color: rgba(255, 255, 255, 0.76);
-  font-size: 0.68rem;
-  line-height: 1.2;
+  font-size: 0.64rem;
+  line-height: 1.15;
 }
 
 .home-bento-cta {
-  margin-top: 0.42rem;
+  margin-top: 0.32rem;
   color: rgba(255, 255, 255, 0.92);
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   font-weight: 800;
 }
 
@@ -887,7 +893,7 @@ html.legal-route body {
   overflow: hidden;
   border-radius: 1.25rem;
   border: 1px solid rgba(244, 114, 182, 0.28);
-  padding: 0.68rem 0.75rem 0.72rem;
+  padding: 0.58rem 0.75rem 0.64rem;
   color: #ffffff;
   background:
     radial-gradient(circle at 86% 10%, rgba(236, 72, 153, 0.56), transparent 38%),
@@ -913,7 +919,7 @@ html.legal-route body {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.35rem;
 }
 
 .home-bento-join-kicker {
@@ -933,8 +939,8 @@ html.legal-route body {
 }
 
 .home-bento-join-motif {
-  width: 5.4rem;
-  max-height: 3rem;
+  width: 4.8rem;
+  max-height: 2.55rem;
   flex-shrink: 0;
   filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.28));
 }
@@ -945,7 +951,7 @@ html.legal-route body {
   flex: 0 0 auto;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 0.45rem;
+  gap: 0.38rem;
   width: 100%;
   min-width: 0;
 }
@@ -953,8 +959,8 @@ html.legal-route body {
 .home-bento-input--lg {
   box-sizing: border-box;
   width: 100%;
-  min-height: 2.45rem;
-  padding: 0.5rem 0.75rem;
+  min-height: 2.25rem;
+  padding: 0.44rem 0.75rem;
   font-size: 1rem;
   letter-spacing: 0.22em;
 }
@@ -962,8 +968,8 @@ html.legal-route body {
 .home-bento-submit--lg {
   box-sizing: border-box;
   width: 100%;
-  min-height: 2.42rem;
-  padding: 0.48rem 0.75rem;
+  min-height: 2.22rem;
+  padding: 0.42rem 0.75rem;
   font-size: 0.8125rem;
 }
 
@@ -1035,7 +1041,7 @@ html.legal-route body {
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  padding-top: 0.15rem;
+  padding-top: 0;
 }
 
 .home-legal-links {
@@ -1046,11 +1052,11 @@ html.legal-route body {
 }
 
 .home-legal-link {
-  min-height: 2rem;
+  min-height: 1.45rem;
   display: inline-flex;
   align-items: center;
-  padding: 0.15rem 0.35rem;
-  font-size: 0.8125rem;
+  padding: 0.05rem 0.3rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--chrome-text-secondary);
   text-decoration: none;
@@ -1064,6 +1070,121 @@ html.legal-route body {
 .home-legal-sep {
   font-size: 0.625rem;
   color: var(--chrome-text-subtle);
+}
+
+@media (max-height: 760px) {
+  .home-screen-main {
+    gap: 0.5rem;
+    padding-top: max(0.45rem, env(safe-area-inset-top));
+    padding-bottom: max(0.35rem, env(safe-area-inset-bottom));
+  }
+
+  .home-hero-banner {
+    gap: 0.4rem;
+    padding: 0.62rem 0.78rem;
+    border-radius: 1.05rem;
+  }
+
+  .home-hero-title {
+    font-size: 1.28rem;
+  }
+
+  .home-hero-subtitle {
+    display: none;
+  }
+
+  .home-hero-stats {
+    gap: 0.32rem;
+  }
+
+  .home-hero-stats span {
+    padding: 0.32rem 0.38rem;
+    font-size: 0.52rem;
+  }
+
+  .home-hero-stats strong {
+    font-size: 0.78rem;
+  }
+
+  .home-hero-record {
+    gap: 0.3rem;
+    padding: 0.38rem;
+  }
+
+  .home-hero-record-metrics {
+    gap: 0.32rem;
+  }
+
+  .home-hero-record-metrics span {
+    padding: 0.28rem 0.38rem;
+    font-size: 0.52rem;
+  }
+
+  .home-hero-record-track {
+    height: 0.32rem;
+  }
+
+  .home-bento-grid {
+    grid-template-rows: minmax(0, 0.96fr) minmax(0, 0.82fr) minmax(6.6rem, 0.9fr);
+    gap: 0.5rem;
+  }
+
+  .home-bento-tile {
+    border-radius: 1.05rem;
+    padding: 0.5rem 0.58rem 0.55rem;
+  }
+
+  .home-bento-poster-art {
+    min-height: 1.85rem;
+    padding: 0;
+  }
+
+  .home-bento-motif {
+    width: min(100%, 6.9rem);
+    max-height: 4.6rem;
+  }
+
+  .home-bento-tile--stats .home-bento-motif,
+  .home-bento-tile--solo .home-bento-motif {
+    width: min(100%, 5.1rem);
+    max-height: 3.25rem;
+  }
+
+  .home-bento-title {
+    font-size: 0.86rem;
+  }
+
+  .home-bento-subtitle {
+    display: none;
+  }
+
+  .home-bento-cta {
+    margin-top: 0.2rem;
+    font-size: 0.56rem;
+  }
+
+  .home-bento-badge {
+    padding: 0.18rem 0.42rem;
+    font-size: 0.5rem;
+  }
+
+  .home-bento-stat-value {
+    font-size: 1.08rem;
+  }
+
+  .home-bento-join-bar {
+    border-radius: 1.05rem;
+    padding: 0.48rem 0.62rem 0.54rem;
+  }
+
+  .home-bento-join-title {
+    font-size: 0.92rem;
+  }
+
+  .home-bento-join-motif {
+    width: 4.1rem;
+    max-height: 2.15rem;
+  }
 }
 
 .setup-screen-body {
