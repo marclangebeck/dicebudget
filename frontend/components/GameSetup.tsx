@@ -1,24 +1,27 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { BonusCelebrationToggle } from "@/components/BonusCelebrationToggle";
-import { StrategyModeToggle } from "@/components/StrategyModeToggle";
+import { useEffect, useState } from "react";
 import { saveActiveGame } from "@/lib/activeGame";
 import { createLocalSoloRun } from "@/lib/localSoloRun";
+import { DEFAULT_APP_SETTINGS, getAppSettings, type AppSettings } from "@/lib/uiPrefs";
 
 export function GameSetup() {
   const router = useRouter();
-  const [gameCount, setGameCount] = useState(3);
-  const [useStrategyRules, setUseStrategyRules] = useState(true);
+  const [settings, setSettings] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSettings(getAppSettings());
+  }, []);
 
   async function handleStart() {
     setLoading(true);
     setError(null);
     try {
-      const run = createLocalSoloRun(gameCount, useStrategyRules);
+      const run = createLocalSoloRun(settings.soloGameCount, settings.useStrategyRules);
       saveActiveGame({ type: "solo", runId: run.id });
       router.push(`/play?runId=${run.id}`);
     } catch (e) {
@@ -36,46 +39,25 @@ export function GameSetup() {
       }}
       className="setup-host-form"
     >
-      <div className="setup-host-card setup-host-card--mode">
-        <StrategyModeToggle
-          useStrategyRules={useStrategyRules}
-          onChange={setUseStrategyRules}
-          disabled={loading}
-          variant="setup"
-        />
-      </div>
-
-      <div className="setup-host-card setup-host-card--mode">
-        <BonusCelebrationToggle disabled={loading} />
-      </div>
-
-      <label className="setup-slider-card setup-slider-card--sky setup-slider-card--wide">
-        <span className="setup-slider-label">Spielanzahl</span>
-        <span className="setup-slider-value tabular-nums">{gameCount}</span>
-        <span className="setup-slider-hint">
-          {gameCount === 1 ? "Spiel" : "Spiele"} · {gameCount * 13} Felder
-          {useStrategyRules ? (
-            <>
-              <br />
-              max. {gameCount * 39} Würfe (Strategy Edition)
-            </>
-          ) : (
-            <>
-              <br />
-              DiceBudget Klassisch
-            </>
-          )}
-        </span>
-        <input
-          type="range"
-          min={1}
-          max={6}
-          value={gameCount}
-          disabled={loading}
-          onChange={(e) => setGameCount(Number(e.target.value))}
-          className="setup-host-range"
-        />
-      </label>
+      <section className="setup-host-success">
+        <p className="text-strong text-center text-sm font-semibold">Solo bereit</p>
+        <div className="settings-summary-grid">
+          <span>
+            <strong>{settings.soloGameCount}</strong>
+            Spiele
+          </span>
+          <span>
+            <strong>{settings.useStrategyRules ? "Strategy" : "Klassisch"}</strong>
+            Modus
+          </span>
+        </div>
+        <p className="setup-host-success-hint">
+          Standardwerte aenderst du zentral in den App-Einstellungen.
+        </p>
+        <Link href="/settings" className="settings-inline-link">
+          Einstellungen öffnen
+        </Link>
+      </section>
 
       {error && <p className="glass-alert-error px-3 py-2 text-sm">{error}</p>}
 

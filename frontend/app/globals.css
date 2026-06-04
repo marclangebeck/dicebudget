@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --app-bg-top: #3d4f63;
-  --app-bg-mid: #243447;
-  --app-bg-bottom: #1a2332;
+  --app-bg-top: #1b2838;
+  --app-bg-mid: #111c2a;
+  --app-bg-bottom: #090f18;
   --chrome-foreground: #f1f5f9;
   --chrome-text-secondary: #cbd5e1;
   --chrome-text-muted: #94a3b8;
@@ -124,6 +124,7 @@ body {
     .setup-host-card,
     .setup-slider-card,
     .setup-host-success,
+    .settings-section-card,
     .stats-pairing-card,
     .stats-empty-state,
     .stats-detail-player-card,
@@ -499,18 +500,17 @@ html.legal-route body {
   height: 100dvh;
   max-height: 100dvh;
   min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
   overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y manipulation;
+  -webkit-overflow-scrolling: auto;
+  touch-action: manipulation;
 }
 
 .home-screen-main {
-  min-height: min-content;
-  overflow: visible;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y manipulation;
+  min-height: 0;
+  overflow: hidden;
+  -webkit-overflow-scrolling: auto;
+  touch-action: manipulation;
 }
 
 /* —— Startscreen Bento (nur home-route) —— */
@@ -532,9 +532,9 @@ html.legal-route body {
   padding: 0.85rem 0.95rem;
   color: #f8fafc;
   background:
-    radial-gradient(circle at 18% 12%, rgba(34, 211, 238, 0.34), transparent 34%),
-    radial-gradient(circle at 88% 10%, rgba(168, 85, 247, 0.42), transparent 38%),
-    linear-gradient(145deg, #070b1d 0%, #11183a 56%, #271448 100%);
+    radial-gradient(circle at 18% 12%, rgba(30, 93, 116, 0.34), transparent 34%),
+    radial-gradient(circle at 88% 10%, rgba(214, 168, 90, 0.16), transparent 38%),
+    linear-gradient(145deg, #07101c 0%, #102033 58%, #18242d 100%);
   box-shadow:
     0 18px 44px -24px rgba(0, 0, 0, 0.72),
     inset 0 1px 0 rgba(255, 255, 255, 0.22);
@@ -559,7 +559,7 @@ html.legal-route body {
   inset: 0.05rem;
   z-index: -1;
   border-radius: inherit;
-  background: linear-gradient(115deg, rgba(255, 255, 255, 0.2), transparent 28%, transparent 74%, rgba(251, 191, 36, 0.16));
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.16), transparent 28%, transparent 74%, rgba(214, 168, 90, 0.12));
   pointer-events: none;
 }
 
@@ -572,7 +572,7 @@ html.legal-route body {
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #93c5fd;
+  color: #b8c7d6;
 }
 
 .home-hero-title {
@@ -685,13 +685,13 @@ html.legal-route body {
 }
 
 .home-hero-record-win {
-  background: rgba(20, 184, 166, 0.16);
-  color: #99f6e4;
+  background: rgba(48, 113, 118, 0.22);
+  color: #b7ddd8;
 }
 
 .home-hero-record-loss {
-  background: rgba(236, 72, 153, 0.14);
-  color: #fbcfe8;
+  background: rgba(136, 90, 56, 0.2);
+  color: #e6c4a2;
 }
 
 .home-hero-record-track {
@@ -705,14 +705,14 @@ html.legal-route body {
 
 .home-hero-record-track-win {
   height: 100%;
-  background: linear-gradient(90deg, #34d399 0%, #14b8a6 100%);
-  box-shadow: 0 0 18px rgba(20, 184, 166, 0.46);
+  background: linear-gradient(90deg, #7cb7ae 0%, #2f6f73 100%);
+  box-shadow: 0 0 16px rgba(47, 111, 115, 0.34);
 }
 
 .home-hero-record-track-loss {
   height: 100%;
-  background: linear-gradient(90deg, #ec4899 0%, #ef4444 100%);
-  box-shadow: 0 0 18px rgba(236, 72, 153, 0.42);
+  background: linear-gradient(90deg, #b98452 0%, #7a4c31 100%);
+  box-shadow: 0 0 16px rgba(185, 132, 82, 0.3);
 }
 
 .home-bento-brand-icon {
@@ -726,20 +726,20 @@ html.legal-route body {
 
 .home-bento-grid {
   display: grid;
+  flex: 1 1 0;
   min-height: 0;
   grid-template-columns: 1.12fr 0.88fr;
-  grid-template-rows: minmax(12rem, auto) minmax(11rem, auto) minmax(8.5rem, auto);
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
   grid-template-areas:
     "multi stats"
-    "multi solo"
-    "join join";
+    "solo settings";
   gap: 0.65rem;
 }
 
 .home-bento-tile {
   position: relative;
   isolation: isolate;
-  min-height: 11rem;
+  min-height: 0;
   overflow: hidden;
   border-radius: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.16);
@@ -797,13 +797,15 @@ html.legal-route body {
 }
 
 .home-bento-tile--stats .home-bento-motif,
-.home-bento-tile--solo .home-bento-motif {
+.home-bento-tile--solo .home-bento-motif,
+.home-bento-tile--settings .home-bento-motif {
   width: min(100%, 5.8rem);
   max-height: 3.8rem;
 }
 
 .home-bento-tile--stats .home-bento-poster-art,
-.home-bento-tile--solo .home-bento-poster-art {
+.home-bento-tile--solo .home-bento-poster-art,
+.home-bento-tile--settings .home-bento-poster-art {
   padding: 0.35rem 0 0.75rem;
 }
 
@@ -812,7 +814,8 @@ html.legal-route body {
 }
 
 .home-bento-tile--stats .home-bento-tile-footer,
-.home-bento-tile--solo .home-bento-tile-footer {
+.home-bento-tile--solo .home-bento-tile-footer,
+.home-bento-tile--settings .home-bento-tile-footer {
   padding-top: 0.85rem;
 }
 
@@ -878,9 +881,9 @@ html.legal-route body {
 
 .home-bento-tile--solo {
   background:
-    radial-gradient(circle at 18% 16%, rgba(52, 211, 153, 0.72), transparent 34%),
-    linear-gradient(150deg, #042f2e 0%, #0f766e 52%, #0b1120 100%);
-  border-color: rgba(45, 212, 191, 0.32);
+    radial-gradient(circle at 18% 16%, rgba(124, 183, 174, 0.32), transparent 34%),
+    linear-gradient(150deg, #0b2527 0%, #173f43 52%, #0b1120 100%);
+  border-color: rgba(124, 183, 174, 0.26);
 }
 
 .home-bento-tile--solo::before {
@@ -891,29 +894,41 @@ html.legal-route body {
 
 .home-bento-tile--multi {
   background:
-    radial-gradient(circle at 12% 10%, rgba(34, 211, 238, 0.82), transparent 34%),
-    linear-gradient(150deg, #172554 0%, #2563eb 50%, #4c1d95 100%);
-  border-color: rgba(125, 211, 252, 0.36);
-  min-height: 23.65rem;
+    radial-gradient(circle at 12% 10%, rgba(62, 106, 137, 0.38), transparent 34%),
+    linear-gradient(150deg, #101a2a 0%, #1b3550 50%, #10282d 100%);
+  border-color: rgba(124, 183, 174, 0.26);
 }
 
 .home-bento-tile--multi::before {
   background:
-    radial-gradient(circle at 82% 74%, rgba(124, 58, 237, 0.52), transparent 42%),
+    radial-gradient(circle at 82% 74%, rgba(214, 168, 90, 0.18), transparent 42%),
     linear-gradient(145deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
 }
 
 .home-bento-tile--stats {
   background:
-    radial-gradient(circle at 22% 14%, rgba(251, 191, 36, 0.8), transparent 34%),
-    linear-gradient(150deg, #431407 0%, #92400e 48%, #2e1065 100%);
-  border-color: rgba(253, 230, 138, 0.34);
+    radial-gradient(circle at 22% 14%, rgba(214, 168, 90, 0.38), transparent 34%),
+    linear-gradient(150deg, #241a12 0%, #5b3a24 48%, #111827 100%);
+  border-color: rgba(214, 168, 90, 0.32);
 }
 
 .home-bento-tile--stats::before {
   background:
-    radial-gradient(circle at 84% 78%, rgba(168, 85, 247, 0.44), transparent 38%),
+    radial-gradient(circle at 84% 78%, rgba(124, 183, 174, 0.18), transparent 38%),
     linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.09) 100%);
+}
+
+.home-bento-tile--settings {
+  background:
+    radial-gradient(circle at 22% 14%, rgba(214, 168, 90, 0.22), transparent 34%),
+    linear-gradient(150deg, #111827 0%, #26313d 50%, #14272b 100%);
+  border-color: rgba(214, 168, 90, 0.24);
+}
+
+.home-bento-tile--settings::before {
+  background:
+    radial-gradient(circle at 84% 78%, rgba(124, 183, 174, 0.2), transparent 38%),
+    linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.08) 100%);
 }
 
 .home-bento-join-bar {
@@ -1018,8 +1033,8 @@ html.legal-route body {
   font-weight: 850;
   line-height: 1;
   letter-spacing: -0.03em;
-  color: #fde68a;
-  text-shadow: 0 0 18px rgba(251, 191, 36, 0.36);
+  color: #e5c07b;
+  text-shadow: 0 0 14px rgba(214, 168, 90, 0.26);
 }
 
 .home-bento-input {
@@ -1046,10 +1061,10 @@ html.legal-route body {
 
 .home-bento-submit {
   border-radius: 0.82rem;
-  border: 1px solid rgba(244, 114, 182, 0.58);
-  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 56%, #2563eb 100%);
+  border: 1px solid rgba(214, 168, 90, 0.5);
+  background: linear-gradient(135deg, #2f6f73 0%, #1b3550 56%, #7a4c31 100%);
   color: #fff;
-  box-shadow: 0 8px 18px -10px rgba(236, 72, 153, 0.72);
+  box-shadow: 0 8px 18px -10px rgba(214, 168, 90, 0.48);
 }
 
 .home-bento-submit:active {
@@ -1160,18 +1175,13 @@ html.legal-route body {
   }
 
   .home-bento-grid {
-    grid-template-rows: minmax(11rem, auto) minmax(10rem, auto) minmax(8.2rem, auto);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
     gap: 0.5rem;
   }
 
   .home-bento-tile {
     border-radius: 1.05rem;
-    min-height: 10rem;
     padding: 0.5rem 0.58rem 0.55rem;
-  }
-
-  .home-bento-tile--multi {
-    min-height: 21.5rem;
   }
 
   .home-bento-poster-art {
@@ -1185,13 +1195,15 @@ html.legal-route body {
   }
 
   .home-bento-tile--stats .home-bento-motif,
-  .home-bento-tile--solo .home-bento-motif {
+  .home-bento-tile--solo .home-bento-motif,
+  .home-bento-tile--settings .home-bento-motif {
     width: min(100%, 4.8rem);
     max-height: 3rem;
   }
 
   .home-bento-tile--stats .home-bento-tile-footer,
-  .home-bento-tile--solo .home-bento-tile-footer {
+  .home-bento-tile--solo .home-bento-tile-footer,
+  .home-bento-tile--settings .home-bento-tile-footer {
     padding-top: 0.55rem;
   }
 
@@ -2229,12 +2241,12 @@ html.legal-route body {
 
 /* —— App-Screens (Statistik, Multi, … — wie Home-Bento) —— */
 .setup-screen.app-bg {
-  background-color: #070b1d;
+  background-color: #090f18;
   background-image:
-    radial-gradient(circle at 14% 8%, rgba(34, 211, 238, 0.28), transparent 34%),
-    radial-gradient(circle at 92% 12%, rgba(168, 85, 247, 0.3), transparent 36%),
-    radial-gradient(circle at 50% 100%, rgba(20, 184, 166, 0.2), transparent 42%),
-    linear-gradient(180deg, #070b1d 0%, #10183a 52%, #151022 100%);
+    radial-gradient(circle at 14% 8%, rgba(48, 113, 118, 0.24), transparent 34%),
+    radial-gradient(circle at 92% 12%, rgba(214, 168, 90, 0.14), transparent 36%),
+    radial-gradient(circle at 50% 100%, rgba(27, 53, 80, 0.32), transparent 42%),
+    linear-gradient(180deg, #090f18 0%, #111c2a 52%, #14191f 100%);
 }
 
 .setup-screen-main {
@@ -2337,8 +2349,8 @@ html.legal-route body {
   padding: 0.8rem 0.85rem;
   color: #f8fafc;
   background:
-    radial-gradient(circle at 20% 10%, rgba(34, 211, 238, 0.34), transparent 38%),
-    linear-gradient(145deg, #0f172a 0%, #172554 56%, #312e81 100%);
+    radial-gradient(circle at 20% 10%, rgba(62, 106, 137, 0.28), transparent 38%),
+    linear-gradient(145deg, #101824 0%, #1b3550 56%, #14272b 100%);
   box-shadow:
     0 18px 40px -26px rgba(0, 0, 0, 0.8),
     inset 0 1px 0 rgba(255, 255, 255, 0.18);
@@ -2356,15 +2368,21 @@ html.legal-route body {
 
 .app-screen-header--solo .app-screen-header-row {
   background:
-    radial-gradient(circle at 18% 10%, rgba(52, 211, 153, 0.34), transparent 38%),
-    linear-gradient(145deg, #042f2e 0%, #0f766e 54%, #0b1120 100%);
+    radial-gradient(circle at 18% 10%, rgba(124, 183, 174, 0.26), transparent 38%),
+    linear-gradient(145deg, #0b2527 0%, #173f43 54%, #0b1120 100%);
 }
 
 .app-screen-header--stats .app-screen-header-row,
 .stats-screen-header-row {
   background:
-    radial-gradient(circle at 18% 10%, rgba(251, 191, 36, 0.36), transparent 38%),
-    linear-gradient(145deg, #431407 0%, #92400e 52%, #2e1065 100%);
+    radial-gradient(circle at 18% 10%, rgba(214, 168, 90, 0.28), transparent 38%),
+    linear-gradient(145deg, #241a12 0%, #5b3a24 52%, #111827 100%);
+}
+
+.app-screen-header--settings .app-screen-header-row {
+  background:
+    radial-gradient(circle at 18% 10%, rgba(214, 168, 90, 0.2), transparent 38%),
+    linear-gradient(145deg, #111827 0%, #26313d 54%, #14272b 100%);
 }
 
 .app-screen-kicker {
@@ -2762,16 +2780,123 @@ html.legal-route body {
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 
+.settings-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.settings-section-card {
+  --foreground: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-subtle: #64748b;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  overflow: hidden;
+  border-radius: 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 0.85rem;
+  color: #f8fafc;
+  background:
+    radial-gradient(circle at 92% 8%, rgba(214, 168, 90, 0.12), transparent 38%),
+    linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(31, 42, 55, 0.82));
+  box-shadow:
+    0 16px 34px -24px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(18px);
+}
+
+.settings-section-card::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.12), transparent 30%, transparent 78%, rgba(214, 168, 90, 0.08));
+  pointer-events: none;
+}
+
+.settings-section-kicker {
+  color: #d6a85a;
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.settings-section-title {
+  margin-top: 0.08rem;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 850;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.settings-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.settings-summary-grid span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.46rem 0.4rem;
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.settings-summary-grid strong {
+  overflow: hidden;
+  max-width: 100%;
+  color: #ffffff;
+  font-size: 0.94rem;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.settings-inline-link {
+  align-self: center;
+  border-radius: 999px;
+  border: 1px solid rgba(214, 168, 90, 0.34);
+  background: rgba(214, 168, 90, 0.1);
+  padding: 0.42rem 0.8rem;
+  color: #e5c07b;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.settings-inline-link:active {
+  transform: translateY(1px);
+}
+
 .setup-slider-card--sky {
   background:
-    radial-gradient(circle at 18% 18%, rgba(34, 211, 238, 0.5), transparent 38%),
-    linear-gradient(150deg, #172554 0%, #2563eb 52%, #312e81 100%);
+    radial-gradient(circle at 18% 18%, rgba(62, 106, 137, 0.34), transparent 38%),
+    linear-gradient(150deg, #101a2a 0%, #1b3550 52%, #26313d 100%);
 }
 
 .setup-slider-card--emerald {
   background:
-    radial-gradient(circle at 18% 18%, rgba(52, 211, 153, 0.5), transparent 38%),
-    linear-gradient(150deg, #042f2e 0%, #0f766e 52%, #0b1120 100%);
+    radial-gradient(circle at 18% 18%, rgba(124, 183, 174, 0.3), transparent 38%),
+    linear-gradient(150deg, #0b2527 0%, #173f43 52%, #0b1120 100%);
 }
 
 .setup-slider-label {
@@ -2788,7 +2913,7 @@ html.legal-route body {
   line-height: 1;
   letter-spacing: -0.03em;
   color: #ffffff;
-  text-shadow: 0 0 20px rgba(34, 211, 238, 0.28);
+  text-shadow: 0 0 18px rgba(214, 168, 90, 0.22);
 }
 
 .setup-slider-hint {
@@ -2805,13 +2930,13 @@ html.legal-route body {
 
 .setup-host-submit {
   border-radius: 0.95rem;
-  border: 1px solid rgba(45, 212, 191, 0.5);
-  background: linear-gradient(135deg, #22d3ee 0%, #2563eb 52%, #7c3aed 100%);
+  border: 1px solid rgba(214, 168, 90, 0.42);
+  background: linear-gradient(135deg, #2f6f73 0%, #1b3550 52%, #7a4c31 100%);
   color: #fff;
   font-weight: 800;
   font-size: 0.9375rem;
   min-height: 3rem;
-  box-shadow: 0 12px 24px -14px rgba(34, 211, 238, 0.72);
+  box-shadow: 0 12px 24px -14px rgba(214, 168, 90, 0.58);
   transition: filter 0.15s ease, transform 0.15s ease;
 }
 
@@ -2824,9 +2949,9 @@ html.legal-route body {
 }
 
 .setup-host-submit--sky {
-  border-color: rgba(45, 212, 191, 0.55);
-  background: linear-gradient(135deg, #34d399 0%, #14b8a6 48%, #2563eb 100%);
-  box-shadow: 0 12px 24px -14px rgba(20, 184, 166, 0.72);
+  border-color: rgba(124, 183, 174, 0.48);
+  background: linear-gradient(135deg, #7cb7ae 0%, #2f6f73 48%, #1b3550 100%);
+  box-shadow: 0 12px 24px -14px rgba(47, 111, 115, 0.62);
 }
 
 .setup-host-success {
@@ -2845,9 +2970,9 @@ html.legal-route body {
   padding: 0.9rem 0.85rem;
   color: #f8fafc;
   background:
-    radial-gradient(circle at 18% 12%, rgba(34, 211, 238, 0.32), transparent 38%),
-    radial-gradient(circle at 88% 12%, rgba(168, 85, 247, 0.28), transparent 40%),
-    linear-gradient(145deg, #0f172a 0%, #172554 54%, #312e81 100%);
+    radial-gradient(circle at 18% 12%, rgba(48, 113, 118, 0.24), transparent 38%),
+    radial-gradient(circle at 88% 12%, rgba(214, 168, 90, 0.16), transparent 40%),
+    linear-gradient(145deg, #101824 0%, #1b3550 54%, #26313d 100%);
   box-shadow:
     0 18px 40px -24px rgba(0, 0, 0, 0.82),
     inset 0 1px 0 rgba(255, 255, 255, 0.16);
@@ -2870,7 +2995,7 @@ html.legal-route body {
   letter-spacing: 0.22em;
   line-height: 1.2;
   color: #ffffff;
-  text-shadow: 0 0 20px rgba(34, 211, 238, 0.38);
+  text-shadow: 0 0 18px rgba(214, 168, 90, 0.28);
 }
 
 .setup-host-code--league {
@@ -2917,8 +3042,8 @@ html.legal-route body {
 }
 
 .setup-mode-toggle button[role="switch"][aria-checked="true"] {
-  border-color: rgba(52, 211, 153, 0.58);
-  background: linear-gradient(135deg, #34d399 0%, #0f766e 100%);
+  border-color: rgba(124, 183, 174, 0.58);
+  background: linear-gradient(135deg, #7cb7ae 0%, #2f6f73 100%);
 }
 
 .join-page-wrap,

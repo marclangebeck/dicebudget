@@ -114,6 +114,7 @@ Dateien:
 - Startscreen zeigt `Paarungs-Spiele` aus `/stats/pairings` statt globaler App-Runs.
 - Startscreen-Bilanz ersetzt den alten Platzhalter-Fortschrittsbalken: gewonnen/verloren aus lokal zusammengefuehrten Paarungsdaten, inkl. Fallback auf lokal benannte Statistikspieler.
 - iOS-Scrollport-Fix bestaetigt: Startscreen nutzt internen `100dvh`-Scrollport (`home-screen`) statt Body-Scroll; `html/body` konkurrieren nicht mehr. Home-Main blockiert Scrollen nicht mehr. Spielzettel/Play-Screens bleiben starr.
+- Startscreen-Ueberarbeitung: feste Dashboard-Flaeche ohne Scrollbereich, vier Hauptkarten (`Multiplayer`, `Einzelspiel`, `Statistik`, `Einstellungen`), Footer als letztes Element. `Raum beitreten` ist in `/multi` integriert. Zentrale `/settings`-Seite verwaltet Solo-/Multiplayer-Defaults, Strategy/Klassisch, Gegner-Pool, Pool-Endspiel, Bonus-Einblendung und iPad-Tischmodus. Farbwelt ruhiger: Dunkelblau, Anthrazit, Petrol, Gold/Kupfer statt Neon/Pink/Lila/Cyan.
 
 Dateien:
 
@@ -122,6 +123,10 @@ Dateien:
 - `frontend/components/AppScreenHeader.tsx`
 - `frontend/app/app/page.tsx`
 - `frontend/app/multi/join/page.tsx`
+- `frontend/app/settings/page.tsx`
+- `frontend/app/settings/layout.tsx`
+- `frontend/components/GameSetup.tsx`
+- `frontend/lib/uiPrefs.ts`
 - `frontend/app/globals.css`
 
 ## Offene Aufgaben

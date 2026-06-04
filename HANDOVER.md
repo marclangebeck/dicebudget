@@ -37,6 +37,7 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 - **Tischmodus-Namen:** Host gibt Namen für linken/rechten Spieler ein. Technische Spieler-IDs sind gültige UUIDs; Namen werden lokal als Aliase gespeichert und für Anzeige/Statistik-Zuordnung genutzt.
 - **Tischmodus + Strategy-Optionen:** Gegner-Pool sichtbar und Pool-Endspiel bleiben wählbar. Pool-Endspiel ist direkt im Zwei-Zettel-Screen auflösbar.
 - **Game-Dashboard-Design:** Startscreen, `/solo`, `/multi` und `/multi/join` wurden optisch auf dunkles Strategiespiel-/Premium-Mobile-Game-Design umgestellt. Hauptfunktionen bleiben erhalten: Raum erstellen, Statistik, Einzelspiel, Raum beitreten.
+- **Startscreen + zentrale Einstellungen:** Startscreen ist jetzt wieder ein fester, nicht scrollbarer Dashboard-Screen mit vier Hauptkarten: `Multiplayer`, `Einzelspiel`, `Statistik`, `Einstellungen`; Footer ist letztes Element. `Raum beitreten` ist in `/multi` integriert. `/settings` verwaltet Solo-/Multiplayer-Defaults, Strategy/Klassisch, Gegner-Pool, Pool-Endspiel, Bonus-Einblendung und iPad-Tischmodus. Farbwelt ist ruhiger: Dunkelblau, Anthrazit, Petrol, dezente Gold-/Kupferakzente.
 - **Startscreen-Statistik:** Header zeigt `Paarungs-Spiele` aus `/stats/pairings` statt globaler App-Runs. Die Bilanz ersetzt den alten Platzhalter-Fortschrittsbalken und nutzt lokal zusammengeführte Paarungsdaten; falls die aktuelle Geräte-ID nicht in historischen Paarungen steckt, wird ein lokal benannter Statistikspieler als Perspektive genutzt (z. B. `Marc Bilanz 48:62`).
 - **iOS-Scrollport-Fix bestätigt:** Der Startscreen ist in iOS/Capacitor jetzt zuverlässig scrollbar. Ursache war der alte starre Home-/Bento-Aufbau; finaler Fix: `home-screen` als interner `100dvh`-Scrollport, `html/body` auf `home-route` ohne konkurrierenden Body-Scroll, Home-Main ohne `overflow-hidden`/`flex-1`/`min-h-0`. `Einzelspiel` hat mehr Abstand zwischen Bild und Text. Spielzettel/Play-Screens bleiben starr.
 
@@ -49,6 +50,8 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 - `frontend/components/HomeScreenShell.tsx` - scrollbarer iOS-Startscreen-Container
 - `frontend/components/AppScreenHeader.tsx` - farbige Unterseiten-Header
 - `frontend/app/app/page.tsx` - Startscreen-Main ohne Scroll-Blockade
+- `frontend/app/settings/page.tsx` - zentrale App-Einstellungen
+- `frontend/lib/uiPrefs.ts` - lokale Geräte- und App-Defaults
 - `frontend/app/multi/join/page.tsx` - modernisierte Lobby-/Join-Ansicht
 - `frontend/lib/tableMode.ts` - lokaler Tischmodus-Speicher und UUID-Erzeugung
 - `frontend/lib/activeGame.ts` - Resume auch für Tischmodus

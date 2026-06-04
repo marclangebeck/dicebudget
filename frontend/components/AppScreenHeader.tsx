@@ -17,7 +17,9 @@ export function AppScreenHeader({
       ? "solo"
       : section === "Statistik"
         ? "stats"
-        : "multi";
+        : section === "Einstellungen"
+          ? "settings"
+          : "multi";
 
   return (
     <header className={`app-screen-header app-screen-header--${tone} shrink-0`}>
