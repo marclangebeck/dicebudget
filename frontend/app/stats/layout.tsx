@@ -8,7 +8,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#aca08f",
+  themeColor: "#242528",
 };
 
 export default function StatsLayout({ children }: { children: ReactNode }) {
