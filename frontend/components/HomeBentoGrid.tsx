@@ -13,14 +13,19 @@ import type { StatsDto } from "@/lib/statsTypes";
 function SoloMotif({ className }: { className?: string }) {
   return (
     <svg aria-hidden className={className} viewBox="0 0 160 120" fill="none">
-      <rect x="38" y="17" width="72" height="88" rx="14" fill="rgba(255,255,255,0.9)" />
-      <path d="M53 39h40M53 54h40M53 69h30" stroke="#2F6F73" strokeWidth="6" strokeLinecap="round" />
-      <rect x="92" y="54" width="42" height="42" rx="12" fill="url(#soloDie)" />
-      <circle cx="105" cy="67" r="3.5" fill="white" />
-      <circle cx="121" cy="67" r="3.5" fill="white" />
-      <circle cx="105" cy="83" r="3.5" fill="white" />
-      <circle cx="121" cy="83" r="3.5" fill="white" />
-      <path d="M32 93c21-14 42-14 63 0" stroke="rgba(255,255,255,0.55)" strokeWidth="5" strokeLinecap="round" />
+      <ellipse cx="82" cy="99" rx="54" ry="10" fill="rgba(15,23,42,0.28)" />
+      <rect x="39" y="19" width="68" height="82" rx="16" fill="rgba(255,255,255,0.92)" />
+      <rect x="49" y="32" width="40" height="6" rx="3" fill="#2F6F73" opacity="0.82" />
+      <rect x="49" y="48" width="44" height="6" rx="3" fill="#7CB7AE" opacity="0.78" />
+      <rect x="49" y="64" width="32" height="6" rx="3" fill="#D6A85A" opacity="0.82" />
+      <rect x="92" y="45" width="50" height="50" rx="14" fill="url(#soloDie)" />
+      <rect x="92" y="45" width="50" height="50" rx="14" stroke="rgba(255,255,255,0.5)" strokeWidth="2" />
+      <circle cx="107" cy="60" r="3.8" fill="white" />
+      <circle cx="126" cy="60" r="3.8" fill="white" />
+      <circle cx="116.5" cy="70" r="3.8" fill="white" />
+      <circle cx="107" cy="80" r="3.8" fill="white" />
+      <circle cx="126" cy="80" r="3.8" fill="white" />
+      <path d="M24 89c23-16 47-16 70 0" stroke="rgba(255,255,255,0.54)" strokeWidth="5" strokeLinecap="round" />
       <defs>
         <linearGradient id="soloDie" x1="92" y1="54" x2="134" y2="96" gradientUnits="userSpaceOnUse">
           <stop stopColor="#7CB7AE" />
@@ -34,17 +39,21 @@ function SoloMotif({ className }: { className?: string }) {
 function MultiMotif({ className }: { className?: string }) {
   return (
     <svg aria-hidden className={className} viewBox="0 0 160 120" fill="none">
-      <path d="M28 64c20-30 84-30 104 0" stroke="rgba(255,255,255,0.35)" strokeWidth="6" strokeLinecap="round" />
-      <circle cx="44" cy="47" r="15" fill="#7CB7AE" />
-      <circle cx="116" cy="47" r="15" fill="#D6A85A" />
-      <path d="M19 92c2-20 16-31 35-31s33 11 35 31" fill="rgba(124,183,174,0.78)" />
-      <path d="M71 92c2-20 16-31 35-31s33 11 35 31" fill="rgba(214,168,90,0.72)" />
-      <rect x="62" y="34" width="38" height="38" rx="11" fill="url(#multiDie)" />
-      <circle cx="73" cy="45" r="3.2" fill="white" />
-      <circle cx="89" cy="45" r="3.2" fill="white" />
-      <circle cx="81" cy="53" r="3.2" fill="white" />
-      <circle cx="73" cy="61" r="3.2" fill="white" />
-      <circle cx="89" cy="61" r="3.2" fill="white" />
+      <path d="M24 72c23-34 89-34 112 0" stroke="rgba(255,255,255,0.34)" strokeWidth="6" strokeLinecap="round" />
+      <rect x="18" y="49" width="48" height="42" rx="12" fill="rgba(124,183,174,0.18)" stroke="rgba(124,183,174,0.62)" strokeWidth="2" />
+      <rect x="94" y="49" width="48" height="42" rx="12" fill="rgba(214,168,90,0.16)" stroke="rgba(214,168,90,0.62)" strokeWidth="2" />
+      <path d="M29 65h25M29 77h18M106 65h25M113 77h18" stroke="rgba(255,255,255,0.72)" strokeWidth="4" strokeLinecap="round" />
+      <circle cx="42" cy="34" r="14" fill="#7CB7AE" />
+      <circle cx="118" cy="34" r="14" fill="#D6A85A" />
+      <path d="M23 58c4-14 14-21 29-21s25 7 29 21" fill="rgba(124,183,174,0.72)" />
+      <path d="M79 58c4-14 14-21 29-21s25 7 29 21" fill="rgba(214,168,90,0.68)" />
+      <rect x="61" y="32" width="42" height="42" rx="12" fill="url(#multiDie)" />
+      <rect x="61" y="32" width="42" height="42" rx="12" stroke="rgba(255,255,255,0.45)" strokeWidth="2" />
+      <circle cx="73" cy="44" r="3.4" fill="white" />
+      <circle cx="91" cy="44" r="3.4" fill="white" />
+      <circle cx="82" cy="53" r="3.4" fill="white" />
+      <circle cx="73" cy="62" r="3.4" fill="white" />
+      <circle cx="91" cy="62" r="3.4" fill="white" />
       <defs>
         <linearGradient id="multiDie" x1="62" y1="34" x2="100" y2="72" gradientUnits="userSpaceOnUse">
           <stop stopColor="#D6A85A" />
@@ -58,13 +67,16 @@ function MultiMotif({ className }: { className?: string }) {
 function StatsMotif({ className }: { className?: string }) {
   return (
     <svg aria-hidden className={className} viewBox="0 0 160 120" fill="none">
-      <path d="M52 30h56v17c0 20-12 35-28 35S52 67 52 47V30Z" fill="url(#statsCup)" />
-      <path d="M52 39H36c1 19 10 29 24 31M108 39h16c-1 19-10 29-24 31" stroke="#FDE68A" strokeWidth="8" strokeLinecap="round" />
-      <rect x="67" y="80" width="26" height="10" rx="5" fill="#F59E0B" />
-      <rect x="55" y="90" width="50" height="10" rx="5" fill="#92400E" />
-      <rect x="21" y="70" width="14" height="26" rx="5" fill="rgba(251,191,36,0.72)" />
-      <rect x="125" y="58" width="14" height="38" rx="5" fill="rgba(251,191,36,0.54)" />
-      <path d="M80 40l4.5 9 10 1.5-7.2 7 1.7 9.8-9-4.7-9 4.7 1.7-9.8-7.2-7 10-1.5L80 40Z" fill="#FFFBEB" />
+      <ellipse cx="80" cy="99" rx="48" ry="9" fill="rgba(15,23,42,0.28)" />
+      <path d="M50 26h60v18c0 22-13 38-30 38S50 66 50 44V26Z" fill="url(#statsCup)" />
+      <path d="M50 36H32c1 20 10 31 25 33M110 36h18c-1 20-10 31-25 33" stroke="#FDE68A" strokeWidth="8" strokeLinecap="round" />
+      <rect x="66" y="81" width="28" height="10" rx="5" fill="#F59E0B" />
+      <rect x="52" y="91" width="56" height="10" rx="5" fill="#92400E" />
+      <rect x="18" y="71" width="14" height="26" rx="5" fill="rgba(251,191,36,0.72)" />
+      <rect x="126" y="56" width="14" height="41" rx="5" fill="rgba(251,191,36,0.54)" />
+      <rect x="34" y="61" width="14" height="36" rx="5" fill="rgba(124,183,174,0.46)" />
+      <path d="M80 38l4.8 9.6 10.6 1.6-7.7 7.4 1.8 10.4-9.5-5-9.5 5 1.8-10.4-7.7-7.4 10.6-1.6L80 38Z" fill="#FFFBEB" />
+      <path d="M118 22c8 5 13 12 15 22" stroke="rgba(255,255,255,0.32)" strokeWidth="5" strokeLinecap="round" />
       <defs>
         <linearGradient id="statsCup" x1="52" y1="30" x2="108" y2="82" gradientUnits="userSpaceOnUse">
           <stop stopColor="#FDE68A" />
@@ -79,11 +91,15 @@ function StatsMotif({ className }: { className?: string }) {
 function SettingsMotif({ className }: { className?: string }) {
   return (
     <svg aria-hidden className={className} viewBox="0 0 160 120" fill="none">
-      <rect x="34" y="24" width="92" height="72" rx="18" fill="rgba(255,255,255,0.12)" />
-      <path d="M52 47h56M52 73h56" stroke="rgba(255,255,255,0.45)" strokeWidth="7" strokeLinecap="round" />
-      <circle cx="72" cy="47" r="11" fill="#D6A85A" />
-      <circle cx="98" cy="73" r="11" fill="#7CB7AE" />
-      <path d="M80 19l5 12 13 2-9 9 2 13-11-6-11 6 2-13-9-9 13-2 5-12Z" fill="rgba(214,168,90,0.78)" />
+      <ellipse cx="80" cy="99" rx="50" ry="9" fill="rgba(15,23,42,0.26)" />
+      <rect x="30" y="22" width="100" height="76" rx="20" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
+      <rect x="44" y="37" width="72" height="10" rx="5" fill="rgba(255,255,255,0.16)" />
+      <rect x="44" y="63" width="72" height="10" rx="5" fill="rgba(255,255,255,0.16)" />
+      <rect x="44" y="79" width="39" height="8" rx="4" fill="rgba(214,168,90,0.36)" />
+      <circle cx="69" cy="42" r="12" fill="#D6A85A" />
+      <circle cx="100" cy="68" r="12" fill="#7CB7AE" />
+      <path d="M117 23l3 6 7 1-5 5 1 7-6-3.3-6 3.3 1-7-5-5 7-1 3-6Z" fill="rgba(214,168,90,0.78)" />
+      <path d="M34 27c-5 7-7 15-6 25" stroke="rgba(255,255,255,0.25)" strokeWidth="5" strokeLinecap="round" />
     </svg>
   );
 }
