@@ -1132,13 +1132,13 @@ html.legal-route body {
 
 .app-legal-footer {
   display: flex;
-  min-height: 2.05rem;
+  min-height: 1.85rem;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 0.28rem 0.75rem max(0.42rem, env(safe-area-inset-bottom, 0px));
+  padding: 0.18rem 0.75rem 0.26rem;
   background: var(--app-bg-bottom);
   pointer-events: auto;
 }
