@@ -1,8 +1,8 @@
 # iOS Aktuell - dice.budget
 
-**Stand:** 2026-06-03  
+**Stand:** 2026-06-04
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `cfc2819`  
+**Produktcode-HEAD:** `70ad656`
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-/App-Store-Stand. Aeltere iOS-Historie steht in `docs/ios_archive.md`.
@@ -49,6 +49,7 @@ Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-
   - Spielzettel zum Eintragen bewusst unveraendert
   - Startscreen zaehlt Paarungs-Spiele aus `/stats/pairings`
   - Startscreen-Bilanz zeigt gewonnen/verloren aus lokal zusammengefuehrten Paarungsdaten
+  - Startscreen-Scroll in iOS/Capacitor ist bestaetigt: interner `home-screen`-Scrollport, kein Body-Scroll-Konflikt
 
 ## Mac-Workflow Fuer Naechsten Upload
 
@@ -84,7 +85,7 @@ In Xcode:
 ## TestFlight-Pruefung Fuer 2.0 (7)
 
 - iPhone: bestehender Solo-/Multiplayer-Flow unveraendert.
-- iPhone: Startscreen, `/solo`, `/multi` und `/multi/join` im neuen Design pruefen.
+- iPhone: Startscreen muss scrollbar sein; `Einzelspiel`/`Statistik` duerfen nicht gequetscht wirken; `/solo`, `/multi` und `/multi/join` im neuen Design pruefen.
 - iPad Hochformat: Tischmodus zeigt Dreh-Hinweis.
 - iPad Querformat: Tischmodus zeigt zwei anklickbare Zettel nebeneinander.
 - Tischmodus: Namen links/rechts eingeben und pruefen, ob Statistik/Paarung diese Aliase nutzt.

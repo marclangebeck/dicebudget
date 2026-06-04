@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `cfc2819` (`Korrigiere Startscreen-Bilanz`)  
+**Produktcode-HEAD:** `70ad656` (`Korrigiere iOS-Scrollport am Startscreen`)
 **Sprache:** Deutsch
 
 Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milestones_active.md`. iOS/App Store: `docs/ios_current.md`. Dauerhafte Projektentscheidungen nur bei Bedarf: `docs/decisions.md`.
@@ -25,7 +25,7 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
 | Branch | `milestone-22-prep` |
-| Produktcode | HEAD `cfc2819` mit iPad-Tischmodus + Game-Dashboard-Design |
+| Produktcode | HEAD `70ad656` mit iPad-Tischmodus + Game-Dashboard-Design + bestätigtem iOS-Scrollport-Fix |
 | Backend | Keine neue Backend-Migration für iPad-Tischmodus |
 | iOS/TestFlight | Version `2.0`, aktueller Build `2.0 (6)`, nächster Upload `2.0 (7)` |
 | Noch nicht in iOS `2.0 (6)` | M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-Design |
@@ -38,6 +38,7 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 - **Tischmodus + Strategy-Optionen:** Gegner-Pool sichtbar und Pool-Endspiel bleiben wählbar. Pool-Endspiel ist direkt im Zwei-Zettel-Screen auflösbar.
 - **Game-Dashboard-Design:** Startscreen, `/solo`, `/multi` und `/multi/join` wurden optisch auf dunkles Strategiespiel-/Premium-Mobile-Game-Design umgestellt. Hauptfunktionen bleiben erhalten: Raum erstellen, Statistik, Einzelspiel, Raum beitreten.
 - **Startscreen-Statistik:** Header zeigt `Paarungs-Spiele` aus `/stats/pairings` statt globaler App-Runs. Die Bilanz ersetzt den alten Platzhalter-Fortschrittsbalken und nutzt lokal zusammengeführte Paarungsdaten; falls die aktuelle Geräte-ID nicht in historischen Paarungen steckt, wird ein lokal benannter Statistikspieler als Perspektive genutzt (z. B. `Marc Bilanz 48:62`).
+- **iOS-Scrollport-Fix bestätigt:** Der Startscreen ist in iOS/Capacitor jetzt zuverlässig scrollbar. Ursache war der alte starre Home-/Bento-Aufbau; finaler Fix: `home-screen` als interner `100dvh`-Scrollport, `html/body` auf `home-route` ohne konkurrierenden Body-Scroll, Home-Main ohne `overflow-hidden`/`flex-1`/`min-h-0`. `Einzelspiel` hat mehr Abstand zwischen Bild und Text. Spielzettel/Play-Screens bleiben starr.
 
 ## Wichtige Dateien
 
@@ -45,7 +46,9 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 - `frontend/app/play/page.tsx` - Routing zu normalem Spiel oder Tischmodus
 - `frontend/components/TableModePlayBoard.tsx` - Zwei-Zettel-Screen für iPad-Querformat
 - `frontend/components/HomeBentoGrid.tsx` - Game-Dashboard-Startscreen, Paarungs-Spiele und Bilanz
+- `frontend/components/HomeScreenShell.tsx` - scrollbarer iOS-Startscreen-Container
 - `frontend/components/AppScreenHeader.tsx` - farbige Unterseiten-Header
+- `frontend/app/app/page.tsx` - Startscreen-Main ohne Scroll-Blockade
 - `frontend/app/multi/join/page.tsx` - modernisierte Lobby-/Join-Ansicht
 - `frontend/lib/tableMode.ts` - lokaler Tischmodus-Speicher und UUID-Erzeugung
 - `frontend/lib/activeGame.ts` - Resume auch für Tischmodus
@@ -56,7 +59,7 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 ## Offene Prioritäten
 
 1. iOS-Build `2.0 (7)` auf dem Mac bauen und hochladen; enthält M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-Design.
-2. TestFlight auf iPhone und iPad prüfen: normaler iPhone-Flow darf unverändert bleiben; iPad-Tischmodus im Querformat und neue Start-/Setup-/Lobby-Optik testen.
+2. TestFlight auf iPhone und iPad prüfen: normaler iPhone-Flow darf unverändert bleiben; Startscreen muss scrollbar sein; `Einzelspiel`/`Statistik` dürfen nicht gedrungen wirken; iPad-Tischmodus im Querformat testen.
 3. App Store Connect: Paid Applications Agreement, Bank/Steuer, Preis `1,19 EUR`.
 4. Store-Metadaten: Screenshots, Beschreibung DE, Datenschutzfragebogen.
 5. Optional später: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschränken.
@@ -107,7 +110,7 @@ Wichtige Regeln:
 
 Aktueller Kurzstand:
 - Branch: milestone-22-prep
-- Produktcode-HEAD: cfc2819 (Korrigiere Startscreen-Bilanz)
+- Produktcode-HEAD: 70ad656 (Korrigiere iOS-Scrollport am Startscreen)
 - Web/API live: https://dicebudget.bottle-trade.de
 - iOS: Version 2.0, TestFlight 2.0 (6), nächster Upload 2.0 (7)
 - Noch nicht in TestFlight 2.0 (6): M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-Design
@@ -115,6 +118,7 @@ Aktueller Kurzstand:
 - Gegner-Pool sichtbar und Pool-Endspiel bleiben im Tischmodus wählbar; Pool-Endspiel wird im Zwei-Zettel-Screen aufgelöst.
 - Game-Dashboard-Design: Startscreen, /solo, /multi und /multi/join sind optisch modernisiert; Hauptfunktionen bleiben Raum erstellen, Statistik, Einzelspiel, Raum beitreten.
 - Startscreen-Statistik: Paarungs-Spiele kommen aus /stats/pairings; Bilanz nutzt lokal zusammengeführte Paarungsdaten und fällt auf lokal benannte Statistikspieler zurück, wenn die aktuelle Geräte-ID nicht in historischen Paarungen steckt.
+- iOS-Scrollport-Fix ist bestätigt: Startscreen scrollt in iOS/Capacitor; Spielzettel/Play-Screens bleiben starr. Wichtige Dateien: frontend/components/HomeScreenShell.tsx, frontend/app/app/page.tsx, frontend/app/globals.css.
 
 Auftrag:
 <hier konkrete Aufgabe einfügen>
