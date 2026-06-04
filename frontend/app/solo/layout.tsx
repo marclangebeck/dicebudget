@@ -8,7 +8,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#d2cabe",
+  themeColor: "#bfb3a3",
 };
 
 export default function SoloLayout({ children }: { children: ReactNode }) {

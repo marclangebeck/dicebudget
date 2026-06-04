@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --app-bg-top: #f0ede6;
-  --app-bg-mid: #e1ddd4;
-  --app-bg-bottom: #d2cabe;
+  --app-bg-top: #ddd8ce;
+  --app-bg-mid: #cec6b8;
+  --app-bg-bottom: #bfb3a3;
   --chrome-foreground: #f1f5f9;
   --chrome-text-secondary: #cbd5e1;
   --chrome-text-muted: #94a3b8;
@@ -458,6 +458,13 @@ html.play-route body {
   height: 100%;
   overflow: hidden;
   overscroll-behavior: none;
+  background-color: var(--app-bg-bottom);
+  background-image: linear-gradient(
+    180deg,
+    var(--app-bg-top) 0%,
+    var(--app-bg-mid) 48%,
+    var(--app-bg-bottom) 100%
+  );
   touch-action: manipulation;
 }
 
@@ -1423,7 +1430,12 @@ html.legal-route body {
 .play-sheet-card {
   border-radius: 1rem;
   border: 1px solid var(--glass-border);
-  background: linear-gradient(160deg, #ffffff 0%, #f8fafc 100%);
+  background: linear-gradient(
+    180deg,
+    var(--app-bg-top) 0%,
+    var(--app-bg-mid) 48%,
+    var(--app-bg-bottom) 100%
+  );
   box-shadow:
     0 2px 14px -4px rgba(15, 23, 42, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.95);
@@ -1603,7 +1615,12 @@ html.legal-route body {
 
 .play-score-board {
   border-radius: 0.75rem;
-  background: #fff;
+  background: linear-gradient(
+    180deg,
+    var(--app-bg-top) 0%,
+    var(--app-bg-mid) 48%,
+    var(--app-bg-bottom) 100%
+  );
 }
 
 .play-table-head-row {
