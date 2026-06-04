@@ -263,10 +263,20 @@ export function HomeBentoGrid() {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2.5 overflow-hidden">
       <header className="home-hero-banner shrink-0">
-        <div className="home-hero-copy">
-          <p className="home-hero-kicker">{APP_SHORT} · Strategy Edition</p>
-          <h1 className="home-hero-title">Bereit für die nächste Runde?</h1>
-          <p className="home-hero-subtitle">Risiko, Timing und Rivalität in jedem Wurf.</p>
+        <div className="home-hero-brand-row">
+          <img
+            src="/apple-touch-icon.png"
+            alt=""
+            width={88}
+            height={88}
+            className="home-hero-brand-icon"
+            decoding="async"
+          />
+          <div className="home-hero-copy">
+            <p className="home-hero-kicker">{APP_SHORT} · Strategy Edition</p>
+            <h1 className="home-hero-title">Bereit für die nächste Runde?</h1>
+            <p className="home-hero-subtitle">Risiko, Timing und Rivalität in jedem Wurf.</p>
+          </div>
         </div>
         <div className="home-hero-stats" aria-label="Spielübersicht">
           <span>

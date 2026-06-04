@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --app-bg-top: #1b2838;
-  --app-bg-mid: #111c2a;
-  --app-bg-bottom: #090f18;
+  --app-bg-top: #223247;
+  --app-bg-mid: #182638;
+  --app-bg-bottom: #101824;
   --chrome-foreground: #f1f5f9;
   --chrome-text-secondary: #cbd5e1;
   --chrome-text-muted: #94a3b8;
@@ -574,6 +574,25 @@ html.legal-route body {
   min-width: 0;
 }
 
+.home-hero-brand-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.home-hero-brand-icon {
+  width: 5.15rem;
+  height: 5.15rem;
+  flex-shrink: 0;
+  border-radius: 1.05rem;
+  object-fit: cover;
+  box-shadow:
+    0 16px 28px -18px rgba(0, 0, 0, 0.95),
+    0 0 0 1px rgba(255, 255, 255, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
 .home-hero-kicker {
   font-size: 0.62rem;
   font-weight: 800;
@@ -1142,8 +1161,23 @@ html.legal-route body {
     border-radius: 1.05rem;
   }
 
+  .home-hero-brand-row {
+    gap: 0.62rem;
+  }
+
+  .home-hero-brand-icon {
+    width: 4.35rem;
+    height: 4.35rem;
+    border-radius: 0.9rem;
+  }
+
+  .home-hero-kicker {
+    font-size: 0.54rem;
+    letter-spacing: 0.08em;
+  }
+
   .home-hero-title {
-    font-size: 1.28rem;
+    font-size: 1.18rem;
   }
 
   .home-hero-subtitle {
