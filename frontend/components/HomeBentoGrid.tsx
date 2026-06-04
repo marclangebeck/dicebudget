@@ -10,71 +10,6 @@ import { getOrCreatePlayerId, normalizePublicPlayerId, playerLabel } from "@/lib
 import { loadPlayerAliases, type PlayerAliasMap } from "@/lib/playerAliases";
 import type { StatsDto } from "@/lib/statsTypes";
 
-function SoloMotif({ className }: { className?: string }) {
-  return (
-    <svg aria-hidden className={className} viewBox="0 0 160 120" fill="none">
-      <circle cx="80" cy="60" r="47" fill="rgba(124,183,174,0.12)" />
-      <rect x="49" y="29" width="62" height="62" rx="18" fill="url(#soloDie)" />
-      <rect x="49" y="29" width="62" height="62" rx="18" stroke="rgba(255,255,255,0.38)" strokeWidth="2" />
-      <circle cx="67" cy="47" r="4.5" fill="white" />
-      <circle cx="93" cy="47" r="4.5" fill="white" />
-      <circle cx="80" cy="60" r="4.5" fill="white" />
-      <circle cx="67" cy="73" r="4.5" fill="white" />
-      <circle cx="93" cy="73" r="4.5" fill="white" />
-      <path d="M43 99h74" stroke="rgba(255,255,255,0.45)" strokeWidth="5" strokeLinecap="round" />
-      <defs>
-        <linearGradient id="soloDie" x1="92" y1="54" x2="134" y2="96" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#7CB7AE" />
-          <stop offset="1" stopColor="#2F6F73" />
-        </linearGradient>
-      </defs>
-    </svg>
-  );
-}
-
-function MultiMotif({ className }: { className?: string }) {
-  return (
-    <svg aria-hidden className={className} viewBox="0 0 160 120" fill="none">
-      <circle cx="80" cy="60" r="48" fill="rgba(214,168,90,0.1)" />
-      <rect x="31" y="35" width="44" height="54" rx="14" fill="rgba(124,183,174,0.24)" stroke="#7CB7AE" strokeWidth="4" />
-      <rect x="85" y="35" width="44" height="54" rx="14" fill="rgba(214,168,90,0.2)" stroke="#D6A85A" strokeWidth="4" />
-      <path d="M67 60h26" stroke="rgba(255,255,255,0.72)" strokeWidth="5" strokeLinecap="round" />
-      <path d="M78 49 89 60 78 71" stroke="rgba(255,255,255,0.72)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="53" cy="53" r="4" fill="#F8FAFC" />
-      <circle cx="53" cy="71" r="4" fill="#F8FAFC" />
-      <circle cx="107" cy="53" r="4" fill="#F8FAFC" />
-      <circle cx="107" cy="71" r="4" fill="#F8FAFC" />
-    </svg>
-  );
-}
-
-function StatsMotif({ className }: { className?: string }) {
-  return (
-    <svg aria-hidden className={className} viewBox="0 0 160 120" fill="none">
-      <circle cx="80" cy="60" r="47" fill="rgba(214,168,90,0.11)" />
-      <rect x="39" y="69" width="18" height="25" rx="7" fill="rgba(124,183,174,0.62)" />
-      <rect x="68" y="51" width="18" height="43" rx="7" fill="#D6A85A" />
-      <rect x="97" y="35" width="18" height="59" rx="7" fill="rgba(253,230,138,0.88)" />
-      <path d="M38 98h84" stroke="rgba(255,255,255,0.42)" strokeWidth="5" strokeLinecap="round" />
-      <path d="M50 57 76 39l25 9 20-24" stroke="#FDE68A" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="121" cy="24" r="6" fill="#FFFBEB" />
-    </svg>
-  );
-}
-
-function SettingsMotif({ className }: { className?: string }) {
-  return (
-    <svg aria-hidden className={className} viewBox="0 0 160 120" fill="none">
-      <circle cx="80" cy="60" r="47" fill="rgba(255,255,255,0.08)" />
-      <rect x="37" y="31" width="86" height="58" rx="20" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.28)" strokeWidth="3" />
-      <path d="M54 48h52M54 72h52" stroke="rgba(255,255,255,0.52)" strokeWidth="6" strokeLinecap="round" />
-      <circle cx="72" cy="48" r="11" fill="#D6A85A" />
-      <circle cx="96" cy="72" r="11" fill="#7CB7AE" />
-      <path d="M123 31 132 40M132 31l-9 9" stroke="rgba(214,168,90,0.78)" strokeWidth="4" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 type NavTileProps = {
   href: string;
   area: string;
@@ -83,7 +18,7 @@ type NavTileProps = {
   subtitle: string;
   badge: string;
   cta: string;
-  icon: (props: { className: string }) => ReactNode;
+  iconSrc: string;
   footer?: ReactNode;
 };
 
@@ -95,7 +30,7 @@ function NavTile({
   subtitle,
   badge,
   cta,
-  icon,
+  iconSrc,
   footer,
 }: NavTileProps) {
   return (
@@ -109,7 +44,7 @@ function NavTile({
         →
       </span>
       <div className="home-bento-poster-art">
-        {icon({ className: "home-bento-motif" })}
+        <img src={iconSrc} alt="" className="home-bento-motif" loading="eager" decoding="async" />
       </div>
       <div className="home-bento-tile-footer shrink-0">
         <p className="home-bento-title">{title}</p>
@@ -285,7 +220,7 @@ export function HomeBentoGrid() {
           subtitle="Erstelle einen Raum oder tritt per Code bei."
           badge="Multiplayer"
           cta="Zum Mehrspieler"
-          icon={(p) => <MultiMotif {...p} />}
+          iconSrc="/home-icons/multiplayer.png"
         />
         <NavTile
           href="/stats"
@@ -295,7 +230,7 @@ export function HomeBentoGrid() {
           subtitle="Rekorde, Duelle und Erfolge auf einen Blick."
           badge="Rangliste"
           cta="Erfolge ansehen"
-          icon={(p) => <StatsMotif {...p} />}
+          iconSrc="/home-icons/stats.png"
           footer={statsFooter}
         />
         <NavTile
@@ -306,7 +241,7 @@ export function HomeBentoGrid() {
           subtitle="Trainiere deinen Run mit taktischem Fokus."
           badge="Solo"
           cta="Run starten"
-          icon={(p) => <SoloMotif {...p} />}
+          iconSrc="/home-icons/solo.png"
         />
         <NavTile
           href="/settings"
@@ -316,7 +251,7 @@ export function HomeBentoGrid() {
           subtitle="Standards für Solo, Multiplayer und Tischmodus."
           badge="App"
           cta="Defaults setzen"
-          icon={(p) => <SettingsMotif {...p} />}
+          iconSrc="/home-icons/settings.png"
         />
       </div>
 
