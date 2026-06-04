@@ -9,10 +9,10 @@ import type { RunDto } from "@/lib/types";
 
 type Props = {
   run: RunDto;
-  inviteCode?: string | null;
+  onViewSheet?: () => void;
 };
 
-export function RunFinishScreen({ run, inviteCode }: Props) {
+export function RunFinishScreen({ run, onViewSheet }: Props) {
   useEffect(() => {
     clearActiveGame();
   }, []);
@@ -78,15 +78,16 @@ export function RunFinishScreen({ run, inviteCode }: Props) {
           href={APP_HOME_PATH}
           className="btn-primary inline-flex min-h-10 items-center justify-center px-6 text-sm"
         >
-          Startseite
+          Spiel beenden und zur Startseite
         </Link>
-        {inviteCode && (
-          <Link
-            href={`/multi/join?code=${encodeURIComponent(inviteCode)}`}
+        {onViewSheet && (
+          <button
+            type="button"
+            onClick={onViewSheet}
             className="btn-secondary inline-flex min-h-10 items-center justify-center px-6 text-sm"
           >
-            Lobby & Rangliste
-          </Link>
+            Zettel ansehen
+          </button>
         )}
       </div>
     </section>

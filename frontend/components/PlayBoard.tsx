@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { BonusOverlay } from "@/components/BonusOverlay";
 import { RunCompleteOverlay } from "@/components/RunCompleteOverlay";
@@ -25,6 +26,7 @@ import { poolDeltaForComplete } from "@/lib/gameRules";
 import { upperBonusAchieved } from "@/lib/gameScoring";
 import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
 import { getBonusCelebrationEnabled } from "@/lib/uiPrefs";
+import { APP_HOME_PATH } from "@/lib/branding";
 import {
   abandonLocalSoloRun,
   clearLocalSoloField,
@@ -252,6 +254,15 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       resetEntry();
       setActiveFieldId(null);
       if (allFieldsScored(updated)) {
+        if (inviteCode && playerSecret) {
+          const finished = (await finishRun(runId, playerSecret)).run;
+          clearActiveGame();
+          setRun(finished);
+          setShowCompleteOverlay(false);
+          setSheetReviewAfterComplete(false);
+          await refreshLobby();
+          return;
+        }
         setSheetReviewAfterComplete(false);
         setShowCompleteOverlay(true);
       } else if (bonusJustAchieved && getBonusCelebrationEnabled()) {
@@ -336,6 +347,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       );
       setEndgameFieldId(null);
       setEndgameScoreInput("");
+      setSheetReviewAfterComplete(false);
       const { run: updated } = await getRun(runId, playerSecret);
       setRun(updated);
       await refreshLobby();
@@ -354,6 +366,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       await resolvePoolEndgame(inviteCode, { keep: true }, playerSecret);
       setEndgameFieldId(null);
       setEndgameScoreInput("");
+      setSheetReviewAfterComplete(false);
       await refreshLobby();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Aktion fehlgeschlagen");
@@ -400,6 +413,33 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       : run.rollsInPool;
 
   if (run.status === "FINISHED") {
+    if (sheetReviewAfterComplete) {
+      return (
+        <div className="play-board play-board--finished flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
+          {error && (
+            <p className="glass-alert-error shrink-0 px-3 py-2 text-sm">{error}</p>
+          )}
+          <div className="play-board-main flex min-h-0 flex-1 flex-col overflow-hidden">
+            <div className="play-sheet-card flex min-h-0 flex-1 overflow-hidden">
+              <FitScoreSheet layoutKey={`finished-review-${run.gameCount}`}>
+                <ScoreSheetTable
+                  run={run}
+                  activeFieldId={null}
+                  onSelectField={() => undefined}
+                />
+              </FitScoreSheet>
+            </div>
+          </div>
+          <Link
+            href={APP_HOME_PATH}
+            className="setup-host-submit flex min-h-10 shrink-0 items-center justify-center text-center no-underline"
+          >
+            Spiel beenden und zur Startseite
+          </Link>
+        </div>
+      );
+    }
+
     if (amPoolEndgameImprover) {
       const endgameField = run.games
         .flatMap((g) => g.fields)
@@ -409,15 +449,8 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         null;
       return (
         <div className="play-board relative flex min-h-0 flex-1 flex-col gap-1.5 overflow-hidden">
-          <PlayTopBar
-            inviteCode={inviteCode}
-            useStrategyRules={run.useStrategyRules}
-            rollsInPool={run.rollsInPool}
-            rollsRemaining={run.rollsRemaining}
-          />
-
           <div className="play-endgame-banner shrink-0">
-            <p className="play-endgame-banner-title">🎲 Pool-Sieger!</p>
+            <p className="play-endgame-banner-title">Pool-Sieger</p>
             <p className="play-endgame-banner-text">
               Du hattest die meisten Würfe im Pool – wähle ein Feld zum Verbessern
               oder behalte alles.
@@ -476,14 +509,8 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     if (poolEndgamePending) {
       return (
         <div className="play-board play-board--finished flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
-          <PlayTopBar
-            inviteCode={inviteCode}
-            useStrategyRules={run.useStrategyRules}
-            rollsInPool={run.rollsInPool}
-            rollsRemaining={run.rollsRemaining}
-          />
           <div className="play-endgame-banner shrink-0">
-            <p className="play-endgame-banner-title">⏳ Pool-Endspiel läuft</p>
+            <p className="play-endgame-banner-title">Pool-Endspiel läuft</p>
             <p className="play-endgame-banner-text">
               Sobald alle Mitspieler fertig sind, darf der Spieler mit dem größten
               Wurf-Pool ein Feld verbessern. Tippe auf „Aktualisieren“, sobald die
@@ -501,27 +528,21 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
           {error && (
             <p className="glass-alert-error shrink-0 px-3 py-2 text-sm">{error}</p>
           )}
-          <div className="play-finish-scroll min-h-0 flex-1 overflow-y-auto">
-            <RunFinishScreen run={run} inviteCode={inviteCode ?? undefined} />
-          </div>
         </div>
       );
     }
 
     return (
       <div className="play-board play-board--finished flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
-        <PlayTopBar
-          inviteCode={inviteCode}
-          useStrategyRules={run.useStrategyRules}
-          rollsInPool={run.rollsInPool}
-          rollsRemaining={run.rollsRemaining}
-        />
         <p className="play-finished-label shrink-0 text-center text-xs">Spiel beendet</p>
         {error && (
           <p className="glass-alert-error shrink-0 px-3 py-2 text-sm">{error}</p>
         )}
         <div className="play-finish-scroll min-h-0 flex-1 overflow-y-auto">
-          <RunFinishScreen run={run} inviteCode={inviteCode ?? undefined} />
+          <RunFinishScreen
+            run={run}
+            onViewSheet={() => setSheetReviewAfterComplete(true)}
+          />
         </div>
       </div>
     );

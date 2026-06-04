@@ -1,9 +1,15 @@
 import Link from "next/link";
-import { CONTACT_EMAIL, IMPRESSUM_PATH, PRIVACY_PATH } from "@/lib/branding";
+import { APP_HOME_PATH, CONTACT_EMAIL, IMPRESSUM_PATH, PRIVACY_PATH } from "@/lib/branding";
 
 export function AppLegalFooter() {
   return (
     <footer className="app-legal-footer">
+      <Link href={APP_HOME_PATH} className="app-legal-link">
+        Home
+      </Link>
+      <span aria-hidden className="app-legal-sep">
+        ·
+      </span>
       <Link href={PRIVACY_PATH} className="app-legal-link">
         Datenschutz
       </Link>

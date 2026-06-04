@@ -441,10 +441,10 @@ export function TableModePlayBoard({ inviteCode }: Props) {
 
       {sessionFinished && (
         <Link
-          href={`/multi/join?code=${encodeURIComponent(inviteCode)}`}
+          href={APP_HOME_PATH}
           className="play-table-ranking-link"
         >
-          Zur Rangliste
+          Spiel beenden und zur Startseite
         </Link>
       )}
 

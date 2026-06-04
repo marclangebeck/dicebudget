@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { APP_HOME_PATH, APP_SHORT } from "@/lib/branding";
+import { APP_SHORT } from "@/lib/branding";
 
 type Props = {
   section: string;
@@ -23,12 +22,6 @@ export function AppScreenHeader({
 
   return (
     <header className={`app-screen-header app-screen-header--${tone} shrink-0`}>
-      <Link href={APP_HOME_PATH} className="app-nav-btn app-nav-btn--header">
-        <span aria-hidden className="app-nav-btn-icon">
-          ←
-        </span>
-        <span>Startseite</span>
-      </Link>
       <div className="app-screen-header-row">
         <img
           src="/apple-touch-icon.png"

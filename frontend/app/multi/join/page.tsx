@@ -4,7 +4,6 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { JoinByCodeForm } from "@/components/JoinByCodeForm";
-import { BackToHome } from "@/components/BackToHome";
 import { getSessionLobby, getSessionRanking, joinSession, createGameSession } from "@/lib/api";
 import { saveActiveGame } from "@/lib/activeGame";
 import { ResumeLobbySheet } from "@/components/ResumeLobbySheet";
@@ -343,7 +342,6 @@ export default function MultiJoinPage() {
   return (
     <Suspense fallback={<p className="text-muted">Lade …</p>}>
       <div className="join-page-wrap">
-        <BackToHome className="shrink-0" />
         <MultiJoinInner />
       </div>
     </Suspense>

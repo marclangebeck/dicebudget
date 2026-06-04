@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { APP_HOME_PATH } from "@/lib/branding";
 
 type Props = {
   inviteCode?: string | null;
@@ -31,7 +30,7 @@ export function PlayTopBar({
 }: Props) {
   return (
     <div className="play-top-bar shrink-0">
-      {inviteCode ? (
+      {inviteCode && (
         <Link
           href={`/multi/join?code=${encodeURIComponent(inviteCode)}`}
           className="app-nav-btn"
@@ -40,13 +39,6 @@ export function PlayTopBar({
             ←
           </span>
           <span>Zur Lobby</span>
-        </Link>
-      ) : (
-        <Link href={APP_HOME_PATH} className="app-nav-btn">
-          <span aria-hidden className="app-nav-btn-icon">
-            ←
-          </span>
-          <span>Startseite</span>
         </Link>
       )}
 
