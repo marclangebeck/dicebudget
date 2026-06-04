@@ -135,7 +135,7 @@ function PlayContent() {
 
 export default function PlayPage() {
   return (
-    <div className="play-screen-inner pt-safe pb-safe flex min-h-0 flex-1 flex-col overflow-hidden px-2">
+    <div className="play-screen-inner pt-safe flex min-h-0 flex-1 flex-col overflow-hidden px-2">
       <Suspense fallback={<p className="play-empty-state">Lade …</p>}>
         <PlayContent />
       </Suspense>

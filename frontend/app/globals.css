@@ -1133,7 +1133,7 @@ html.legal-route body {
   .home-screen-main {
     gap: 0.5rem;
     padding-top: max(0.45rem, env(safe-area-inset-top));
-    padding-bottom: max(0.35rem, env(safe-area-inset-bottom));
+    padding-bottom: 0.35rem;
   }
 
   .home-hero-banner {
