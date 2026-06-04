@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { AppLegalFooter } from "@/components/AppLegalFooter";
 import { useFixedViewport } from "@/lib/useFixedViewport";
 
 type Props = {
@@ -11,8 +12,9 @@ export function HomeScreenShell({ children }: Props) {
   useFixedViewport("home-route");
 
   return (
-    <div className="home-screen app-bg flex h-dvh max-h-dvh min-h-0 w-full max-w-full flex-col overflow-hidden">
+    <div className="home-screen app-bg relative flex h-dvh max-h-dvh min-h-0 w-full max-w-full flex-col overflow-hidden">
       {children}
+      <AppLegalFooter />
     </div>
   );
 }

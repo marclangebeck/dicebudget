@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { getPairingSummaries, getStats } from "@/lib/api";
-import { APP_SHORT, CONTACT_EMAIL, IMPRESSUM_PATH, PRIVACY_PATH } from "@/lib/branding";
+import { APP_SHORT } from "@/lib/branding";
 import { mergePairingSummaries } from "@/lib/pairingMerge";
 import type { PairingSummaryDto } from "@/lib/pairingTypes";
 import { getOrCreatePlayerId, normalizePublicPlayerId, playerLabel } from "@/lib/playerIdentity";
@@ -85,31 +85,6 @@ function SettingsMotif({ className }: { className?: string }) {
       <circle cx="98" cy="73" r="11" fill="#7CB7AE" />
       <path d="M80 19l5 12 13 2-9 9 2 13-11-6-11 6 2-13-9-9 13-2 5-12Z" fill="rgba(214,168,90,0.78)" />
     </svg>
-  );
-}
-
-function HomeLegalFooter() {
-  return (
-    <footer className="home-legal-footer shrink-0">
-      <Link href={PRIVACY_PATH} className="home-legal-link">
-        Datenschutz
-      </Link>
-      <span aria-hidden className="home-legal-sep">
-        ·
-      </span>
-      <Link href={IMPRESSUM_PATH} className="home-legal-link">
-        Impressum
-      </Link>
-      <span aria-hidden className="home-legal-sep">
-        ·
-      </span>
-      <a
-        href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("dice.budget Support")}`}
-        className="home-legal-link"
-      >
-        Support
-      </a>
-    </footer>
   );
 }
 
@@ -358,7 +333,6 @@ export function HomeBentoGrid() {
         />
       </div>
 
-      <HomeLegalFooter />
     </div>
   );
 }
