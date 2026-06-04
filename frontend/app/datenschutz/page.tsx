@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { BackToHome } from "@/components/BackToHome";
+import { AppScreenHeader } from "@/components/AppScreenHeader";
 import {
-  APP_HOME_PATH,
   APP_NAME,
   CONTACT_EMAIL,
   PRIVACY_URL,
@@ -26,17 +24,12 @@ export default function DatenschutzPage() {
 
   return (
     <main className="legal-page">
+      <AppScreenHeader
+        section="Datenschutz"
+        title="Datenschutz"
+        subtitle={`Stand: Mai 2026 · App und Website ${SITE_URL.replace(/^https:\/\//, "")}`}
+      />
       <article className="legal-article">
-        <header className="legal-header">
-          <BackToHome className="app-nav-btn--header" />
-          <h1>Datenschutzerklärung</h1>
-          <p className="legal-meta">
-            Stand: Mai 2026 · Gültig für die App „{APP_NAME}“ sowie die
-            begleitende Website unter{" "}
-            <a href={SITE_URL}>{SITE_URL.replace(/^https:\/\//, "")}</a>
-          </p>
-        </header>
-
         <section>
           <h2>1. Verantwortlicher</h2>
           <p>
@@ -224,11 +217,6 @@ export default function DatenschutzPage() {
           </p>
         </section>
 
-        <footer className="legal-footer">
-          <Link href={APP_HOME_PATH} className="legal-footer-cta">
-            Zur App
-          </Link>
-        </footer>
       </article>
     </main>
   );

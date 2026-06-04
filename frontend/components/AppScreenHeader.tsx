@@ -16,7 +16,7 @@ export function AppScreenHeader({
       ? "solo"
       : section === "Statistik"
         ? "stats"
-        : section === "Einstellungen"
+        : section === "Einstellungen" || section === "Datenschutz" || section === "Impressum"
           ? "settings"
           : "multi";
 

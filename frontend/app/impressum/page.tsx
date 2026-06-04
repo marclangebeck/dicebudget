@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { BackToHome } from "@/components/BackToHome";
+import { AppScreenHeader } from "@/components/AppScreenHeader";
 import {
-  APP_HOME_PATH,
   APP_NAME,
   CONTACT_EMAIL,
   IMPRESSUM_URL,
-  PRIVACY_PATH,
   SITE_URL,
 } from "@/lib/branding";
 import {
@@ -27,15 +24,12 @@ export default function ImpressumPage() {
 
   return (
     <main className="legal-page">
+      <AppScreenHeader
+        section="Impressum"
+        title="Impressum"
+        subtitle="Angaben gemaess § 5 DDG sowie § 18 Abs. 2 MStV"
+      />
       <article className="legal-article">
-        <header className="legal-header">
-          <BackToHome className="app-nav-btn--header" />
-          <h1>Impressum</h1>
-          <p className="legal-meta">
-            Angaben gemäß § 5 DDG sowie § 18 Abs. 2 MStV
-          </p>
-        </header>
-
         <section>
           <h2>Diensteanbieter</h2>
           <p>
@@ -102,16 +96,6 @@ export default function ImpressumPage() {
           </p>
         </section>
 
-        <footer className="legal-footer">
-          <div className="flex flex-wrap items-center gap-2">
-            <Link href={APP_HOME_PATH} className="legal-footer-cta">
-              Zur App
-            </Link>
-            <Link href={PRIVACY_PATH} className="legal-footer-cta">
-              Datenschutz
-            </Link>
-          </div>
-        </footer>
       </article>
     </main>
   );
