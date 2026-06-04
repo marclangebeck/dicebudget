@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --app-bg-top: #223247;
-  --app-bg-mid: #182638;
-  --app-bg-bottom: #101824;
+  --app-bg-top: #eef1f0;
+  --app-bg-mid: #dde3e2;
+  --app-bg-bottom: #cfd8d6;
   --chrome-foreground: #f1f5f9;
   --chrome-text-secondary: #cbd5e1;
   --chrome-text-muted: #94a3b8;

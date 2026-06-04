@@ -8,7 +8,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#101824",
+  themeColor: "#cfd8d6",
 };
 
 export default function AppHomeLayout({ children }: { children: ReactNode }) {
