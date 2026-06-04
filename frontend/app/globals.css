@@ -526,6 +526,10 @@ html.legal-route body {
   touch-action: manipulation;
 }
 
+.play-screen {
+  grid-template-rows: minmax(0, 1fr);
+}
+
 .home-screen-main,
 .setup-screen-main,
 .setup-screen-body {

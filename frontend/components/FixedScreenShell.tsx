@@ -18,13 +18,14 @@ function screenClass(routeClass: RouteClass): string {
 /** Vollbild ohne Dokument-Scroll und ohne Pinch-Zoom. */
 export function FixedScreenShell({ routeClass, children }: Props) {
   useFixedViewport(routeClass);
+  const showFooter = routeClass !== "play-route";
 
   return (
     <div
       className={`${screenClass(routeClass)} app-bg h-dvh max-h-dvh min-h-0 w-full max-w-full overflow-hidden`}
     >
       {children}
-      <AppLegalFooter />
+      {showFooter && <AppLegalFooter />}
     </div>
   );
 }
