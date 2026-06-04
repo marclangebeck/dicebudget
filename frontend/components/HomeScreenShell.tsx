@@ -12,7 +12,7 @@ export function HomeScreenShell({ children }: Props) {
   useFixedViewport("home-route");
 
   return (
-    <div className="home-screen app-bg relative flex h-dvh max-h-dvh min-h-0 w-full max-w-full flex-col overflow-hidden">
+    <div className="home-screen app-bg h-dvh max-h-dvh min-h-0 w-full max-w-full overflow-hidden">
       {children}
       <AppLegalFooter />
     </div>

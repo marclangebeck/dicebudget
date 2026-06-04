@@ -21,7 +21,7 @@ export function FixedScreenShell({ routeClass, children }: Props) {
 
   return (
     <div
-      className={`${screenClass(routeClass)} app-bg relative flex h-dvh max-h-dvh min-h-0 w-full max-w-full flex-col overflow-hidden`}
+      className={`${screenClass(routeClass)} app-bg h-dvh max-h-dvh min-h-0 w-full max-w-full overflow-hidden`}
     >
       {children}
       <AppLegalFooter />
