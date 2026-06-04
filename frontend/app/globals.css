@@ -463,6 +463,13 @@ html.home-route body {
   overflow-x: hidden;
   overflow-y: hidden;
   overscroll-behavior: none;
+  background-color: var(--app-bg-bottom);
+  background-image: linear-gradient(
+    180deg,
+    var(--app-bg-top) 0%,
+    var(--app-bg-mid) 48%,
+    var(--app-bg-bottom) 100%
+  );
   touch-action: pan-y manipulation;
 }
 
