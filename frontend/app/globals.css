@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --app-bg-top: #eef1f0;
-  --app-bg-mid: #dde3e2;
-  --app-bg-bottom: #cfd8d6;
+  --app-bg-top: #f1eadc;
+  --app-bg-mid: #e4d8c4;
+  --app-bg-bottom: #d5c5ad;
   --chrome-foreground: #f1f5f9;
   --chrome-text-secondary: #cbd5e1;
   --chrome-text-muted: #94a3b8;
@@ -1134,18 +1134,18 @@ html.legal-route body {
   padding: 0.05rem 0.3rem;
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--chrome-text-secondary);
+  color: #26313d;
   text-decoration: none;
 }
 
 .home-legal-link:hover {
-  color: var(--chrome-link);
+  color: #5b3a24;
   text-decoration: underline;
 }
 
 .home-legal-sep {
   font-size: 0.625rem;
-  color: var(--chrome-text-subtle);
+  color: rgba(38, 49, 61, 0.48);
 }
 
 @media (max-height: 760px) {
@@ -2282,12 +2282,13 @@ html.legal-route body {
 
 /* —— App-Screens (Statistik, Multi, … — wie Home-Bento) —— */
 .setup-screen.app-bg {
-  background-color: #090f18;
-  background-image:
-    radial-gradient(circle at 14% 8%, rgba(48, 113, 118, 0.24), transparent 34%),
-    radial-gradient(circle at 92% 12%, rgba(214, 168, 90, 0.14), transparent 36%),
-    radial-gradient(circle at 50% 100%, rgba(27, 53, 80, 0.32), transparent 42%),
-    linear-gradient(180deg, #090f18 0%, #111c2a 52%, #14191f 100%);
+  background-color: var(--app-bg-bottom);
+  background-image: linear-gradient(
+    180deg,
+    var(--app-bg-top) 0%,
+    var(--app-bg-mid) 48%,
+    var(--app-bg-bottom) 100%
+  );
 }
 
 .setup-screen-main {
