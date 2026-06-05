@@ -108,18 +108,33 @@ function YatzyRowLabel({
   );
 }
 
+function buildYatzyMarkCounts(run: RunDto): Partial<Record<1 | 2 | 3 | 4 | 5 | 6, number>> {
+  const counts: Partial<Record<1 | 2 | 3 | 4 | 5 | 6, number>> = {};
+  for (const game of run.games) {
+    const kniffel = game.fields.find((f) => f.fieldType === "KNIFFEL");
+    const die = kniffel?.yatzyDieValue;
+    if (kniffel?.score === 50 && die !== null && die !== undefined && die >= 1 && die <= 6) {
+      const key = die as 1 | 2 | 3 | 4 | 5 | 6;
+      counts[key] = (counts[key] ?? 0) + 1;
+    }
+  }
+  return counts;
+}
+
 function FieldRowLabel({
   row,
   extraYatzyCount,
   runActive,
   extraYatzyBusy,
   onIncrementExtraYatzy,
+  yatzyMarkCount,
 }: {
   row: Extract<SheetRow, { kind: "field" }>;
   extraYatzyCount: number;
   runActive: boolean;
   extraYatzyBusy?: boolean;
   onIncrementExtraYatzy?: () => void;
+  yatzyMarkCount?: number;
 }) {
   if (row.fieldType === "KNIFFEL") {
     return (
@@ -134,11 +149,22 @@ function FieldRowLabel({
   const diceValue = diceValueForField(row.fieldType);
   if (diceValue !== null) {
     return (
-      <DiceFace
-        value={diceValue}
-        pipClassName="bg-slate-800"
-        className="h-5 w-5 rounded border border-slate-400 bg-white md:h-5 md:w-5"
-      />
+      <span className="play-dice-label inline-flex items-center gap-0.5">
+        <DiceFace
+          value={diceValue}
+          pipClassName="bg-slate-800"
+          className="h-5 w-5 rounded border border-slate-400 bg-white md:h-5 md:w-5"
+        />
+        {yatzyMarkCount !== undefined && yatzyMarkCount > 0 && (
+          <span
+            className="play-yatzy-mark tabular-nums"
+            title={`${yatzyMarkCount}× Yatzy mit dieser Augenzahl`}
+            aria-label={`${yatzyMarkCount} Yatzy-Markierungen`}
+          >
+            {"|".repeat(yatzyMarkCount)}
+          </span>
+        )}
+      </span>
     );
   }
   return <span className="text-[10px] leading-tight md:text-[11px]">{FIELD_LABELS[row.fieldType]}</span>;
@@ -276,6 +302,7 @@ export function ScoreSheetTable({
   const runActive = run.status === "ACTIVE";
   const tilesSelectable = runActive || !!allowSelectWhenFinished;
   const games = run.games;
+  const yatzyMarkCounts = buildYatzyMarkCounts(run);
   const gameColCount = games.length;
   const labelColPct = gameColCount <= 2 ? 30 : gameColCount <= 4 ? 26 : 22;
   const gameColPct = (100 - labelColPct) / gameColCount;
@@ -333,6 +360,10 @@ export function ScoreSheetTable({
                       runActive={runActive}
                       extraYatzyBusy={extraYatzyBusy}
                       onIncrementExtraYatzy={onIncrementExtraYatzy}
+                      yatzyMarkCount={(() => {
+                        const die = diceValueForField(row.fieldType);
+                        return die !== null ? yatzyMarkCounts[die] : undefined;
+                      })()}
                     />
                   )}
                 </th>

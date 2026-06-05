@@ -24,11 +24,25 @@ fieldsRouter.post("/:fieldId/complete", async (req, res, next) => {
     const { runId, fieldId } = req.params as { runId: string; fieldId: string };
     const score = Number(req.body?.score);
     const rollsUsed = Number(req.body?.rollsUsed);
+    const yatzyDieValueRaw = req.body?.yatzyDieValue;
+    const yatzyDieValue =
+      yatzyDieValueRaw === undefined || yatzyDieValueRaw === null
+        ? undefined
+        : Number(yatzyDieValueRaw);
     if (Number.isNaN(score) || Number.isNaN(rollsUsed)) {
       res.status(400).json({ error: "score and rollsUsed required" });
       return;
     }
-    const run = await completeField(runId, fieldId, { score, rollsUsed }, readPlayerSecret(req));
+    if (yatzyDieValue !== undefined && Number.isNaN(yatzyDieValue)) {
+      res.status(400).json({ error: "yatzyDieValue must be a number" });
+      return;
+    }
+    const run = await completeField(
+      runId,
+      fieldId,
+      { score, rollsUsed, yatzyDieValue },
+      readPlayerSecret(req),
+    );
     res.json({ run });
   } catch (error) {
     next(error);

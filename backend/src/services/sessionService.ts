@@ -120,6 +120,13 @@ export class PoolEndgameNotAvailableError extends Error {
 }
 
 /** Ungültige Feldwahl beim Pool-Endspiel (z. B. leeres Feld). */
+export class SessionNotReadyError extends Error {
+  constructor() {
+    super("Session is not ready for stats finalization");
+    this.name = "SessionNotReadyError";
+  }
+}
+
 export class PoolEndgameInputError extends Error {
   constructor(message: string) {
     super(message);
@@ -416,7 +423,90 @@ export async function maybeFinishSessionForRun(runId: string) {
     }
   }
 
-  await awardSessionLeaguePoints(session.id);
+  // Liga-/Paarungs-Punkte erst nach Nutzer-Entscheidung („Werten“ / „Nicht werten“).
+}
+
+function sessionReadyForStatsFinalize(session: {
+  players: { run: { status: string } }[];
+  poolEndgameEnabled: boolean;
+  useStrategyRules: boolean;
+  poolEndgameResolved: boolean;
+  poolEndgameImproverId: string | null;
+}): boolean {
+  if (session.players.length < 2) return false;
+  if (!session.players.every((p) => p.run.status === RUN_STATUS.FINISHED)) return false;
+  if (
+    session.poolEndgameEnabled &&
+    session.useStrategyRules &&
+    !session.poolEndgameResolved &&
+    session.poolEndgameImproverId
+  ) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Multiplayer-Abschluss: Session in Statistik aufnehmen oder bewusst auslassen.
+ * Idempotent – nur die erste Entscheidung pro Session zählt.
+ */
+export async function finalizeSessionStats(
+  inviteCode: string,
+  includeInPairingStats: boolean,
+  playerSecret: string | undefined,
+) {
+  const session = await prisma.gameSession.findUnique({
+    where: { inviteCode: inviteCode.toUpperCase() },
+    include: {
+      players: {
+        orderBy: { orderIndex: "asc" },
+        include: { run: { select: { status: true } } },
+      },
+    },
+  });
+
+  if (!session) throw new SessionNotFoundError();
+
+  const token = playerSecret?.trim();
+  const player = session.players.find((p) => p.secretToken === token);
+  if (!token || !player) throw new ForbiddenRunError();
+
+  if (session.pointsAwarded) {
+    return getSessionRanking(session.inviteCode);
+  }
+
+  if (!sessionReadyForStatsFinalize(session)) {
+    throw new SessionNotReadyError();
+  }
+
+  if (includeInPairingStats) {
+    await awardSessionLeaguePoints(session.id);
+    const afterAward = await prisma.gameSession.findUnique({
+      where: { id: session.id },
+      select: { pointsAwarded: true },
+    });
+    if (!afterAward?.pointsAwarded) {
+      await prisma.gameSession.update({
+        where: { id: session.id },
+        data: {
+          pointsAwarded: true,
+          includeInPairingStats: true,
+          status: SESSION_STATUS.FINISHED,
+        },
+      });
+    }
+  } else {
+    await prisma.gameSession.update({
+      where: { id: session.id },
+      data: {
+        pointsAwarded: true,
+        includeInPairingStats: false,
+        status: SESSION_STATUS.FINISHED,
+      },
+    });
+  }
+
+  return getSessionRanking(session.inviteCode);
 }
 
 /**
@@ -501,6 +591,6 @@ export async function resolvePoolEndgame(
     });
   }
 
-  await awardSessionLeaguePoints(session.id);
+  // Stats erst nach Nutzer-Entscheidung auf dem Ergebnis-Screen.
   return getSessionRanking(session.inviteCode);
 }

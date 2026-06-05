@@ -34,7 +34,7 @@ function SettingsSwitch({
         aria-checked={checked}
         aria-label={`${title} ${checked ? "deaktivieren" : "aktivieren"}`}
         onClick={() => onChange(!checked)}
-        className="relative h-8 w-14 shrink-0 rounded-full border-2 transition"
+        className="app-toggle relative h-8 w-14 shrink-0 rounded-full border-2 transition"
       >
         <span
           className={`absolute top-0.5 block h-6 w-6 rounded-full bg-white shadow-md transition-transform ${
@@ -66,7 +66,9 @@ function RangeSettingCard({
   onChange: (value: number) => void;
 }) {
   return (
-    <label className="settings-compact-card settings-compact-card--range">
+    <label
+      className={`settings-compact-card settings-compact-card--range${disabled ? " settings-compact-card--disabled" : ""}`}
+    >
       <span className="settings-compact-kicker">{kicker}</span>
       <span className="settings-compact-title">{title}</span>
       <span className="settings-compact-value tabular-nums">{value}</span>
@@ -84,6 +86,21 @@ function RangeSettingCard({
   );
 }
 
+function SettingsSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="settings-group">
+      <h2 className="settings-group-title">{title}</h2>
+      <div className="settings-card-grid">{children}</div>
+    </section>
+  );
+}
+
 export default function SettingsPage() {
   const [settings, setSettingsState] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
 
@@ -98,6 +115,8 @@ export default function SettingsPage() {
     });
   }
 
+  const tableModeActive = settings.tableModeEnabled;
+
   return (
     <div className="settings-screen">
       <AppScreenHeader
@@ -106,7 +125,7 @@ export default function SettingsPage() {
         subtitle="Lege die Standardwerte für Solo, Multiplayer und Tischmodus fest."
       />
 
-      <section className="settings-card-grid">
+      <SettingsSection title="Allgemein">
         <div className="settings-compact-card settings-compact-card--toggle">
           <StrategyModeToggle
             useStrategyRules={settings.useStrategyRules}
@@ -117,6 +136,9 @@ export default function SettingsPage() {
         <div className="settings-compact-card settings-compact-card--toggle">
           <BonusCelebrationToggle />
         </div>
+      </SettingsSection>
+
+      <SettingsSection title="Solo">
         <RangeSettingCard
           kicker="Einzelspiel"
           title="Solo-Spiele"
@@ -131,6 +153,9 @@ export default function SettingsPage() {
           max={6}
           onChange={(value) => update({ soloGameCount: value })}
         />
+      </SettingsSection>
+
+      <SettingsSection title="Multi">
         <RangeSettingCard
           kicker="Multiplayer"
           title="Raum-Spiele"
@@ -172,6 +197,9 @@ export default function SettingsPage() {
             />
           </>
         )}
+      </SettingsSection>
+
+      <SettingsSection title="iPad">
         <SettingsSwitch
           checked={settings.tableModeEnabled}
           onChange={(value) =>
@@ -183,7 +211,9 @@ export default function SettingsPage() {
           title="iPad-Tisch"
           description="2-Spieler-Spiel auf einem iPad."
         />
-        <div className="settings-compact-card settings-compact-card--wide">
+        <div
+          className={`settings-compact-card settings-compact-card--wide${tableModeActive ? "" : " settings-compact-card--disabled"}`}
+        >
           <p className="settings-compact-kicker">Tischmodus</p>
           <p className="settings-compact-title">Spielernamen</p>
           <div className="grid grid-cols-2 gap-2">
@@ -193,8 +223,9 @@ export default function SettingsPage() {
                 type="text"
                 value={settings.tableLeftName}
                 maxLength={24}
+                disabled={!tableModeActive}
                 onChange={(e) => update({ tableLeftName: e.target.value })}
-                className="glass-input min-h-10 px-3 text-sm font-semibold"
+                className="glass-input min-h-10 px-3 text-sm font-semibold disabled:opacity-45"
               />
             </label>
             <label className="flex min-w-0 flex-col gap-1">
@@ -203,16 +234,19 @@ export default function SettingsPage() {
                 type="text"
                 value={settings.tableRightName}
                 maxLength={24}
+                disabled={!tableModeActive}
                 onChange={(e) => update({ tableRightName: e.target.value })}
-                className="glass-input min-h-10 px-3 text-sm font-semibold"
+                className="glass-input min-h-10 px-3 text-sm font-semibold disabled:opacity-45"
               />
             </label>
           </div>
           <p className="settings-compact-text mt-2">
-            Lokale Aliase für Anzeige und Statistik.
+            {tableModeActive
+              ? "Lokale Aliase für Anzeige und Statistik."
+              : "Aktiviere iPad-Tisch, um Namen festzulegen."}
           </p>
         </div>
-      </section>
+      </SettingsSection>
     </div>
   );
 }

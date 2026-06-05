@@ -24,6 +24,8 @@ export type FieldDto = {
   fieldType: FieldTypeId;
   score: number | null;
   rollsUsed: number;
+  /** Würfel-Augenzahl bei Yatzy (50 Punkte), für Strichliste auf dem Zettel. */
+  yatzyDieValue?: number | null;
   rolls: RollDto[];
 };
 

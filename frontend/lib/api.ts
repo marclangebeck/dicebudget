@@ -74,12 +74,35 @@ export function completeField(
   score: number,
   rollsUsed: number,
   playerSecret?: string,
+  yatzyDieValue?: number,
 ) {
+  const body: { score: number; rollsUsed: number; yatzyDieValue?: number } = {
+    score,
+    rollsUsed,
+  };
+  if (yatzyDieValue !== undefined) {
+    body.yatzyDieValue = yatzyDieValue;
+  }
   return request<{ run: RunDto }>(`/runs/${runId}/fields/${fieldId}/complete`, {
     method: "POST",
-    body: JSON.stringify({ score, rollsUsed }),
+    body: JSON.stringify(body),
     playerSecret,
   });
+}
+
+export function finalizeSessionStats(
+  inviteCode: string,
+  includeInPairingStats: boolean,
+  playerSecret: string,
+) {
+  return request<{ session: SessionRankingDto }>(
+    `/sessions/invite/${encodeURIComponent(inviteCode)}/finalize-stats`,
+    {
+      method: "POST",
+      body: JSON.stringify({ includeInPairingStats }),
+      playerSecret,
+    },
+  );
 }
 
 export function clearLastField(runId: string, fieldId: string, playerSecret?: string) {

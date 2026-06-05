@@ -114,7 +114,7 @@ export function emptyAccumulator(key: string, playerA: string, playerB: string):
 
 async function loadFinishedSessions() {
   return prisma.gameSession.findMany({
-    where: { pointsAwarded: true },
+    where: { pointsAwarded: true, includeInPairingStats: true },
     include: {
       league: { select: { leagueCode: true } },
       players: {

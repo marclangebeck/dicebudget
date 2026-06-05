@@ -11,11 +11,13 @@ type Props = {
   field: FieldDto;
   scoreInput: string;
   rollsUsed: number | null;
+  yatzyDieValue?: number | null;
   busy: boolean;
   isCorrection?: boolean;
   canClearLast?: boolean;
   rollsInPoolOverride?: number;
   onPickScoreValue: (value: number) => void;
+  onYatzyDieValue?: (value: number) => void;
   onRollsUsed: (n: number) => void;
   onSubmit: () => void;
   onClearLast?: () => void;
@@ -29,11 +31,13 @@ export function ScoreEntryPanel({
   field,
   scoreInput,
   rollsUsed,
+  yatzyDieValue,
   busy,
   isCorrection,
   canClearLast,
   rollsInPoolOverride,
   onPickScoreValue,
+  onYatzyDieValue,
   onRollsUsed,
   onSubmit,
   onClearLast,
@@ -54,9 +58,13 @@ export function ScoreEntryPanel({
     Number.isInteger(parsedScore) &&
     scoreChoices.includes(parsedScore);
 
+  const needsYatzyDie = field.fieldType === "KNIFFEL" && parsedScore === 50;
+  const yatzyDieOk = !needsYatzyDie || (yatzyDieValue !== null && yatzyDieValue !== undefined);
+
   const canSubmit =
     run.status === "ACTIVE" &&
     scoreOk &&
+    yatzyDieOk &&
     (strategy ? rollsUsed !== null : true) &&
     !busy;
 
@@ -112,6 +120,27 @@ export function ScoreEntryPanel({
               onPick={onPickScoreValue}
             />
           </div>
+
+          {needsYatzyDie && onYatzyDieValue && (
+            <div className="play-entry-section">
+              <p className="play-entry-section-label mb-1.5">Yatzy mit Würfel</p>
+              <div className="play-roll-chips play-roll-chips--large">
+                {[1, 2, 3, 4, 5, 6].map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    disabled={run.status !== "ACTIVE" || busy}
+                    onClick={() => onYatzyDieValue(n)}
+                    className={`play-roll-chip play-roll-chip--large tabular-nums ${
+                      yatzyDieValue === n ? "play-roll-chip--selected" : ""
+                    } disabled:opacity-40`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {strategy && (
             <div className="play-entry-section">

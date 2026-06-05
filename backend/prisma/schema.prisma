@@ -66,6 +66,7 @@ model GameSession {
   league            League   @relation(fields: [leagueId], references: [id], onDelete: Cascade)
   roundNumber       Int      @default(1) @map("round_number")
   pointsAwarded     Boolean  @default(false) @map("points_awarded")
+  includeInPairingStats Boolean @default(true) @map("include_in_pairing_stats")
   createdAt         DateTime @default(now()) @map("created_at")
   players           Player[]
 
@@ -124,6 +125,7 @@ model Field {
   score      Int?
   rollsUsed  Int     @default(0) @map("rolls_used")
   scoredSequence Int? @map("scored_sequence")
+  yatzyDieValue  Int? @map("yatzy_die_value")
   game       Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
   rolls      Roll[]
 

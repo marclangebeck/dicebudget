@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { StatsRatingToggle } from "@/components/StatsRatingToggle";
 import { BonusOverlay } from "@/components/BonusOverlay";
 import { RunCompleteOverlay } from "@/components/RunCompleteOverlay";
 import { RunFinishScreen } from "@/components/RunFinishScreen";
@@ -15,6 +17,7 @@ import {
   abandonRun,
   clearLastField,
   completeField,
+  finalizeSessionStats,
   finishRun,
   getRun,
   getSessionLobby,
@@ -51,6 +54,7 @@ function defaultRollsUsed(run: RunDto): number {
 }
 
 export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
+  const router = useRouter();
   const isLocalSolo = !inviteCode && !playerSecret && isLocalSoloRunId(runId);
   const [run, setRun] = useState<RunDto | null>(null);
   const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
@@ -65,10 +69,14 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   const [lobby, setLobby] = useState<SessionLobbyDto | null>(null);
   const [endgameFieldId, setEndgameFieldId] = useState<string | null>(null);
   const [endgameScoreInput, setEndgameScoreInput] = useState("");
+  const [yatzyDieValue, setYatzyDieValue] = useState<number | null>(null);
+  const [includeInStats, setIncludeInStats] = useState(true);
+  const [leavingHome, setLeavingHome] = useState(false);
 
   const resetEntry = useCallback(() => {
     setScoreInput("");
     setRollsUsed(null);
+    setYatzyDieValue(null);
   }, []);
 
   const load = useCallback(async () => {
@@ -219,17 +227,32 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     }
   }
 
+  const finalizeStatsIfMulti = useCallback(
+    async (includeInPairingStats: boolean) => {
+      if (inviteCode && playerSecret) {
+        await finalizeSessionStats(inviteCode, includeInPairingStats, playerSecret);
+      }
+    },
+    [inviteCode, playerSecret],
+  );
+
   async function handleSubmit() {
     if (!activeFieldId || !run || scoreInput === "") return;
     const effectiveRolls: number = run.useStrategyRules ? (rollsUsed ?? 0) : (rollsUsed ?? 1);
     if (run.useStrategyRules && rollsUsed === null) return;
     if (effectiveRolls < 1) return;
     const score = Number(scoreInput);
+    const activeFieldType = run.games
+      .flatMap((g) => g.fields)
+      .find((f) => f.id === activeFieldId)?.fieldType;
+    const needsYatzyDie = activeFieldType === "KNIFFEL" && score === 50;
+    if (needsYatzyDie && yatzyDieValue === null) return;
+    const yatzyArg = needsYatzyDie ? yatzyDieValue! : undefined;
     setBusy(true);
     setError(null);
     try {
       const updated = isLocalSolo
-        ? completeLocalSoloField(runId, activeFieldId, score, effectiveRolls)
+        ? completeLocalSoloField(runId, activeFieldId, score, effectiveRolls, yatzyArg)
         : (
             await completeField(
               runId,
@@ -237,6 +260,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
               score,
               effectiveRolls,
               playerSecret,
+              yatzyArg,
             )
           ).run;
       const gameBefore = run.games.find((g) =>
@@ -430,12 +454,41 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
               </FitScoreSheet>
             </div>
           </div>
-          <Link
-            href={APP_HOME_PATH}
-            className="setup-host-submit flex min-h-10 shrink-0 items-center justify-center text-center no-underline"
-          >
-            Spiel beenden und zur Startseite
-          </Link>
+          {inviteCode && playerSecret && (
+            <div className="shrink-0 px-1">
+              <p className="text-muted mb-2 text-center text-xs">Paarungs-Statistik</p>
+              <StatsRatingToggle
+                includeInStats={includeInStats}
+                onChange={setIncludeInStats}
+                disabled={leavingHome}
+              />
+            </div>
+          )}
+          {inviteCode && playerSecret ? (
+            <button
+              type="button"
+              disabled={leavingHome}
+              onClick={() => {
+                setLeavingHome(true);
+                void finalizeStatsIfMulti(includeInStats)
+                  .then(() => router.push(APP_HOME_PATH))
+                  .catch((e) =>
+                    setError(e instanceof Error ? e.message : "Statistik-Speicherung fehlgeschlagen"),
+                  )
+                  .finally(() => setLeavingHome(false));
+              }}
+              className="setup-host-submit flex min-h-10 shrink-0 items-center justify-center text-center disabled:opacity-50"
+            >
+              {leavingHome ? "Speichere …" : "Spiel beenden und zur Startseite"}
+            </button>
+          ) : (
+            <Link
+              href={APP_HOME_PATH}
+              className="setup-host-submit flex min-h-10 shrink-0 items-center justify-center text-center no-underline"
+            >
+              Spiel beenden und zur Startseite
+            </Link>
+          )}
         </div>
       );
     }
@@ -542,6 +595,10 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
           <RunFinishScreen
             run={run}
             onViewSheet={() => setSheetReviewAfterComplete(true)}
+            multiplayer={!!inviteCode && !!playerSecret}
+            onFinalizeStats={
+              inviteCode && playerSecret ? finalizeStatsIfMulti : undefined
+            }
           />
         </div>
       </div>
@@ -637,7 +694,12 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
           isCorrection={isCorrection}
           canClearLast={canClearLast}
           rollsInPoolOverride={rollsInPoolForEntry}
-          onPickScoreValue={(v) => setScoreInput(String(v))}
+          onPickScoreValue={(v) => {
+            setScoreInput(String(v));
+            if (v !== 50) setYatzyDieValue(null);
+          }}
+          yatzyDieValue={yatzyDieValue}
+          onYatzyDieValue={setYatzyDieValue}
           onRollsUsed={setRollsUsed}
           onSubmit={() => void handleSubmit()}
           onClearLast={() => void handleClearLast()}

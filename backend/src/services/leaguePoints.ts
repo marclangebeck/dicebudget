@@ -126,7 +126,7 @@ export async function awardSessionLeaguePoints(sessionId: string): Promise<void>
 
     await tx.gameSession.update({
       where: { id: session.id },
-      data: { pointsAwarded: true, status: "FINISHED" },
+      data: { pointsAwarded: true, includeInPairingStats: true, status: "FINISHED" },
     });
   });
 }

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { StatsRatingToggle } from "@/components/StatsRatingToggle";
 import { FitScoreSheet } from "@/components/FitScoreSheet";
 import { PoolEndgamePanel } from "@/components/PoolEndgamePanel";
 import { ScoreEntryPanel } from "@/components/ScoreEntryPanel";
@@ -9,6 +11,7 @@ import { ScoreSheetTable } from "@/components/ScoreSheetTable";
 import {
   clearLastField,
   completeField,
+  finalizeSessionStats,
   finishRun,
   getRun,
   getSessionLobby,
@@ -45,6 +48,7 @@ function playerCardClass(side: TableModeSide, activeSide: TableModeSide | null):
 }
 
 export function TableModePlayBoard({ inviteCode }: Props) {
+  const router = useRouter();
   const [players, setPlayers] = useState<[TableModePlayer, TableModePlayer] | null>(null);
   const [runs, setRuns] = useState<RunMap>({ left: null, right: null });
   const [lobby, setLobby] = useState<SessionLobbyDto | null>(null);
@@ -60,6 +64,9 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     side: TableModeSide;
     gameIndex: number | null;
   } | null>(null);
+  const [yatzyDieValue, setYatzyDieValue] = useState<number | null>(null);
+  const [includeInStats, setIncludeInStats] = useState(true);
+  const [leavingHome, setLeavingHome] = useState(false);
 
   const load = useCallback(async () => {
     const stored = loadTableModeSession(inviteCode);
@@ -140,6 +147,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     setActiveFieldId(null);
     setScoreInput("");
     setRollsUsed(null);
+    setYatzyDieValue(null);
   }
 
   function selectField(side: TableModeSide, fieldId: string) {
@@ -180,6 +188,12 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     if (effectiveRolls < 1) return;
     const score = Number(scoreInput);
     if (Number.isNaN(score)) return;
+    const activeFieldType = activeRun.games
+      .flatMap((g) => g.fields)
+      .find((f) => f.id === activeFieldId)?.fieldType;
+    const needsYatzyDie = activeFieldType === "KNIFFEL" && score === 50;
+    if (needsYatzyDie && yatzyDieValue === null) return;
+    const yatzyArg = needsYatzyDie ? yatzyDieValue! : undefined;
 
     setBusy(true);
     setError(null);
@@ -193,6 +207,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
         score,
         effectiveRolls,
         activePlayer.playerSecret,
+        yatzyArg,
       );
       const gameAfter = updated.games.find((g) =>
         g.fields.some((f) => f.id === activeFieldId),
@@ -332,7 +347,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
   }
 
   const allFinished = players.every((p) => runs[p.side]?.status === "FINISHED");
-  const sessionFinished = allFinished && lobby?.status === "FINISHED";
+  const sessionFinished = allFinished && !poolEndgamePending;
 
   return (
     <div className="play-table-mode relative flex min-h-0 flex-1 flex-col gap-1.5 overflow-hidden">
@@ -440,12 +455,39 @@ export function TableModePlayBoard({ inviteCode }: Props) {
       </div>
 
       {sessionFinished && (
-        <Link
-          href={APP_HOME_PATH}
-          className="play-table-ranking-link"
-        >
-          Spiel beenden und zur Startseite
-        </Link>
+        <div className="play-table-finish-footer shrink-0">
+          <p className="text-muted mb-2 text-center text-xs">Paarungs-Statistik</p>
+          <StatsRatingToggle
+            includeInStats={includeInStats}
+            onChange={setIncludeInStats}
+            disabled={leavingHome}
+          />
+          <button
+            type="button"
+            disabled={leavingHome}
+            onClick={() => {
+              const stored = loadTableModeSession(inviteCode);
+              if (!stored) {
+                router.push(APP_HOME_PATH);
+                return;
+              }
+              setLeavingHome(true);
+              void finalizeSessionStats(
+                inviteCode,
+                includeInStats,
+                stored.players[0].playerSecret,
+              )
+                .then(() => router.push(APP_HOME_PATH))
+                .catch((e) =>
+                  setError(e instanceof Error ? e.message : "Statistik-Speicherung fehlgeschlagen"),
+                )
+                .finally(() => setLeavingHome(false));
+            }}
+            className="play-table-ranking-link mt-3 disabled:opacity-50"
+          >
+            {leavingHome ? "Speichere …" : "Spiel beenden und zur Startseite"}
+          </button>
+        </div>
       )}
 
       {bonusOverlay && (
@@ -467,7 +509,12 @@ export function TableModePlayBoard({ inviteCode }: Props) {
           isCorrection={isCorrection}
           canClearLast={canClearLast}
           rollsInPoolOverride={rollsInPoolForEntry}
-          onPickScoreValue={(v) => setScoreInput(String(v))}
+          onPickScoreValue={(v) => {
+            setScoreInput(String(v));
+            if (v !== 50) setYatzyDieValue(null);
+          }}
+          yatzyDieValue={yatzyDieValue}
+          onYatzyDieValue={setYatzyDieValue}
           onRollsUsed={setRollsUsed}
           onSubmit={() => void handleSubmit()}
           onClearLast={() => void handleClearLast()}

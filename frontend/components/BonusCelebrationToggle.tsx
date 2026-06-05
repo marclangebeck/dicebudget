@@ -42,9 +42,7 @@ export function BonusCelebrationToggle({ disabled }: Props) {
           }
           disabled={disabled}
           onClick={toggle}
-          className={`relative h-8 w-14 shrink-0 rounded-full border-2 transition disabled:opacity-50 ${
-            enabled ? "border-emerald-800 bg-emerald-600" : "border-slate-500 bg-slate-400"
-          }`}
+          className="app-toggle relative h-8 w-14 shrink-0 rounded-full border-2 transition disabled:opacity-50"
         >
           <span
             className={`absolute top-0.5 block h-6 w-6 rounded-full bg-white shadow-md transition-transform ${

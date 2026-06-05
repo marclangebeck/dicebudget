@@ -170,12 +170,26 @@ export function completeLocalSoloField(
   fieldId: string,
   score: number,
   rollsUsed: number,
+  yatzyDieValue?: number,
 ): RunDto {
   const state = getState(runId);
   const run = state.run;
   if (run.status !== "ACTIVE") throw new Error("Run is not active");
   const field = findField(state, fieldId);
   if (!field) throw new Error("Field not found");
+
+  if (field.fieldType === "KNIFFEL" && score === 50) {
+    if (
+      yatzyDieValue === undefined ||
+      !Number.isInteger(yatzyDieValue) ||
+      yatzyDieValue < 1 ||
+      yatzyDieValue > 6
+    ) {
+      throw new Error("yatzyDieValue must be between 1 and 6 for Yatzy");
+    }
+  } else if (yatzyDieValue !== undefined) {
+    throw new Error("yatzyDieValue is only allowed for Yatzy (50 points)");
+  }
 
   if (run.useStrategyRules) {
     if (!Number.isInteger(rollsUsed) || rollsUsed < 1 || rollsUsed > 20) {
@@ -209,6 +223,8 @@ export function completeLocalSoloField(
 
   field.score = score;
   field.rollsUsed = rollsUsed;
+  field.yatzyDieValue =
+    field.fieldType === "KNIFFEL" && score === 50 ? yatzyDieValue ?? null : null;
   run.totalRollsUsed += rollsUsed;
   recomputeRun(run);
   return saveState(state);
@@ -234,6 +250,7 @@ export function clearLocalSoloField(runId: string, fieldId: string): RunDto {
   run.totalRollsUsed -= field.rollsUsed;
   field.score = null;
   field.rollsUsed = 0;
+  field.yatzyDieValue = null;
   delete state.scoredSequenceByFieldId[field.id];
 
   recomputeRun(run);

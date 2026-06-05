@@ -247,20 +247,43 @@ export async function incrementExtraYatzy(runId: string, playerSecret?: string) 
   return getRunById(runId);
 }
 
+function assertYatzyDieValue(
+  fieldType: string,
+  score: number,
+  yatzyDieValue: number | undefined,
+): number | null {
+  if (fieldType !== "KNIFFEL" || score !== 50) {
+    if (yatzyDieValue !== undefined && yatzyDieValue !== null) {
+      throw new Error("yatzyDieValue is only allowed for a scored Yatzy (50 points)");
+    }
+    return null;
+  }
+  if (
+    yatzyDieValue === undefined ||
+    !Number.isInteger(yatzyDieValue) ||
+    yatzyDieValue < 1 ||
+    yatzyDieValue > 6
+  ) {
+    throw new Error("yatzyDieValue must be an integer from 1 to 6 for Yatzy");
+  }
+  return yatzyDieValue;
+}
+
 export async function completeField(
   runId: string,
   fieldId: string,
-  input: { score: number; rollsUsed: number },
+  input: { score: number; rollsUsed: number; yatzyDieValue?: number },
   playerSecret?: string,
 ) {
   await assertRunPlayerAccess(runId, playerSecret);
-  const { score, rollsUsed } = input;
+  const { score, rollsUsed, yatzyDieValue } = input;
 
   const field = await loadFieldForRun(runId, fieldId);
   if (!field) throw new FieldNotFoundError();
   const run = field.game.run;
   assertManualEntry(score, rollsUsed, run.useStrategyRules);
   assertValidScoreForField(field.fieldType, score);
+  const resolvedYatzyDie = assertYatzyDieValue(field.fieldType, score, yatzyDieValue);
   if (run.status !== RUN_STATUS.ACTIVE) throw new RunNotActiveError();
 
   const isCorrection = field.score !== null;
@@ -305,7 +328,7 @@ export async function completeField(
 
     await tx.field.update({
       where: { id: fieldId },
-      data: { score, rollsUsed, scoredSequence },
+      data: { score, rollsUsed, scoredSequence, yatzyDieValue: resolvedYatzyDie },
     });
     await tx.run.update({
       where: { id: runId },
@@ -350,7 +373,7 @@ export async function clearLastField(
     await tx.roll.deleteMany({ where: { fieldId } });
     await tx.field.update({
       where: { id: fieldId },
-      data: { score: null, rollsUsed: 0, scoredSequence: null },
+      data: { score: null, rollsUsed: 0, scoredSequence: null, yatzyDieValue: null },
     });
     await tx.run.update({
       where: { id: runId },

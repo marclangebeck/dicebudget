@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createGameSession,
+  finalizeSessionStats,
   getSessionLobbyByInvite,
   getSessionRanking,
   joinSession,
@@ -79,6 +80,20 @@ sessionsRouter.post("/invite/:inviteCode/pool-endgame", async (req, res, next) =
     const data = await resolvePoolEndgame(
       req.params.inviteCode,
       { keep, fieldId, score },
+      readPlayerSecret(req),
+    );
+    res.json({ session: data });
+  } catch (error) {
+    next(error);
+  }
+});
+
+sessionsRouter.post("/invite/:inviteCode/finalize-stats", async (req, res, next) => {
+  try {
+    const includeInPairingStats = req.body?.includeInPairingStats !== false;
+    const data = await finalizeSessionStats(
+      req.params.inviteCode,
+      includeInPairingStats,
       readPlayerSecret(req),
     );
     res.json({ session: data });
