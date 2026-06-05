@@ -1,8 +1,8 @@
 # Aktive Milestones - dice.budget
 
-**Stand:** 2026-06-04
+**Stand:** 2026-06-05
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `70ad656`
+**Produktcode-HEAD:** `d443444`
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -19,12 +19,12 @@ Technische Basis ist erledigt:
 - Native App startet direkt auf `/app`.
 - Native API-Basis zeigt auf `https://dicebudget.bottle-trade.de/api`.
 - TestFlight ist aktiv, aktueller Build ist `2.0 (6)`.
-- Naechster Upload ist `2.0 (7)` und muss M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-Finalisierung enthalten.
+- Naechster Upload ist `2.0 (7)` und muss M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons enthalten.
 
 Offen:
 
 - iOS-Build `2.0 (7)` auf dem Mac bauen und hochladen.
-- Startscreen, `/solo`, `/multi`, `/settings` und `/play` in iOS/Capacitor auf iPhone pruefen: Footer muss am unteren Viewport-Rand sitzen; Content darf nur oberhalb davon scrollen.
+- Startscreen, `/solo`, `/multi`, `/settings`, `/stats`, `/datenschutz`, `/impressum` und `/play` in iOS/Capacitor auf iPhone pruefen: Footer-Tabbar muss auf App-/Setup-/Legal-Screens unten sitzen; `/play` muss footerfrei sein und der Zettel muss die volle Screenhoehe nutzen.
 - iPad-Tischmodus in TestFlight auf iPad Querformat testen; iPhone-Flow muss unveraendert bleiben.
 - TestFlight nach Upload erneut testen.
 - App Store Connect fuer kostenpflichtigen Release fertigstellen.
@@ -108,23 +108,29 @@ Dateien:
 
 - Startscreen wirkt als modernes Game-Dashboard mit dunklem Premium-/Strategiespiel-Look.
 - Aktuelle Startscreen-Hauptkarten: `Multiplayer`, `Einzelspiel`, `Statistik`, `Einstellungen`; `Raum beitreten` ist in `/multi` integriert.
-- Jede Hauptfunktion hat eine eigene Farbwelt und eigene SVG-Mini-Poster-Motive.
+- Jede Hauptfunktion hat eine eigene Farbwelt; die Startscreen-Karten nutzen 3D-PNG-Icons aus `frontend/public/home-icons/`.
 - `/solo`, `/multi` und `/multi/join` wurden visuell an den Startscreen angepasst; Formularlogik, Routen und API-Aufrufe bleiben unveraendert.
 - Der eigentliche Spielzettel zum Eintragen wurde bewusst nicht umgestaltet.
 - Startscreen zeigt `Paarungs-Spiele` aus `/stats/pairings` statt globaler App-Runs.
 - Startscreen-Bilanz ersetzt den alten Platzhalter-Fortschrittsbalken: gewonnen/verloren aus lokal zusammengefuehrten Paarungsdaten, inkl. Fallback auf lokal benannte Statistikspieler.
 - iOS-Scrollport-Fix bestaetigt: Startscreen nutzt internen `100dvh`-Scrollport (`home-screen`) statt Body-Scroll; `html/body` konkurrieren nicht mehr. Home-Main blockiert Scrollen nicht mehr. Spielzettel/Play-Screens bleiben starr.
 - Startscreen-Ueberarbeitung: feste Dashboard-Flaeche ohne Scrollbereich, vier Hauptkarten (`Multiplayer`, `Einzelspiel`, `Statistik`, `Einstellungen`), Footer als letztes Element. `Raum beitreten` ist in `/multi` integriert. Zentrale `/settings`-Seite verwaltet Solo-/Multiplayer-Defaults, Strategy/Klassisch, Gegner-Pool, Pool-Endspiel, Bonus-Einblendung und iPad-Tischmodus. Farbwelt ruhiger: Dunkelblau, Anthrazit, Petrol, Gold/Kupfer statt Neon/Pink/Lila/Cyan.
-- App-weite Footer-Finalisierung: Home-, Setup- und Play-Shells sind als zweizeiliges Grid aufgebaut (`Content` + fester Footer). Datenschutz/Impressum/Support stehen in einer kompakten Footer-Zeile am unteren Viewport-Rand. Der Footer nutzt bewusst kein `safe-area-inset-bottom`, weil iOS dadurch die Links sichtbar nach oben schiebt; aktuelles Padding: 2px oben und 2px unten. App-Hintergrund ist dunkles Grau.
+- Multiplayer-Abschluss: Nach dem letzten Feldeintrag wird der Run automatisch abgeschlossen. Ohne Pool-Endspiel erscheint direkt das Ergebnis mit `Spiel beenden und zur Startseite` + `Zettel ansehen`; in der Zettelansicht bleibt nur der Startseiten-Button. Abschluss-Screens verlinken nicht mehr zu Statistik/Lobby/Rangliste.
+- App-weite Footer-/Legal-Finalisierung: Home-, Setup-, Stats-, Settings- und Legal-Screens nutzen unten eine dunkle Bottom-Tabbar mit vier gleich breiten Bereichen (`Home`, `Datenschutz`, `Impressum`, `Support`) und SVG-Line-Icons. Der Footer nutzt bewusst kein `safe-area-inset-bottom`, weil iOS dadurch Links sichtbar nach oben schiebt. `/play` rendert bewusst keinen Footer, damit Solo-, Multiplayer- und Tischmodus-Zettel die volle Screenhoehe nutzen.
+- Datenschutz und Impressum nutzen jetzt dieselbe App-Aufteilung wie die übrigen Screens: dunkler Hintergrund, `AppScreenHeader`, scrollender Contentbereich und Footer-Tabbar.
 
 Dateien:
 
 - `frontend/components/HomeBentoGrid.tsx`
+- `frontend/public/home-icons/*.png`
 - `frontend/components/HomeScreenShell.tsx`
 - `frontend/components/FixedScreenShell.tsx`
 - `frontend/components/AppLegalFooter.tsx`
+- `frontend/components/LegalScrollShell.tsx`
 - `frontend/components/AppScreenHeader.tsx`
 - `frontend/app/app/page.tsx`
+- `frontend/app/datenschutz/page.tsx`
+- `frontend/app/impressum/page.tsx`
 - `frontend/app/multi/join/page.tsx`
 - `frontend/app/settings/page.tsx`
 - `frontend/app/settings/layout.tsx`
@@ -134,10 +140,10 @@ Dateien:
 
 ## Offene Aufgaben
 
-1. iOS-Build `2.0 (7)` mit M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-Finalisierung hochladen.
+1. iOS-Build `2.0 (7)` mit M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons hochladen.
 2. App Store Connect: Paid Applications Agreement, Bank/Steuer.
 3. Preis `1,19 EUR`, Screenshots, Beschreibung DE, Datenschutzfragebogen.
-4. TestFlight auf iPhone und iPad pruefen; Footer-Position auf Start-, Setup-, Settings- und Play-Screens explizit testen.
+4. TestFlight auf iPhone und iPad pruefen; Footer-Tabbar auf Start-, Setup-, Settings-, Stats- und Legal-Screens sowie footerfreie `/play`-Zettel explizit testen.
 5. Optional: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschraenken.
 6. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
 
@@ -153,7 +159,7 @@ Dateien:
 ## Aktuelle Prioritaeten
 
 1. iOS/TestFlight `2.0 (7)` bereitstellen.
-2. iPad-Tischmodus auf iPad Querformat, neue Start-/Setup-/Lobby-/Settings-Optik, Footer-Position in iOS und iPhone-Regression testen.
+2. iPad-Tischmodus auf iPad Querformat, neue Start-/Setup-/Lobby-/Settings-/Legal-Optik, Footer-Tabbar in iOS, footerfreie `/play`-Zettel und iPhone-Regression testen.
 3. Store-Connect-Freigaben und Metadaten abschliessen.
 4. Danach erst optionale Sicherheits-/Auth-Verfeinerung der Stats-Endpunkte planen.
 
@@ -170,11 +176,15 @@ Dateien:
 - `frontend/components/FitScoreSheet.tsx`
 - `frontend/components/TableModePlayBoard.tsx`
 - `frontend/components/HomeBentoGrid.tsx`
+- `frontend/public/home-icons/*.png`
 - `frontend/components/HomeScreenShell.tsx`
 - `frontend/components/FixedScreenShell.tsx`
 - `frontend/components/AppLegalFooter.tsx`
+- `frontend/components/LegalScrollShell.tsx`
 - `frontend/components/AppScreenHeader.tsx`
 - `frontend/app/app/page.tsx`
+- `frontend/app/datenschutz/page.tsx`
+- `frontend/app/impressum/page.tsx`
 - `frontend/app/multi/join/page.tsx`
 - `frontend/components/PairingEditOverlay.tsx`
 - `frontend/components/PairingSummaryCard.tsx`

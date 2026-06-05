@@ -1,8 +1,8 @@
 # iOS Aktuell - dice.budget
 
-**Stand:** 2026-06-04
+**Stand:** 2026-06-05
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `70ad656`
+**Produktcode-HEAD:** `d443444`
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-/App-Store-Stand. Aeltere iOS-Historie steht in `docs/ios_archive.md`.
@@ -12,8 +12,8 @@ Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-
 - App Store Connect ist bei **Version 2.0**.
 - Aktueller TestFlight-Build ist **2.0 (6)**.
 - Naechster Upload ist **2.0 (7)**.
-- M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-Finalisierung sind **noch nicht** in TestFlight `2.0 (6)`.
-- Der Upload `2.0 (7)` muss M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-Finalisierung enthalten.
+- M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons sind **noch nicht** in TestFlight `2.0 (6)`.
+- Der Upload `2.0 (7)` muss M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons enthalten.
 - Web/API sind live unter https://dicebudget.bottle-trade.de.
 
 ## Was In 2.0 (7) Enthalten Sein Muss
@@ -45,14 +45,17 @@ Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-
 - Game-Dashboard-Design:
   - Startscreen mit dunklem Strategiespiel-/Premium-Look
   - Hauptfunktionen: `Multiplayer`, `Einzelspiel`, `Statistik`, `Einstellungen`
+  - Hauptkarten nutzen 3D-PNG-Icons aus `frontend/public/home-icons/`
   - `Raum beitreten` ist in `/multi` integriert
   - `/solo`, `/multi`, `/multi/join` und `/settings` optisch modernisiert
   - Spielzettel zum Eintragen bewusst unveraendert
   - Startscreen zaehlt Paarungs-Spiele aus `/stats/pairings`
   - Startscreen-Bilanz zeigt gewonnen/verloren aus lokal zusammengefuehrten Paarungsdaten
   - App-Hintergrund ist dunkles Grau
-  - Datenschutz/Impressum/Support stehen als kompakte feste Footer-Zeile am unteren Viewport-Rand
-  - Der Footer nutzt bewusst kein `safe-area-inset-bottom`; aktuelles Padding: 2px oben und 2px unten
+  - Home-/Setup-/Stats-/Settings-/Legal-Screens nutzen unten eine dunkle Footer-Tabbar mit `Home`, `Datenschutz`, `Impressum`, `Support`
+  - `/datenschutz` und `/impressum` sind an das App-Screen-Layout angeglichen
+  - `/play` zeigt bewusst keinen Footer, damit Solo-, Multiplayer- und Tischmodus-Zettel die volle Screenhoehe nutzen
+  - Der Footer nutzt bewusst kein `safe-area-inset-bottom`
 
 ## Mac-Workflow Fuer Naechsten Upload
 
@@ -89,7 +92,8 @@ In Xcode:
 
 - iPhone: bestehender Solo-/Multiplayer-Flow unveraendert.
 - iPhone: Startscreen darf nicht unerwuenscht scrollen; `Einzelspiel`/`Statistik` duerfen nicht gequetscht wirken; `/solo`, `/multi`, `/multi/join` und `/settings` im neuen Design pruefen.
-- iPhone: Footer auf Start-, Solo-, Multiplayer-, Settings- und Play-Screen pruefen. Datenschutz/Impressum/Support muessen unten am Viewport sitzen; Content darf nur oberhalb davon scrollen.
+- iPhone: Footer-Tabbar auf Start-, Solo-Setup-, Multiplayer-, Settings-, Statistik-, Datenschutz- und Impressum-Screens pruefen. Content darf nur oberhalb davon scrollen.
+- iPhone: `/play` pruefen: kein Footer, Zettel fuellt die volle Screenhoehe und bleibt eintragbar.
 - iPad Hochformat: Tischmodus zeigt Dreh-Hinweis.
 - iPad Querformat: Tischmodus zeigt zwei anklickbare Zettel nebeneinander.
 - Tischmodus: Namen links/rechts eingeben und pruefen, ob Statistik/Paarung diese Aliase nutzt.
