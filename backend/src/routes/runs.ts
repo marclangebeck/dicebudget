@@ -2,6 +2,7 @@ import { Router } from "express";
 import { assertRunPlayerAccess } from "../services/runPlayerAuth.js";
 import { createRun } from "../services/createRun.js";
 import { getRunById } from "../services/getRun.js";
+import { getRunMatchAnalysisSolo } from "../services/matchAnalysisService.js";
 import { abandonRun, finishRun, incrementExtraYatzy } from "../services/playField.js";
 import { readPlayerSecret } from "./readPlayerSecret.js";
 import { fieldsRouter } from "./fields.js";
@@ -47,6 +48,16 @@ runsRouter.post("/:runId/abandon", async (req, res, next) => {
   try {
     const run = await abandonRun(req.params.runId, readPlayerSecret(req));
     res.json({ run });
+  } catch (error) {
+    next(error);
+  }
+});
+
+runsRouter.get("/:id/match-analysis", async (req, res, next) => {
+  try {
+    await assertRunPlayerAccess(req.params.id, readPlayerSecret(req));
+    const analysis = await getRunMatchAnalysisSolo(req.params.id);
+    res.json({ analysis });
   } catch (error) {
     next(error);
   }

@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { StatsRatingToggle } from "@/components/StatsRatingToggle";
 import { BonusOverlay } from "@/components/BonusOverlay";
 import { RunCompleteOverlay } from "@/components/RunCompleteOverlay";
+import { MatchAnalysisView } from "@/components/MatchAnalysisView";
 import { RunFinishScreen } from "@/components/RunFinishScreen";
 import { FitScoreSheet } from "@/components/FitScoreSheet";
 import { PlayTopBar } from "@/components/PlayTopBar";
@@ -21,6 +22,7 @@ import {
   finishRun,
   getRun,
   getSessionLobby,
+  getSessionMatchAnalysis,
   incrementExtraYatzy,
   resolvePoolEndgame,
 } from "@/lib/api";
@@ -39,6 +41,8 @@ import {
   incrementLocalSoloExtraYatzy,
   isLocalSoloRunId,
 } from "@/lib/localSoloRun";
+import { buildSoloMatchAnalysis } from "@/lib/matchAnalysis";
+import type { MatchAnalysisDto, SessionMatchAnalysisDto } from "@/lib/matchAnalysisTypes";
 import { ABANDON_RUN_CONFIRM, allFieldsScored, getLastScoredFieldId } from "@/lib/runUtils";
 import type { FieldDto, RunDto } from "@/lib/types";
 
@@ -72,6 +76,11 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   const [yatzyDieValue, setYatzyDieValue] = useState<number | null>(null);
   const [includeInStats, setIncludeInStats] = useState(true);
   const [leavingHome, setLeavingHome] = useState(false);
+  const [showMatchAnalysis, setShowMatchAnalysis] = useState(false);
+  const [matchAnalysis, setMatchAnalysis] = useState<
+    MatchAnalysisDto | SessionMatchAnalysisDto | null
+  >(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
 
   const resetEntry = useCallback(() => {
     setScoreInput("");
@@ -235,6 +244,31 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     },
     [inviteCode, playerSecret],
   );
+
+  async function handleViewAnalysis() {
+    if (!run) return;
+    setAnalysisLoading(true);
+    setError(null);
+    try {
+      if (isLocalSolo) {
+        setMatchAnalysis(buildSoloMatchAnalysis(run));
+        setShowMatchAnalysis(true);
+        return;
+      }
+      if (inviteCode) {
+        const { analysis } = await getSessionMatchAnalysis(
+          inviteCode,
+          getOrCreatePlayerId(),
+        );
+        setMatchAnalysis(analysis);
+        setShowMatchAnalysis(true);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Analyse fehlgeschlagen");
+    } finally {
+      setAnalysisLoading(false);
+    }
+  }
 
   async function handleSubmit() {
     if (!activeFieldId || !run || scoreInput === "") return;
@@ -437,6 +471,30 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       : run.rollsInPool;
 
   if (run.status === "FINISHED") {
+    const poolEndgamePending =
+      !!lobby?.poolEndgameEnabled && !lobby?.poolEndgameResolved;
+    const analysisAvailable =
+      !poolEndgamePending &&
+      (isLocalSolo || !inviteCode || lobby == null || lobby.playerCount === 2);
+
+    if (showMatchAnalysis && matchAnalysis) {
+      return (
+        <div className="play-board play-board--finished flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
+          {error && (
+            <p className="glass-alert-error shrink-0 px-3 py-2 text-sm">{error}</p>
+          )}
+          <div className="play-finish-scroll min-h-0 flex-1 overflow-y-auto">
+            <MatchAnalysisView
+              analysis={matchAnalysis}
+              ownPlayerId={getOrCreatePlayerId()}
+              onBack={() => setShowMatchAnalysis(false)}
+              backLabel="Zurück zum Ergebnis"
+            />
+          </div>
+        </div>
+      );
+    }
+
     if (sheetReviewAfterComplete) {
       return (
         <div className="play-board play-board--finished flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
@@ -462,6 +520,16 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
                 disabled={leavingHome}
               />
             </div>
+          )}
+          {analysisAvailable && (
+            <button
+              type="button"
+              disabled={analysisLoading}
+              onClick={() => void handleViewAnalysis()}
+              className="btn-secondary flex min-h-10 shrink-0 items-center justify-center px-6 text-sm disabled:opacity-50"
+            >
+              {analysisLoading ? "Lade Analyse …" : "Spielanalyse"}
+            </button>
           )}
           {inviteCode && playerSecret ? (
             <button
@@ -556,8 +624,6 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     // nicht fest (es sind noch nicht alle fertig) oder verbessert gerade. Ohne
     // Polling kann der bereits fertige Spieler die Improver-Phase verpassen –
     // daher Warte-Hinweis mit gezieltem Aktualisieren (+ Focus-Refresh).
-    const poolEndgamePending =
-      !!lobby?.poolEndgameEnabled && !lobby?.poolEndgameResolved;
     if (poolEndgamePending) {
       return (
         <div className="play-board play-board--finished flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
@@ -594,6 +660,9 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
           <RunFinishScreen
             run={run}
             onViewSheet={() => setSheetReviewAfterComplete(true)}
+            onViewAnalysis={() => void handleViewAnalysis()}
+            analysisAvailable={analysisAvailable}
+            analysisLoading={analysisLoading}
             multiplayer={!!inviteCode && !!playerSecret}
             onFinalizeStats={
               inviteCode && playerSecret ? finalizeStatsIfMulti : undefined

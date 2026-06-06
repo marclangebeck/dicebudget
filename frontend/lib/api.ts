@@ -3,6 +3,7 @@ import {
   normalizePairingDetail,
   normalizePairingSummary,
 } from "./normalizePairing";
+import type { SessionMatchAnalysisDto } from "./matchAnalysisTypes";
 import type { PairingSummaryDto } from "./pairingTypes";
 import type { RunDto } from "./types";
 import type { SessionLobbyDto, SessionRankingDto } from "./sessionTypes";
@@ -236,6 +237,12 @@ export function joinSession(inviteCode: string, playerId: string) {
 export function getSessionRanking(inviteCode: string) {
   return request<{ session: SessionRankingDto }>(
     `/sessions/invite/${encodeURIComponent(inviteCode)}/ranking`,
+  );
+}
+
+export function getSessionMatchAnalysis(inviteCode: string, viewerPlayerId: string) {
+  return request<{ analysis: SessionMatchAnalysisDto }>(
+    `/sessions/invite/${encodeURIComponent(inviteCode)}/match-analysis?viewerPlayerId=${encodeURIComponent(viewerPlayerId)}`,
   );
 }
 

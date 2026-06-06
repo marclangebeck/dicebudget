@@ -15,6 +15,10 @@ import {
 } from "../services/playField.js";
 import { ForbiddenRunError } from "../services/runPlayerAuth.js";
 import {
+  MatchAnalysisNotReadyError,
+  MatchAnalysisNotSupportedError,
+} from "../services/matchAnalysisService.js";
+import {
   InvalidPlayerNameError,
   InvalidSessionPlayersError,
   LeagueNotFoundError,
@@ -50,6 +54,14 @@ export function errorHandler(
   }
   if (err instanceof PoolEndgameNotAvailableError) {
     res.status(409).json({ error: err.message });
+    return;
+  }
+  if (err instanceof MatchAnalysisNotReadyError) {
+    res.status(409).json({ error: err.message });
+    return;
+  }
+  if (err instanceof MatchAnalysisNotSupportedError) {
+    res.status(400).json({ error: err.message });
     return;
   }
   if (err instanceof LeagueNotFoundError) {

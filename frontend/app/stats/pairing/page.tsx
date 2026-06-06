@@ -203,44 +203,47 @@ function PairingDetailInner() {
             ) : (
               <ul className="stats-round-list">
                 {pairing.rounds.map((round, index) => (
-                  <li
-                    key={`${round.inviteCode}-${round.roundNumber}-${round.finishedAt ?? index}`}
-                    className="stats-round-card"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-strong text-sm font-semibold">
-                          Serie {round.leagueCode} · Runde {round.roundNumber}
-                        </p>
-                        <p className="text-muted mt-0.5 text-xs">
-                          {formatDateTime(round.finishedAt)}
+                  <li key={`${round.inviteCode}-${round.roundNumber}-${round.finishedAt ?? index}`}>
+                    <Link
+                      href={`/stats/match-analysis?invite=${encodeURIComponent(round.inviteCode)}&key=${encodeURIComponent(key)}&perspective=${encodeURIComponent(ownPlayerId)}`}
+                      className="stats-round-card stats-round-card--link block no-underline"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-strong text-sm font-semibold">
+                            Serie {round.leagueCode} · Runde {round.roundNumber}
+                          </p>
+                          <p className="text-muted mt-0.5 text-xs">
+                            {formatDateTime(round.finishedAt)}
+                          </p>
+                        </div>
+                        <p className="text-accent shrink-0 text-right text-xs font-semibold">
+                          {winnerLabel(round, pairing, ownPlayerId, aliases)}
+                          {round.winner !== "tie" && (
+                            <span className="text-muted block font-normal tabular-nums">
+                              +{round.scoreDiff}
+                            </span>
+                          )}
                         </p>
                       </div>
-                      <p className="text-accent shrink-0 text-right text-xs font-semibold">
-                        {winnerLabel(round, pairing, ownPlayerId, aliases)}
-                        {round.winner !== "tie" && (
-                          <span className="text-muted block font-normal tabular-nums">
-                            +{round.scoreDiff}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                    <div className="stats-round-scores tabular-nums">
-                      <span
-                        className={
-                          round.winner === "A" ? "text-strong font-semibold" : "text-muted"
-                        }
-                      >
-                        {playerLabel(pairing.playerA, ownPlayerId, aliases)}: {round.playerAScore}
-                      </span>
-                      <span
-                        className={
-                          round.winner === "B" ? "text-strong font-semibold" : "text-muted"
-                        }
-                      >
-                        {playerLabel(pairing.playerB, ownPlayerId, aliases)}: {round.playerBScore}
-                      </span>
-                    </div>
+                      <div className="stats-round-scores tabular-nums">
+                        <span
+                          className={
+                            round.winner === "A" ? "text-strong font-semibold" : "text-muted"
+                          }
+                        >
+                          {playerLabel(pairing.playerA, ownPlayerId, aliases)}: {round.playerAScore}
+                        </span>
+                        <span
+                          className={
+                            round.winner === "B" ? "text-strong font-semibold" : "text-muted"
+                          }
+                        >
+                          {playerLabel(pairing.playerB, ownPlayerId, aliases)}: {round.playerBScore}
+                        </span>
+                      </div>
+                      <p className="text-muted mt-2 text-[11px]">Spielanalyse ansehen →</p>
+                    </Link>
                   </li>
                 ))}
               </ul>

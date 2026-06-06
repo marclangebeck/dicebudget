@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { getSessionMatchAnalysis } from "../services/matchAnalysisService.js";
 import {
   createGameSession,
   finalizeSessionStats,
@@ -110,6 +111,23 @@ sessionsRouter.get("/invite/:inviteCode/ranking", async (req, res, next) => {
       return;
     }
     res.json({ session: data });
+  } catch (error) {
+    next(error);
+  }
+});
+
+sessionsRouter.get("/invite/:inviteCode/match-analysis", async (req, res, next) => {
+  try {
+    const viewerPlayerId = req.query.viewerPlayerId;
+    if (typeof viewerPlayerId !== "string" || !viewerPlayerId.trim()) {
+      res.status(400).json({ error: "viewerPlayerId required" });
+      return;
+    }
+    const analysis = await getSessionMatchAnalysis(
+      req.params.inviteCode,
+      viewerPlayerId,
+    );
+    res.json({ analysis });
   } catch (error) {
     next(error);
   }

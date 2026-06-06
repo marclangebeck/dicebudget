@@ -12,6 +12,9 @@ import type { RunDto } from "@/lib/types";
 type Props = {
   run: RunDto;
   onViewSheet?: () => void;
+  onViewAnalysis?: () => void;
+  analysisAvailable?: boolean;
+  analysisLoading?: boolean;
   /** Multiplayer: Toggle „Werten“ / „Nicht werten“ vor Verlassen. */
   multiplayer?: boolean;
   onFinalizeStats?: (includeInPairingStats: boolean) => Promise<void>;
@@ -20,6 +23,9 @@ type Props = {
 export function RunFinishScreen({
   run,
   onViewSheet,
+  onViewAnalysis,
+  analysisAvailable = false,
+  analysisLoading = false,
   multiplayer,
   onFinalizeStats,
 }: Props) {
@@ -143,6 +149,16 @@ export function RunFinishScreen({
             className="btn-secondary inline-flex min-h-10 items-center justify-center px-6 text-sm"
           >
             Zettel ansehen
+          </button>
+        )}
+        {analysisAvailable && onViewAnalysis && (
+          <button
+            type="button"
+            disabled={analysisLoading}
+            onClick={onViewAnalysis}
+            className="btn-secondary inline-flex min-h-10 items-center justify-center px-6 text-sm disabled:opacity-50"
+          >
+            {analysisLoading ? "Lade Analyse …" : "Spielanalyse"}
           </button>
         )}
       </div>
