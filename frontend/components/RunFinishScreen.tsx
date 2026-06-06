@@ -68,8 +68,7 @@ export function RunFinishScreen({
       {finishedLabel && <p className="text-subtle mt-1 text-[11px]">{finishedLabel}</p>}
 
       {multiplayer && onFinalizeStats && (
-        <div className="mt-5">
-          <p className="text-muted mb-2 text-xs">Paarungs-Statistik</p>
+        <div className="mt-5 text-left">
           <StatsRatingToggle
             includeInStats={includeInStats}
             onChange={setIncludeInStats}

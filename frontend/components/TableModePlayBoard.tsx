@@ -456,7 +456,6 @@ export function TableModePlayBoard({ inviteCode }: Props) {
 
       {sessionFinished && (
         <div className="play-table-finish-footer shrink-0">
-          <p className="text-muted mb-2 text-center text-xs">Paarungs-Statistik</p>
           <StatsRatingToggle
             includeInStats={includeInStats}
             onChange={setIncludeInStats}

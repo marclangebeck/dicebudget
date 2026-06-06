@@ -456,7 +456,6 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
           </div>
           {inviteCode && playerSecret && (
             <div className="shrink-0 px-1">
-              <p className="text-muted mb-2 text-center text-xs">Paarungs-Statistik</p>
               <StatsRatingToggle
                 includeInStats={includeInStats}
                 onChange={setIncludeInStats}
