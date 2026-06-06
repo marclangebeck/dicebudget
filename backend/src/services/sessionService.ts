@@ -121,8 +121,16 @@ export class PoolEndgameNotAvailableError extends Error {
 
 /** Ungültige Feldwahl beim Pool-Endspiel (z. B. leeres Feld). */
 export class SessionNotReadyError extends Error {
-  constructor() {
-    super("Session is not ready for stats finalization");
+  constructor(
+    reason: "pool_endgame" | "runs_open" | "no_players" = "runs_open",
+  ) {
+    const message =
+      reason === "pool_endgame"
+        ? "Pool-Endspiel ist noch nicht abgeschlossen."
+        : reason === "no_players"
+          ? "Keine Spieler in der Session."
+          : "Es sind noch nicht alle Mitspieler fertig.";
+    super(message);
     this.name = "SessionNotReadyError";
   }
 }
@@ -426,24 +434,27 @@ export async function maybeFinishSessionForRun(runId: string) {
   // Liga-/Paarungs-Punkte erst nach Nutzer-Entscheidung („Werten“ / „Nicht werten“).
 }
 
-function sessionReadyForStatsFinalize(session: {
+function assertSessionReadyForStatsFinalize(session: {
   players: { run: { status: string } }[];
   poolEndgameEnabled: boolean;
   useStrategyRules: boolean;
   poolEndgameResolved: boolean;
   poolEndgameImproverId: string | null;
-}): boolean {
-  if (session.players.length < 2) return false;
-  if (!session.players.every((p) => p.run.status === RUN_STATUS.FINISHED)) return false;
+}): void {
+  if (session.players.length < 1) {
+    throw new SessionNotReadyError("no_players");
+  }
+  if (!session.players.every((p) => p.run.status === RUN_STATUS.FINISHED)) {
+    throw new SessionNotReadyError("runs_open");
+  }
   if (
     session.poolEndgameEnabled &&
     session.useStrategyRules &&
     !session.poolEndgameResolved &&
     session.poolEndgameImproverId
   ) {
-    return false;
+    throw new SessionNotReadyError("pool_endgame");
   }
-  return true;
 }
 
 /**
@@ -475,11 +486,13 @@ export async function finalizeSessionStats(
     return getSessionRanking(session.inviteCode);
   }
 
-  if (!sessionReadyForStatsFinalize(session)) {
-    throw new SessionNotReadyError();
-  }
+  assertSessionReadyForStatsFinalize(session);
 
-  if (includeInPairingStats) {
+  // Paarungs-Statistik braucht mindestens zwei Spieler in der Session.
+  const effectiveIncludeInPairingStats =
+    includeInPairingStats && session.players.length >= 2;
+
+  if (effectiveIncludeInPairingStats) {
     await awardSessionLeaguePoints(session.id);
     const afterAward = await prisma.gameSession.findUnique({
       where: { id: session.id },

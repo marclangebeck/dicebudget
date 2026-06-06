@@ -185,13 +185,13 @@ cd /home/bottleadmin/projects/kniffel/frontend && npm run build
 
 Frontend-`out/` wird von Nginx direkt ausgeliefert → **kein sudo, sofort live**.
 
-3. **[Mac] nur bei geändertem Backend-Code: Service neu starten** (Nutzer, sudo):
+3. **[Server] Backend deployen / neu starten** (Nutzer per SSH auf dem Server, sudo):
 
 ```bash
 sudo bash /home/bottleadmin/projects/kniffel/infra/scripts/deploy-backend-prod.sh
 ```
 
-Reine Frontend-Änderungen brauchen **keinen** Backend-Neustart. Prüfen, ob Backend neuen Code hat: ein neuer Endpunkt liefert nach Neustart z. B. `400` statt `404`.
+Nicht auf dem Mac ausführen (Pfad `/home/bottleadmin/…` existiert dort nicht). Reine Frontend-Änderungen brauchen **keinen** Backend-Neustart. Prüfen: neuer Endpunkt liefert nach Neustart z. B. `404` mit JSON statt Route-Fehler.
 
 4. **[Mac] lokal nachziehen** (Nutzer):
 

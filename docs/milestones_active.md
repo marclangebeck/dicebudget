@@ -1,8 +1,8 @@
 # Aktive Milestones - dice.budget
 
-**Stand:** 2026-06-05
+**Stand:** 2026-06-05  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `d443444`
+**Produktcode-HEAD:** `d130be7`  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -19,19 +19,47 @@ Technische Basis ist erledigt:
 - Native App startet direkt auf `/app`.
 - Native API-Basis zeigt auf `https://dicebudget.bottle-trade.de/api`.
 - TestFlight ist aktiv, aktueller Build ist `2.0 (6)`.
-- Naechster Upload ist `2.0 (7)` und muss M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons enthalten.
+- Naechster Upload ist `2.0 (7)` und muss M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons + Spiel-UX Juni 2026 (Werten/Nicht werten, Yatzy-Strichliste, Settings-Gruppen, dunkle Ergebniszeilen, vergroesserte Start-Icons) enthalten.
 
 Offen:
 
 - iOS-Build `2.0 (7)` auf dem Mac bauen und hochladen.
 - Startscreen, `/solo`, `/multi`, `/settings`, `/stats`, `/datenschutz`, `/impressum` und `/play` in iOS/Capacitor auf iPhone pruefen: Footer-Tabbar muss auf App-/Setup-/Legal-Screens unten sitzen; `/play` muss footerfrei sein und der Zettel muss die volle Screenhoehe nutzen.
 - iPad-Tischmodus in TestFlight auf iPad Querformat testen; iPhone-Flow muss unveraendert bleiben.
-- TestFlight nach Upload erneut testen.
+- TestFlight nach Upload erneut testen (inkl. Multi-Statistik-Toggle und Yatzy-Strichliste).
 - App Store Connect fuer kostenpflichtigen Release fertigstellen.
 
 Details: `docs/ios_current.md`.
 
 ## Letzte Abgeschlossene Milestones
+
+### Spiel-UX-Politur 2026-06-05
+
+**Status:** erledigt und Web/Backend deployed, noch nicht in iOS `2.0 (6)`.
+
+- Spielzettel: Ergebnis 1 und Ergebnis 2 mit dunklem Hintergrund wie der restliche Zettel.
+- Multiplayer: Switch „Werten“ / „Nicht werten“ (Settings-Design) auf Abschluss-Screen; Paarungs-Statistik erst nach `POST /sessions/invite/:code/finalize-stats` beim Verlassen.
+- Yatzy: Wuerfel-Abfrage (1–6) bei 50 Punkten; Strichliste auf dem Zettel (`yatzy_die_value`).
+- Toggles app-weit blassgruen/blassrot (`.app-toggle`).
+- Startscreen-3D-Icons ca. +75 % (CSS).
+- `/settings` gruppiert (Allgemein, Solo, Multi, iPad); iPad-Namen nur bei aktivem Tischmodus editierbar.
+- **Fix Abschluss-Fehler:** Einzelspieler in Multi-Räumen; `SessionNotReadyError` → 409 statt 500; Fehlertext auf Abschluss-Screen.
+
+Technische Hinweise:
+
+- Migration `20260605120000_pairing_stats_yatzy_die`.
+- `loadFinishedSessions` filtert `includeInPairingStats: true`.
+- `finalizeSessionStats`: Paarungs-Statistik nur bei `players.length >= 2`; sonst Session trotzdem schließbar.
+- `SessionNotReadyError` mit Gründen: Pool-Endspiel offen, Mitspieler nicht fertig, keine Spieler.
+- Bekanntes UX-Thema: Nach Pool-Endspiel muessen Nicht-Sieger ggf. „Aktualisieren“ tippen, bevor der Abschluss-Toggle erscheint.
+
+Dateien:
+
+- `frontend/components/StatsRatingToggle.tsx`, `RunFinishScreen.tsx`, `PlayBoard.tsx`, `TableModePlayBoard.tsx`
+- `frontend/components/ScoreEntryPanel.tsx`, `ScoreSheetTable.tsx`, `frontend/app/settings/page.tsx`
+- `backend/src/services/sessionService.ts`, `backend/src/routes/sessions.ts`, `backend/src/services/playField.ts`
+- `backend/src/middleware/errorHandler.ts`
+- `frontend/app/globals.css`, `CHANGELOG.md`
 
 ### M34 - Bugfixes + Stats-Reset
 
@@ -140,12 +168,13 @@ Dateien:
 
 ## Offene Aufgaben
 
-1. iOS-Build `2.0 (7)` mit M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons hochladen.
+1. iOS-Build `2.0 (7)` mit allen Features seit `2.0 (6)` inkl. Spiel-UX Juni 2026 hochladen.
 2. App Store Connect: Paid Applications Agreement, Bank/Steuer.
 3. Preis `1,19 EUR`, Screenshots, Beschreibung DE, Datenschutzfragebogen.
-4. TestFlight auf iPhone und iPad pruefen; Footer-Tabbar auf Start-, Setup-, Settings-, Stats- und Legal-Screens sowie footerfreie `/play`-Zettel explizit testen.
-5. Optional: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschraenken.
-6. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
+4. TestFlight: Footer-Tabbar, footerfreie `/play`, Multi-Statistik-Toggle, Pool-Endspiel-Flow, Yatzy-Strichliste.
+5. Optional: Auto-Refresh nach Pool-Endspiel fuer Statistik-Toggle.
+6. Optional: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschraenken.
+7. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
 
 ## Bekannte Technische Schulden
 
@@ -169,6 +198,11 @@ Dateien:
 - `HANDOVER.md`
 - `docs/ios_current.md`
 - `docs/decisions.md`
+- `frontend/components/StatsRatingToggle.tsx`
+- `backend/src/services/sessionService.ts`
+- `backend/src/routes/sessions.ts`
+- `backend/src/services/playField.ts`
+- `frontend/components/RunFinishScreen.tsx`
 - `frontend/components/PlayBoard.tsx`
 - `frontend/components/ScoreEntryPanel.tsx`
 - `frontend/components/FieldScoreChoiceGrid.tsx`

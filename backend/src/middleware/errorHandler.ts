@@ -23,6 +23,7 @@ import {
   SessionFinishedError,
   SessionFullError,
   SessionNotFoundError,
+  SessionNotReadyError,
 } from "../services/sessionService.js";
 import {
   InvalidPlayerNameMergeError,
@@ -84,6 +85,7 @@ export function errorHandler(
   if (
     err instanceof SessionFullError ||
     err instanceof SessionFinishedError ||
+    err instanceof SessionNotReadyError ||
     err instanceof RunNotActiveError ||
     err instanceof FieldAlreadyScoredError ||
     err instanceof FieldNotScoredError ||

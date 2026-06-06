@@ -26,6 +26,7 @@ export function RunFinishScreen({
   const router = useRouter();
   const [includeInStats, setIncludeInStats] = useState(true);
   const [leaving, setLeaving] = useState(false);
+  const [leaveError, setLeaveError] = useState<string | null>(null);
 
   useEffect(() => {
     clearActiveGame();
@@ -46,9 +47,12 @@ export function RunFinishScreen({
       return;
     }
     setLeaving(true);
+    setLeaveError(null);
     try {
       await onFinalizeStats(includeInStats);
       router.push(APP_HOME_PATH);
+    } catch (e) {
+      setLeaveError(e instanceof Error ? e.message : "Speichern fehlgeschlagen");
     } finally {
       setLeaving(false);
     }
@@ -74,6 +78,9 @@ export function RunFinishScreen({
             onChange={setIncludeInStats}
             disabled={leaving}
           />
+          {leaveError && (
+            <p className="mt-2 text-center text-xs font-medium text-red-700">{leaveError}</p>
+          )}
         </div>
       )}
 

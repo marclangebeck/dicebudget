@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `d443444` (`Entferne Footer vom Spielzettel`)
+**Produktcode-HEAD:** `d130be7` (Spiel-UX: Werten/Nicht werten, Yatzy-Strichliste, Zettel-/Settings-Politur)  
 **Sprache:** Deutsch
 
 Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milestones_active.md`. iOS/App Store: `docs/ios_current.md`. Dauerhafte Projektentscheidungen nur bei Bedarf: `docs/decisions.md`.
@@ -13,11 +13,12 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 - `AGENT_RULES.md` hat Vorrang vor allen anderen Dokumenten.
 - `AGENT_RULES.md` Sektion 9 ist Pflicht: Nach jeder Code-Änderung GitHub, Server und Mac synchronisieren und nummerierte `[Server]`-/`[Mac]`-Befehle ausgeben.
 - Keine Commits ohne ausdrückliche Nutzer-Anweisung.
-- Kein `sudo`; sudo-Schritte sind immer Nutzer-Aufgabe.
+- Kein `sudo` durch den Agent; sudo-Schritte sind immer Nutzer-Aufgabe **auf dem Server** (per SSH), nicht auf dem Mac.
 - Keine Watcher, kein Polling, keine Dauerprozesse, kein Auto-Deploy.
 - Agent arbeitet nur auf dem Server unter `/home/bottleadmin/projects/kniffel`.
 - Mac-Pfad des Nutzers: `/Users/marclangebeck/projects/kniffel`.
 - Reine Frontend-Änderungen: auf dem Server genügt `cd frontend && npm run build`; Nginx liefert `frontend/out/` direkt aus.
+- Backend-Neustart/Migration: Nutzer per SSH auf dem Server mit `sudo bash …/deploy-backend-prod.sh` — **nicht** mit Mac-Pfad `/home/bottleadmin/…`.
 
 ## Aktueller Stand
 
@@ -25,75 +26,58 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
 | Branch | `milestone-22-prep` |
-| Produktcode | HEAD `d443444`; aktueller Arbeitsstand enthält Game-Dashboard-/Footer-/Legal-Finalisierung, 3D-Startscreen-Icons und Spielzettel ohne Footer |
-| Backend | Keine neue Backend-Migration für iPad-Tischmodus |
+| Produktcode | HEAD `d130be7`; Web deployed (Frontend `out/` + Backend-Service mit Migration `20260605120000_pairing_stats_yatzy_die`) |
+| Backend | Migration: `include_in_pairing_stats` auf `GameSession`, `yatzy_die_value` auf `Field`; Endpoint `POST /sessions/invite/:code/finalize-stats` |
 | iOS/TestFlight | Version `2.0`, aktueller Build `2.0 (6)`, nächster Upload `2.0 (7)` |
-| Noch nicht in iOS `2.0 (6)` | M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons |
+| Noch nicht in iOS `2.0 (6)` | M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard + Footer/Legal + 3D-Icons + Spiel-UX Juni 2026 (Werten/Nicht werten, Yatzy-Strichliste, Settings-Gruppen, …) |
 
-## Neu Seit Letzter Übergabe
+## Neu Seit Letzter Übergabe (2026-06-05)
 
-- **Spielzettel-Ergebniszeilen moderater:** Ergebnis-Zeilen weniger hoch; `Ergebnis 1` zeigt Hauptwert und `+/-`-Bonus-Delta deutlicher.
-- **iPad-Tischmodus:** Host-Option in `/multi`; erstellt bewusst ein 2-Spieler-Spiel auf einem iPad. `/play?table=1&invite=...` zeigt im Querformat zwei anklickbare Zettel nebeneinander.
-- **Tischmodus-Namen:** Host gibt Namen für linken/rechten Spieler ein. Technische Spieler-IDs sind gültige UUIDs; Namen werden lokal als Aliase gespeichert und für Anzeige/Statistik-Zuordnung genutzt.
-- **Tischmodus + Strategy-Optionen:** Gegner-Pool sichtbar und Pool-Endspiel bleiben wählbar. Pool-Endspiel ist direkt im Zwei-Zettel-Screen auflösbar.
-- **Game-Dashboard-Design:** Startscreen, `/solo`, `/multi`, `/multi/join` und `/settings` wurden optisch auf dunkles Strategiespiel-/Premium-Mobile-Game-Design umgestellt. Aktuelle Startscreen-Hauptkarten: `Multiplayer`, `Einzelspiel`, `Statistik`, `Einstellungen`.
-- **Startscreen + zentrale Einstellungen:** Startscreen ist jetzt wieder ein fester, nicht scrollbarer Dashboard-Screen mit vier Hauptkarten: `Multiplayer`, `Einzelspiel`, `Statistik`, `Einstellungen`; Footer ist letztes Element. `Raum beitreten` ist in `/multi` integriert. `/settings` verwaltet Solo-/Multiplayer-Defaults, Strategy/Klassisch, Gegner-Pool, Pool-Endspiel, Bonus-Einblendung und iPad-Tischmodus. Farbwelt ist ruhiger: Dunkelblau, Anthrazit, Petrol, dezente Gold-/Kupferakzente.
-- **Footer-Finalisierung auf iPhone:** Home-, Setup-, Stats-, Settings- und Legal-Screens nutzen eine feste Footer-Tabbar unten. `/play` ist bewusst footerfrei, damit der Spielzettel volle Screenhoehe bekommt. Der Footer nutzt bewusst kein `safe-area-inset-bottom`, weil iOS dadurch Links nach oben schiebt. App-Hintergrund ist dunkles Grau.
-- **Settings-Optik:** `/settings` nutzt kompaktere Karten. Toggles sitzen rechts in der Card und sind gruen fuer `an`, rot fuer `aus`.
-- **Startscreen-Statistik:** Header zeigt `Paarungs-Spiele` aus `/stats/pairings` statt globaler App-Runs. Die Bilanz ersetzt den alten Platzhalter-Fortschrittsbalken und nutzt lokal zusammengeführte Paarungsdaten; falls die aktuelle Geräte-ID nicht in historischen Paarungen steckt, wird ein lokal benannter Statistikspieler als Perspektive genutzt (z. B. `Marc Bilanz 48:62`).
-- **Multiplayer-Abschluss:** Im normalen Multiplayer wird der Run nach dem letzten Feld automatisch abgeschlossen. Ohne Pool-Endspiel erscheint direkt das Ergebnis mit `Spiel beenden und zur Startseite` + `Zettel ansehen`; in der Zettelansicht bleibt nur der Startseiten-Button. Abschluss-Screens verlinken nicht mehr zur Lobby/Rangliste.
-- **Footer-Tabbar:** Home-, Setup-, Stats-, Settings- und Legal-Screens nutzen unten eine dunkle, pillenfoermige Tabbar (`Home`, `Datenschutz`, `Impressum`, `Support`) mit vier gleich breiten Bereichen und SVG-Line-Icons. Kein `safe-area-inset-bottom` verwenden.
-- **Spielzettel ohne Footer:** `/play` rendert bewusst keine Footer-Tabbar mehr; Solo-, Multiplayer- und Tischmodus-Zettel sollen den gesamten Screen zum Eintragen nutzen.
-- **Legal-Screens:** `/datenschutz` und `/impressum` nutzen dieselbe feste App-Aufteilung wie die anderen Screens: dunkler Hintergrund, `AppScreenHeader`, scrollender Content und Footer-Tabbar.
-- **Startscreen-3D-Icons:** Die vier Hauptkarten nutzen PNG-Assets aus `frontend/public/home-icons/` (`multiplayer.png`, `solo.png`, `stats.png`, `settings.png`) statt Inline-SVG-Motiven.
-- **iOS-Layout-Hinweis:** Der aktuelle gewünschte Stand ist nicht mehr „Footer mit Safe-Area nach oben ziehen“, sondern eine feste Footer-Tabbar auf App-/Setup-/Legal-Screens und kein Footer auf `/play`. Falls auf iPhone Abstand/Abschneiden sichtbar ist, zuerst `.app-legal-footer`, Shell-Grid und iOS-WebView-/Capacitor-Bundle-Stand pruefen, nicht wieder pauschal `safe-area-inset-bottom` erhoehen.
+- **Spielzettel Ergebnis 1/2 dunkel:** Zeilen- und Zellenhintergrund von „Ergebnis 1“ und „Ergebnis 2“ an dunklen Spielzettel angeglichen (kein Hellgrau mehr).
+- **Multiplayer: Werten / Nicht werten:** Auf dem Abschluss-Screen (`RunFinishScreen`) und beim Verlassen aus der Zettelansicht entscheidet ein Switch (Design wie `/settings`), ob die Session in die Paarungs-Statistik einfließt. Stats werden **nicht** mehr automatisch vergeben; Finalisierung beim Verlassen über `POST /sessions/invite/:code/finalize-stats`. Feld `include_in_pairing_stats` (Default `true` für Rückwärtskompatibilität).
+- **Yatzy-Würfel-Strichliste:** Beim Yatzy-Eintrag (50 Punkte) Abfrage der Augenzahl 1–6; goldene Strichliste hinter dem passenden Würfel auf dem Zettel. Backend: `fields.yatzy_die_value`; Solo lokal in `localSoloRun.ts`.
+- **Toggles einheitlich:** `.app-toggle` blassgrün (an) / blassrot (aus) app-weit in Settings und Setup.
+- **Startscreen-Icons +75 %:** 3D-PNG-Motive vergrößert (CSS).
+- **Einstellungen gruppiert:** Bereiche Allgemein, Solo, Multi, iPad; iPad-Spielernamen nur bei aktivem iPad-Tisch editierbar.
+- **Stats-Toggle wie Einstellungen:** „Werten“ / „Nicht werten“ als Settings-Switch-Karte (nicht mehr als zwei Buttons neben einander).
+- **Fix Multi-Abschluss „Internal Server Error“ (2026-06-06):** `finalize-stats` verlangte fälschlich mindestens 2 Spieler; Einzelspieler-Tests in Multi-Räumen schlugen fehl. `SessionNotReadyError` wurde nicht abgefangen → 500. Jetzt: Abschluss ab 1 Spieler möglich; Paarungs-Statistik (`Werten`) erst ab 2 Spielern; klare **409**-Meldungen (Pool-Endspiel offen / Mitspieler nicht fertig); Fehlertext auf `RunFinishScreen`.
+
+## Bekanntes UX-Thema (offen)
+
+- **Pool-Endspiel + Statistik-Toggle:** Nach Pool-Endspiel sehen Nicht-Sieger oft noch „Pool-Endspiel läuft“ und müssen **Aktualisieren** tippen, bevor der Abschluss-Screen mit dem Toggle erscheint. Verbesserung (Auto-Refresh nach Pool-Auflösung) ist sinnvolle Folgeaufgabe.
 
 ## Wichtige Dateien
 
-- `frontend/app/multi/page.tsx` - Host-Optionen inkl. iPad-Tischmodus und Spielernamen
-- `frontend/app/play/page.tsx` - Routing zu normalem Spiel oder Tischmodus
-- `frontend/components/TableModePlayBoard.tsx` - Zwei-Zettel-Screen für iPad-Querformat
-- `frontend/components/HomeBentoGrid.tsx` - Game-Dashboard-Startscreen, Paarungs-Spiele und Bilanz
-- `frontend/public/home-icons/*.png` - 3D-Icons fuer die vier Startscreen-Hauptkarten
-- `frontend/components/HomeScreenShell.tsx` - Home-Shell mit festem Footer
-- `frontend/components/FixedScreenShell.tsx` - feste Shell; zeigt Footer nicht auf `play-route`
-- `frontend/components/AppLegalFooter.tsx` - dunkle Footer-Tabbar mit Home/Datenschutz/Impressum/Support
-- `frontend/components/LegalScrollShell.tsx` - Legal-Shell mit App-Footer und eigenem Scrollbereich
-- `frontend/components/AppScreenHeader.tsx` - farbige Unterseiten-Header
-- `frontend/app/app/page.tsx` - Startscreen-Main ohne Scroll-Blockade
-- `frontend/app/datenschutz/page.tsx`, `frontend/app/impressum/page.tsx` - Legal-Seiten im App-Layout
-- `frontend/app/settings/page.tsx` - zentrale App-Einstellungen
-- `frontend/lib/uiPrefs.ts` - lokale Geräte- und App-Defaults
-- `frontend/app/multi/join/page.tsx` - modernisierte Lobby-/Join-Ansicht
-- `frontend/lib/tableMode.ts` - lokaler Tischmodus-Speicher und UUID-Erzeugung
-- `frontend/lib/activeGame.ts` - Resume auch für Tischmodus
-- `frontend/components/ScoreSheetTable.tsx` - Ergebnis-1-Typografie / Bonus-Delta
-- `frontend/app/globals.css` - App-Hintergrund, Footer-Tabbar, Legal-Screens, Settings-Karten, Tischmodus-Layout und Zettel-Höhen
+- `frontend/components/StatsRatingToggle.tsx` — Switch Werten/Nicht werten (Settings-Design)
+- `frontend/components/RunFinishScreen.tsx` — Multi-Abschluss inkl. Statistik-Entscheidung
+- `frontend/components/PlayBoard.tsx` — Multi-Flow, Pool-Endspiel, Zettel-Abschluss
+- `frontend/components/TableModePlayBoard.tsx` — iPad-Tischmodus inkl. Statistik-Toggle
+- `frontend/components/ScoreEntryPanel.tsx` — Yatzy-Würfel-Abfrage
+- `frontend/components/ScoreSheetTable.tsx` — Yatzy-Strichliste, dunkle Ergebniszeilen
+- `frontend/app/settings/page.tsx` — gruppierte Einstellungen
+- `backend/src/services/sessionService.ts` — `finalizeSessionStats`, kein Auto-Award mehr
+- `backend/src/middleware/errorHandler.ts` — `SessionNotReadyError` → 409
+- `backend/src/routes/sessions.ts` — `finalize-stats`
+- `backend/src/services/playField.ts` — `yatzyDieValue` bei `completeField`
+- `backend/prisma/migrations/20260605120000_pairing_stats_yatzy_die/`
+- `frontend/app/globals.css` — `.app-toggle`, Zettel, Startscreen-Icons, Settings-Gruppen
 - `CHANGELOG.md`, `docs/milestones_active.md`, `docs/ios_current.md`
 
 ## Offene Prioritäten
 
-1. iOS-Build `2.0 (7)` auf dem Mac bauen und hochladen; enthält M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons.
-2. TestFlight auf iPhone und iPad prüfen: normaler iPhone-Flow darf unverändert bleiben; Footer-Tabbar muss auf Start-, Setup-, Settings-, Stats- und Legal-Screens unten sitzen; `/play` darf keinen Footer zeigen und der Zettel muss die volle Screenhoehe nutzen; `Einzelspiel`/`Statistik` dürfen nicht gedrungen wirken; iPad-Tischmodus im Querformat testen.
-3. App Store Connect: Paid Applications Agreement, Bank/Steuer, Preis `1,19 EUR`.
-4. Store-Metadaten: Screenshots, Beschreibung DE, Datenschutzfragebogen.
-5. Optional später: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschränken.
-6. Optional später: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
+1. iOS-Build `2.0 (7)` auf dem Mac: enthält alles seit `2.0 (6)` inkl. Spiel-UX Juni 2026.
+2. TestFlight: Multi-Abschluss mit Werten/Nicht werten, Pool-Endspiel-Flow, Yatzy-Strichliste, footerfreier `/play`, Footer auf App-Screens.
+3. Optional: Nach Pool-Endspiel automatisch Lobby aktualisieren, damit der Statistik-Toggle ohne manuelles Aktualisieren erscheint.
+4. App Store Connect: Paid Applications Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
+5. Optional später: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschränken; `milestone-22-prep` → `main`.
 
 ## Pflicht-Lesereihenfolge
-
-Bei jeder Übergabe lesen:
 
 1. `AGENT_RULES.md`
 2. `HANDOVER.md`
 3. `docs/milestones_active.md`
 
-Nur bei Bedarf:
-
-4. `docs/ios_current.md` - iOS/TestFlight/App Store
-5. `docs/decisions.md` - dauerhafte Architektur-/Betriebsentscheidungen
-6. `docs/milestones_archive.md` - ältere Milestone-Historie
-7. `docs/ios_archive.md` - ältere iOS-Historie
+Nur bei Bedarf: `docs/ios_current.md`, `docs/decisions.md`, `docs/milestones_archive.md`, `docs/ios_archive.md`
 
 ## Übergabeprompt Für Neuen Agent
 
@@ -115,29 +99,30 @@ LIES NUR BEI BEDARF:
 
 Wichtige Regeln:
 - AGENT_RULES.md hat Vorrang.
-- AGENT_RULES.md Sektion 9 ist verbindlich: Nach jeder Code-Änderung GitHub + Server + Mac synchronisieren und nummerierte [Server]/[Mac]-Befehle ausgeben.
-- Keine sudo-Befehle ausführen; sudo ist Nutzer-Aufgabe.
-- Keine Watcher, kein Polling, keine Dauerprozesse, kein Auto-Deploy.
-- Agent arbeitet direkt auf dem Server unter /home/bottleadmin/projects/kniffel.
-- Mac-Pfad des Nutzers: /Users/marclangebeck/projects/kniffel.
-- Reine Frontend-Änderungen brauchen auf dem Server nur: cd frontend && npm run build.
-- Keine Archivdateien lesen, wenn Pflichtdateien reichen.
+- AGENT_RULES.md Sektion 9: Nach Code-Änderungen nummerierte [Server]/[Mac]-Befehle ausgeben.
+- Kein sudo durch den Agent; Backend-Deploy/Neustart per SSH auf dem Server (Nutzer-Aufgabe).
+- Keine Watcher, kein Polling, keine Dauerprozesse.
+- Agent arbeitet auf dem Server unter /home/bottleadmin/projects/kniffel.
+- Mac-Clone: /Users/marclangebeck/projects/kniffel (git pull, Xcode/iOS).
+- Reine Frontend-Änderungen: cd frontend && npm run build auf dem Server.
 
 Aktueller Kurzstand:
 - Branch: milestone-22-prep
-- Produktcode-HEAD: d443444 (Entferne Footer vom Spielzettel)
+- Produktcode-HEAD: d130be7 (Spiel-UX Juni 2026)
 - Web/API live: https://dicebudget.bottle-trade.de
 - iOS: Version 2.0, TestFlight 2.0 (6), nächster Upload 2.0 (7)
-- Noch nicht in TestFlight 2.0 (6): M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons
-- iPad-Tischmodus: /multi Host-Option, genau 2 Spieler auf einem iPad, Namen links/rechts eingebbar, gültige UUIDs, lokale Aliase für Stats, zwei anklickbare Zettel in /play?table=1 im Querformat.
-- Gegner-Pool sichtbar und Pool-Endspiel bleiben im Tischmodus wählbar; Pool-Endspiel wird im Zwei-Zettel-Screen aufgelöst.
-- Multiplayer-Abschluss: nach letztem Feld automatischer Run-Abschluss; Ergebnis zeigt nur Startseite/Zettel ansehen; keine Statistik-/Lobby-/Ranglisten-Abzweige vom Abschluss.
-- Startscreen: fester Dashboard-Screen mit vier Hauptkarten Multiplayer, Einzelspiel, Statistik, Einstellungen. Raum beitreten ist in /multi integriert. Logo prominent links oben. Hauptkarten nutzen 3D-PNG-Icons aus frontend/public/home-icons/.
-- Zentrale Einstellungen: /settings verwaltet Solo-/Multiplayer-Defaults, Strategy/Klassisch, Gegner-Pool, Pool-Endspiel, Bonus-Einblendung und iPad-Tischmodus. Toggles rechts in den Cards, gruen fuer an und rot fuer aus.
-- Footer: Home-/Setup-/Stats-/Settings-/Legal-Screens nutzen AppLegalFooter als dunkle Bottom-Tabbar mit Home, Datenschutz, Impressum, Support. Kein safe-area-inset-bottom verwenden; das schiebt auf iPhone Links nach oben.
-- Play-Screens: /play zeigt bewusst keinen Footer; Solo-, Multiplayer- und Tischmodus-Zettel sollen volle Screenhoehe nutzen.
-- Legal-Screens: /datenschutz und /impressum nutzen AppScreenHeader, dunklen App-Hintergrund, scrollenden Content und Footer-Tabbar.
-- Wichtige Dateien fuer Layout/Footer: frontend/components/HomeScreenShell.tsx, frontend/components/FixedScreenShell.tsx, frontend/components/AppLegalFooter.tsx, frontend/components/LegalScrollShell.tsx, frontend/app/globals.css.
+- Backend-Migration: include_in_pairing_stats, yatzy_die_value; Endpoint POST …/finalize-stats
+- Multi-Statistik: Switch „Werten“/„Nicht werten“ (Settings-Design) auf RunFinishScreen; Entscheidung beim Verlassen zur Startseite; keine Auto-Statistik mehr
+- finalize-stats: Einzelspieler-Multi-Räume können abschließen; „Werten“ zählt Paarungen erst ab 2 Spielern; bei Blockade 409 mit deutscher Meldung (nicht 500)
+- Yatzy: bei 50 Punkten Würfel 1–6 wählen; Strichliste hinter Würfelzeile auf dem Zettel
+- Spielzettel: Ergebnis 1/2 dunkler Hintergrund; /play ohne Footer
+- Settings: Gruppen Allgemein/Solo/Multi/iPad; iPad-Namen nur bei aktivem Tischmodus
+- Startscreen: 3D-Icons aus frontend/public/home-icons/ (+75 % Größe)
+- Toggles app-weit: .app-toggle blassgrün/blassrot
+- Pool-Endspiel: Nicht-Sieger ggf. „Aktualisieren“ nötig, bevor Abschluss-Toggle sichtbar (bekanntes UX-Thema)
+- Backend-Neustart (nur bei Backend-Änderung): Nutzer per SSH auf Server:
+  sudo bash /home/bottleadmin/projects/kniffel/infra/scripts/deploy-backend-prod.sh
+  (Nicht auf dem Mac mit /home/bottleadmin/… ausführen.)
 
 Auftrag:
 <hier konkrete Aufgabe einfügen>
