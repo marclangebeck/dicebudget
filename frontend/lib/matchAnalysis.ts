@@ -2,9 +2,8 @@ import { poolDeltaForComplete } from "@/lib/gameRules";
 import {
   UPPER_BONUS_POINTS,
 } from "@/lib/gameScoring";
-import { FIELD_LABELS, LOWER_FIELD_TYPES, UPPER_FIELD_TYPES } from "@/lib/labels";
+import { FIELD_LABELS, LOWER_FIELD_TYPES } from "@/lib/labels";
 import type {
-  HeadToHeadAnalysisDto,
   MatchAnalysisDto,
   PlayerRunMetricsDto,
 } from "@/lib/matchAnalysisTypes";
@@ -13,8 +12,6 @@ import type { FieldTypeId, RunDto } from "@/lib/types";
 const LOWER_COMBO_TYPES: FieldTypeId[] = LOWER_FIELD_TYPES.filter(
   (t) => t !== "KNIFFEL" && t !== "CHANCE",
 );
-
-const ALL_FIELD_TYPES: FieldTypeId[] = [...UPPER_FIELD_TYPES, ...LOWER_FIELD_TYPES];
 
 export function analyzeRunDto(run: RunDto): PlayerRunMetricsDto {
   let bonusCount = 0;
@@ -100,109 +97,6 @@ export function analyzeRunDto(run: RunDto): PlayerRunMetricsDto {
   };
 }
 
-function aggregateFieldScores(run: RunDto): Map<FieldTypeId, number> {
-  const totals = new Map<FieldTypeId, number>();
-  for (const type of ALL_FIELD_TYPES) totals.set(type, 0);
-  for (const game of run.games) {
-    for (const field of game.fields) {
-      if (field.score === null) continue;
-      totals.set(field.fieldType, (totals.get(field.fieldType) ?? 0) + field.score);
-    }
-  }
-  return totals;
-}
-
-function buildHeadToHead(
-  viewer: PlayerRunMetricsDto,
-  opponent: PlayerRunMetricsDto,
-  viewerRun: RunDto,
-  opponentRun: RunDto,
-): HeadToHeadAnalysisDto {
-  const scoreDiff = viewer.totalScore - opponent.totalScore;
-  let winner: HeadToHeadAnalysisDto["winner"] = "tie";
-  if (scoreDiff > 0) winner = "viewer";
-  else if (scoreDiff < 0) winner = "opponent";
-
-  const bonusDiff = (viewer.bonusCount - opponent.bonusCount) * UPPER_BONUS_POINTS;
-  const attribution = [
-    {
-      key: "bonus",
-      label: "Bonus (+35)",
-      viewerValue: viewer.bonusCount * UPPER_BONUS_POINTS,
-      opponentValue: opponent.bonusCount * UPPER_BONUS_POINTS,
-      diff: bonusDiff,
-    },
-    {
-      key: "upper",
-      label: "Obere Sektion",
-      viewerValue: viewer.upperSumTotal,
-      opponentValue: opponent.upperSumTotal,
-      diff: viewer.upperSumTotal - opponent.upperSumTotal,
-    },
-    {
-      key: "lower",
-      label: "Untere Sektion",
-      viewerValue: viewer.lowerSumTotal,
-      opponentValue: opponent.lowerSumTotal,
-      diff: viewer.lowerSumTotal - opponent.lowerSumTotal,
-    },
-    {
-      key: "extraYatzy",
-      label: "Zusatz-Yatzy",
-      viewerValue: viewer.extraYatzyTotal,
-      opponentValue: opponent.extraYatzyTotal,
-      diff: viewer.extraYatzyTotal - opponent.extraYatzyTotal,
-    },
-  ];
-
-  let decisiveGameIndex: number | null = null;
-  let decisiveGameDiff = 0;
-  for (let i = 0; i < viewer.gameTotals.length; i += 1) {
-    const diff = viewer.gameTotals[i]! - (opponent.gameTotals[i] ?? 0);
-    if (Math.abs(diff) > Math.abs(decisiveGameDiff)) {
-      decisiveGameDiff = diff;
-      decisiveGameIndex = i + 1;
-    }
-  }
-
-  const viewerFields = aggregateFieldScores(viewerRun);
-  const opponentFields = aggregateFieldScores(opponentRun);
-  let decisiveFieldType: FieldTypeId | null = null;
-  let decisiveFieldDiff = 0;
-  for (const type of ALL_FIELD_TYPES) {
-    const diff = (viewerFields.get(type) ?? 0) - (opponentFields.get(type) ?? 0);
-    if (Math.abs(diff) > Math.abs(decisiveFieldDiff)) {
-      decisiveFieldDiff = diff;
-      decisiveFieldType = type;
-    }
-  }
-
-  let counterfactual: string | null = null;
-  if (bonusDiff !== 0) {
-    const withoutBonus = scoreDiff - bonusDiff;
-    if (withoutBonus !== scoreDiff) {
-      const verb =
-        withoutBonus > 0
-          ? "hättest gewonnen"
-          : withoutBonus < 0
-            ? "hättest verloren"
-            : "wäre Remis gewesen";
-      counterfactual = `Ohne Bonus-Unterschied (${bonusDiff > 0 ? "+" : ""}${bonusDiff}) ${verb} mit ${withoutBonus > 0 ? "+" : ""}${withoutBonus} Punkten.`;
-    }
-  }
-
-  return {
-    scoreDiff,
-    winner,
-    attribution,
-    decisiveGameIndex,
-    decisiveGameDiff,
-    decisiveFieldType,
-    decisiveFieldDiff,
-    counterfactual,
-  };
-}
-
 function buildSoloInsights(metrics: PlayerRunMetricsDto): string[] {
   const insights: string[] = [];
   if (metrics.useStrategyRules) {
@@ -234,106 +128,26 @@ function buildSoloInsights(metrics: PlayerRunMetricsDto): string[] {
   return insights.slice(0, 5);
 }
 
-function buildMultiInsights(
-  viewer: PlayerRunMetricsDto,
-  opponent: PlayerRunMetricsDto,
-  h2h: HeadToHeadAnalysisDto,
-): string[] {
-  const insights: string[] = [];
-  const sign = h2h.scoreDiff > 0 ? "+" : "";
-
-  if (h2h.decisiveGameIndex != null && h2h.decisiveGameDiff !== 0) {
-    insights.push(
-      `Sp${h2h.decisiveGameIndex} war am einflussreichsten (${h2h.decisiveGameDiff > 0 ? "+" : ""}${h2h.decisiveGameDiff} vs. Gegner).`,
-    );
-  }
-
-  if (h2h.decisiveFieldType != null && h2h.decisiveFieldDiff !== 0) {
-    insights.push(
-      `${FIELD_LABELS[h2h.decisiveFieldType as FieldTypeId]}: größte Feld-Differenz (${h2h.decisiveFieldDiff > 0 ? "+" : ""}${h2h.decisiveFieldDiff}).`,
-    );
-  }
-
-  const bonusRow = h2h.attribution.find((a) => a.key === "bonus");
-  if (bonusRow && bonusRow.diff !== 0) {
-    insights.push(
-      `Bonus: ${viewer.bonusCount} vs. ${opponent.bonusCount} (${bonusRow.diff > 0 ? "+" : ""}${bonusRow.diff} Punkte).`,
-    );
-  }
-
-  if (viewer.useStrategyRules) {
-    const poolDiff = viewer.rollsInPool - opponent.rollsInPool;
-    if (poolDiff !== 0) {
-      insights.push(
-        `End-Pool ${viewer.rollsInPool} vs. ${opponent.rollsInPool} (${poolDiff > 0 ? "+" : ""}${poolDiff}).`,
-      );
-    }
-    const viewerPpr = viewer.pointsPerPoolRoll;
-    const oppPpr = opponent.pointsPerPoolRoll;
-    if (
-      viewerPpr != null &&
-      oppPpr != null &&
-      viewer.poolRollCost > 0 &&
-      opponent.poolRollCost > 0
-    ) {
-      if (viewerPpr < oppPpr - 0.3) {
-        insights.push(
-          `Pool weniger effektiv (${viewerPpr.toFixed(1)} vs. ${oppPpr.toFixed(1)} Pkt/eingekaufter Wurf).`,
-        );
-      } else if (viewerPpr > oppPpr + 0.3) {
-        insights.push(
-          `Pool effektiver eingesetzt (${viewerPpr.toFixed(1)} vs. ${oppPpr.toFixed(1)} Pkt/eingekaufter Wurf).`,
-        );
-      }
-    }
-  }
-
-  if (viewer.yatzyHits !== opponent.yatzyHits || viewer.yatzyMisses !== opponent.yatzyMisses) {
-    insights.push(
-      `Yatzy: ${viewer.yatzyHits}/${viewer.yatzyMisses} (Treffer/Null) vs. ${opponent.yatzyHits}/${opponent.yatzyMisses}.`,
-    );
-  }
-
-  if (h2h.counterfactual) {
-    insights.push(h2h.counterfactual);
-  } else {
-    insights.push(`Ergebnis: ${sign}${h2h.scoreDiff} Punkte.`);
-  }
-
-  return insights.slice(0, 6);
-}
-
 export function buildSoloMatchAnalysis(run: RunDto): MatchAnalysisDto {
   const viewer = analyzeRunDto(run);
+  const finished = run.status === "FINISHED";
   return {
     mode: "solo",
-    ready: run.status === "FINISHED",
-    unavailableReason:
-      run.status === "FINISHED" ? null : "Analyse erst nach Run-Abschluss verfügbar.",
+    ready: finished,
+    unavailableReason: finished ? null : "Analyse erst nach Run-Abschluss verfügbar.",
+    playerCount: 1,
+    viewerRank: finished ? 1 : null,
+    pointsBehindLeader: finished ? 0 : null,
+    directWins: 0,
+    directLosses: 0,
+    directTies: 0,
     viewer,
     opponent: null,
     headToHead: null,
-    insights: run.status === "FINISHED" ? buildSoloInsights(viewer) : [],
+    ranking: [],
+    comparisons: [],
+    insights: finished ? buildSoloInsights(viewer) : [],
     allPlayers: [viewer],
-  };
-}
-
-export function buildMultiMatchAnalysisFromRuns(
-  viewerRun: RunDto,
-  opponentRun: RunDto,
-): MatchAnalysisDto {
-  const viewer = analyzeRunDto(viewerRun);
-  const opponent = analyzeRunDto(opponentRun);
-  const headToHead = buildHeadToHead(viewer, opponent, viewerRun, opponentRun);
-  return {
-    mode: "multi",
-    ready: true,
-    unavailableReason: null,
-    viewer,
-    opponent,
-    headToHead,
-    insights: buildMultiInsights(viewer, opponent, headToHead),
-    allPlayers: [viewer, opponent],
   };
 }
 

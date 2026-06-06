@@ -1,8 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { fieldLabelForAnalysis } from "@/lib/matchAnalysis";
 import type {
+  HeadToHeadAnalysisDto,
   MatchAnalysisDto,
+  PlayerComparisonDto,
   PlayerRunMetricsDto,
   SessionMatchAnalysisDto,
 } from "@/lib/matchAnalysisTypes";
@@ -87,6 +90,100 @@ function MetricsGrid({
   );
 }
 
+function HeadToHeadBlock({
+  h2h,
+  opponentLabel,
+  compact = false,
+}: {
+  h2h: HeadToHeadAnalysisDto;
+  opponentLabel: string;
+  compact?: boolean;
+}) {
+  return (
+    <section className={compact ? "match-analysis-section mt-3" : "match-analysis-section mt-5"}>
+      {!compact && (
+        <h3 className="match-analysis-section-title">Warum ±? (Head-to-Head)</h3>
+      )}
+      <ul className="match-analysis-attribution">
+        {h2h.attribution.map((row) => (
+          <li key={row.key}>
+            <span className="match-analysis-attribution-label">{row.label}</span>
+            <span className="match-analysis-attribution-values tabular-nums">
+              {row.viewerValue} · {row.opponentValue}
+            </span>
+            <span
+              className={`match-analysis-attribution-diff tabular-nums ${
+                row.diff > 0
+                  ? "match-analysis-diff--pos"
+                  : row.diff < 0
+                    ? "match-analysis-diff--neg"
+                    : ""
+              }`}
+            >
+              {formatSigned(row.diff)}
+            </span>
+          </li>
+        ))}
+      </ul>
+      {h2h.decisiveGameIndex != null && h2h.decisiveGameDiff !== 0 && (
+        <p className="match-analysis-note mt-3 text-xs">
+          Entscheidendster Block: Sp{h2h.decisiveGameIndex} (
+          {formatSigned(h2h.decisiveGameDiff)} vs. {opponentLabel})
+        </p>
+      )}
+      {h2h.decisiveFieldType && h2h.decisiveFieldDiff !== 0 && (
+        <p className="match-analysis-note text-xs">
+          Größte Feld-Differenz: {fieldLabelForAnalysis(h2h.decisiveFieldType)} (
+          {formatSigned(h2h.decisiveFieldDiff)})
+        </p>
+      )}
+    </section>
+  );
+}
+
+function ComparisonCard({
+  comparison,
+  ownPlayerId,
+  aliases,
+  defaultOpen,
+}: {
+  comparison: PlayerComparisonDto;
+  ownPlayerId: string;
+  aliases: PlayerAliasMap;
+  defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen ?? false);
+  const name = playerLabel(comparison.opponentName, ownPlayerId, aliases);
+  const { headToHead: h2h } = comparison;
+  const resultLabel =
+    h2h.winner === "viewer"
+      ? "Du gewinnst"
+      : h2h.winner === "opponent"
+        ? "Du verlierst"
+        : "Remis";
+
+  return (
+    <article className="match-analysis-comparison">
+      <button
+        type="button"
+        className="match-analysis-comparison-toggle"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <span className="text-strong text-sm font-semibold">{name}</span>
+        <span className="text-muted text-xs tabular-nums">
+          {resultLabel} · {formatSigned(h2h.scoreDiff)}
+        </span>
+      </button>
+      {open && (
+        <div className="match-analysis-comparison-body">
+          <HeadToHeadBlock h2h={h2h} opponentLabel={name} compact />
+        </div>
+      )}
+    </article>
+  );
+}
+
 export function MatchAnalysisView({
   analysis,
   ownPlayerId = "",
@@ -115,6 +212,7 @@ export function MatchAnalysisView({
 
   const h2h = analysis.headToHead;
   const sessionMeta = "inviteCode" in analysis ? analysis : null;
+  const isMultiRound = analysis.playerCount > 2;
 
   const resolvedViewerLabel =
     sessionMeta && ownPlayerId
@@ -132,14 +230,29 @@ export function MatchAnalysisView({
       {sessionMeta && (
         <p className="text-muted mt-1 text-xs">
           Serie {sessionMeta.leagueCode} · Runde {sessionMeta.roundNumber}
+          {analysis.playerCount > 1 && ` · ${analysis.playerCount} Spieler`}
         </p>
       )}
 
-      {h2h && (
+      {isMultiRound && analysis.viewerRank != null && (
         <div className="match-analysis-headline mt-4">
-          <p className="match-analysis-score tabular-nums">
-            {formatSigned(h2h.scoreDiff)}
+          <p className="match-analysis-score tabular-nums">{analysis.viewer.totalScore}</p>
+          <p className="text-muted text-xs">
+            Platz {analysis.viewerRank} von {analysis.playerCount}
+            {analysis.pointsBehindLeader != null && analysis.pointsBehindLeader > 0
+              ? ` · ${analysis.pointsBehindLeader} hinter Spitze`
+              : " · Spitze"}
           </p>
+          <p className="text-muted mt-1 text-xs tabular-nums">
+            Direktvergleiche: {analysis.directWins}–{analysis.directLosses}
+            {analysis.directTies > 0 ? `–${analysis.directTies}` : ""}
+          </p>
+        </div>
+      )}
+
+      {!isMultiRound && h2h && (
+        <div className="match-analysis-headline mt-4">
+          <p className="match-analysis-score tabular-nums">{formatSigned(h2h.scoreDiff)}</p>
           <p className="text-muted text-xs">
             {h2h.winner === "viewer"
               ? "Du liegst vorne"
@@ -152,10 +265,13 @@ export function MatchAnalysisView({
         </div>
       )}
 
-      {!h2h && (
+      {analysis.mode === "solo" && (
         <div className="match-analysis-headline mt-4">
           <p className="match-analysis-score tabular-nums">{analysis.viewer.totalScore}</p>
-          <p className="text-muted text-xs">Einzelspiel · {analysis.viewer.gameCount} Spielblock</p>
+          <p className="text-muted text-xs">
+            Einzelspiel · {analysis.viewer.gameCount}{" "}
+            {analysis.viewer.gameCount === 1 ? "Spielblock" : "Spielblöcke"}
+          </p>
         </div>
       )}
 
@@ -167,55 +283,61 @@ export function MatchAnalysisView({
         </ul>
       )}
 
-      {h2h && (
+      {isMultiRound && analysis.ranking.length > 0 && (
         <section className="match-analysis-section mt-5">
-          <h3 className="match-analysis-section-title">Warum ±? (Head-to-Head)</h3>
-          <ul className="match-analysis-attribution">
-            {h2h.attribution.map((row) => (
-              <li key={row.key}>
-                <span className="match-analysis-attribution-label">{row.label}</span>
-                <span className="match-analysis-attribution-values tabular-nums">
-                  {row.viewerValue} · {row.opponentValue}
-                </span>
-                <span
-                  className={`match-analysis-attribution-diff tabular-nums ${
-                    row.diff > 0
-                      ? "match-analysis-diff--pos"
-                      : row.diff < 0
-                        ? "match-analysis-diff--neg"
-                        : ""
-                  }`}
+          <h3 className="match-analysis-section-title">Runden-Ranking</h3>
+          <ol className="match-analysis-ranking">
+            {analysis.ranking.map((entry) => {
+              const label = playerLabel(entry.playerName, ownPlayerId, aliases);
+              const isViewer = entry.playerId === sessionMeta?.viewerPlayerId;
+              return (
+                <li
+                  key={entry.playerId}
+                  className={isViewer ? "match-analysis-ranking-row--viewer" : undefined}
                 >
-                  {formatSigned(row.diff)}
-                </span>
-              </li>
-            ))}
-          </ul>
-          {h2h.decisiveGameIndex != null && h2h.decisiveGameDiff !== 0 && (
-            <p className="match-analysis-note mt-3 text-xs">
-              Entscheidendster Block: Sp{h2h.decisiveGameIndex} (
-              {formatSigned(h2h.decisiveGameDiff)} vs. {resolvedOpponentLabel})
-            </p>
-          )}
-          {h2h.decisiveFieldType && h2h.decisiveFieldDiff !== 0 && (
-            <p className="match-analysis-note text-xs">
-              Größte Feld-Differenz: {fieldLabelForAnalysis(h2h.decisiveFieldType)} (
-              {formatSigned(h2h.decisiveFieldDiff)})
-            </p>
-          )}
+                  <span className="match-analysis-ranking-rank tabular-nums">{entry.rank}.</span>
+                  <span className="match-analysis-ranking-name">{label}</span>
+                  <span className="match-analysis-ranking-score tabular-nums">
+                    {entry.totalScore}
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
         </section>
       )}
 
-      {analysis.mode === "multi" && analysis.opponent && (
-        <div className="match-analysis-compare mt-5 space-y-4">
-          <MetricsGrid title={resolvedViewerLabel} metrics={analysis.viewer} />
-          <MetricsGrid title={resolvedOpponentLabel} metrics={analysis.opponent} />
-        </div>
+      {!isMultiRound && h2h && (
+        <HeadToHeadBlock h2h={h2h} opponentLabel={resolvedOpponentLabel} />
       )}
 
-      {analysis.mode === "solo" && (
-        <div className="mt-5">
-          <MetricsGrid title="Dein Spiel" metrics={analysis.viewer} />
+      <div className="mt-5">
+        <MetricsGrid
+          title={isMultiRound ? `Dein Spiel (${resolvedViewerLabel})` : resolvedViewerLabel}
+          metrics={analysis.viewer}
+        />
+      </div>
+
+      {isMultiRound && analysis.comparisons.length > 0 && (
+        <section className="match-analysis-section mt-5">
+          <h3 className="match-analysis-section-title">Direktvergleiche</h3>
+          <div className="match-analysis-comparison-list">
+            {analysis.comparisons.map((comparison, index) => (
+              <ComparisonCard
+                key={comparison.opponentPlayerId}
+                comparison={comparison}
+                ownPlayerId={ownPlayerId}
+                aliases={aliases}
+                defaultOpen={index === 0}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {!isMultiRound && analysis.mode === "multi" && analysis.opponent && (
+        <div className="mt-4">
+          <MetricsGrid title={resolvedOpponentLabel} metrics={analysis.opponent} />
         </div>
       )}
 

@@ -73,15 +73,47 @@ export type HeadToHeadAnalysis = {
   counterfactual: string | null;
 };
 
+export type AnalysisParticipant = {
+  playerId: string;
+  playerName: string;
+  orderIndex: number;
+  run: AnalysisRun;
+};
+
+export type SessionRankEntry = {
+  playerId: string;
+  playerName: string;
+  orderIndex: number;
+  rank: number;
+  totalScore: number;
+};
+
+export type PlayerComparison = {
+  opponentPlayerId: string;
+  opponentName: string;
+  opponentOrderIndex: number;
+  opponent: PlayerRunMetrics;
+  headToHead: HeadToHeadAnalysis;
+};
+
 export type MatchAnalysisResult = {
   mode: "solo" | "multi";
   ready: boolean;
   unavailableReason: string | null;
+  playerCount: number;
+  viewerRank: number | null;
+  pointsBehindLeader: number | null;
+  directWins: number;
+  directLosses: number;
+  directTies: number;
   viewer: PlayerRunMetrics;
+  /** Nur bei genau 2 Spielern (Abwärtskompatibilität). */
   opponent: PlayerRunMetrics | null;
   headToHead: HeadToHeadAnalysis | null;
+  ranking: SessionRankEntry[];
+  comparisons: PlayerComparison[];
   insights: string[];
-  /** Vorbereitet für x-Spieler: alle Teilnehmer-Metriken in Session-Reihenfolge. */
+  /** Metriken aller Teilnehmer in Session-Reihenfolge. */
   allPlayers: PlayerRunMetrics[];
 };
 
@@ -328,7 +360,7 @@ function buildSoloInsights(metrics: PlayerRunMetrics): string[] {
   return insights.slice(0, 5);
 }
 
-function buildMultiInsights(
+function buildTwoPlayerInsights(
   viewer: PlayerRunMetrics,
   opponent: PlayerRunMetrics,
   h2h: HeadToHeadAnalysis,
@@ -390,53 +422,211 @@ function buildMultiInsights(
   return insights.slice(0, 6);
 }
 
+function buildSessionRanking(
+  participants: AnalysisParticipant[],
+): SessionRankEntry[] {
+  const sorted = [...participants].sort((a, b) => {
+    const scoreDiff = b.run.totalScore - a.run.totalScore;
+    if (scoreDiff !== 0) return scoreDiff;
+    return a.orderIndex - b.orderIndex;
+  });
+
+  return sorted.map((entry, index) => ({
+    playerId: entry.playerId,
+    playerName: entry.playerName,
+    orderIndex: entry.orderIndex,
+    rank: index + 1,
+    totalScore: entry.run.totalScore,
+  }));
+}
+
+function buildMultiPlayerSessionInsights(
+  viewerRank: number,
+  playerCount: number,
+  pointsBehindLeader: number,
+  directWins: number,
+  directLosses: number,
+  directTies: number,
+  viewer: PlayerRunMetrics,
+  leaderScore: number,
+): string[] {
+  const insights: string[] = [];
+  insights.push(
+    `Platz ${viewerRank} von ${playerCount} · ${viewer.totalScore} Punkte${pointsBehindLeader > 0 ? ` · ${pointsBehindLeader} hinter dem Sieger (${leaderScore})` : " · Spitze"}.`,
+  );
+  if (playerCount > 2) {
+    insights.push(
+      `Direktvergleiche: ${directWins} Siege, ${directLosses} Niederlagen${directTies > 0 ? `, ${directTies} Remis` : ""}.`,
+    );
+  }
+  insights.push(...buildSoloInsights(viewer));
+  return insights.slice(0, 7);
+}
+
+function emptyMultiShell(viewer: PlayerRunMetrics, allPlayers: PlayerRunMetrics[]): Omit<
+  MatchAnalysisResult,
+  "mode" | "ready" | "unavailableReason" | "insights"
+> {
+  return {
+    playerCount: allPlayers.length,
+    viewerRank: null,
+    pointsBehindLeader: null,
+    directWins: 0,
+    directLosses: 0,
+    directTies: 0,
+    viewer,
+    opponent: null,
+    headToHead: null,
+    ranking: [],
+    comparisons: [],
+    allPlayers,
+  };
+}
+
 export function buildMatchAnalysis(input: {
   mode: "solo" | "multi";
   ready: boolean;
   unavailableReason?: string | null;
-  viewerRun: AnalysisRun;
-  opponentRun?: AnalysisRun | null;
-  allRuns?: AnalysisRun[];
+  viewerPlayerId?: string;
+  participants?: AnalysisParticipant[];
+  viewerRun?: AnalysisRun;
 }): MatchAnalysisResult {
-  const viewer = analyzePlayerRun(input.viewerRun);
-  const allPlayers = (input.allRuns ?? [input.viewerRun]).map(analyzePlayerRun);
-  const opponent = input.opponentRun ? analyzePlayerRun(input.opponentRun) : null;
-
-  if (!input.ready) {
-    return {
-      mode: input.mode,
-      ready: false,
-      unavailableReason: input.unavailableReason ?? "Analyse noch nicht verfügbar.",
-      viewer,
-      opponent,
-      headToHead: null,
-      insights: [],
-      allPlayers,
-    };
-  }
-
-  if (input.mode === "solo" || !opponent || !input.opponentRun) {
+  if (input.mode === "solo" && input.viewerRun) {
+    const viewer = analyzePlayerRun(input.viewerRun);
+    const allPlayers = [viewer];
+    if (!input.ready) {
+      return {
+        mode: "solo",
+        ready: false,
+        unavailableReason: input.unavailableReason ?? "Analyse noch nicht verfügbar.",
+        insights: [],
+        ...emptyMultiShell(viewer, allPlayers),
+        playerCount: 1,
+      };
+    }
     return {
       mode: "solo",
       ready: true,
       unavailableReason: null,
+      playerCount: 1,
+      viewerRank: 1,
+      pointsBehindLeader: 0,
+      directWins: 0,
+      directLosses: 0,
+      directTies: 0,
       viewer,
       opponent: null,
       headToHead: null,
+      ranking: [],
+      comparisons: [],
       insights: buildSoloInsights(viewer),
       allPlayers,
     };
   }
 
-  const headToHead = buildHeadToHead(viewer, opponent, input.viewerRun, input.opponentRun);
+  const participants = input.participants ?? [];
+  const viewerParticipant = participants.find((p) => p.playerId === input.viewerPlayerId);
+  const allPlayers = participants.map((p) => analyzePlayerRun(p.run));
+  const viewer = viewerParticipant
+    ? analyzePlayerRun(viewerParticipant.run)
+    : allPlayers[0] ?? analyzePlayerRun({ gameCount: 0, useStrategyRules: true, totalScore: 0, totalRollsUsed: 0, rollsInPool: 0, extraYatzyCount: 0, games: [] });
+
+  if (!input.ready) {
+    return {
+      mode: "multi",
+      ready: false,
+      unavailableReason: input.unavailableReason ?? "Analyse noch nicht verfügbar.",
+      insights: [],
+      ...emptyMultiShell(viewer, allPlayers),
+      playerCount: participants.length,
+    };
+  }
+
+  if (!viewerParticipant || participants.length < 2) {
+    return {
+      mode: "solo",
+      ready: true,
+      unavailableReason: null,
+      playerCount: participants.length || 1,
+      viewerRank: participants.length === 1 ? 1 : null,
+      pointsBehindLeader: null,
+      directWins: 0,
+      directLosses: 0,
+      directTies: 0,
+      viewer,
+      opponent: null,
+      headToHead: null,
+      ranking: [],
+      comparisons: [],
+      insights: buildSoloInsights(viewer),
+      allPlayers,
+    };
+  }
+
+  const ranking = buildSessionRanking(participants);
+  const viewerRankEntry = ranking.find((r) => r.playerId === viewerParticipant.playerId);
+  const leader = ranking[0]!;
+  const viewerRank = viewerRankEntry?.rank ?? participants.length;
+  const pointsBehindLeader = Math.max(0, leader.totalScore - viewer.totalScore);
+
+  const others = participants.filter((p) => p.playerId !== viewerParticipant.playerId);
+  const comparisons: PlayerComparison[] = others.map((other) => {
+    const opponent = analyzePlayerRun(other.run);
+    const headToHead = buildHeadToHead(
+      viewer,
+      opponent,
+      viewerParticipant.run,
+      other.run,
+    );
+    return {
+      opponentPlayerId: other.playerId,
+      opponentName: other.playerName,
+      opponentOrderIndex: other.orderIndex,
+      opponent,
+      headToHead,
+    };
+  });
+
+  let directWins = 0;
+  let directLosses = 0;
+  let directTies = 0;
+  for (const cmp of comparisons) {
+    if (cmp.headToHead.winner === "viewer") directWins += 1;
+    else if (cmp.headToHead.winner === "opponent") directLosses += 1;
+    else directTies += 1;
+  }
+
+  const soleComparison = comparisons.length === 1 ? comparisons[0]! : null;
+  const insights =
+    comparisons.length === 1 && soleComparison
+      ? buildTwoPlayerInsights(viewer, soleComparison.opponent, soleComparison.headToHead)
+      : buildMultiPlayerSessionInsights(
+          viewerRank,
+          participants.length,
+          pointsBehindLeader,
+          directWins,
+          directLosses,
+          directTies,
+          viewer,
+          leader.totalScore,
+        );
+
   return {
     mode: "multi",
     ready: true,
     unavailableReason: null,
+    playerCount: participants.length,
+    viewerRank,
+    pointsBehindLeader,
+    directWins,
+    directLosses,
+    directTies,
     viewer,
-    opponent,
-    headToHead,
-    insights: buildMultiInsights(viewer, opponent, headToHead),
+    opponent: soleComparison?.opponent ?? null,
+    headToHead: soleComparison?.headToHead ?? null,
+    ranking,
+    comparisons,
+    insights,
     allPlayers,
   };
 }

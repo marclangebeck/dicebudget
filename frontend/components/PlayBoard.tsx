@@ -475,7 +475,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       !!lobby?.poolEndgameEnabled && !lobby?.poolEndgameResolved;
     const analysisAvailable =
       !poolEndgamePending &&
-      (isLocalSolo || !inviteCode || lobby == null || lobby.playerCount === 2);
+      (isLocalSolo || !inviteCode || lobby == null || lobby.playerCount >= 2);
 
     if (showMatchAnalysis && matchAnalysis) {
       return (

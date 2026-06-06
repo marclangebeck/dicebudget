@@ -43,13 +43,37 @@ export type HeadToHeadAnalysisDto = {
   counterfactual: string | null;
 };
 
+export type SessionRankEntryDto = {
+  playerId: string;
+  playerName: string;
+  orderIndex: number;
+  rank: number;
+  totalScore: number;
+};
+
+export type PlayerComparisonDto = {
+  opponentPlayerId: string;
+  opponentName: string;
+  opponentOrderIndex: number;
+  opponent: PlayerRunMetricsDto;
+  headToHead: HeadToHeadAnalysisDto;
+};
+
 export type MatchAnalysisDto = {
   mode: "solo" | "multi";
   ready: boolean;
   unavailableReason: string | null;
+  playerCount: number;
+  viewerRank: number | null;
+  pointsBehindLeader: number | null;
+  directWins: number;
+  directLosses: number;
+  directTies: number;
   viewer: PlayerRunMetricsDto;
   opponent: PlayerRunMetricsDto | null;
   headToHead: HeadToHeadAnalysisDto | null;
+  ranking: SessionRankEntryDto[];
+  comparisons: PlayerComparisonDto[];
   insights: string[];
   allPlayers: PlayerRunMetricsDto[];
 };

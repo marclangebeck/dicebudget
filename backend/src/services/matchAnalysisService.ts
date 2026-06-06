@@ -3,6 +3,7 @@ import { computeGameBreakdown } from "../domain/gameScoring.js";
 import { FIELD_TYPES_PER_GAME } from "../domain/fieldTypes.js";
 import {
   buildMatchAnalysis,
+  type AnalysisParticipant,
   type AnalysisRun,
   type MatchAnalysisResult,
 } from "../domain/matchAnalysis.js";
@@ -54,6 +55,10 @@ function runDtoToAnalysisRun(run: NonNullable<Awaited<ReturnType<typeof getRunBy
   };
 }
 
+function displayName(storedName: string, publicId: string): string {
+  return storedName.startsWith("pid:") ? publicId : storedName;
+}
+
 async function loadAnalysisRun(runId: string): Promise<AnalysisRun | null> {
   const run = await getRunById(runId);
   if (!run) return null;
@@ -78,10 +83,7 @@ function assertSessionAnalysisReady(session: {
   }
 }
 
-export async function getSessionMatchAnalysis(
-  inviteCode: string,
-  viewerPlayerId: string,
-): Promise<MatchAnalysisResult & {
+export type SessionMatchAnalysisResponse = MatchAnalysisResult & {
   inviteCode: string;
   leagueCode: string;
   roundNumber: number;
@@ -90,7 +92,12 @@ export async function getSessionMatchAnalysis(
   opponentPlayerId: string | null;
   viewerName: string;
   opponentName: string | null;
-}> {
+};
+
+export async function getSessionMatchAnalysis(
+  inviteCode: string,
+  viewerPlayerId: string,
+): Promise<SessionMatchAnalysisResponse> {
   const session = await prisma.gameSession.findUnique({
     where: { inviteCode: inviteCode.toUpperCase() },
     include: {
@@ -117,34 +124,36 @@ export async function getSessionMatchAnalysis(
     throw new MatchAnalysisNotSupportedError("Spieler gehört nicht zu dieser Session.");
   }
 
-  if (session.players.length !== 2) {
+  if (session.players.length < 2) {
     throw new MatchAnalysisNotSupportedError(
-      "Spielanalyse ist derzeit nur für Zwei-Spieler-Runden verfügbar.",
+      "Spielanalyse braucht mindestens zwei Spieler in der Session.",
     );
   }
 
   assertSessionAnalysisReady(session);
 
-  const opponentPlayer = playersWithIds.find((p) => p.id !== viewerPlayer.id) ?? null;
-
-  const runIds = session.players.map((p) => p.run.id);
-  const analysisRuns = await Promise.all(runIds.map((id) => loadAnalysisRun(id)));
+  const analysisRuns = await Promise.all(
+    session.players.map((p) => loadAnalysisRun(p.run.id)),
+  );
   if (analysisRuns.some((r) => !r)) {
     throw new MatchAnalysisNotReadyError("Spieldaten unvollständig.");
   }
 
-  const viewerRun = analysisRuns.find((_, i) => session.players[i]!.id === viewerPlayer.id)!;
-  const opponentRun = opponentPlayer
-    ? analysisRuns.find((_, i) => session.players[i]!.id === opponentPlayer.id)!
-    : null;
+  const participants: AnalysisParticipant[] = playersWithIds.map((player, index) => ({
+    playerId: player.publicId,
+    playerName: displayName(player.name, player.publicId),
+    orderIndex: player.orderIndex,
+    run: analysisRuns[index]!,
+  }));
 
   const analysis = buildMatchAnalysis({
     mode: "multi",
     ready: true,
-    viewerRun: viewerRun!,
-    opponentRun,
-    allRuns: analysisRuns as AnalysisRun[],
+    viewerPlayerId: viewerPlayer.publicId,
+    participants,
   });
+
+  const soleComparison = analysis.comparisons.length === 1 ? analysis.comparisons[0]! : null;
 
   const finishedAt = session.players
     .map((p) => p.run.finishedAt)
@@ -158,15 +167,9 @@ export async function getSessionMatchAnalysis(
     roundNumber: session.roundNumber,
     finishedAt: finishedAt?.toISOString() ?? null,
     viewerPlayerId: viewerPlayer.publicId,
-    opponentPlayerId: opponentPlayer?.publicId ?? null,
-    viewerName: viewerPlayer.name.startsWith("pid:")
-      ? viewerPlayer.publicId
-      : viewerPlayer.name,
-    opponentName: opponentPlayer
-      ? opponentPlayer.name.startsWith("pid:")
-        ? opponentPlayer.publicId
-        : opponentPlayer.name
-      : null,
+    opponentPlayerId: soleComparison?.opponentPlayerId ?? null,
+    viewerName: displayName(viewerPlayer.name, viewerPlayer.publicId),
+    opponentName: soleComparison?.opponentName ?? null,
   };
 }
 

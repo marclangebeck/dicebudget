@@ -65,21 +65,51 @@ describe("analyzePlayerRun", () => {
 });
 
 describe("buildMatchAnalysis", () => {
-  it("liefert Head-to-Head bei zwei Runs", () => {
+  it("liefert Head-to-Head bei zwei Spielern", () => {
     const viewerRun = emptyRun({ totalScore: 200, rollsInPool: 10 });
     const opponentRun = emptyRun({ totalScore: 180, rollsInPool: 5 });
     const result = buildMatchAnalysis({
       mode: "multi",
       ready: true,
-      viewerRun,
-      opponentRun,
-      allRuns: [viewerRun, opponentRun],
+      viewerPlayerId: "viewer",
+      participants: [
+        { playerId: "viewer", playerName: "A", orderIndex: 1, run: viewerRun },
+        { playerId: "opp", playerName: "B", orderIndex: 2, run: opponentRun },
+      ],
     });
     assert.equal(result.mode, "multi");
+    assert.equal(result.playerCount, 2);
     assert.ok(result.headToHead);
+    assert.equal(result.comparisons.length, 1);
     assert.equal(result.headToHead!.scoreDiff, 20);
-    assert.equal(result.headToHead!.winner, "viewer");
+    assert.equal(result.viewerRank, 1);
     assert.ok(result.insights.length > 0);
+  });
+
+  it("liefert Ranking und mehrere Direktvergleiche bei 3 Spielern", () => {
+    const runs = [
+      emptyRun({ totalScore: 300 }),
+      emptyRun({ totalScore: 250 }),
+      emptyRun({ totalScore: 200 }),
+    ];
+    const result = buildMatchAnalysis({
+      mode: "multi",
+      ready: true,
+      viewerPlayerId: "p2",
+      participants: [
+        { playerId: "p1", playerName: "A", orderIndex: 1, run: runs[0]! },
+        { playerId: "p2", playerName: "B", orderIndex: 2, run: runs[1]! },
+        { playerId: "p3", playerName: "C", orderIndex: 3, run: runs[2]! },
+      ],
+    });
+    assert.equal(result.playerCount, 3);
+    assert.equal(result.comparisons.length, 2);
+    assert.equal(result.viewerRank, 2);
+    assert.equal(result.pointsBehindLeader, 50);
+    assert.equal(result.directWins, 1);
+    assert.equal(result.directLosses, 1);
+    assert.equal(result.ranking[0]!.playerId, "p1");
+    assert.equal(result.headToHead, null);
   });
 
   it("liefert Solo-Insights ohne Gegner", () => {

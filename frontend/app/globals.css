@@ -3033,6 +3033,78 @@ html.legal-route body {
   margin-top: 0;
 }
 
+.match-analysis-ranking {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.match-analysis-ranking-row--viewer,
+.match-analysis-ranking li {
+  display: grid;
+  grid-template-columns: 1.75rem 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.4rem 0.5rem;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 0.8125rem;
+}
+
+.match-analysis-ranking-row--viewer {
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  background: rgba(236, 253, 245, 0.85);
+}
+
+.match-analysis-ranking-rank {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.match-analysis-ranking-name {
+  color: #0f172a;
+  font-weight: 500;
+}
+
+.match-analysis-ranking-score {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.match-analysis-comparison-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.match-analysis-comparison {
+  border-radius: 0.65rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(255, 255, 255, 0.75);
+  overflow: hidden;
+}
+
+.match-analysis-comparison-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.55rem 0.65rem;
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.match-analysis-comparison-body {
+  padding: 0 0.65rem 0.65rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
 .stats-empty-state--error {
   color: #b91c1c;
 }
