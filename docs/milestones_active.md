@@ -1,8 +1,8 @@
 # Aktive Milestones - dice.budget
 
-**Stand:** 2026-06-06  
+**Stand:** 2026-06-08  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `d00059f`  
+**Produktcode-HEAD:** `cb101f6`  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -19,19 +19,43 @@ Technische Basis ist erledigt:
 - Native App startet direkt auf `/app`.
 - Native API-Basis zeigt auf `https://dicebudget.bottle-trade.de/api`.
 - TestFlight ist aktiv, aktueller Build ist `2.0 (6)`.
-- Naechster Upload ist `2.0 (7)` und muss M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons + Spiel-UX Juni 2026 + **Spielanalyse** (2P/3–6P/Solo) enthalten.
+- Naechster Upload ist `2.0 (7)` und muss M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons + Spiel-UX Juni 2026 + Spielanalyse + **Yatzy-Miniwürfel / Zusatz-Yatzy-Würfelwahl** enthalten.
 
 Offen:
 
 - iOS-Build `2.0 (7)` auf dem Mac bauen und hochladen.
 - Startscreen, `/solo`, `/multi`, `/settings`, `/stats`, `/datenschutz`, `/impressum` und `/play` in iOS/Capacitor auf iPhone pruefen: Footer-Tabbar muss auf App-/Setup-/Legal-Screens unten sitzen; `/play` muss footerfrei sein und der Zettel muss die volle Screenhoehe nutzen.
 - iPad-Tischmodus in TestFlight auf iPad Querformat testen; iPhone-Flow muss unveraendert bleiben.
-- TestFlight nach Upload erneut testen (inkl. Multi-Statistik-Toggle, Yatzy-Strichliste, Spielanalyse).
+- TestFlight nach Upload erneut testen (inkl. Multi-Statistik-Toggle, Yatzy-Miniwürfel, Zusatz-Yatzy-Würfelwahl, Spielanalyse).
 - App Store Connect fuer kostenpflichtigen Release fertigstellen.
 
 Details: `docs/ios_current.md`.
 
 ## Letzte Abgeschlossene Milestones
+
+### Yatzy-Markierung und Zusatz-Yatzy 2026-06-08
+
+**Status:** erledigt im Produktcode (`cb101f6`), Frontend gebaut; Backend-Deploy durch Nutzer (Migration `extra_yatzy_die_values`); noch nicht in iOS `2.0 (6)`.
+
+- Yatzy-Eintrag (50 Pkt.): Würfelwahl 1–6; Markierung als **Mini-Würfel** (50 % Feldhöhe) neben dem passenden Feld-Würfel.
+- Ab 6. Yatzy gleicher Augenzahl: **Umbruch** (Grid max. 5 pro Zeile), Label-Spalte mit `overflow: hidden`.
+- **Zusatz-Yatzy (+100):** Plus-Button bei Yatzy → Würfelwahl → Bonus; Augenzahl in `games.extra_yatzy_die_values` (JSON), erscheint in der Markierung.
+- Popover-Auswahl per Portal (`ExtraYatzyPickerOverlay`) — nicht mehr vom Zettel abgeschnitten.
+
+Technische Hinweise:
+
+- Migration `20260608120000_extra_yatzy_die_values`
+- `POST /runs/:id/extra-yatzy` Body `{ yatzyDieValue: 1–6 }` (Pflicht)
+- `DiceFace` Groessen `field` / `mini`; `YatzyDiePicker` gemeinsam fuer Eintrag und Zusatz-Yatzy
+- Solo: `incrementLocalSoloExtraYatzy(runId, yatzyDieValue)` lokal
+
+Dateien:
+
+- `frontend/components/ScoreSheetTable.tsx`, `DiceFace.tsx`, `YatzyDiePicker.tsx`, `ExtraYatzyPickerOverlay.tsx`
+- `frontend/components/ScoreEntryPanel.tsx`, `PlayBoard.tsx`, `TableModePlayBoard.tsx`
+- `frontend/lib/localSoloRun.ts`, `frontend/app/globals.css`
+- `backend/src/services/playField.ts`, `backend/src/routes/runs.ts`, `backend/src/domain/extraYatzyDieValues.ts`
+- `backend/src/services/getRun.ts`, `backend/prisma/schema.prisma`
 
 ### Spielanalyse 2026-06-06
 
@@ -64,7 +88,7 @@ Dateien:
 
 - Spielzettel: Ergebnis 1 und Ergebnis 2 mit dunklem Hintergrund wie der restliche Zettel.
 - Multiplayer: Switch „Werten“ / „Nicht werten“ (Settings-Design) auf Abschluss-Screen; Paarungs-Statistik erst nach `POST /sessions/invite/:code/finalize-stats` beim Verlassen.
-- Yatzy: Wuerfel-Abfrage (1–6) bei 50 Punkten; Strichliste auf dem Zettel (`yatzy_die_value`).
+- Yatzy: Wuerfel-Abfrage (1–6) bei 50 Punkten; Markierung als Mini-Wuerfel auf dem Zettel (`yatzy_die_value`; erweitert in Yatzy-Milestone 2026-06-08).
 - Toggles app-weit blassgruen/blassrot (`.app-toggle`).
 - Startscreen-3D-Icons ca. +75 % (CSS).
 - `/settings` gruppiert (Allgemein, Solo, Multi, iPad); iPad-Namen nur bei aktivem Tischmodus editierbar.
@@ -193,13 +217,14 @@ Dateien:
 
 ## Offene Aufgaben
 
-1. iOS-Build `2.0 (7)` mit allen Features seit `2.0 (6)` inkl. Spiel-UX Juni 2026 hochladen.
-2. App Store Connect: Paid Applications Agreement, Bank/Steuer.
-3. Preis `1,19 EUR`, Screenshots, Beschreibung DE, Datenschutzfragebogen.
-4. TestFlight: Footer-Tabbar, footerfreie `/play`, Multi-Statistik-Toggle, Pool-Endspiel-Flow, Yatzy-Strichliste.
-5. Optional: Auto-Refresh nach Pool-Endspiel fuer Statistik-Toggle.
-6. Optional: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschraenken.
-7. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
+1. **Backend deployen** (Migration `extra_yatzy_die_values`, falls Zusatz-Yatzy live noch fehlschlaegt).
+2. iOS/TestFlight `2.0 (7)` bereitstellen.
+3. App Store Connect: Paid Applications Agreement, Bank/Steuer.
+4. Preis `1,19 EUR`, Screenshots, Beschreibung DE, Datenschutzfragebogen.
+5. TestFlight: Yatzy-Miniwürfel, Zusatz-Yatzy-Würfelwahl, Footer-Tabbar, footerfreie `/play`, Multi-Statistik-Toggle, Pool-Endspiel-Flow.
+6. Optional: Auto-Refresh nach Pool-Endspiel fuer Statistik-Toggle.
+7. Optional: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschraenken.
+8. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
 
 ## Bekannte Technische Schulden
 
@@ -212,10 +237,11 @@ Dateien:
 
 ## Aktuelle Prioritaeten
 
-1. iOS/TestFlight `2.0 (7)` bereitstellen.
-2. iPad-Tischmodus auf iPad Querformat, neue Start-/Setup-/Lobby-/Settings-/Legal-Optik, Footer-Tabbar in iOS, footerfreie `/play`-Zettel und iPhone-Regression testen.
-3. Store-Connect-Freigaben und Metadaten abschliessen.
-4. Danach erst optionale Sicherheits-/Auth-Verfeinerung der Stats-Endpunkte planen.
+1. Backend deployen (Migration `extra_yatzy_die_values`).
+2. iOS/TestFlight `2.0 (7)` bereitstellen.
+3. iPad-Tischmodus auf iPad Querformat, neue Start-/Setup-/Lobby-/Settings-/Legal-Optik, Footer-Tabbar in iOS, footerfreie `/play`-Zettel und iPhone-Regression testen.
+4. Store-Connect-Freigaben und Metadaten abschliessen.
+5. Danach erst optionale Sicherheits-/Auth-Verfeinerung der Stats-Endpunkte planen.
 
 ## Wichtige Dateien Fuer Aktuelle Arbeit
 
@@ -235,6 +261,9 @@ Dateien:
 - `frontend/components/ScoreEntryPanel.tsx`
 - `frontend/components/FieldScoreChoiceGrid.tsx`
 - `frontend/components/ScoreSheetTable.tsx`
+- `frontend/components/DiceFace.tsx`
+- `frontend/components/YatzyDiePicker.tsx`
+- `frontend/components/ExtraYatzyPickerOverlay.tsx`
 - `frontend/components/FitScoreSheet.tsx`
 - `frontend/components/TableModePlayBoard.tsx`
 - `frontend/components/HomeBentoGrid.tsx`
