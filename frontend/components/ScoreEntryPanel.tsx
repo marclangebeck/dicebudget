@@ -1,6 +1,7 @@
 "use client";
 
 import { FieldScoreChoiceGrid } from "@/components/FieldScoreChoiceGrid";
+import { YatzyDiePicker } from "@/components/YatzyDiePicker";
 import { FIELD_LABELS, fieldScoreChoices } from "@/lib/labels";
 import type { FieldDto, RunDto } from "@/lib/types";
 
@@ -124,21 +125,11 @@ export function ScoreEntryPanel({
           {needsYatzyDie && onYatzyDieValue && (
             <div className="play-entry-section">
               <p className="play-entry-section-label mb-1.5">Yatzy mit Würfel</p>
-              <div className="play-roll-chips play-roll-chips--large">
-                {[1, 2, 3, 4, 5, 6].map((n) => (
-                  <button
-                    key={n}
-                    type="button"
-                    disabled={run.status !== "ACTIVE" || busy}
-                    onClick={() => onYatzyDieValue(n)}
-                    className={`play-roll-chip play-roll-chip--large tabular-nums ${
-                      yatzyDieValue === n ? "play-roll-chip--selected" : ""
-                    } disabled:opacity-40`}
-                  >
-                    {n}
-                  </button>
-                ))}
-              </div>
+              <YatzyDiePicker
+                disabled={run.status !== "ACTIVE" || busy}
+                selected={yatzyDieValue}
+                onPick={onYatzyDieValue}
+              />
             </div>
           )}
 

@@ -113,9 +113,14 @@ export function clearLastField(runId: string, fieldId: string, playerSecret?: st
   });
 }
 
-export function incrementExtraYatzy(runId: string, playerSecret?: string) {
+export function incrementExtraYatzy(
+  runId: string,
+  yatzyDieValue: number,
+  playerSecret?: string,
+) {
   return request<{ run: RunDto }>(`/runs/${runId}/extra-yatzy`, {
     method: "POST",
+    body: JSON.stringify({ yatzyDieValue }),
     playerSecret,
   });
 }

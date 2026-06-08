@@ -1,4 +1,5 @@
 import { maxRollsForGameCount } from "../config.js";
+import { parseExtraYatzyDieValues } from "../domain/extraYatzyDieValues.js";
 import { computeGameBreakdown } from "../domain/gameScoring.js";
 import { FIELD_TYPES_PER_GAME } from "../domain/fieldTypes.js";
 import { prisma } from "../db/prisma.js";
@@ -80,7 +81,10 @@ export async function getRunById(runId: string) {
         id: game.id,
         index: game.index,
         score: game.score,
-        summary,
+        summary: {
+          ...summary,
+          extraYatzyDieValues: parseExtraYatzyDieValues(game.extraYatzyDieValues),
+        },
         fields: sortedFields.map((field) => ({
           id: field.id,
           fieldType: field.fieldType,

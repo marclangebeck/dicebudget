@@ -1,5 +1,6 @@
 import { ROLLS_PER_FIELD, maxRollsForGameCount } from "../config.js";
 import { poolDeltaForComplete } from "../domain/gameRules.js";
+import { assertExtraYatzyDieValue, appendExtraYatzyDieValue } from "../domain/extraYatzyDieValues.js";
 import {
   EXTRA_YATZY_BONUS_POINTS,
   computeGameBreakdown,
@@ -215,7 +216,12 @@ export async function recordRoll(
  * Bis 3 Würfe: Rest geht in den Pool. Mehr als 3: verbraucht Pool.
  */
 /** Zusatz-Yatzy (ab 7.): +100 auf Ergebnis Spiel der nächsten Spalte (Sp1, Sp2, … rotierend). */
-export async function incrementExtraYatzy(runId: string, playerSecret?: string) {
+export async function incrementExtraYatzy(
+  runId: string,
+  yatzyDieValue: number,
+  playerSecret?: string,
+) {
+  assertExtraYatzyDieValue(yatzyDieValue);
   await assertRunPlayerAccess(runId, playerSecret);
 
   const run = await prisma.run.findUnique({
@@ -239,6 +245,10 @@ export async function incrementExtraYatzy(runId: string, playerSecret?: string) 
       where: { id: targetGame.id },
       data: {
         extraYatzyBonus: { increment: EXTRA_YATZY_BONUS_POINTS },
+        extraYatzyDieValues: appendExtraYatzyDieValue(
+          targetGame.extraYatzyDieValues,
+          yatzyDieValue,
+        ),
       },
     });
     await recalculateRunTotals(runId, tx);

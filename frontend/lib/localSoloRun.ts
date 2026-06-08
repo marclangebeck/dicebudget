@@ -58,8 +58,9 @@ function saveStore(store: LocalSoloStore): void {
 function recomputeRun(run: RunDto): void {
   let totalScore = 0;
   for (const game of run.games) {
+    const extraYatzyDieValues = game.summary.extraYatzyDieValues ?? [];
     const breakdown = computeGameBreakdown(game.fields, game.summary.extraYatzyBonus ?? 0);
-    game.summary = breakdown;
+    game.summary = { ...breakdown, extraYatzyDieValues };
     game.score = breakdown.gameTotal;
     totalScore += breakdown.gameTotal;
   }
@@ -257,7 +258,14 @@ export function clearLocalSoloField(runId: string, fieldId: string): RunDto {
   return saveState(state);
 }
 
-export function incrementLocalSoloExtraYatzy(runId: string): RunDto {
+export function incrementLocalSoloExtraYatzy(runId: string, yatzyDieValue: number): RunDto {
+  if (
+    !Number.isInteger(yatzyDieValue) ||
+    yatzyDieValue < 1 ||
+    yatzyDieValue > 6
+  ) {
+    throw new Error("yatzyDieValue must be between 1 and 6 for Yatzy");
+  }
   const state = getState(runId);
   const run = state.run;
   if (run.status !== "ACTIVE") throw new Error("Run is not active");
@@ -267,6 +275,8 @@ export function incrementLocalSoloExtraYatzy(runId: string): RunDto {
   const targetGame = run.games.find((g) => g.index === gameIndex);
   if (!targetGame) throw new Error("Game not found for extra yatzy");
   targetGame.summary.extraYatzyBonus += 100;
+  const dieValues = targetGame.summary.extraYatzyDieValues ?? [];
+  targetGame.summary.extraYatzyDieValues = [...dieValues, yatzyDieValue];
   recomputeRun(run);
   return saveState(state);
 }

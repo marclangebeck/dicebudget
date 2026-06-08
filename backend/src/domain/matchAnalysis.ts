@@ -171,6 +171,9 @@ export function analyzePlayerRun(run: AnalysisRun): PlayerRunMetrics {
     upperSumTotal += game.summary.upperSum;
     lowerSumTotal += game.summary.lowerSum;
     extraYatzyTotal += game.summary.extraYatzyBonus;
+    for (const die of game.summary.extraYatzyDieValues ?? []) {
+      yatzyDieValues.push(die);
+    }
 
     for (const field of game.fields) {
       if (field.score === null) continue;

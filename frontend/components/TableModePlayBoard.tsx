@@ -251,14 +251,18 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     }
   }
 
-  async function handleExtraYatzy(side: TableModeSide) {
+  async function handleExtraYatzy(side: TableModeSide, yatzyDieValue: number) {
     const player = players?.find((p) => p.side === side);
     const run = runs[side];
     if (!player || !run || run.status !== "ACTIVE") return;
     setBusy(true);
     setError(null);
     try {
-      const { run: updated } = await incrementExtraYatzy(run.id, player.playerSecret);
+      const { run: updated } = await incrementExtraYatzy(
+        run.id,
+        yatzyDieValue,
+        player.playerSecret,
+      );
       await refreshAfterChange(side, updated);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Zusatz-Yatzy fehlgeschlagen");
@@ -440,7 +444,9 @@ export function TableModePlayBoard({ inviteCode }: Props) {
                           ? selectEndgameField(player.side, fieldId)
                           : selectField(player.side, fieldId)
                       }
-                      onIncrementExtraYatzy={() => void handleExtraYatzy(player.side)}
+                      onIncrementExtraYatzy={(yatzyDieValue) =>
+                        void handleExtraYatzy(player.side, yatzyDieValue)
+                      }
                       extraYatzyBusy={busy}
                       allowSelectWhenFinished={poolEndgamePending && endgameSide === player.side}
                     />

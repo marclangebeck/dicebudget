@@ -220,14 +220,14 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     setRollsUsed(defaultRollsUsed(run));
   }
 
-  async function handleExtraYatzy() {
+  async function handleExtraYatzy(yatzyDieValue: number) {
     if (!run || run.status !== "ACTIVE") return;
     setBusy(true);
     setError(null);
     try {
       const updated = isLocalSolo
-        ? incrementLocalSoloExtraYatzy(runId)
-        : (await incrementExtraYatzy(runId, playerSecret)).run;
+        ? incrementLocalSoloExtraYatzy(runId, yatzyDieValue)
+        : (await incrementExtraYatzy(runId, yatzyDieValue, playerSecret)).run;
       setRun(updated);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Zusatz-Yatzy fehlgeschlagen");
@@ -723,7 +723,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
               run={run}
               activeFieldId={activeFieldId}
               onSelectField={selectField}
-              onIncrementExtraYatzy={() => void handleExtraYatzy()}
+              onIncrementExtraYatzy={(yatzyDieValue) => void handleExtraYatzy(yatzyDieValue)}
               extraYatzyBusy={busy}
             />
           </FitScoreSheet>

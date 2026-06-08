@@ -1837,6 +1837,40 @@ html.legal-route body {
   padding-left: 0.1rem;
 }
 
+.play-yatzy-picker-backdrop {
+  background: transparent;
+}
+
+.play-yatzy-picker-popover {
+  min-width: 9.5rem;
+  padding: 0.35rem 0.4rem 0.45rem;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 0.5rem;
+  background: #fff;
+  box-shadow: 0 8px 20px -8px rgba(15, 23, 42, 0.35);
+}
+
+.play-yatzy-picker-label {
+  margin-bottom: 0.25rem;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+}
+
+.play-roll-chips--compact {
+  gap: 0.2rem;
+}
+
+.play-roll-chip--compact {
+  min-height: 1.35rem;
+  min-width: 1.35rem;
+  padding: 0;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
 .play-entry-sheet {
   border-radius: 1rem 1rem 0 0;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, #f8fafc 100%);

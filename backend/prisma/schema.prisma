@@ -111,6 +111,7 @@ model Game {
   index  Int
   score             Int @default(0)
   extraYatzyBonus   Int @default(0) @map("extra_yatzy_bonus")
+  extraYatzyDieValues String? @map("extra_yatzy_die_values")
   run               Run @relation(fields: [runId], references: [id], onDelete: Cascade)
   fields Field[]
 

@@ -35,6 +35,8 @@ export type GameSummaryDto = {
   ergebnisOben: number | null;
   lowerSum: number;
   extraYatzyBonus: number;
+  /** Augenzahlen der Zusatz-Yatzy-Klicks (+100) auf diesem Spielblock. */
+  extraYatzyDieValues?: number[];
   gameTotal: number;
 };
 

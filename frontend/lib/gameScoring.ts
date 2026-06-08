@@ -33,6 +33,7 @@ export type GameBreakdown = {
   ergebnisOben: number | null;
   lowerSum: number;
   extraYatzyBonus: number;
+  extraYatzyDieValues?: number[];
   gameTotal: number;
 };
 

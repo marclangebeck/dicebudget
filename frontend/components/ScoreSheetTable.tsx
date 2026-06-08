@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { DiceFace } from "@/components/DiceFace";
+import { YatzyDiePicker } from "@/components/YatzyDiePicker";
 import { upperBonusDelta } from "@/lib/gameScoring";
 import {
   diceValueForField,
@@ -18,7 +20,7 @@ type Props = {
   activeFieldId: string | null;
   fieldPreviews?: Map<string, FieldPreview> | null;
   onSelectField: (fieldId: string) => void;
-  onIncrementExtraYatzy?: () => void;
+  onIncrementExtraYatzy?: (yatzyDieValue: number) => void;
   extraYatzyBusy?: boolean;
   /** Pool-Endspiel: bereits eingetragene Felder trotz beendetem Run antippbar. */
   allowSelectWhenFinished?: boolean;
@@ -78,10 +80,12 @@ function YatzyRowLabel({
   extraYatzyCount: number;
   disabled: boolean;
   busy?: boolean;
-  onIncrement?: () => void;
+  onIncrement?: (yatzyDieValue: number) => void;
 }) {
+  const [showPicker, setShowPicker] = useState(false);
+
   return (
-    <div className="flex items-center gap-0.5">
+    <div className="relative flex items-center gap-0.5">
       <span className="text-[10px] leading-tight md:text-[11px]">{FIELD_LABELS.KNIFFEL}</span>
       {extraYatzyCount > 0 && (
         <span
@@ -96,7 +100,7 @@ function YatzyRowLabel({
         disabled={disabled || busy}
         onClick={(e) => {
           e.stopPropagation();
-          onIncrement?.();
+          setShowPicker(true);
         }}
         title="Zusatz-Yatzy: +100 Punkte auf Ergebnis Spiel (nächste Spalte)"
         aria-label="Zusatz-Yatzy Bonus hinzufügen"
@@ -104,6 +108,31 @@ function YatzyRowLabel({
       >
         +
       </button>
+      {showPicker && (
+        <>
+          <button
+            type="button"
+            className="play-yatzy-picker-backdrop fixed inset-0 z-40"
+            aria-label="Schließen"
+            onClick={() => setShowPicker(false)}
+          />
+          <div
+            className="play-yatzy-picker-popover absolute left-0 top-full z-50 mt-1"
+            role="dialog"
+            aria-label="Yatzy mit Würfel wählen"
+          >
+            <p className="play-yatzy-picker-label">Yatzy mit Würfel</p>
+            <YatzyDiePicker
+              compact
+              disabled={disabled || busy}
+              onPick={(value) => {
+                setShowPicker(false);
+                onIncrement?.(value);
+              }}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -116,6 +145,12 @@ function buildYatzyMarkCounts(run: RunDto): Partial<Record<1 | 2 | 3 | 4 | 5 | 6
     if (kniffel?.score === 50 && die !== null && die !== undefined && die >= 1 && die <= 6) {
       const key = die as 1 | 2 | 3 | 4 | 5 | 6;
       counts[key] = (counts[key] ?? 0) + 1;
+    }
+    for (const extraDie of game.summary.extraYatzyDieValues ?? []) {
+      if (extraDie >= 1 && extraDie <= 6) {
+        const key = extraDie as 1 | 2 | 3 | 4 | 5 | 6;
+        counts[key] = (counts[key] ?? 0) + 1;
+      }
     }
   }
   return counts;
@@ -133,7 +168,7 @@ function FieldRowLabel({
   extraYatzyCount: number;
   runActive: boolean;
   extraYatzyBusy?: boolean;
-  onIncrementExtraYatzy?: () => void;
+  onIncrementExtraYatzy?: (yatzyDieValue: number) => void;
   yatzyMarkCount?: number;
 }) {
   if (row.fieldType === "KNIFFEL") {

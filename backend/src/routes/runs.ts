@@ -37,7 +37,20 @@ runsRouter.post("/:runId/finish", async (req, res, next) => {
 
 runsRouter.post("/:runId/extra-yatzy", async (req, res, next) => {
   try {
-    const run = await incrementExtraYatzy(req.params.runId, readPlayerSecret(req));
+    const yatzyDieValueRaw = req.body?.yatzyDieValue;
+    const yatzyDieValue =
+      yatzyDieValueRaw === undefined || yatzyDieValueRaw === null
+        ? NaN
+        : Number(yatzyDieValueRaw);
+    if (Number.isNaN(yatzyDieValue)) {
+      res.status(400).json({ error: "yatzyDieValue is required" });
+      return;
+    }
+    const run = await incrementExtraYatzy(
+      req.params.runId,
+      yatzyDieValue,
+      readPlayerSecret(req),
+    );
     res.json({ run });
   } catch (error) {
     next(error);
