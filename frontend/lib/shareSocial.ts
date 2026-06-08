@@ -43,6 +43,34 @@ export function appendSiteLink(body: string): string {
   return `${body}\n\nJetzt spielen: ${SITE_URL}`;
 }
 
+export async function sharePlainText(params: {
+  title: string;
+  text: string;
+}): Promise<"shared" | "copied" | "aborted"> {
+  const { title, text } = params;
+  const fullText = appendSiteLink(text);
+
+  if (canUseWebShare()) {
+    try {
+      await navigator.share({ title, text: fullText });
+      return "shared";
+    } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") return "aborted";
+    }
+  }
+
+  if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(fullText);
+      return "copied";
+    } catch {
+      /* fallback below */
+    }
+  }
+
+  return "copied";
+}
+
 export function shareCardTitle(suffix: string): string {
   return `${APP_NAME} — ${suffix}`;
 }

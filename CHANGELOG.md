@@ -5,6 +5,10 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **Zettel: Ergebnis-Zeilen in Feld-Spalte:** Die Label-Zellen „Ergebnis 1“, „Ergebnis 2“ und „Ergebnis Spiel“ nutzen dieselben Hintergrund- und Schriftfarben wie die Wertezellen in den Spielspalten (dunkel bzw. grün hervorgehoben)
+- **Multi: Raum-Code teilen:** Nach dem Anlegen eines Raums ersetzt „Code teilen“ das Kopieren — System-Share mit Einladungstext (Fallback: Zwischenablage)
+- **Fortschritt 25 / 50 / 75 %:** Kurzes Overlay und Sound, wenn ein Viertel der Felder eines Laufs eingetragen ist (Solo, Multi, iPad-Tischmodus)
+- **Spiel-Feedback granular:** Unter `/settings/feedback` einzeln schaltbar: Erfolgsanimationen, Sounds, Fortschrittshinweise
 - **Spielanalyse: Punkte-Duell-Graphik (Multi):** Nach Multi-Spielen zeigt die Analyse einen SVG-Verlauf der Gesamtpunkte von Spieler 1 vs. Spieler 2 (Session-Reihenfolge) — Führungswechsel und farbige Linien im Koordinatensystem. Backend: `scoreProgression` in `GET /sessions/invite/:code/match-analysis` (Feld `scoredSequence` pro Eintrag)
 - **Spielanalyse-Coaching (Multi):** Regelbasierte Auswertung mit Narrative (Sieg/Niederlage), Stärken/Schwächen, Pool-Report (Strategy), Feld-Differenzen, bis zu 3 Tipps; UI im dunklen App-Dashboard-Design mit klaren Sektionen (Warum · Profil · Pool · Felder · Nächstes Mal · Details)
 - **Einstellungen: Rücknavigation** — Von `/solo` und `/multi` öffnet „Einstellungen“ mit `?from=solo|multi`; auf `/settings` erscheint „Zurück zu Einzelspiel/Multiplayer“ statt Umweg über den Startscreen

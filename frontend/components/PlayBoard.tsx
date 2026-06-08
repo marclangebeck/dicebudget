@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { StatsRatingToggle } from "@/components/StatsRatingToggle";
 import { AchievementOverlay } from "@/components/AchievementOverlay";
+import { RunProgressOverlay } from "@/components/RunProgressOverlay";
 import { RunCompleteOverlay } from "@/components/RunCompleteOverlay";
 import { MatchAnalysisView } from "@/components/MatchAnalysisView";
 import { RunFinishScreen } from "@/components/RunFinishScreen";
@@ -34,6 +35,12 @@ import {
   notifyAchievement,
   type AchievementOverlayState,
 } from "@/lib/achievementFeedback";
+import { playProgressMilestoneSound } from "@/lib/achievementSound";
+import {
+  buildProgressMilestoneAfterField,
+  RUN_PROGRESS_DURATION_MS,
+  type RunProgressOverlayState,
+} from "@/lib/runProgressFeedback";
 import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
 import { APP_HOME_PATH } from "@/lib/branding";
 import {
@@ -75,6 +82,8 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   const [achievementOverlay, setAchievementOverlay] = useState<AchievementOverlayState | null>(
     null,
   );
+  const [progressOverlay, setProgressOverlay] = useState<RunProgressOverlayState | null>(null);
+  const shownProgressRef = useRef<Set<number>>(new Set());
   const [opponentPool, setOpponentPool] = useState<number | null>(null);
   const [lobby, setLobby] = useState<SessionLobbyDto | null>(null);
   const [endgameFieldId, setEndgameFieldId] = useState<string | null>(null);
@@ -184,6 +193,10 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   }, [run, runId, inviteCode, playerSecret]);
 
   useEffect(() => {
+    shownProgressRef.current = new Set();
+  }, [runId]);
+
+  useEffect(() => {
     if (!achievementOverlay) return;
     const timer = window.setTimeout(
       () => setAchievementOverlay(null),
@@ -191,6 +204,12 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     );
     return () => window.clearTimeout(timer);
   }, [achievementOverlay]);
+
+  useEffect(() => {
+    if (!progressOverlay) return;
+    const timer = window.setTimeout(() => setProgressOverlay(null), RUN_PROGRESS_DURATION_MS);
+    return () => window.clearTimeout(timer);
+  }, [progressOverlay]);
 
   const activeField: FieldDto | undefined = run?.games
     .flatMap((g) => g.fields)
@@ -323,6 +342,11 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
               yatzyArg ?? null,
             )
           : null;
+      const progress = buildProgressMilestoneAfterField(
+        run,
+        updated,
+        shownProgressRef.current,
+      );
       setRun(updated);
       resetEntry();
       setActiveFieldId(null);
@@ -341,6 +365,10 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       } else if (achievement) {
         notifyAchievement(achievement);
         setAchievementOverlay(achievement);
+      } else if (progress) {
+        shownProgressRef.current.add(progress.percent);
+        playProgressMilestoneSound(progress.percent);
+        setProgressOverlay(progress);
       }
       void refreshLobby();
     } catch (e) {
@@ -364,6 +392,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       setShowCompleteOverlay(false);
       setSheetReviewAfterComplete(false);
       setAchievementOverlay(null);
+      setProgressOverlay(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Löschen fehlgeschlagen");
     } finally {
@@ -752,6 +781,13 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
           gameIndex={achievementOverlay.gameIndex}
           yatzyDieValue={achievementOverlay.yatzyDieValue}
           onClose={() => setAchievementOverlay(null)}
+        />
+      )}
+
+      {progressOverlay && !showCompleteOverlay && !achievementOverlay && (
+        <RunProgressOverlay
+          percent={progressOverlay.percent}
+          onClose={() => setProgressOverlay(null)}
         />
       )}
 

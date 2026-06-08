@@ -1,5 +1,5 @@
 import type { AchievementType } from "@/lib/achievementTypes";
-import { getGameFeedbackEnabled } from "@/lib/uiPrefs";
+import { getFeedbackSoundsEnabled } from "@/lib/gameFeedbackPrefs";
 
 let audioCtx: AudioContext | null = null;
 
@@ -292,8 +292,20 @@ function playYatzySound(ctx: AudioContext, t0: number) {
   playTone(ctx, 2093.0, fanfareAt + 0.86, 0.55, { type: "triangle", gain: 0.06, pan: 0.4 });
 }
 
+export function playProgressMilestoneSound(percent: 25 | 50 | 75): void {
+  if (!getFeedbackSoundsEnabled() || prefersReducedFeedback()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const t0 = ctx.currentTime + 0.02;
+  const base = percent === 25 ? 392 : percent === 50 ? 523.25 : 659.25;
+  playTone(ctx, base, t0, 0.22, { type: "triangle", gain: 0.14, pan: -0.15 });
+  playTone(ctx, base * 1.25, t0 + 0.12, 0.28, { type: "sine", gain: 0.1, pan: 0.2 });
+  playChord(ctx, t0 + 0.22, [base, base * 1.5], 0.35, { gain: 0.12, type: "triangle" });
+}
+
 export function playAchievementSound(type: AchievementType): void {
-  if (!getGameFeedbackEnabled() || prefersReducedFeedback()) return;
+  if (!getFeedbackSoundsEnabled() || prefersReducedFeedback()) return;
   const ctx = getAudioContext();
   if (!ctx) return;
 

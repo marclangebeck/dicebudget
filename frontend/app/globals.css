@@ -1789,14 +1789,27 @@ html.legal-route body {
   vertical-align: top;
 }
 
-.play-row-label--summary {
-  background: #f1f5f9;
-  color: #475569;
+.play-row-label--summary-match {
+  border-radius: 0.35rem;
 }
 
-.play-row-label--highlight {
+.play-row-label--summary-standard {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(15, 23, 42, 0.42);
+  color: #e2e8f0;
+  font-weight: 500;
+}
+
+.play-row-label--summary-highlight {
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  background: rgba(6, 78, 59, 0.38);
+  color: #d1fae5;
   font-weight: 700;
-  color: #065f46;
+}
+
+.play-row-label--summary-ergebnis1 {
+  font-size: 0.75rem;
+  font-weight: 800;
 }
 
 .play-row--summary {
@@ -5998,5 +6011,109 @@ html.legal-route body {
 
   .legal-article {
     padding: 0.85rem 0.9rem 1rem;
+  }
+}
+
+.run-progress-overlay {
+  background: rgba(2, 6, 23, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.run-progress-scene {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.run-progress-scene-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(72vw, 18rem);
+  height: min(72vw, 18rem);
+  transform: translate(-50%, -50%);
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.28) 0%, transparent 68%);
+}
+
+.run-progress-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 9999px;
+  transform: translate(-50%, -50%);
+  border: 2px solid rgba(52, 211, 153, 0.35);
+}
+
+.run-progress-ring--outer {
+  width: min(58vw, 14rem);
+  height: min(58vw, 14rem);
+  animation: run-progress-pulse 1.4s ease-out infinite;
+}
+
+.run-progress-ring--inner {
+  width: min(42vw, 10rem);
+  height: min(42vw, 10rem);
+  border-color: rgba(110, 231, 183, 0.55);
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.25);
+}
+
+.run-progress-card {
+  min-width: 11rem;
+  padding: 1.1rem 1.35rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  background: linear-gradient(165deg, rgba(6, 78, 59, 0.92) 0%, rgba(15, 23, 42, 0.95) 100%);
+  color: #d1fae5;
+  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.45);
+}
+
+.run-progress-kicker {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6ee7b7;
+}
+
+.run-progress-value {
+  margin-top: 0.35rem;
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #ecfdf5;
+}
+
+.run-progress-title {
+  margin-top: 0.15rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.run-progress-sub {
+  margin-top: 0.45rem;
+  font-size: 0.75rem;
+  color: #a7f3d0;
+}
+
+@keyframes run-progress-pulse {
+  0% {
+    opacity: 0.45;
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+  70% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .run-progress-ring--outer {
+    animation: none;
+    opacity: 0.35;
   }
 }

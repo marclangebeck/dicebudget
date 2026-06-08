@@ -8,6 +8,8 @@ import { JoinByCodeForm } from "@/components/JoinByCodeForm";
 import { createGameSession, joinSession } from "@/lib/api";
 import { saveActiveGame } from "@/lib/activeGame";
 import { setPlayerAlias } from "@/lib/playerAliases";
+import { APP_NAME } from "@/lib/branding";
+import { sharePlainText } from "@/lib/shareSocial";
 import { settingsHrefWithReturn } from "@/lib/settingsReturn";
 import { DEFAULT_APP_SETTINGS, getAppSettings, type AppSettings } from "@/lib/uiPrefs";
 import {
@@ -24,7 +26,7 @@ export default function MultiHostPage() {
   const [createdStrategyMode, setCreatedStrategyMode] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [shareState, setShareState] = useState<"idle" | "shared" | "copied">("idle");
 
   useEffect(() => {
     setSettings(getAppSettings());
@@ -86,14 +88,18 @@ export default function MultiHostPage() {
     }
   }
 
-  async function copyCode() {
+  async function shareCode() {
     if (!inviteCode) return;
-    try {
-      await navigator.clipboard.writeText(inviteCode);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(false);
+    const result = await sharePlainText({
+      title: `${APP_NAME} — Raum-Code`,
+      text: `Komm in meinen ${APP_NAME}-Raum!\n\nRaum-Code: ${inviteCode}\n\nMultiplayer → Code eingeben`,
+    });
+    if (result === "shared") {
+      setShareState("shared");
+      window.setTimeout(() => setShareState("idle"), 2000);
+    } else if (result === "copied") {
+      setShareState("copied");
+      window.setTimeout(() => setShareState("idle"), 2000);
     }
   }
 
@@ -183,10 +189,14 @@ export default function MultiHostPage() {
 
             <button
               type="button"
-              onClick={() => void copyCode()}
+              onClick={() => void shareCode()}
               className="home-bento-submit home-bento-submit--lg w-full font-semibold"
             >
-              {copied ? "Kopiert!" : "Code kopieren"}
+              {shareState === "shared"
+                ? "Geteilt!"
+                : shareState === "copied"
+                  ? "Kopiert!"
+                  : "Code teilen"}
             </button>
 
             <p className="setup-host-success-hint">

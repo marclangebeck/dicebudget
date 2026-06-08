@@ -71,6 +71,15 @@ function rowBgClass(row: SheetRow): string {
   return "";
 }
 
+function summaryLabelClass(row: Extract<SheetRow, { kind: "summary" }>): string {
+  const base = "play-row-label--summary-match";
+  if (row.key === "lowerSum") return `${base} play-row-label--summary-standard`;
+  if (row.key === "ergebnis1") {
+    return `${base} play-row-label--summary-highlight play-row-label--summary-ergebnis1`;
+  }
+  return `${base} play-row-label--summary-highlight`;
+}
+
 function YatzyRowLabel({
   extraYatzyCount,
   disabled,
@@ -392,11 +401,7 @@ export function ScoreSheetTable({
                   scope="row"
                   title={rowLabel(row)}
                   className={`play-row-label px-1 py-0.5 text-left font-normal ${
-                    row.kind === "summary" && row.highlight
-                      ? "play-row-label--highlight"
-                      : isSummary
-                        ? "play-row-label--summary"
-                        : ""
+                    isSummary ? summaryLabelClass(row) : ""
                   }`}
                 >
                   {isSummary ? (

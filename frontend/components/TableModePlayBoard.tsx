@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { StatsRatingToggle } from "@/components/StatsRatingToggle";
@@ -27,6 +27,12 @@ import {
   notifyAchievement,
   type AchievementOverlayState,
 } from "@/lib/achievementFeedback";
+import { playProgressMilestoneSound } from "@/lib/achievementSound";
+import {
+  buildProgressMilestoneAfterField,
+  RUN_PROGRESS_DURATION_MS,
+  type RunProgressOverlayState,
+} from "@/lib/runProgressFeedback";
 import type { SessionMatchAnalysisDto } from "@/lib/matchAnalysisTypes";
 import { allFieldsScored, getLastScoredFieldId } from "@/lib/runUtils";
 import { loadPlayerAliases } from "@/lib/playerAliases";
@@ -39,6 +45,7 @@ import { normalizePublicPlayerId } from "@/lib/playerIdentity";
 import type { SessionLobbyDto } from "@/lib/sessionTypes";
 import type { FieldDto, RunDto } from "@/lib/types";
 import { AchievementOverlay } from "@/components/AchievementOverlay";
+import { RunProgressOverlay } from "@/components/RunProgressOverlay";
 import { MatchAnalysisView } from "@/components/MatchAnalysisView";
 
 type Props = {
@@ -71,6 +78,8 @@ export function TableModePlayBoard({ inviteCode }: Props) {
   const [achievementOverlay, setAchievementOverlay] = useState<AchievementOverlayState | null>(
     null,
   );
+  const [progressOverlay, setProgressOverlay] = useState<RunProgressOverlayState | null>(null);
+  const shownProgressByRunRef = useRef<Record<string, Set<number>>>({});
   const [yatzyDieValue, setYatzyDieValue] = useState<number | null>(null);
   const [includeInStats, setIncludeInStats] = useState(true);
   const [leavingHome, setLeavingHome] = useState(false);
@@ -109,6 +118,12 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     );
     return () => window.clearTimeout(timer);
   }, [achievementOverlay]);
+
+  useEffect(() => {
+    if (!progressOverlay) return;
+    const timer = window.setTimeout(() => setProgressOverlay(null), RUN_PROGRESS_DURATION_MS);
+    return () => window.clearTimeout(timer);
+  }, [progressOverlay]);
 
   const activeRun = activeSide ? runs[activeSide] : null;
   const activePlayer = useMemo(
@@ -236,10 +251,19 @@ export function TableModePlayBoard({ inviteCode }: Props) {
               yatzyArg ?? null,
             )
           : null;
+      const shownSet = shownProgressByRunRef.current[activeRun.id] ?? new Set<number>();
+      if (!shownProgressByRunRef.current[activeRun.id]) {
+        shownProgressByRunRef.current[activeRun.id] = shownSet;
+      }
+      const progress = buildProgressMilestoneAfterField(activeRun, updated, shownSet);
       await refreshAfterChange(activeSide, updated);
       if (achievement) {
         notifyAchievement(achievement);
         setAchievementOverlay(achievement);
+      } else if (progress) {
+        shownSet.add(progress.percent);
+        playProgressMilestoneSound(progress.percent);
+        setProgressOverlay(progress);
       }
       resetEntry();
     } catch (e) {
@@ -582,6 +606,13 @@ export function TableModePlayBoard({ inviteCode }: Props) {
           gameIndex={achievementOverlay.gameIndex}
           yatzyDieValue={achievementOverlay.yatzyDieValue}
           onClose={() => setAchievementOverlay(null)}
+        />
+      )}
+
+      {progressOverlay && !achievementOverlay && (
+        <RunProgressOverlay
+          percent={progressOverlay.percent}
+          onClose={() => setProgressOverlay(null)}
         />
       )}
 

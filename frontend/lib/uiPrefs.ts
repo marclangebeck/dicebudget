@@ -2,7 +2,12 @@
  * Lokale Geräte-Einstellungen (kein Backend, kein Sync).
  */
 
-const BONUS_CELEBRATION_KEY = "dicebudget.bonusCelebration";
+import {
+  getGameFeedbackPrefs,
+  setGameFeedbackPrefs,
+  type GameFeedbackPrefs,
+} from "@/lib/gameFeedbackPrefs";
+
 const APP_SETTINGS_KEY = "dicebudget.appSettings.v1";
 
 export type AppSettings = {
@@ -72,24 +77,26 @@ function normalizeSettings(value: unknown): AppSettings {
   };
 }
 
-/** Default: an. Nur "0" gilt als ausgeschaltet. */
+/** Default: an, wenn mindestens eine Feedback-Option aktiv ist. */
 export function getBonusCelebrationEnabled(): boolean {
-  return getGameFeedbackEnabled();
+  const prefs = getGameFeedbackPrefs();
+  return prefs.animationsEnabled || prefs.soundsEnabled || prefs.progressHintsEnabled;
 }
 
 export function setBonusCelebrationEnabled(enabled: boolean): void {
-  setGameFeedbackEnabled(enabled);
+  const next: GameFeedbackPrefs = enabled
+    ? { animationsEnabled: true, soundsEnabled: true, progressHintsEnabled: true }
+    : { animationsEnabled: false, soundsEnabled: false, progressHintsEnabled: false };
+  setGameFeedbackPrefs(next);
 }
 
-/** Animation + Sound bei Spiel-Erfolgen (Bonus, untere Spalte, Große Straße, Alle Fünfe). */
+/** Mindestens eine Feedback-Option aktiv (Kompatibilität). */
 export function getGameFeedbackEnabled(): boolean {
-  if (typeof window === "undefined") return true;
-  return window.localStorage.getItem(BONUS_CELEBRATION_KEY) !== "0";
+  return getBonusCelebrationEnabled();
 }
 
 export function setGameFeedbackEnabled(enabled: boolean): void {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(BONUS_CELEBRATION_KEY, enabled ? "1" : "0");
+  setBonusCelebrationEnabled(enabled);
 }
 
 export function getAppSettings(): AppSettings {

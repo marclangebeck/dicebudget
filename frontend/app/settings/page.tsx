@@ -105,7 +105,8 @@ function SettingsSection({
 
 function SettingsPageInner() {
   const searchParams = useSearchParams();
-  const returnTarget = parseSettingsReturn(searchParams.get("from"));
+  const fromParam = searchParams.get("from");
+  const returnTarget = parseSettingsReturn(fromParam);
   const [settings, setSettingsState] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
 
   useEffect(() => {
@@ -140,7 +141,13 @@ function SettingsPageInner() {
           />
         </div>
         <div className="settings-compact-card settings-compact-card--toggle">
-          <BonusCelebrationToggle />
+          <BonusCelebrationToggle
+            feedbackHref={
+              fromParam === "solo" || fromParam === "multi"
+                ? `/settings/feedback?from=${fromParam}`
+                : "/settings/feedback"
+            }
+          />
         </div>
       </SettingsSection>
 
