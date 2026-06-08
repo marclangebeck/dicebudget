@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **Spielanalyse: Punkte-Duell-Graphik (Multi):** Nach Multi-Spielen zeigt die Analyse einen SVG-Verlauf der Gesamtpunkte von Spieler 1 vs. Spieler 2 (Session-Reihenfolge) — Führungswechsel und farbige Linien im Koordinatensystem. Backend: `scoreProgression` in `GET /sessions/invite/:code/match-analysis` (Feld `scoredSequence` pro Eintrag)
 - **Spielanalyse-Coaching (Multi):** Regelbasierte Auswertung mit Narrative (Sieg/Niederlage), Stärken/Schwächen, Pool-Report (Strategy), Feld-Differenzen, bis zu 3 Tipps; UI im dunklen App-Dashboard-Design mit klaren Sektionen (Warum · Profil · Pool · Felder · Nächstes Mal · Details)
 - **Einstellungen: Rücknavigation** — Von `/solo` und `/multi` öffnet „Einstellungen“ mit `?from=solo|multi`; auf `/settings` erscheint „Zurück zu Einzelspiel/Multiplayer“ statt Umweg über den Startscreen
 - **Spiel-Feedback (Erfolgs-Overlays + Sound):** Einheitliches `AchievementOverlay` bei Bonus, unterer Spalte voll, Große Straße (40 Pkt.) und Yatzy (50 Pkt.) — typabhängige Farben, Konfetti, Würfel-Motive; synthetisierte Web-Audio-Sounds; Toggle „Spiel-Feedback“ in Einstellungen (ersetzt „Bonus-Einblendung“)
@@ -38,6 +39,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Erfolg teilen:** Screenshot-freundliche Share-Karte mit App-Branding; Share-Leiste (WhatsApp, Instagram Story, System-Teilen) auf **Erfolgs-Overlays**, **Abschluss-Screen**, **Spielanalyse**, **Paarungs-Bilanz** (`/stats/pairing`), **Startscreen-Bilanz** und **iPad-Tischmodus-Duell** (inkl. Spielanalyse im Tischmodus)
 
 ### Changed
+- **Spiel-Feedback Gaming-Politur II:** Deutlich reichere Erfolgs-Overlays (Aurora-Hintergrund, Schockwellen, Orbit-Partikel, typ-spezifische Szenen: Münzregen/Bonus, Hex-Grid/unten voll, Blitze/Große Straße, Jackpot-Strahlen + Krone/Alle Fünfe) und aufwändigere Web-Audio (Shimmer-Arpeggios, Power-Up-Kaskaden, Jackpot-Fanfare)
 - **Markenwort „Yatzy“ entfernt:** Nutzer-sichtbare Texte heißen jetzt **Alle Fünfe** (Zettelzeile, Eintrag, Zusatz-Bonus, Spiel-Feedback, Spielanalyse/Coaching, Fehlermeldungen)
 - **Spiel-Feedback Gaming-Politur:** Erfolgs-Overlays im dunklen Dashboard-Look (Glas-Karte, Gold-Kicker, typ-spezifische Szenen: obere Sektion-Slots, Ring-Siegel, Combo-Würfelkette, Alle-Fünfe-Shake/Flash); Layered Web-Audio mit Riser, Kicks, Stereo-Panning und Noise-Bursts; „Außerhalb tippen zum Schließen“
 - **Bonus-Einblendung → Spiel-Feedback:** Einstellungs-Toggle steuert jetzt alle Erfolgs-Animationen und Sounds (lokal, gleicher Storage-Key)

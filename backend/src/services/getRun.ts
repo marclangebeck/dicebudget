@@ -90,6 +90,7 @@ export async function getRunById(runId: string) {
           fieldType: field.fieldType,
           score: field.score,
           rollsUsed: field.rollsUsed,
+          scoredSequence: field.scoredSequence,
           yatzyDieValue: field.yatzyDieValue,
           rolls: field.rolls.map((roll) => ({
             id: roll.id,

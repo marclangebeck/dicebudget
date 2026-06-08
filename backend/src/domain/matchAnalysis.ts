@@ -5,11 +5,16 @@ import {
 } from "./gameScoring.js";
 import { FIELD_TYPES_PER_GAME, type FieldTypeId } from "./fieldTypes.js";
 import { buildMatchCoaching, type MatchCoachingReport } from "./matchCoaching.js";
+import {
+  buildHeadToHeadScoreProgression,
+  type ScoreProgression,
+} from "./scoreProgression.js";
 
 export type AnalysisField = {
   fieldType: string;
   score: number | null;
   rollsUsed: number;
+  scoredSequence?: number | null;
   yatzyDieValue?: number | null;
 };
 
@@ -117,7 +122,11 @@ export type MatchAnalysisResult = {
   /** Metriken aller Teilnehmer in Session-Reihenfolge. */
   allPlayers: PlayerRunMetrics[];
   coaching: MatchCoachingReport;
+  /** Punkteverlauf Spieler 1 vs. Spieler 2 (Session-Reihenfolge), nur Multi. */
+  scoreProgression: ScoreProgression | null;
 };
+
+export type { ScoreProgression, ScoreProgressionPoint } from "./scoreProgression.js";
 
 export type { MatchCoachingReport } from "./matchCoaching.js";
 
@@ -497,7 +506,25 @@ function emptyMultiShell(viewer: PlayerRunMetrics, allPlayers: PlayerRunMetrics[
     ranking: [],
     comparisons: [],
     allPlayers,
+    scoreProgression: null,
   };
+}
+
+function buildSessionScoreProgression(
+  participants: AnalysisParticipant[],
+): ScoreProgression | null {
+  const ordered = [...participants].sort((a, b) => a.orderIndex - b.orderIndex);
+  const playerA = ordered[0];
+  const playerB = ordered[1];
+  if (!playerA || !playerB) return null;
+  return buildHeadToHeadScoreProgression(
+    playerA.run,
+    playerB.run,
+    playerA.playerId,
+    playerA.playerName,
+    playerB.playerId,
+    playerB.playerName,
+  );
 }
 
 export function buildMatchAnalysis(input: {
@@ -545,6 +572,7 @@ export function buildMatchAnalysis(input: {
         viewer,
         viewerRun,
       }),
+      scoreProgression: null,
     };
   }
 
@@ -589,6 +617,7 @@ export function buildMatchAnalysis(input: {
       coaching: soloRun
         ? buildMatchCoaching({ mode: "solo", viewer, viewerRun: soloRun })
         : EMPTY_COACHING,
+      scoreProgression: null,
     };
   }
 
@@ -669,6 +698,8 @@ export function buildMatchAnalysis(input: {
           pointsBehindLeader,
         });
 
+  const scoreProgression = buildSessionScoreProgression(participants);
+
   return {
     mode: "multi",
     ready: true,
@@ -687,5 +718,6 @@ export function buildMatchAnalysis(input: {
     insights,
     allPlayers,
     coaching,
+    scoreProgression,
   };
 }

@@ -21,6 +21,10 @@ const STRAIGHT_DICE = [2, 3, 4, 5, 6] as const;
 const UPPER_DICE = [1, 2, 3, 4, 5, 6] as const;
 const CONFETTI_SHAPES = ["rect", "star", "pip"] as const;
 
+const SCENE_SPARK_COUNT = 18;
+const ORBIT_COUNT = 10;
+const COIN_COUNT = 14;
+
 export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: Props) {
   const visual = achievementVisual(type, gameIndex);
   const confettiCount = ACHIEVEMENT_CONFETTI_COUNT[type];
@@ -41,6 +45,42 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
     [confettiCount, visual.confettiColors],
   );
 
+  const sceneSparks = useMemo(
+    () =>
+      Array.from({ length: SCENE_SPARK_COUNT }, (_, i) => ({
+        left: 8 + Math.random() * 84,
+        top: 10 + Math.random() * 72,
+        delay: (i % 5) * 0.12 + Math.random() * 0.5,
+        size: 3 + Math.random() * 5,
+        drift: Math.round((Math.random() - 0.5) * 60),
+      })),
+    [],
+  );
+
+  const orbitSparks = useMemo(
+    () =>
+      Array.from({ length: ORBIT_COUNT }, (_, i) => ({
+        delay: i * 0.07,
+        radius: 7.5 + (i % 3) * 1.2,
+        duration: 2.4 + (i % 4) * 0.35,
+      })),
+    [],
+  );
+
+  const coins = useMemo(
+    () =>
+      type === "bonus"
+        ? Array.from({ length: COIN_COUNT }, (_, i) => ({
+            left: 12 + ((i * 17) % 76) + Math.random() * 8,
+            delay: 0.1 + (i % 4) * 0.08 + Math.random() * 0.45,
+            duration: 1.4 + Math.random() * 0.9,
+            size: 0.55 + Math.random() * 0.45,
+            spin: Math.round(Math.random() * 360),
+          }))
+        : [],
+    [type],
+  );
+
   const yatzyFace =
     yatzyDieValue !== null &&
     yatzyDieValue !== undefined &&
@@ -56,7 +96,90 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
       aria-live="polite"
       onClick={onClose}
     >
-      {type === "yatzy" && <div className="achievement-flash" aria-hidden />}
+      <div className="achievement-scene" aria-hidden>
+        <div className="achievement-scene-aurora" />
+        <div className="achievement-scene-vignette" />
+        {sceneSparks.map((spark, i) => (
+          <span
+            key={`spark-${i}`}
+            className="achievement-scene-spark"
+            style={
+              {
+                left: `${spark.left}%`,
+                top: `${spark.top}%`,
+                width: `${spark.size}px`,
+                height: `${spark.size}px`,
+                animationDelay: `${spark.delay}s`,
+                "--spark-drift": `${spark.drift}px`,
+              } as React.CSSProperties
+            }
+          />
+        ))}
+      </div>
+
+      <div className="achievement-edge-glow" aria-hidden />
+      <div className="achievement-shockwave achievement-shockwave--1" aria-hidden />
+      <div className="achievement-shockwave achievement-shockwave--2" aria-hidden />
+
+      {type === "yatzy" && (
+        <>
+          <div className="achievement-flash" aria-hidden />
+          <div className="achievement-jackpot-rays" aria-hidden>
+            {Array.from({ length: 16 }, (_, i) => (
+              <span
+                key={i}
+                className="achievement-jackpot-ray"
+                style={{ "--ray-i": i } as React.CSSProperties}
+              />
+            ))}
+          </div>
+        </>
+      )}
+
+      {type === "large_straight" && (
+        <div className="achievement-lightning-bolts" aria-hidden>
+          {Array.from({ length: 3 }, (_, i) => (
+            <span
+              key={i}
+              className="achievement-lightning-bolt"
+              style={{ "--bolt-i": i } as React.CSSProperties}
+            />
+          ))}
+        </div>
+      )}
+
+      {type === "lower_complete" && (
+        <div className="achievement-hex-grid" aria-hidden>
+          {Array.from({ length: 12 }, (_, i) => (
+            <span
+              key={i}
+              className="achievement-hex-cell"
+              style={{ "--hex-i": i } as React.CSSProperties}
+            />
+          ))}
+        </div>
+      )}
+
+      {type === "bonus" && (
+        <div className="achievement-coin-fountain" aria-hidden>
+          {coins.map((coin, i) => (
+            <span
+              key={i}
+              className="achievement-coin"
+              style={
+                {
+                  left: `${coin.left}%`,
+                  animationDelay: `${coin.delay}s`,
+                  animationDuration: `${coin.duration}s`,
+                  width: `${coin.size}rem`,
+                  height: `${coin.size}rem`,
+                  "--coin-spin": `${coin.spin}deg`,
+                } as React.CSSProperties
+              }
+            />
+          ))}
+        </div>
+      )}
 
       <div className="achievement-confetti" aria-hidden>
         {confetti.map((c, i) => (
@@ -79,8 +202,24 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
         ))}
       </div>
 
+      <div className="achievement-orbit" aria-hidden>
+        {orbitSparks.map((orbit, i) => (
+          <span
+            key={i}
+            className="achievement-orbit-spark"
+            style={
+              {
+                animationDelay: `${orbit.delay}s`,
+                animationDuration: `${orbit.duration}s`,
+                "--orbit-radius": `${orbit.radius}rem`,
+              } as React.CSSProperties
+            }
+          />
+        ))}
+      </div>
+
       <div className="achievement-burst" aria-hidden>
-        {Array.from({ length: 12 }, (_, i) => (
+        {Array.from({ length: 16 }, (_, i) => (
           <span
             key={i}
             className="achievement-burst-ray"
@@ -93,6 +232,12 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
         className="achievement-overlay-card achievement-share-frame relative z-10 text-center"
         onClick={(e) => e.stopPropagation()}
       >
+        {type === "yatzy" && (
+          <div className="achievement-crown" aria-hidden>
+            <span className="achievement-crown-gem" />
+          </div>
+        )}
+
         <div className="achievement-share-brand" aria-hidden>
           <img src="/apple-touch-icon.png" alt="" className="achievement-share-brand-icon" />
           <span className="achievement-share-brand-name">{APP_NAME}</span>
@@ -142,6 +287,15 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
               ))}
             </div>
             <div className="achievement-combo-line" aria-hidden />
+            <div className="achievement-combo-sparks" aria-hidden>
+              {STRAIGHT_DICE.map((_, i) => (
+                <span
+                  key={i}
+                  className="achievement-combo-spark"
+                  style={{ "--spark-i": i } as React.CSSProperties}
+                />
+              ))}
+            </div>
           </>
         )}
 
@@ -155,6 +309,7 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
               />
             ))}
             <span className="achievement-lower-ring-core">✓</span>
+            <span className="achievement-lower-ring-pulse" />
           </div>
         )}
 

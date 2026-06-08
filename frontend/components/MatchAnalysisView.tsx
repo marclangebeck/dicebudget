@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { ScoreProgressionChart } from "@/components/ScoreProgressionChart";
 import { ShareActionBar } from "@/components/ShareActionBar";
 import { fieldLabelForAnalysis } from "@/lib/matchAnalysis";
 import {
@@ -300,6 +301,15 @@ export function MatchAnalysisView({
         buildImage={buildShareImage}
         prominent
       />
+
+      {analysis.mode === "multi" && analysis.scoreProgression && (
+        <Panel kicker="Verlauf" title="Punkte-Duell">
+          <ScoreProgressionChart
+            progression={analysis.scoreProgression}
+            highlightPlayerId={sessionMeta?.viewerPlayerId}
+          />
+        </Panel>
+      )}
 
       {(hasCoaching || analysis.insights.length > 0) && (
         <Panel kicker="Auswertung" title="Warum so?">

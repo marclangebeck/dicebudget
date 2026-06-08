@@ -49,6 +49,7 @@ function runDtoToAnalysisRun(run: NonNullable<Awaited<ReturnType<typeof getRunBy
         fieldType: field.fieldType,
         score: field.score,
         rollsUsed: field.rollsUsed,
+        scoredSequence: field.scoredSequence,
         yatzyDieValue: field.yatzyDieValue,
       })),
     })),

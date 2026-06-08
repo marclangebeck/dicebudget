@@ -110,6 +110,23 @@ export type MatchCoachingDto = {
   fieldComparison: FieldComparisonCellDto[];
 };
 
+export type ScoreProgressionPointDto = {
+  turn: number;
+  playerAScore: number;
+  playerBScore: number;
+  leader: "a" | "b" | "tie";
+};
+
+export type ScoreProgressionDto = {
+  playerAId: string;
+  playerAName: string;
+  playerBId: string;
+  playerBName: string;
+  points: ScoreProgressionPointDto[];
+  finalLeader: "a" | "b" | "tie";
+  leadChanges: number;
+};
+
 export const EMPTY_MATCH_COACHING: MatchCoachingDto = {
   narrative: "",
   playStyle: null,
@@ -138,6 +155,7 @@ export type MatchAnalysisDto = {
   insights: string[];
   allPlayers: PlayerRunMetricsDto[];
   coaching?: MatchCoachingDto;
+  scoreProgression?: ScoreProgressionDto | null;
 };
 
 export type SessionMatchAnalysisDto = MatchAnalysisDto & {
