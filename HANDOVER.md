@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `cb101f6` (Yatzy-Markierung + Zusatz-Yatzy mit Würfelwahl)  
+**Produktcode-HEAD:** `3c03592` (Spielanalyse-Coaching + Spiel-Feedback + Einstellungen-Rücknavigation)  
 **Sprache:** Deutsch
 
 Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milestones_active.md`. iOS/App Store: `docs/ios_current.md`. Dauerhafte Projektentscheidungen nur bei Bedarf: `docs/decisions.md`.
@@ -18,7 +18,7 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 - Agent arbeitet nur auf dem Server unter `/home/bottleadmin/projects/kniffel`.
 - Mac-Pfad des Nutzers: `/Users/marclangebeck/projects/kniffel`.
 - Reine Frontend-Änderungen: auf dem Server genügt `cd frontend && npm run build`; Nginx liefert `frontend/out/` direkt aus.
-- Backend-Neustart/Migration: Nutzer per SSH auf dem Server mit `sudo bash …/deploy-backend-prod.sh` — **nicht** mit Mac-Pfad `/home/bottleadmin/…`.
+- Backend-Neustart: Nutzer per SSH auf dem Server mit `sudo bash …/deploy-backend-prod.sh` — **nicht** mit Mac-Pfad `/home/bottleadmin/…`.
 
 ## Aktueller Stand
 
@@ -26,48 +26,47 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
 | Branch | `milestone-22-prep` |
-| Produktcode | HEAD `cb101f6`; Frontend `out/` gebaut; **Backend-Deploy** für Zusatz-Yatzy-Migration + geänderten Endpunkt durch Nutzer (siehe unten) |
-| Backend | Migrationen `20260605120000_pairing_stats_yatzy_die`, **`20260608120000_extra_yatzy_die_values`**; `finalize-stats`, `GET /sessions/invite/:code/match-analysis`; `POST /runs/:id/extra-yatzy` mit `{ yatzyDieValue }` |
+| Produktcode | HEAD `3c03592`; Frontend `out/` gebaut; **Backend-Deploy** für Coaching-API + ggf. Yatzy-Migration durch Nutzer (siehe unten) |
+| Backend | `finalize-stats`, `GET /sessions/invite/:code/match-analysis` inkl. **`coaching`**; `POST /runs/:id/extra-yatzy` mit `{ yatzyDieValue }`; Migration `extra_yatzy_die_values` |
 | iOS/TestFlight | Version `2.0`, aktueller Build `2.0 (21)`, nächster Upload `2.0 (22)` |
-| Noch nicht in iOS `2.0 (21)` | **Yatzy-Miniwürfel / Zusatz-Yatzy-Würfelwahl** (`cb101f6`) |
+| Noch nicht in iOS `2.0 (21)` | Yatzy-Miniwürfel, Zusatz-Yatzy-Würfelwahl, **Spiel-Feedback**, **Spielanalyse-Coaching**, Einstellungen-Rücknavigation (alles seit `48a65f1` / `3c03592`) |
 
-## Neu Seit Letzter Übergabe (2026-06-08)
+## Neu Seit Letzter Übergabe (2026-06-08, `3c03592`)
 
-- **Yatzy-Markierung auf dem Zettel:** Nach Yatzy (50 Punkte) erscheinen neben dem Feld-Würfel **Mini-Würfel** (50 % Höhe) mit der gewählten Augenzahl. Ab dem 6. Yatzy pro Augenzahl **Umbruch** (max. 5 pro Zeile), damit nichts in die Wertespalten ragt. `DiceFace` mit Größen `field` / `mini`.
-- **Zusatz-Yatzy (+100):** Beim **+** neben „Yatzy“ Würfelwahl (1–6) vor dem Bonus; Augenzahl wird gespeichert und in der Markierung mitgezählt. Backend: `games.extra_yatzy_die_values` (JSON-Array, Migration `20260608120000`). API: `POST /runs/:id/extra-yatzy` erfordert `yatzyDieValue`. Solo lokal analog in `localSoloRun.ts`.
-- **Zusatz-Yatzy-Auswahl sichtbar:** Popover per **Portal** (`ExtraYatzyPickerOverlay`) — Fix für Abschneiden durch `overflow: hidden` und `FitScoreSheet`-Skalierung.
+- **Spielanalyse-Coaching (Multi + Solo):** Regelbasierte Auswertung — Narrative (Sieg/Niederlage/Platz), Stärken/Schwächen, Pool-Report (Strategy), Feld-Differenzen, bis zu 3 Tipps. Backend: `backend/src/domain/matchCoaching.ts`, Feld `coaching` in Match-Analysis-API. UI: `MatchAnalysisView` im dunklen App-Dashboard-Design (Sektionen Warum · Profil · Pool · Felder · Nächstes Mal · Details).
+- **Spiel-Feedback:** `AchievementOverlay` bei Bonus, unterer Spalte voll, Große Straße, Yatzy — mit synthetisierten Web-Audio-Sounds. Toggle **„Spiel-Feedback“** in Einstellungen (ersetzt „Bonus-Einblendung“). Solo, Multi und iPad-Tischmodus.
+- **Einstellungen-Rücknavigation:** Von `/solo` und `/multi` → `/settings?from=solo|multi` → „Zurück zu Einzelspiel/Multiplayer“.
 
-## Bereits Vorher (Spielanalyse 2026-06-06, `d00059f`)
+## Bereits Vorher (Yatzy-UX, `cb101f6`)
 
-- Spielanalyse optional nach Multi/Solo-Abschluss und unter `/stats/pairing`; 2P Head-to-Head, 3–6P Ranking + Direktvergleiche, Solo lokal.
-- Multi `maxPlayers` Default 2, Cap 2–6; kein Wartesaal.
+- Yatzy-Miniwürfel (50 % Höhe), Umbruch ab 6. gleicher Augenzahl; Zusatz-Yatzy mit Würfelwahl (+100); Portal-Popover `ExtraYatzyPickerOverlay`.
+- Migration `20260608120000_extra_yatzy_die_values`.
 
-## Bereits Vorher (Spiel-UX Juni 2026)
+## Bereits Vorher (Spielanalyse Basis, `d00059f`)
 
-- Werten/Nicht werten, Yatzy-Würfel-Abfrage beim Eintrag, dunkle Ergebniszeilen, Settings-Gruppen, Toggles `.app-toggle`, Start-Icons +75 %.
-- Fix `finalize-stats`: Einzelspieler-Multi-Räume, 409 statt 500 bei Blockade.
+- Optionale Analyse nach Spielende und unter `/stats/pairing`; 2P Head-to-Head, 3–6P Ranking + Direktvergleiche, Solo lokal.
 
 ## Bekanntes UX-Thema (offen)
 
 - **Pool-Endspiel + Statistik-Toggle:** Nicht-Sieger müssen ggf. **Aktualisieren** tippen, bevor Abschluss-Screen mit Toggle erscheint.
 - **iPad-Tischmodus:** Spielanalyse am Finish-Flow noch nicht in `TableModePlayBoard` eingebunden.
+- **Multi-Coaching live:** Volles Coaching nach Multi-Spielende erst nach **Backend-Deploy** (`coaching` in API); Solo-Coaching läuft clientseitig sofort.
 
 ## Wichtige Dateien
 
-- `frontend/components/ScoreSheetTable.tsx`, `DiceFace.tsx`, `YatzyDiePicker.tsx`, `ExtraYatzyPickerOverlay.tsx`
-- `frontend/components/ScoreEntryPanel.tsx`, `PlayBoard.tsx`, `TableModePlayBoard.tsx`
-- `frontend/lib/localSoloRun.ts`, `frontend/lib/api.ts`
-- `backend/src/services/playField.ts`, `backend/src/routes/runs.ts`, `backend/src/domain/extraYatzyDieValues.ts`
-- `backend/prisma/migrations/20260608120000_extra_yatzy_die_values/`
-- `frontend/components/MatchAnalysisView.tsx` — Spielanalyse
-- `backend/src/domain/matchAnalysis.ts`, `backend/src/services/matchAnalysisService.ts`
+- `frontend/components/MatchAnalysisView.tsx`, `frontend/lib/matchCoaching.ts`, `frontend/lib/matchAnalysisTypes.ts`
+- `backend/src/domain/matchCoaching.ts`, `backend/src/domain/matchAnalysis.ts`
+- `frontend/components/AchievementOverlay.tsx`, `frontend/lib/achievementFeedback.ts`, `frontend/lib/achievementSound.ts`
+- `frontend/lib/settingsReturn.ts`, `frontend/app/settings/page.tsx`, `frontend/components/GameSetup.tsx`, `frontend/app/multi/page.tsx`
+- `frontend/components/ScoreSheetTable.tsx`, `DiceFace.tsx`, `ExtraYatzyPickerOverlay.tsx`
+- `frontend/components/PlayBoard.tsx`, `TableModePlayBoard.tsx`, `RunFinishScreen.tsx`
 - `CHANGELOG.md`, `docs/milestones_active.md`, `docs/ios_current.md`
 
 ## Offene Prioritäten
 
-1. **Backend deployen** (Migration `extra_yatzy_die_values` + geänderter `extra-yatzy`-Endpunkt): Nutzer per SSH `sudo bash …/deploy-backend-prod.sh`.
-2. iOS-Build `2.0 (22)` auf dem Mac (Yatzy-Miniwürfel + Zusatz-Yatzy-Würfelwahl seit `cb101f6`).
-3. TestFlight `2.0 (22)`: Yatzy-Markierung, Zusatz-Yatzy-Würfelwahl; Regression in `2.0 (21)` (Spielanalyse, Multi-Abschluss, Pool-Endspiel, Footer/`/play`).
+1. **Backend deployen** (Coaching-API + ggf. Yatzy-Migration): Nutzer per SSH `sudo bash …/deploy-backend-prod.sh`.
+2. iOS-Build **`2.0 (22)`** auf dem Mac (alles seit `2.0 (21)`).
+3. TestFlight: Spiel-Feedback, Coaching-Analyse, Yatzy-Miniwürfel, Einstellungen-Rücknavigation, Regression Footer/`/play`, Multi-Abschluss.
 4. Optional: Pool-Endspiel Auto-Refresh; Spielanalyse iPad-Tischmodus.
 5. App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
 
@@ -108,15 +107,15 @@ Wichtige Regeln:
 
 Aktueller Kurzstand:
 - Branch: milestone-22-prep
-- Produktcode-HEAD: cb101f6 (Yatzy-Miniwürfel, Zusatz-Yatzy mit Würfelwahl, Portal-Popover)
+- Produktcode-HEAD: 3c03592 (Spielanalyse-Coaching, Spiel-Feedback, Einstellungen-Rücknavigation)
 - Web/API live: https://dicebudget.bottle-trade.de
 - iOS: Version 2.0, TestFlight 2.0 (21), nächster Upload 2.0 (22)
-- Backend: finalize-stats; GET /sessions/invite/:code/match-analysis; POST /runs/:id/extra-yatzy mit yatzyDieValue; Migration extra_yatzy_die_values
-- Yatzy: Mini-Würfel neben Feld-Würfeln (50% Höhe), max. 5 pro Zeile dann Umbruch; + bei Yatzy mit Würfelwahl (+100)
-- Spielanalyse: optional nach Spielende und unter /stats/pairing; 2P/3–6P/Solo
-- Multi maxPlayers: Default 2, Cap 2–6; kein Wartesaal; Werten/Nicht werten
-- Pool-Endspiel: Nicht-Sieger ggf. Aktualisieren nötig (bekanntes UX-Thema)
-- Backend-Neustart (bei Backend-Änderung / Migration): Nutzer per SSH:
+- Spielanalyse-Coaching: Narrative, Stärken/Schwächen, Pool-Report, Tipps; API-Feld coaching (Multi nach Backend-Deploy; Solo clientseitig)
+- Spiel-Feedback: AchievementOverlay + Sound bei Bonus, untere Spalte, Große Straße, Yatzy; Toggle Spiel-Feedback
+- Yatzy: Mini-Würfel, Zusatz-Yatzy-Würfelwahl (+100), Portal-Popover
+- Einstellungen: ?from=solo|multi → Zurück zu Einzelspiel/Multiplayer
+- Multi: maxPlayers Default 2, Cap 2–6; Werten/Nicht werten; Pool-Endspiel (Nicht-Sieger ggf. Aktualisieren)
+- Backend-Neustart (bei Backend-Änderung): Nutzer per SSH:
   sudo bash /home/bottleadmin/projects/kniffel/infra/scripts/deploy-backend-prod.sh
   (Nicht auf dem Mac mit /home/bottleadmin/… ausführen.)
 

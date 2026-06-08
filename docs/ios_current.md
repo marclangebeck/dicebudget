@@ -2,7 +2,7 @@
 
 **Stand:** 2026-06-08
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `cb101f6`
+**Produktcode-HEAD:** `3c03592`
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-/App-Store-Stand. Aeltere iOS-Historie steht in `docs/ios_archive.md`.
@@ -18,10 +18,11 @@ Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-
 
 ## Was In 2.0 (22) Enthalten Sein Muss
 
-- Yatzy-Markierung als Mini-Würfel (50 % Feldhöhe) neben dem passenden Feld-Würfel; ab 6. Yatzy pro Augenzahl Umbruch (max. 5 pro Zeile).
-- Zusatz-Yatzy (+100): Würfelwahl (1–6) vor dem Bonus; Augenzahl in `games.extra_yatzy_die_values`.
-- Popover-Auswahl per Portal (`ExtraYatzyPickerOverlay`).
-- Backend: Migration `extra_yatzy_die_values`, `POST /runs/:id/extra-yatzy` mit `{ yatzyDieValue }` (nach Nutzer-Deploy auf Server).
+- Yatzy-Markierung als Mini-Würfel (50 % Feldhöhe); Zusatz-Yatzy mit Würfelwahl (+100); Portal-Popover.
+- Spiel-Feedback: Erfolgs-Overlays + Sound (Bonus, untere Spalte, Große Straße, Yatzy).
+- Spielanalyse-Coaching: Narrative, Stärken/Schwächen, Pool-Report, Tipps (Multi nach Backend-Deploy).
+- Einstellungen-Rücknavigation von Solo/Multi.
+- Backend: Migration `extra_yatzy_die_values` (falls noch nicht deployed), Coaching-API.
 
 ## Bereits In 2.0 (21)
 

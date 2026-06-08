@@ -2,7 +2,7 @@
 
 **Stand:** 2026-06-08  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `cb101f6`  
+**Produktcode-HEAD:** `3c03592`  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -19,7 +19,7 @@ Technische Basis ist erledigt:
 - Native App startet direkt auf `/app`.
 - Native API-Basis zeigt auf `https://dicebudget.bottle-trade.de/api`.
 - TestFlight ist aktiv, aktueller Build ist `2.0 (21)`.
-- Naechster Upload ist `2.0 (22)` und muss **Yatzy-Miniwürfel / Zusatz-Yatzy-Würfelwahl** (`cb101f6`) enthalten.
+- Naechster Upload ist `2.0 (22)` und muss alles seit `2.0 (21)` enthalten: **Yatzy-Miniwürfel**, **Zusatz-Yatzy-Würfelwahl**, **Spiel-Feedback**, **Spielanalyse-Coaching**, **Einstellungen-Rücknavigation**.
 
 Offen:
 
@@ -32,6 +32,21 @@ Offen:
 Details: `docs/ios_current.md`.
 
 ## Letzte Abgeschlossene Milestones
+
+### Spielanalyse-Coaching + Spiel-Feedback 2026-06-08
+
+**Status:** erledigt im Produktcode (`3c03592`), Frontend gebaut; Backend-Deploy durch Nutzer fuer Multi-Coaching in API; noch nicht in iOS `2.0 (21)`.
+
+- **Coaching:** Narrative (Sieg/Niederlage), Stärken/Schwächen, Pool-Report (Strategy), Feld-Differenzen, bis zu 3 Tipps; UI-Sektionen im dunklen Dashboard-Look.
+- **Spiel-Feedback:** Erfolgs-Overlays + synthetische Sounds bei Bonus, unterer Spalte voll, Große Straße, Yatzy; Toggle „Spiel-Feedback“.
+- **Einstellungen:** Rücknavigation von Solo/Multi mit `?from=solo|multi`.
+
+Technische Hinweise:
+
+- `backend/src/domain/matchCoaching.ts`; API `coaching` in `GET /sessions/invite/:code/match-analysis`
+- `frontend/components/MatchAnalysisView.tsx`, `frontend/lib/matchCoaching.ts`
+- `frontend/components/AchievementOverlay.tsx`, `frontend/lib/achievementFeedback.ts`, `frontend/lib/achievementSound.ts`
+- `frontend/lib/settingsReturn.ts`
 
 ### Yatzy-Markierung und Zusatz-Yatzy 2026-06-08
 
@@ -217,7 +232,7 @@ Dateien:
 
 ## Offene Aufgaben
 
-1. **Backend deployen** (Migration `extra_yatzy_die_values`, falls Zusatz-Yatzy live noch fehlschlaegt).
+1. **Backend deployen** (Coaching-API + ggf. Migration `extra_yatzy_die_values`).
 2. iOS/TestFlight `2.0 (22)` bereitstellen (Yatzy-UX seit `cb101f6`).
 3. App Store Connect: Paid Applications Agreement, Bank/Steuer.
 4. Preis `1,19 EUR`, Screenshots, Beschreibung DE, Datenschutzfragebogen.

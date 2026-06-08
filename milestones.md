@@ -23,17 +23,17 @@ Nur bei Bedarf:
 ## Aktueller Kurzstand
 
 - Branch: `milestone-22-prep`
-- Produktcode-HEAD: `cb101f6`
+- Produktcode-HEAD: `3c03592`
 - Web/API live: https://dicebudget.bottle-trade.de
 - iOS: TestFlight `2.0 (21)`, naechster Upload `2.0 (22)`
-- M34 + M35 + UI-Politur + iPad-Tischmodus + Spiel-UX + Spielanalyse sind in TestFlight `2.0 (21)`.
-- Noch nicht im iOS-Build `2.0 (21)`: Yatzy-Miniwürfel / Zusatz-Yatzy-Würfelwahl (`cb101f6`).
+- In TestFlight `2.0 (21)`: M34, M35, UI-Politur, iPad-Tischmodus, Spiel-UX, Spielanalyse (Basis).
+- Noch nicht in iOS `2.0 (21)`: Yatzy-Miniwürfel, Zusatz-Yatzy, Spiel-Feedback, Coaching-Analyse, Einstellungen-Rücknavigation.
 
 ## Offene Prioritaeten
 
-1. iOS-Build `2.0 (22)` mit Yatzy-UX (`cb101f6`) hochladen.
-2. App Store Connect: Paid Agreement, Bank/Steuer, Preis `1,19 EUR`.
-3. Store-Metadaten und Datenschutzfragebogen abschliessen.
+1. Backend deployen (Coaching-API).
+2. iOS-Build `2.0 (22)` hochladen.
+3. App Store Connect: Paid Agreement, Bank/Steuer, Preis `1,19 EUR`.
 4. TestFlight auf iPhone und iPad pruefen.
 5. Optional: Stats-Reset-/Baseline-Endpunkte absichern.
 6. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main`.
