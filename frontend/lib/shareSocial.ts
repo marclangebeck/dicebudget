@@ -4,23 +4,6 @@ export function canUseWebShare(): boolean {
   return typeof navigator !== "undefined" && typeof navigator.share === "function";
 }
 
-export async function canShareImageFile(): Promise<boolean> {
-  if (!canUseWebShare() || !navigator.canShare) return false;
-  try {
-    const probe = new File([new Blob(["x"], { type: "image/png" })], "probe.png", {
-      type: "image/png",
-    });
-    return navigator.canShare({ files: [probe] });
-  } catch {
-    return false;
-  }
-}
-
-export function shareWhatsApp(text: string): void {
-  const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-  window.open(url, "_blank", "noopener,noreferrer");
-}
-
 export function downloadShareBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");

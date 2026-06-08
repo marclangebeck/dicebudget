@@ -14,7 +14,7 @@ import type { PairingSummaryDto } from "@/lib/pairingTypes";
 import { getOrCreatePlayerId, normalizePublicPlayerId, playerLabel } from "@/lib/playerIdentity";
 import { loadPlayerAliases, type PlayerAliasMap } from "@/lib/playerAliases";
 import type { StatsDto } from "@/lib/statsTypes";
-import { ShareImageButton } from "@/components/ShareImageButton";
+import { ShareActionBar } from "@/components/ShareActionBar";
 
 type NavTileProps = {
   href: string;
@@ -211,11 +211,12 @@ export function HomeBentoGrid() {
             <span>{recordTitle}</span>
             <div className="home-hero-record-head-end">
               <strong className="tabular-nums">{recordSummaryLabel}</strong>
-              <ShareImageButton
+              <ShareActionBar
                 shareSuffix="Bilanz"
                 filename="dicebudget-bilanz.png"
                 buildText={buildHomeShare}
                 buildImage={renderHomeShare}
+                compact
               />
             </div>
           </div>
