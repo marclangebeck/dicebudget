@@ -273,8 +273,8 @@ Dateien:
 
 ## Offene Aufgaben
 
-1. **Backend deployen** (Coaching-API + `scoreProgression` + Migration `extra_yatzy_die_values`).
-2. iOS/TestFlight `2.0 (22)` bereitstellen (Punkte-Duell, Gaming-Feedback II, Teilen, Alle-Fünfe-UX).
+1. **Backend deployen** (Coaching-API + `scoreProgression` + Migration `extra_yatzy_die_values`): Nutzer per SSH `sudo bash …/deploy-backend-prod.sh`.
+2. iOS/TestFlight `2.0 (22)` auf dem Mac bauen und hochladen (Punkte-Duell, Gaming-Feedback II, Teilen, Alle-Fünfe-UX); Mac-Workflow in `HANDOVER.md` und `docs/ios_current.md`.
 3. App Store Connect: Paid Applications Agreement, Bank/Steuer.
 4. Preis `1,19 EUR`, Screenshots, Beschreibung DE, Datenschutzfragebogen.
 5. TestFlight `2.0 (22)`: Punkte-Duell, Gaming-Feedback II, Teilen (Spielende/Bilanz), Alle-Fünfe-Branding; Footer/Pool/Multi in `2.0 (21)` regressionsprüfen.

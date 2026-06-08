@@ -31,8 +31,8 @@ Nur bei Bedarf:
 
 ## Offene Prioritaeten
 
-1. Backend deployen (Coaching-API).
-2. iOS-Build `2.0 (22)` hochladen.
+1. Backend deployen (Coaching-API + `scoreProgression` + Migration `extra_yatzy_die_values`).
+2. iOS-Build `2.0 (22)` auf dem Mac bauen und hochladen (Mac-Befehle in `HANDOVER.md` und `docs/ios_current.md`).
 3. App Store Connect: Paid Agreement, Bank/Steuer, Preis `1,19 EUR`.
 4. TestFlight auf iPhone und iPad pruefen.
 5. Optional: Stats-Reset-/Baseline-Endpunkte absichern.

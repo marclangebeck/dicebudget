@@ -6,7 +6,7 @@
 **Produktcode-HEAD:** `de0f8f2`  
 **Sprache:** Deutsch
 
-Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milestones_active.md`. iOS/App Store: `docs/ios_current.md`. Dauerhafte Projektentscheidungen nur bei Bedarf: `docs/decisions.md`.
+Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milestones_active.md`. iOS/TestFlight/App Store: `docs/ios_current.md`. Dauerhafte Projektentscheidungen nur bei Bedarf: `docs/decisions.md`.
 
 ## Verbindliche Regeln
 
@@ -33,34 +33,19 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 | iOS/TestFlight | Version `2.0`, Build `2.0 (21)`, nächster Upload `2.0 (22)` |
 | Noch nicht in iOS `2.0 (21)` | Alles seit `2.0 (21)`: Alle-Fünfe-UX, Gaming-Feedback II, Punkte-Duell-Graphik, Teilen-Vereinfachung, Coaching, Einstellungen-Rücknavigation |
 
-## Neu Seit Letzter Übergabe (2026-06-08)
+## Produktstand Seit TestFlight 2.0 (21)
 
-### Spielanalyse: Punkte-Duell-Graphik (`f2d061c`)
+Alle folgenden Features sind im Produktcode (`de0f8f2`) und Web-Frontend gebaut; warten auf iOS-Upload `2.0 (22)` und teils Backend-Deploy:
 
-- SVG-Verlauf Spieler 1 vs. Spieler 2 (Session-Reihenfolge) in der Multi-Spielanalyse.
-- Backend: `scoreProgression` in `GET /sessions/invite/:code/match-analysis` (benötigt `scoredSequence`, **Backend-Deploy**).
-- Dateien: `backend/src/domain/scoreProgression.ts`, `frontend/components/ScoreProgressionChart.tsx`, `MatchAnalysisView.tsx`.
-
-### Spiel-Feedback Gaming-Politur II (`f2d061c`)
-
-- Reichere Overlays: Aurora, Schockwellen, Orbit-Partikel, typ-spezifische Szenen (Münzregen, Hex-Grid, Blitze, Jackpot-Strahlen/Krone).
-- Aufwändigere Web-Audio (Shimmer, Power-Up-Kaskaden, Jackpot-Fanfare).
-- **Kein** Share in Overlays (Bonus, Ergebnis 2/unten voll, Große Straße, Alle Fünfe).
-
-### Teilen vereinfacht (`82e2a01` … `de0f8f2`)
-
-- Startscreen-Bilanz: kompakter **Teilen**-Button in der Bilanz-Zeile (nicht mehr volle Share-Leiste).
-- Teilen **nur** bei Spielende + Startscreen-Bilanz; entfernt aus Overlays, Spielanalyse, iPad-Duell, Paarungs-Detail.
-- WhatsApp/Instagram-Separat-Buttons entfernt (direkter App-Sprung mit Bild aus Web nicht zuverlässig); ein Button nutzt `navigator.share`.
-- Dateien: `ShareActionBar.tsx` (`compact` / `prominent`), `shareSocial.ts`, `HomeBentoGrid.tsx`, `RunFinishScreen.tsx`.
-
-## Bereits Vorher (Basis-Features, teils in Web live)
-
-- **Alle Fünfe (UI):** `labels.ts`, Coaching, Fehlermeldungen.
-- **Alle-Fünfe-UX:** Mini-Würfel, Zusatz-Würfelwahl (+100), Portal-Popover (`cb101f6`).
-- **Spielanalyse-Coaching:** Narrative, Stärken/Schwächen, Pool-Report, Tipps (`3c03592`; Multi live nach Backend-Deploy).
-- **Spiel-Feedback (Basis):** `AchievementOverlay` + Sound; Toggle „Spiel-Feedback“.
-- **Einstellungen-Rücknavigation:** `?from=solo|multi`.
+| Feature | Commit(s) | Backend-Deploy nötig |
+|---------|-----------|----------------------|
+| Alle-Fünfe-Miniwürfel, Zusatz-Würfelwahl (+100), Portal-Popover | `cb101f6` | Ja (`extra_yatzy_die_values`) |
+| Spielanalyse-Coaching | `3c03592` | Ja (`coaching` in API) |
+| Einstellungen-Rücknavigation `?from=solo\|multi` | `3c03592` | Nein |
+| Spiel-Feedback Gaming (Basis) | `a93e462` | Nein |
+| Alle-Fünfe-Branding, Erfolg teilen (Canvas) | `5f90ad8` | Nein |
+| Punkte-Duell-Graphik + Gaming-Feedback II | `f2d061c` | Ja (`scoreProgression`) |
+| Teilen vereinfacht (nur Spielende + Bilanz, System-Share) | `82e2a01` … `de0f8f2` | Nein |
 
 ## Bekanntes UX-Thema (offen)
 
@@ -78,11 +63,36 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 
 ## Offene Prioritäten
 
-1. **Backend deployen** (Coaching-API + `scoreProgression` + Migration `extra_yatzy_die_values`): Nutzer per SSH `sudo bash …/deploy-backend-prod.sh`.
-2. iOS-Build **`2.0 (22)`** auf dem Mac (alles seit `2.0 (21)`).
+1. **Backend deployen** (Coaching-API + `scoreProgression` + Migration `extra_yatzy_die_values`): Nutzer per SSH `sudo bash /home/bottleadmin/projects/kniffel/infra/scripts/deploy-backend-prod.sh`.
+2. **iOS-Build `2.0 (22)`** auf dem Mac (siehe Mac-Befehle unten und `docs/ios_current.md`).
 3. TestFlight: Punkte-Duell, Gaming-Feedback II, Teilen (Spielende/Bilanz), Alle-Fünfe-Branding, Mini-Würfel, Regression Footer/`/play`.
 4. Optional: Pool-Endspiel Auto-Refresh.
 5. App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
+
+## Mac: iOS-Build 2.0 (22)
+
+```bash
+cd /Users/marclangebeck/projects/kniffel
+git pull origin milestone-22-prep
+```
+
+Bei Konflikt in der Xcode-Projektdatei:
+
+```bash
+git restore frontend/ios/App/App.xcodeproj/project.pbxproj
+git pull origin milestone-22-prep
+```
+
+Build und Xcode:
+
+```bash
+cd /Users/marclangebeck/projects/kniffel/frontend
+npm run build:ios
+brew unlink rsync
+env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
+```
+
+In Xcode: Team prüfen, Build-Nummer **22**, **Any iOS Device** → **Product → Archive** → Upload.
 
 ## Pflicht-Lesereihenfolge
 
@@ -134,6 +144,19 @@ Aktueller Kurzstand:
 - Backend-Neustart (bei Backend-Änderung): Nutzer per SSH:
   sudo bash /home/bottleadmin/projects/kniffel/infra/scripts/deploy-backend-prod.sh
   (Nicht auf dem Mac mit /home/bottleadmin/… ausführen.)
+
+Mac iOS-Build 2.0 (22):
+cd /Users/marclangebeck/projects/kniffel && git pull origin milestone-22-prep
+cd frontend && npm run build:ios && brew unlink rsync
+env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
+(Xcode: Build-Nummer 22, Archive, Upload)
+
+Offene Prioritäten:
+1. Backend deployen (Coaching + scoreProgression + Migration extra_yatzy_die_values)
+2. iOS TestFlight 2.0 (22) bauen und hochladen
+3. TestFlight-Regression (Footer, /play, Pool-Endspiel, neue Features)
+4. Optional: Pool-Endspiel Auto-Refresh
+5. App Store Connect (Agreement, Bank/Steuer, Preis 1,19 EUR)
 
 Auftrag:
 <hier konkrete Aufgabe einfügen>
