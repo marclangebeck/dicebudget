@@ -2,7 +2,7 @@
 
 **Stand:** 2026-06-08  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `80892e5`  
+**Produktcode-HEAD:** `5f90ad8`  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -35,7 +35,7 @@ Details: `docs/ios_current.md`.
 
 ### Erfolg teilen + Alle-Fünfe-Branding 2026-06-08
 
-**Status:** erledigt im Produktcode (`80892e5`), Frontend gebaut; Backend-Deploy fuer Coaching-/Fehlertexte durch Nutzer; noch nicht in iOS `2.0 (21)`.
+**Status:** erledigt im Produktcode (`5f90ad8`), Frontend gebaut; Backend-Deploy fuer Coaching-/Fehlertexte durch Nutzer; noch nicht in iOS `2.0 (21)`.
 
 - **Erfolg teilen:** Canvas-Share-Karte mit App-Branding; WhatsApp, Instagram Story (Bild), System-Teilen auf Erfolgs-Overlays, Abschluss-Screen, Spielanalyse, Paarungs-Bilanz, Startscreen-Bilanz, iPad-Tischmodus-Duell.
 - **Alle Fünfe (UI):** Nutzer-sichtbare Texte statt „Yatzy“ (Zettel, Eintrag, Zusatz-Bonus, Feedback, Analyse/Coaching, Fehlermeldungen); technische IDs unveraendert.

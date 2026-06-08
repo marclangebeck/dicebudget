@@ -2,7 +2,7 @@
 
 **Stand:** 2026-06-08
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `80892e5`
+**Produktcode-HEAD:** `5f90ad8`
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-/App-Store-Stand. Aeltere iOS-Historie steht in `docs/ios_archive.md`.

@@ -23,7 +23,7 @@ Nur bei Bedarf:
 ## Aktueller Kurzstand
 
 - Branch: `milestone-22-prep`
-- Produktcode-HEAD: `80892e5`
+- Produktcode-HEAD: `5f90ad8`
 - Web/API live: https://dicebudget.bottle-trade.de
 - iOS: TestFlight `2.0 (21)`, naechster Upload `2.0 (22)`
 - In TestFlight `2.0 (21)`: M34, M35, UI-Politur, iPad-Tischmodus, Spiel-UX, Spielanalyse (Basis).

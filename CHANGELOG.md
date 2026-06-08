@@ -73,7 +73,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - (zuvor, Version 2.0) Build **6** — vor M34-Fixes · (Version 1.0) Build **18** — M33 + Würfe-Standard 3 · **17** — M31 + M32 · **16** — M29 + M30 · **15** — M29
 
 ### Docs
-- HANDOVER, docs/milestones_active, docs/ios_current, GOiOS, milestones, projektbeschreibung: Übergabe auf HEAD **`80892e5`** (Share, Alle-Fünfe-Branding, Gaming-Politur); neuer Übergabeprompt
+- HANDOVER, docs/milestones_active, docs/ios_current, GOiOS, milestones, projektbeschreibung: Übergabe auf HEAD **`5f90ad8`** (Share, Alle-Fünfe-Branding, Gaming-Politur); neuer Übergabeprompt
 - HANDOVER, docs/milestones_active, docs/ios_current, GOiOS, milestones, CHANGELOG: TestFlight-Stand auf **2.0 (21)** aktualisiert; nächster Upload **2.0 (22)** (Yatzy-UX seit `cb101f6`)
 - HANDOVER, docs/milestones_active, docs/ios_current, CHANGELOG: Stand 2026-06-04 — zentraler Footer für Home/Setup/Play, dunkles Grau als App-Hintergrund, kompakter iPhone-Footer ohne Safe-Area-Abstand, zentrale `/settings`-Seite und Startscreen mit `Multiplayer`, `Einzelspiel`, `Statistik`, `Einstellungen`; iOS-Upload 2.0 (7) enthält M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-Finalisierung
 - HANDOVER, docs/milestones_active, docs/ios_current, GOiOS, milestones, CHANGELOG: Stand Produktcode **`0b2e25c`** — M34 Bugfixes + Stats-Reset, **M35 Paarungen bearbeiten**, **UI-Politur** und **iPad-Tischmodus**; iOS-Upload 2.0 (7) enthält M34 + M35 + UI-Politur + iPad-Tischmodus

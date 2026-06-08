@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `80892e5` (Erfolg teilen, Alle-Fünfe-Branding, Doku-Übergabe)  
+**Produktcode-HEAD:** `5f90ad8` (Erfolg teilen, Alle-Fünfe-Branding, Doku-Übergabe)  
 **Sprache:** Deutsch
 
 Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milestones_active.md`. iOS/App Store: `docs/ios_current.md`. Dauerhafte Projektentscheidungen nur bei Bedarf: `docs/decisions.md`.
@@ -26,7 +26,7 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
 | Branch | `milestone-22-prep` |
-| Produktcode | HEAD `80892e5`; Frontend `out/` gebaut; **Backend-Deploy** für Coaching-Texte + Fehlermeldungen durch Nutzer |
+| Produktcode | HEAD `5f90ad8`; Frontend `out/` gebaut; **Backend-Deploy** für Coaching-Texte + Fehlermeldungen durch Nutzer |
 | Backend | `finalize-stats`, `GET /sessions/invite/:code/match-analysis` inkl. **`coaching`**; `POST /runs/:id/extra-yatzy` mit `{ yatzyDieValue }`; Migration `extra_yatzy_die_values` |
 | UI-Branding | Nutzer-sichtbar **Alle Fünfe** statt „Yatzy“; technische IDs (`yatzyDieValue`, `extra-yatzy`, CSS `.play-yatzy-*`) unverändert |
 | iOS/TestFlight | Version `2.0`, aktueller Build `2.0 (21)`, nächster Upload `2.0 (22)` |
@@ -124,7 +124,7 @@ Wichtige Regeln:
 
 Aktueller Kurzstand:
 - Branch: milestone-22-prep
-- Produktcode: Share-Funktion, Alle-Fünfe-Branding (UI), Spiel-Feedback Gaming-Politur (a93e462), Coaching (3c03592); HEAD 80892e5
+- Produktcode: Share-Funktion, Alle-Fünfe-Branding (UI), Spiel-Feedback Gaming-Politur (a93e462), Coaching (3c03592); HEAD 5f90ad8
 - Web/API live: https://dicebudget.bottle-trade.de
 - iOS: Version 2.0, TestFlight 2.0 (21), nächster Upload 2.0 (22)
 - UI-Branding: Nutzer-sichtbar „Alle Fünfe“ statt Yatzy; technische IDs (yatzyDieValue, extra-yatzy) unverändert
