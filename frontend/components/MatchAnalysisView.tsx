@@ -2,12 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { ScoreProgressionChart } from "@/components/ScoreProgressionChart";
-import { ShareActionBar } from "@/components/ShareActionBar";
 import { fieldLabelForAnalysis } from "@/lib/matchAnalysis";
-import {
-  buildMatchAnalysisShareText,
-  renderMatchAnalysisShareImage,
-} from "@/lib/matchResultShare";
 import {
   EMPTY_MATCH_COACHING,
   type HeadToHeadAnalysisDto,
@@ -234,20 +229,6 @@ export function MatchAnalysisView({
       ? playerLabel(sessionMeta.opponentName, ownPlayerId, aliases)
       : opponentLabel;
 
-  const buildShareText = () =>
-    buildMatchAnalysisShareText({
-      analysis,
-      viewerLabel: resolvedViewerLabel,
-      opponentLabel: resolvedOpponentLabel,
-    });
-
-  const buildShareImage = () =>
-    renderMatchAnalysisShareImage({
-      analysis,
-      viewerLabel: resolvedViewerLabel,
-      opponentLabel: resolvedOpponentLabel,
-    });
-
   const heroScore = !isMultiRound && h2h
     ? formatSigned(h2h.scoreDiff)
     : String(analysis.viewer.totalScore);
@@ -292,15 +273,6 @@ export function MatchAnalysisView({
           </p>
         )}
       </section>
-
-      <ShareActionBar
-        label="Analyse teilen"
-        shareSuffix="Spielanalyse"
-        filename="dicebudget-analyse.png"
-        buildText={buildShareText}
-        buildImage={buildShareImage}
-        prominent
-      />
 
       {analysis.mode === "multi" && analysis.scoreProgression && (
         <Panel kicker="Verlauf" title="Punkte-Duell">

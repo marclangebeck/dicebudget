@@ -40,6 +40,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ### Changed
 - **Startscreen-Bilanz:** Große Share-Leiste („Bilanz teilen“ mit WhatsApp/Instagram) entfernt — stattdessen kompakter **Teilen**-Button in der Bilanz-Zeile (System-Teilen mit Bilanz-Bild als PNG)
+- **Teilen nur Spielende + Bilanz:** Share-Buttons aus Erfolgs-Overlays (Bonus, Ergebnis 2/unten voll, Große Straße, Alle Fünfe), Spielanalyse, iPad-Duell-Abschluss und Paarungs-Detail entfernt; Teilen bleibt auf `RunFinishScreen` und Startscreen-Bilanz
 - **Spiel-Feedback Gaming-Politur II:** Deutlich reichere Erfolgs-Overlays (Aurora-Hintergrund, Schockwellen, Orbit-Partikel, typ-spezifische Szenen: Münzregen/Bonus, Hex-Grid/unten voll, Blitze/Große Straße, Jackpot-Strahlen + Krone/Alle Fünfe) und aufwändigere Web-Audio (Shimmer-Arpeggios, Power-Up-Kaskaden, Jackpot-Fanfare)
 - **Markenwort „Yatzy“ entfernt:** Nutzer-sichtbare Texte heißen jetzt **Alle Fünfe** (Zettelzeile, Eintrag, Zusatz-Bonus, Spiel-Feedback, Spielanalyse/Coaching, Fehlermeldungen)
 - **Spiel-Feedback Gaming-Politur:** Erfolgs-Overlays im dunklen Dashboard-Look (Glas-Karte, Gold-Kicker, typ-spezifische Szenen: obere Sektion-Slots, Ring-Siegel, Combo-Würfelkette, Alle-Fünfe-Shake/Flash); Layered Web-Audio mit Riser, Kicks, Stereo-Panning und Noise-Bursts; „Außerhalb tippen zum Schließen“

@@ -28,11 +28,6 @@ import {
   type AchievementOverlayState,
 } from "@/lib/achievementFeedback";
 import type { SessionMatchAnalysisDto } from "@/lib/matchAnalysisTypes";
-import {
-  buildTableModeShareText,
-  renderTableModeShareImage,
-  type TableModeShareParams,
-} from "@/lib/matchResultShare";
 import { allFieldsScored, getLastScoredFieldId } from "@/lib/runUtils";
 import { loadPlayerAliases } from "@/lib/playerAliases";
 import {
@@ -45,7 +40,6 @@ import type { SessionLobbyDto } from "@/lib/sessionTypes";
 import type { FieldDto, RunDto } from "@/lib/types";
 import { AchievementOverlay } from "@/components/AchievementOverlay";
 import { MatchAnalysisView } from "@/components/MatchAnalysisView";
-import { ShareActionBar } from "@/components/ShareActionBar";
 
 type Props = {
   inviteCode: string;
@@ -392,16 +386,6 @@ export function TableModePlayBoard({ inviteCode }: Props) {
   const sessionFinished = allFinished && !poolEndgamePending;
   const leftRun = runs.left;
   const rightRun = runs.right;
-  const tableShareParams: TableModeShareParams | null =
-    sessionFinished && leftRun && rightRun
-      ? {
-          leftLabel: players[0].label,
-          rightLabel: players[1].label,
-          leftScore: leftRun.totalScore,
-          rightScore: rightRun.totalScore,
-          inviteCode,
-        }
-      : null;
 
   if (showMatchAnalysis && matchAnalysis) {
     return (
@@ -550,16 +534,6 @@ export function TableModePlayBoard({ inviteCode }: Props) {
                 </span>
               </div>
             </div>
-          )}
-          {tableShareParams && (
-            <ShareActionBar
-              label="Duell teilen"
-              shareSuffix="iPad-Duell"
-              filename="dicebudget-tisch-duell.png"
-              buildText={() => buildTableModeShareText(tableShareParams)}
-              buildImage={() => renderTableModeShareImage(tableShareParams)}
-              prominent
-            />
           )}
           <button
             type="button"
