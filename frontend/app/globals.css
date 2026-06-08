@@ -1721,6 +1721,8 @@ html.legal-route body {
   background: #f8fafc;
   color: #334155;
   font-size: 0.6875rem;
+  overflow: hidden;
+  vertical-align: top;
 }
 
 .play-row-label--summary {
@@ -1826,15 +1828,24 @@ html.legal-route body {
 }
 
 .play-dice-label {
+  --play-field-dice-size: 1.25rem;
+  --play-mini-dice-size: 0.625rem;
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.12rem;
+  max-width: 100%;
+  min-width: 0;
   padding-left: 0.2rem;
 }
 
 .play-yatzy-mark {
-  display: inline-flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(5, var(--play-mini-dice-size));
   gap: 2px;
-  margin-left: 0.15rem;
-  padding-left: 0.1rem;
+  min-width: 0;
+  max-width: calc(5 * var(--play-mini-dice-size) + 4 * 2px);
+  padding-left: 0.08rem;
+  padding-top: 0.02rem;
 }
 
 .play-yatzy-picker-backdrop {
