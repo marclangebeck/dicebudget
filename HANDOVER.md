@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `d130be7` (Spiel-UX: Werten/Nicht werten, Yatzy-Strichliste, Zettel-/Settings-Politur)  
+**Produktcode-HEAD:** `d00059f` (Spielanalyse Multi/Solo, Mehrspieler 3–6)  
 **Sprache:** Deutsch
 
 Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milestones_active.md`. iOS/App Store: `docs/ios_current.md`. Dauerhafte Projektentscheidungen nur bei Bedarf: `docs/decisions.md`.
@@ -26,50 +26,44 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
 | Branch | `milestone-22-prep` |
-| Produktcode | HEAD `d130be7`; Web deployed (Frontend `out/` + Backend-Service mit Migration `20260605120000_pairing_stats_yatzy_die`) |
-| Backend | Migration: `include_in_pairing_stats` auf `GameSession`, `yatzy_die_value` auf `Field`; Endpoint `POST /sessions/invite/:code/finalize-stats` |
+| Produktcode | HEAD `d00059f`; Frontend `out/` gebaut; **Backend-Neustart** für `match-analysis` ggf. noch durch Nutzer (siehe unten) |
+| Backend | Migration `20260605120000_pairing_stats_yatzy_die`; `finalize-stats`, **`GET /sessions/invite/:code/match-analysis`** |
 | iOS/TestFlight | Version `2.0`, aktueller Build `2.0 (6)`, nächster Upload `2.0 (7)` |
-| Noch nicht in iOS `2.0 (6)` | M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard + Footer/Legal + 3D-Icons + Spiel-UX Juni 2026 (Werten/Nicht werten, Yatzy-Strichliste, Settings-Gruppen, …) |
+| Noch nicht in iOS `2.0 (6)` | M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard + Footer/Legal + 3D-Icons + Spiel-UX Juni 2026 + **Spielanalyse** |
 
-## Neu Seit Letzter Übergabe (2026-06-05)
+## Neu Seit Letzter Übergabe (2026-06-06)
 
-- **Spielzettel Ergebnis 1/2 dunkel:** Zeilen- und Zellenhintergrund von „Ergebnis 1“ und „Ergebnis 2“ an dunklen Spielzettel angeglichen (kein Hellgrau mehr).
-- **Multiplayer: Werten / Nicht werten:** Auf dem Abschluss-Screen (`RunFinishScreen`) und beim Verlassen aus der Zettelansicht entscheidet ein Switch (Design wie `/settings`), ob die Session in die Paarungs-Statistik einfließt. Stats werden **nicht** mehr automatisch vergeben; Finalisierung beim Verlassen über `POST /sessions/invite/:code/finalize-stats`. Feld `include_in_pairing_stats` (Default `true` für Rückwärtskompatibilität).
-- **Yatzy-Würfel-Strichliste:** Beim Yatzy-Eintrag (50 Punkte) Abfrage der Augenzahl 1–6; goldene Strichliste hinter dem passenden Würfel auf dem Zettel. Backend: `fields.yatzy_die_value`; Solo lokal in `localSoloRun.ts`.
-- **Toggles einheitlich:** `.app-toggle` blassgrün (an) / blassrot (aus) app-weit in Settings und Setup.
-- **Startscreen-Icons +75 %:** 3D-PNG-Motive vergrößert (CSS).
-- **Einstellungen gruppiert:** Bereiche Allgemein, Solo, Multi, iPad; iPad-Spielernamen nur bei aktivem iPad-Tisch editierbar.
-- **Stats-Toggle wie Einstellungen:** „Werten“ / „Nicht werten“ als Settings-Switch-Karte (nicht mehr als zwei Buttons neben einander).
-- **Fix Multi-Abschluss „Internal Server Error“ (2026-06-06):** `finalize-stats` verlangte fälschlich mindestens 2 Spieler; Einzelspieler-Tests in Multi-Räumen schlugen fehl. `SessionNotReadyError` wurde nicht abgefangen → 500. Jetzt: Abschluss ab 1 Spieler möglich; Paarungs-Statistik (`Werten`) erst ab 2 Spielern; klare **409**-Meldungen (Pool-Endspiel offen / Mitspieler nicht fertig); Fehlertext auf `RunFinishScreen`.
+- **Spielanalyse (Head-to-Head / Session):** Nach Multi-Abschluss (nach Pool-Endspiel bzw. direkt ohne) optional Button **„Spielanalyse“** auf `RunFinishScreen` — aktiv, nicht automatisch. Abgeleitete Kennzahlen (Attribution, Pool-Effektivität, Yatzy, entscheidender Block/Feld), kein Zettel-Duplikat. **2 Spieler:** ein Head-to-Head. **3–6 Spieler:** Runden-Ranking, Direktvergleich vs. jeden Mitspieler, Platz/Abstand zur Spitze. **Solo:** eigene Analyse lokal. **Historie:** `/stats/pairing` → App-Runde antippen → `/stats/match-analysis?invite=…`. Backend: `backend/src/domain/matchAnalysis.ts`, `matchAnalysisService.ts`, Route in `sessions.ts`.
+- **Multiplayer Spieleranzahl:** `maxPlayers` bleibt Host-Option (Default 2 in `/settings`); kein Wartesaal — wer Code hat, tritt bei. Session endet, wenn alle **beigetretenen** Runs fertig sind (nicht wenn `maxPlayers` erreicht).
+
+## Bereits Vorher (Spiel-UX Juni 2026, in `d130be7` ff.)
+
+- Werten/Nicht werten, Yatzy-Strichliste, dunkle Ergebniszeilen, Settings-Gruppen, Toggles `.app-toggle`, Start-Icons +75 %.
+- Fix `finalize-stats`: Einzelspieler-Multi-Räume, 409 statt 500 bei Blockade.
 
 ## Bekanntes UX-Thema (offen)
 
-- **Pool-Endspiel + Statistik-Toggle:** Nach Pool-Endspiel sehen Nicht-Sieger oft noch „Pool-Endspiel läuft“ und müssen **Aktualisieren** tippen, bevor der Abschluss-Screen mit dem Toggle erscheint. Verbesserung (Auto-Refresh nach Pool-Auflösung) ist sinnvolle Folgeaufgabe.
+- **Pool-Endspiel + Statistik-Toggle:** Nicht-Sieger müssen ggf. **Aktualisieren** tippen, bevor Abschluss-Screen mit Toggle erscheint.
+- **iPad-Tischmodus:** Spielanalyse am Finish-Flow noch nicht in `TableModePlayBoard` eingebunden.
 
 ## Wichtige Dateien
 
-- `frontend/components/StatsRatingToggle.tsx` — Switch Werten/Nicht werten (Settings-Design)
-- `frontend/components/RunFinishScreen.tsx` — Multi-Abschluss inkl. Statistik-Entscheidung
-- `frontend/components/PlayBoard.tsx` — Multi-Flow, Pool-Endspiel, Zettel-Abschluss
-- `frontend/components/TableModePlayBoard.tsx` — iPad-Tischmodus inkl. Statistik-Toggle
-- `frontend/components/ScoreEntryPanel.tsx` — Yatzy-Würfel-Abfrage
-- `frontend/components/ScoreSheetTable.tsx` — Yatzy-Strichliste, dunkle Ergebniszeilen
-- `frontend/app/settings/page.tsx` — gruppierte Einstellungen
-- `backend/src/services/sessionService.ts` — `finalizeSessionStats`, kein Auto-Award mehr
-- `backend/src/middleware/errorHandler.ts` — `SessionNotReadyError` → 409
-- `backend/src/routes/sessions.ts` — `finalize-stats`
-- `backend/src/services/playField.ts` — `yatzyDieValue` bei `completeField`
-- `backend/prisma/migrations/20260605120000_pairing_stats_yatzy_die/`
-- `frontend/app/globals.css` — `.app-toggle`, Zettel, Startscreen-Icons, Settings-Gruppen
+- `frontend/components/MatchAnalysisView.tsx` — UI Spielanalyse
+- `frontend/components/RunFinishScreen.tsx`, `PlayBoard.tsx` — Button „Spielanalyse“
+- `frontend/app/stats/match-analysis/page.tsx`, `frontend/app/stats/pairing/page.tsx` — Historie
+- `frontend/lib/matchAnalysis.ts`, `frontend/lib/matchAnalysisTypes.ts`
+- `backend/src/domain/matchAnalysis.ts`, `backend/src/services/matchAnalysisService.ts`
+- `backend/src/routes/sessions.ts` — `GET …/match-analysis`
+- `frontend/components/StatsRatingToggle.tsx`, `sessionService.ts` — Werten/Nicht werten
 - `CHANGELOG.md`, `docs/milestones_active.md`, `docs/ios_current.md`
 
 ## Offene Prioritäten
 
-1. iOS-Build `2.0 (7)` auf dem Mac: enthält alles seit `2.0 (6)` inkl. Spiel-UX Juni 2026.
-2. TestFlight: Multi-Abschluss mit Werten/Nicht werten, Pool-Endspiel-Flow, Yatzy-Strichliste, footerfreier `/play`, Footer auf App-Screens.
-3. Optional: Nach Pool-Endspiel automatisch Lobby aktualisieren, damit der Statistik-Toggle ohne manuelles Aktualisieren erscheint.
-4. App Store Connect: Paid Applications Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
-5. Optional später: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschränken; `milestone-22-prep` → `main`.
+1. **Backend deployen** (falls `match-analysis` live noch 404): Nutzer per SSH `sudo bash …/deploy-backend-prod.sh`.
+2. iOS-Build `2.0 (7)` auf dem Mac (enthält alles seit `2.0 (6)` inkl. Spielanalyse).
+3. TestFlight: Spielanalyse 2P/3+P, Multi-Abschluss, Pool-Endspiel, Yatzy, Footer/`/play`.
+4. Optional: Pool-Endspiel Auto-Refresh; Spielanalyse iPad-Tischmodus.
+5. App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
 
 ## Pflicht-Lesereihenfolge
 
@@ -108,19 +102,16 @@ Wichtige Regeln:
 
 Aktueller Kurzstand:
 - Branch: milestone-22-prep
-- Produktcode-HEAD: d130be7 (Spiel-UX Juni 2026)
+- Produktcode-HEAD: d00059f (Spielanalyse Multi/Solo, Mehrspieler 3–6)
 - Web/API live: https://dicebudget.bottle-trade.de
 - iOS: Version 2.0, TestFlight 2.0 (6), nächster Upload 2.0 (7)
-- Backend-Migration: include_in_pairing_stats, yatzy_die_value; Endpoint POST …/finalize-stats
-- Multi-Statistik: Switch „Werten“/„Nicht werten“ (Settings-Design) auf RunFinishScreen; Entscheidung beim Verlassen zur Startseite; keine Auto-Statistik mehr
-- finalize-stats: Einzelspieler-Multi-Räume können abschließen; „Werten“ zählt Paarungen erst ab 2 Spielern; bei Blockade 409 mit deutscher Meldung (nicht 500)
-- Yatzy: bei 50 Punkten Würfel 1–6 wählen; Strichliste hinter Würfelzeile auf dem Zettel
-- Spielzettel: Ergebnis 1/2 dunkler Hintergrund; /play ohne Footer
-- Settings: Gruppen Allgemein/Solo/Multi/iPad; iPad-Namen nur bei aktivem Tischmodus
-- Startscreen: 3D-Icons aus frontend/public/home-icons/ (+75 % Größe)
-- Toggles app-weit: .app-toggle blassgrün/blassrot
-- Pool-Endspiel: Nicht-Sieger ggf. „Aktualisieren“ nötig, bevor Abschluss-Toggle sichtbar (bekanntes UX-Thema)
-- Backend-Neustart (nur bei Backend-Änderung): Nutzer per SSH auf Server:
+- Backend: finalize-stats; GET /sessions/invite/:code/match-analysis (Spielanalyse)
+- Spielanalyse: optional nach Spielende (RunFinishScreen) und nachträglich unter /stats/pairing; 2P Head-to-Head, 3–6P Ranking + Direktvergleiche, Solo lokal
+- Multi maxPlayers: Default 2 in Settings, Cap 2–6; wer Code hat spielt mit (kein Wartesaal)
+- Multi-Statistik: Switch Werten/Nicht werten; finalize-stats beim Verlassen
+- Yatzy-Strichliste, dunkle Ergebniszeilen, Settings-Gruppen, /play ohne Footer
+- Pool-Endspiel: Nicht-Sieger ggf. Aktualisieren nötig (bekanntes UX-Thema)
+- Backend-Neustart (nur bei Backend-Änderung / neuer Endpunkt): Nutzer per SSH:
   sudo bash /home/bottleadmin/projects/kniffel/infra/scripts/deploy-backend-prod.sh
   (Nicht auf dem Mac mit /home/bottleadmin/… ausführen.)
 

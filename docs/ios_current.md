@@ -1,8 +1,8 @@
 # iOS Aktuell - dice.budget
 
-**Stand:** 2026-06-05
+**Stand:** 2026-06-06
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `d443444`
+**Produktcode-HEAD:** `d00059f`
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-/App-Store-Stand. Aeltere iOS-Historie steht in `docs/ios_archive.md`.
@@ -56,6 +56,16 @@ Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-
   - `/datenschutz` und `/impressum` sind an das App-Screen-Layout angeglichen
   - `/play` zeigt bewusst keinen Footer, damit Solo-, Multiplayer- und Tischmodus-Zettel die volle Screenhoehe nutzen
   - Der Footer nutzt bewusst kein `safe-area-inset-bottom`
+- Spiel-UX Juni 2026:
+  - Werten/Nicht werten auf Abschluss-Screen
+  - Yatzy-Wuerfel-Strichliste
+  - dunkle Ergebniszeilen, Settings-Gruppen, vergroesserte Start-Icons
+- Spielanalyse:
+  - optional nach Spielende (Button auf RunFinishScreen)
+  - 2 Spieler Head-to-Head, 3–6 Spieler Ranking + Direktvergleiche
+  - Solo-Eigenanalyse
+  - Historie unter `/stats/pairing` → Runde antippen
+  - Backend: `GET /sessions/invite/:code/match-analysis` (nach Backend-Deploy auf Server)
 
 ## Mac-Workflow Fuer Naechsten Upload
 

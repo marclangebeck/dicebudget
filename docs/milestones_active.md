@@ -1,8 +1,8 @@
 # Aktive Milestones - dice.budget
 
-**Stand:** 2026-06-05  
+**Stand:** 2026-06-06  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `d130be7`  
+**Produktcode-HEAD:** `d00059f`  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -19,19 +19,44 @@ Technische Basis ist erledigt:
 - Native App startet direkt auf `/app`.
 - Native API-Basis zeigt auf `https://dicebudget.bottle-trade.de/api`.
 - TestFlight ist aktiv, aktueller Build ist `2.0 (6)`.
-- Naechster Upload ist `2.0 (7)` und muss M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons + Spiel-UX Juni 2026 (Werten/Nicht werten, Yatzy-Strichliste, Settings-Gruppen, dunkle Ergebniszeilen, vergroesserte Start-Icons) enthalten.
+- Naechster Upload ist `2.0 (7)` und muss M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons + Spiel-UX Juni 2026 + **Spielanalyse** (2P/3–6P/Solo) enthalten.
 
 Offen:
 
 - iOS-Build `2.0 (7)` auf dem Mac bauen und hochladen.
 - Startscreen, `/solo`, `/multi`, `/settings`, `/stats`, `/datenschutz`, `/impressum` und `/play` in iOS/Capacitor auf iPhone pruefen: Footer-Tabbar muss auf App-/Setup-/Legal-Screens unten sitzen; `/play` muss footerfrei sein und der Zettel muss die volle Screenhoehe nutzen.
 - iPad-Tischmodus in TestFlight auf iPad Querformat testen; iPhone-Flow muss unveraendert bleiben.
-- TestFlight nach Upload erneut testen (inkl. Multi-Statistik-Toggle und Yatzy-Strichliste).
+- TestFlight nach Upload erneut testen (inkl. Multi-Statistik-Toggle, Yatzy-Strichliste, Spielanalyse).
 - App Store Connect fuer kostenpflichtigen Release fertigstellen.
 
 Details: `docs/ios_current.md`.
 
 ## Letzte Abgeschlossene Milestones
+
+### Spielanalyse 2026-06-06
+
+**Status:** erledigt im Produktcode (`d00059f`), Frontend gebaut; Backend-Deploy durch Nutzer falls Endpunkt live noch fehlt; noch nicht in iOS `2.0 (6)`.
+
+- Nach Multi/Solo-Abschluss optional **Spielanalyse** (Button auf `RunFinishScreen`, nicht automatisch).
+- Verfuegbar nach Pool-Endspiel bzw. direkt wenn kein Pool-Endspiel.
+- **2 Spieler:** Head-to-Head mit Attribution (Bonus, oben/unten, Zusatz-Yatzy), Insights, Gegner-Metriken.
+- **3–6 Spieler:** Runden-Ranking, Platz/Abstand zur Spitze, Direktbilanz, aufklappbare Direktvergleiche je Mitspieler.
+- **Solo:** lokale Eigenanalyse aus `RunDto`.
+- **Historie:** `/stats/pairing` → App-Runde antippen → `/stats/match-analysis?invite=…`.
+- Keine neue DB-Migration; Berechnung on-demand aus Runs/Feldern.
+
+Technische Hinweise:
+
+- `GET /sessions/invite/:code/match-analysis?viewerPlayerId=…`
+- Domain `backend/src/domain/matchAnalysis.ts` (Tests in `matchAnalysis.test.ts`)
+- UI: `MatchAnalysisView.tsx`, `globals.css` (`.match-analysis-*`)
+
+Dateien:
+
+- `backend/src/services/matchAnalysisService.ts`, `backend/src/routes/sessions.ts`
+- `frontend/components/MatchAnalysisView.tsx`, `RunFinishScreen.tsx`, `PlayBoard.tsx`
+- `frontend/app/stats/match-analysis/page.tsx`, `frontend/app/stats/pairing/page.tsx`
+- `frontend/lib/matchAnalysisTypes.ts`, `frontend/lib/api.ts` (`getSessionMatchAnalysis`)
 
 ### Spiel-UX-Politur 2026-06-05
 
@@ -198,6 +223,9 @@ Dateien:
 - `HANDOVER.md`
 - `docs/ios_current.md`
 - `docs/decisions.md`
+- `frontend/components/MatchAnalysisView.tsx`
+- `backend/src/domain/matchAnalysis.ts`
+- `backend/src/services/matchAnalysisService.ts`
 - `frontend/components/StatsRatingToggle.tsx`
 - `backend/src/services/sessionService.ts`
 - `backend/src/routes/sessions.ts`

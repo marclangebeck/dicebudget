@@ -23,11 +23,11 @@ Nur bei Bedarf:
 ## Aktueller Kurzstand
 
 - Branch: `milestone-22-prep`
-- Produktcode-HEAD: `0b2e25c`
+- Produktcode-HEAD: `d00059f`
 - Web/API live: https://dicebudget.bottle-trade.de
 - iOS: TestFlight `2.0 (6)`, naechster Upload `2.0 (7)`
-- M34 + M35 + UI-Politur + iPad-Tischmodus sind Web-seitig erledigt.
-- M34 + M35 + UI-Politur + iPad-Tischmodus sind noch nicht im iOS-Build.
+- M34 + M35 + UI-Politur + iPad-Tischmodus + Spiel-UX Juni 2026 + Spielanalyse sind Web-seitig erledigt.
+- Noch nicht im iOS-Build `2.0 (6)`.
 
 ## Offene Prioritaeten
 
