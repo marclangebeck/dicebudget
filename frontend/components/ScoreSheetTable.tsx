@@ -162,7 +162,12 @@ function FieldRowLabel({
             aria-label={`${yatzyMarkCount} Yatzy-Markierungen`}
           >
             {Array.from({ length: yatzyMarkCount }, (_, i) => (
-              <span key={i} className="play-yatzy-mark-bar" aria-hidden />
+              <DiceFace
+                key={i}
+                value={diceValue}
+                pipClassName="bg-slate-800"
+                className="play-yatzy-mark-dice h-2.5 w-2.5 rounded border border-slate-400 bg-white"
+              />
             ))}
           </span>
         )}

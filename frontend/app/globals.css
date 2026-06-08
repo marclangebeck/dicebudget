@@ -1831,18 +1831,21 @@ html.legal-route body {
 
 .play-yatzy-mark {
   display: inline-flex;
-  align-items: stretch;
+  align-items: center;
   gap: 2px;
   margin-left: 0.15rem;
   padding-left: 0.1rem;
 }
 
-.play-yatzy-mark-bar {
-  width: 2px;
-  height: 1.25rem;
+.play-yatzy-mark-dice {
+  gap: 0.0625rem;
+  padding: 0.0625rem;
   flex-shrink: 0;
-  border-radius: 1px;
-  background: #0f172a;
+}
+
+.play-yatzy-mark-dice .rounded-full {
+  height: 0.1875rem;
+  width: 0.1875rem;
 }
 
 .play-entry-sheet {
