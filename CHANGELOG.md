@@ -35,6 +35,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Stats zusammenführen bei Alias:** Spieler-IDs mit demselben lokalen Alias werden in der Statistik wieder als dieselbe Person zusammengeführt (Übersicht + Detail), rein lokal/clientseitig ohne Klarnamen. Neu: `lib/pairingMerge.ts`; angepasst: `app/stats/page.tsx`, `app/stats/pairing/page.tsx`
 
 ### Changed
+- **Spiel-Feedback Gaming-Politur:** Erfolgs-Overlays im dunklen Dashboard-Look (Glas-Karte, Gold-Kicker, typ-spezifische Szenen: obere Sektion-Slots, Ring-Siegel, Combo-Würfelkette, Yatzy-Shake/Flash); Layered Web-Audio mit Riser, Kicks, Stereo-Panning und Noise-Bursts; „Tippen zum Schließen“-Hinweis
 - **Bonus-Einblendung → Spiel-Feedback:** Einstellungs-Toggle steuert jetzt alle Erfolgs-Animationen und Sounds (lokal, gleicher Storage-Key)
 - **Multi-Statistik-Toggle wie Einstellungen:** „Werten“ / „Nicht werten“ nutzt jetzt denselben Switch (`.app-toggle`) und Karten-Stil wie die Toggles unter `/settings`
 - **Spielzettel Ergebnis 1/2 dunkel:** Zeilen- und Zellenhintergrund von „Ergebnis 1“ und „Ergebnis 2“ an den dunklen Spielzettel angeglichen (kein Hellgrau mehr)

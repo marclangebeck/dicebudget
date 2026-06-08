@@ -10,10 +10,10 @@ export const ACHIEVEMENT_PRIORITY: AchievementType[] = [
 ];
 
 export const ACHIEVEMENT_DURATION_MS: Record<AchievementType, number> = {
-  bonus: 2500,
-  lower_complete: 2800,
-  large_straight: 3000,
-  yatzy: 3500,
+  bonus: 2800,
+  lower_complete: 3000,
+  large_straight: 3200,
+  yatzy: 4000,
 };
 
 export const ACHIEVEMENT_CONFETTI_COUNT: Record<AchievementType, number> = {
@@ -24,6 +24,7 @@ export const ACHIEVEMENT_CONFETTI_COUNT: Record<AchievementType, number> = {
 };
 
 export type AchievementVisual = {
+  kicker: string;
   title: string;
   subtitle: string;
   badge?: string;
@@ -39,31 +40,35 @@ export function achievementVisual(
   switch (type) {
     case "bonus":
       return {
+        kicker: "Bonus freigeschaltet",
         badge: `+${UPPER_BONUS_POINTS}`,
-        title: "Bonus erreicht!",
-        subtitle: `Obere Reihe${gameSuffix} ≥ ${UPPER_BONUS_MIN} – plus ${UPPER_BONUS_POINTS} Punkte`,
-        confettiColors: ["#10b981", "#34d399", "#a7f3d0", "#fbbf24", "#38bdf8"],
+        title: "Obere Sektion gesichert!",
+        subtitle: `≥ ${UPPER_BONUS_MIN} Punkte${gameSuffix} — Belohnung gutgeschrieben`,
+        confettiColors: ["#10b981", "#34d399", "#6ee7b7", "#fbbf24", "#e5c07b"],
       };
     case "lower_complete":
       return {
+        kicker: "Sektion komplett",
         badge: "7/7",
         title: "Untere Spalte voll!",
-        subtitle: `Alle Kombinationsfelder${gameSuffix} eingetragen`,
-        confettiColors: ["#22d3ee", "#06b6d4", "#67e8f9", "#a5f3fc", "#38bdf8"],
+        subtitle: `Alle Kombinationsfelder${gameSuffix} abgeschlossen`,
+        confettiColors: ["#22d3ee", "#38bdf8", "#67e8f9", "#7dd3fc", "#e5c07b"],
       };
     case "large_straight":
       return {
+        kicker: "Combo-Kette",
         badge: "+40",
         title: "Große Straße!",
-        subtitle: `2-3-4-5-6${gameSuffix} – volle Punktzahl`,
-        confettiColors: ["#fbbf24", "#f59e0b", "#fcd34d", "#fde68a", "#d97706"],
+        subtitle: `2·3·4·5·6${gameSuffix} — volle Punktzahl`,
+        confettiColors: ["#fbbf24", "#f59e0b", "#fcd34d", "#e5c07b", "#fde68a"],
       };
     case "yatzy":
       return {
+        kicker: "Jackpot",
         badge: "+50",
-        title: "Yatzy!",
-        subtitle: `Fünf gleiche${gameSuffix} – Jackpot`,
-        confettiColors: ["#fef08a", "#facc15", "#fde047", "#f472b6", "#ffffff", "#fbbf24"],
+        title: "YATZY!",
+        subtitle: `Fünf gleiche${gameSuffix} — legendärer Treffer`,
+        confettiColors: ["#fef08a", "#facc15", "#fde047", "#f472b6", "#ffffff", "#e5c07b"],
       };
   }
 }
