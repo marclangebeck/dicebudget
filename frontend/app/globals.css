@@ -714,6 +714,70 @@ html.legal-route body {
   text-transform: none;
 }
 
+.home-hero-record-head-end {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.share-image-btn-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+}
+
+.share-image-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  min-height: 1.55rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(214, 168, 90, 0.4);
+  background: rgba(15, 23, 42, 0.55);
+  color: #fde68a;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+}
+
+.share-image-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.55);
+}
+
+.share-image-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.share-image-btn-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+}
+
+.share-image-btn-status {
+  font-size: 0.48rem;
+  font-weight: 600;
+  color: #7dd3fc;
+  white-space: nowrap;
+}
+
+.home-hero-record-head-end .share-image-btn-status {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 0.1rem;
+}
+
 .home-hero-record-metrics {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -769,17 +833,6 @@ html.legal-route body {
   height: 100%;
   background: linear-gradient(90deg, #b98452 0%, #7a4c31 100%);
   box-shadow: 0 0 16px rgba(185, 132, 82, 0.3);
-}
-
-.home-hero-record .share-action-bar {
-  margin-top: 0.55rem;
-  padding-top: 0;
-  border-top: none;
-}
-
-.home-hero-record .share-action-bar--prominent {
-  margin-top: 0.65rem;
-  padding: 0.55rem 0.45rem 0.4rem;
 }
 
 .home-bento-brand-icon {
@@ -2790,7 +2843,6 @@ html.legal-route body {
 .play-finish-card .share-action-bar--prominent,
 .match-analysis-screen .share-action-bar--prominent,
 .stats-screen .share-action-bar--prominent,
-.home-hero-record .share-action-bar--prominent,
 .play-table-finish-footer .share-action-bar--prominent {
   text-align: center;
 }

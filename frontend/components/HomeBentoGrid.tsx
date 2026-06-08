@@ -14,7 +14,7 @@ import type { PairingSummaryDto } from "@/lib/pairingTypes";
 import { getOrCreatePlayerId, normalizePublicPlayerId, playerLabel } from "@/lib/playerIdentity";
 import { loadPlayerAliases, type PlayerAliasMap } from "@/lib/playerAliases";
 import type { StatsDto } from "@/lib/statsTypes";
-import { ShareActionBar } from "@/components/ShareActionBar";
+import { ShareImageButton } from "@/components/ShareImageButton";
 
 type NavTileProps = {
   href: string;
@@ -209,7 +209,15 @@ export function HomeBentoGrid() {
         <div className="home-hero-record" aria-label="Persönliche Bilanz">
           <div className="home-hero-record-head">
             <span>{recordTitle}</span>
-            <strong>{recordSummaryLabel}</strong>
+            <div className="home-hero-record-head-end">
+              <strong className="tabular-nums">{recordSummaryLabel}</strong>
+              <ShareImageButton
+                shareSuffix="Bilanz"
+                filename="dicebudget-bilanz.png"
+                buildText={buildHomeShare}
+                buildImage={renderHomeShare}
+              />
+            </div>
           </div>
           <div className="home-hero-record-metrics">
             <span className="home-hero-record-win">
@@ -225,14 +233,6 @@ export function HomeBentoGrid() {
             <div className="home-hero-record-track-win" style={{ width: `${winShare}%` }} />
             <div className="home-hero-record-track-loss" style={{ width: `${100 - winShare}%` }} />
           </div>
-          <ShareActionBar
-            label="Bilanz teilen"
-            shareSuffix="Bilanz"
-            filename="dicebudget-bilanz.png"
-            buildText={buildHomeShare}
-            buildImage={renderHomeShare}
-            prominent
-          />
         </div>
       </header>
 

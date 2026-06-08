@@ -1,9 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { AchievementShareBar } from "@/components/AchievementShareBar";
 import { DiceFace } from "@/components/DiceFace";
-import { APP_NAME, SITE_URL } from "@/lib/branding";
+import { APP_NAME } from "@/lib/branding";
 import {
   ACHIEVEMENT_CONFETTI_COUNT,
   achievementVisual,
@@ -28,7 +27,6 @@ const COIN_COUNT = 14;
 export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: Props) {
   const visual = achievementVisual(type, gameIndex);
   const confettiCount = ACHIEVEMENT_CONFETTI_COUNT[type];
-  const siteLabel = SITE_URL.replace(/^https:\/\//, "");
 
   const confetti = useMemo(
     () =>
@@ -319,13 +317,6 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
 
         <p className="achievement-overlay-title">{visual.title}</p>
         <p className="achievement-overlay-sub">{visual.subtitle}</p>
-
-        <footer className="achievement-share-footer">
-          <span className="achievement-share-footer-app">{APP_NAME}</span>
-          <span className="achievement-share-footer-url">{siteLabel}</span>
-        </footer>
-
-        <AchievementShareBar type={type} visual={visual} yatzyDieValue={yatzyDieValue} />
 
         <p className="achievement-overlay-hint">Außerhalb tippen zum Schließen</p>
       </div>
