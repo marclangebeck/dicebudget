@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { DiceFace } from "@/components/DiceFace";
-import { YatzyDiePicker } from "@/components/YatzyDiePicker";
+import { ExtraYatzyPickerOverlay } from "@/components/ExtraYatzyPickerOverlay";
 import { upperBonusDelta } from "@/lib/gameScoring";
 import {
   diceValueForField,
@@ -83,9 +83,26 @@ function YatzyRowLabel({
   onIncrement?: (yatzyDieValue: number) => void;
 }) {
   const [showPicker, setShowPicker] = useState(false);
+  const [pickerAnchor, setPickerAnchor] = useState<{
+    top: number;
+    left: number;
+    bottom: number;
+  } | null>(null);
+  const plusButtonRef = useRef<HTMLButtonElement>(null);
+
+  function openPicker() {
+    const rect = plusButtonRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setPickerAnchor({
+      top: rect.top,
+      left: rect.left,
+      bottom: rect.bottom,
+    });
+    setShowPicker(true);
+  }
 
   return (
-    <div className="relative flex items-center gap-0.5">
+    <div className="flex items-center gap-0.5">
       <span className="text-[10px] leading-tight md:text-[11px]">{FIELD_LABELS.KNIFFEL}</span>
       {extraYatzyCount > 0 && (
         <span
@@ -96,11 +113,12 @@ function YatzyRowLabel({
         </span>
       )}
       <button
+        ref={plusButtonRef}
         type="button"
         disabled={disabled || busy}
         onClick={(e) => {
           e.stopPropagation();
-          setShowPicker(true);
+          openPicker();
         }}
         title="Zusatz-Yatzy: +100 Punkte auf Ergebnis Spiel (nächste Spalte)"
         aria-label="Zusatz-Yatzy Bonus hinzufügen"
@@ -108,30 +126,16 @@ function YatzyRowLabel({
       >
         +
       </button>
-      {showPicker && (
-        <>
-          <button
-            type="button"
-            className="play-yatzy-picker-backdrop fixed inset-0 z-40"
-            aria-label="Schließen"
-            onClick={() => setShowPicker(false)}
-          />
-          <div
-            className="play-yatzy-picker-popover absolute left-0 top-full z-50 mt-1"
-            role="dialog"
-            aria-label="Yatzy mit Würfel wählen"
-          >
-            <p className="play-yatzy-picker-label">Yatzy mit Würfel</p>
-            <YatzyDiePicker
-              compact
-              disabled={disabled || busy}
-              onPick={(value) => {
-                setShowPicker(false);
-                onIncrement?.(value);
-              }}
-            />
-          </div>
-        </>
+      {showPicker && pickerAnchor && (
+        <ExtraYatzyPickerOverlay
+          anchor={pickerAnchor}
+          disabled={disabled || busy}
+          onClose={() => setShowPicker(false)}
+          onPick={(value) => {
+            setShowPicker(false);
+            onIncrement?.(value);
+          }}
+        />
       )}
     </div>
   );

@@ -1849,10 +1849,17 @@ html.legal-route body {
 }
 
 .play-yatzy-picker-backdrop {
-  background: transparent;
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  border: none;
+  background: rgba(15, 23, 42, 0.25);
+  cursor: pointer;
 }
 
 .play-yatzy-picker-popover {
+  position: fixed;
+  z-index: 56;
   min-width: 9.5rem;
   padding: 0.35rem 0.4rem 0.45rem;
   border: 1px solid rgba(15, 23, 42, 0.12);
