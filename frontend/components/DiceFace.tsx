@@ -12,25 +12,44 @@ type Props = {
   value: 1 | 2 | 3 | 4 | 5 | 6;
   className?: string;
   pipClassName?: string;
+  /** field = Zettel-Feld (1,25 rem); mini = halbe Größe für Yatzy-Markierung */
+  size?: "default" | "field" | "mini";
 };
+
+const SIZE_STYLES = {
+  default: {
+    shell: "h-7 w-7 gap-0.5 p-0.5 md:h-6 md:w-6",
+    pip: "size-1.5 md:size-1",
+  },
+  field: {
+    shell: "h-5 w-5 gap-[2px] p-[2px]",
+    pip: "size-1",
+  },
+  mini: {
+    shell: "h-2.5 w-2.5 gap-px p-px",
+    pip: "size-0.5",
+  },
+} as const;
 
 export function DiceFace({
   value,
   className = "",
   pipClassName = "bg-slate-700",
+  size = "default",
 }: Props) {
   const mask = PIP_MASKS[value];
+  const styles = SIZE_STYLES[size];
 
   return (
     <div
-      className={`grid h-7 w-7 grid-cols-3 grid-rows-3 gap-0.5 p-0.5 md:h-6 md:w-6 ${className}`}
+      className={`grid shrink-0 grid-cols-3 grid-rows-3 ${styles.shell} ${className}`}
       aria-hidden
     >
       {mask.map((on, i) => (
         <div key={i} className="flex items-center justify-center">
           {on ? (
             <span
-              className={`h-1.5 w-1.5 rounded-full md:h-1 md:w-1 ${pipClassName}`}
+              className={`${styles.pip} shrink-0 rounded-full ${pipClassName}`}
             />
           ) : null}
         </div>

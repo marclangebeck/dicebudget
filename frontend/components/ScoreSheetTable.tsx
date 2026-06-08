@@ -152,8 +152,9 @@ function FieldRowLabel({
       <span className="play-dice-label inline-flex items-center">
         <DiceFace
           value={diceValue}
+          size="field"
           pipClassName="bg-slate-800"
-          className="play-field-dice rounded border border-slate-400 bg-white"
+          className="rounded border border-slate-400 bg-white"
         />
         {yatzyMarkCount !== undefined && yatzyMarkCount > 0 && (
           <span
@@ -165,8 +166,9 @@ function FieldRowLabel({
               <DiceFace
                 key={i}
                 value={diceValue}
+                size="mini"
                 pipClassName="bg-slate-800"
-                className="play-yatzy-mark-dice rounded border border-slate-400 bg-white"
+                className="rounded border border-slate-400 bg-white"
               />
             ))}
           </span>

@@ -1826,15 +1826,7 @@ html.legal-route body {
 }
 
 .play-dice-label {
-  --play-field-dice-size: 1.25rem;
   padding-left: 0.2rem;
-}
-
-.play-dice-label .play-field-dice {
-  height: var(--play-field-dice-size) !important;
-  width: var(--play-field-dice-size) !important;
-  min-height: 0;
-  min-width: 0;
 }
 
 .play-yatzy-mark {
@@ -1843,21 +1835,6 @@ html.legal-route body {
   gap: 2px;
   margin-left: 0.15rem;
   padding-left: 0.1rem;
-}
-
-.play-yatzy-mark-dice {
-  height: calc(var(--play-field-dice-size) / 2) !important;
-  width: calc(var(--play-field-dice-size) / 2) !important;
-  min-height: 0;
-  min-width: 0;
-  gap: 0.0625rem;
-  padding: 0.0625rem;
-  flex-shrink: 0;
-}
-
-.play-yatzy-mark-dice .rounded-full {
-  height: calc(var(--play-field-dice-size) / 8);
-  width: calc(var(--play-field-dice-size) / 8);
 }
 
 .play-entry-sheet {
