@@ -234,7 +234,7 @@ export async function incrementExtraYatzy(
   const nextCount = run.extraYatzyCount + 1;
   const targetIndex = gameIndexForExtraYatzyClick(nextCount, run.gameCount);
   const targetGame = run.games.find((g) => g.index === targetIndex);
-  if (!targetGame) throw new Error("Game not found for extra yatzy bonus");
+  if (!targetGame) throw new Error("Game not found for extra Alle Fünfe bonus");
 
   await prisma.$transaction(async (tx) => {
     await tx.run.update({
@@ -264,7 +264,7 @@ function assertYatzyDieValue(
 ): number | null {
   if (fieldType !== "KNIFFEL" || score !== 50) {
     if (yatzyDieValue !== undefined && yatzyDieValue !== null) {
-      throw new Error("yatzyDieValue is only allowed for a scored Yatzy (50 points)");
+      throw new Error("yatzyDieValue is only allowed for a scored Alle Fünfe (50 points)");
     }
     return null;
   }
@@ -274,7 +274,7 @@ function assertYatzyDieValue(
     yatzyDieValue < 1 ||
     yatzyDieValue > 6
   ) {
-    throw new Error("yatzyDieValue must be an integer from 1 to 6 for Yatzy");
+    throw new Error("yatzyDieValue must be an integer from 1 to 6 for Alle Fünfe");
   }
   return yatzyDieValue;
 }

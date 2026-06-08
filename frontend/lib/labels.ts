@@ -12,7 +12,7 @@ export const FIELD_LABELS: Record<FieldTypeId, string> = {
   FULL_HOUSE: "Full House",
   SMALL_STRAIGHT: "Kl. Straße",
   LARGE_STRAIGHT: "Gr. Straße",
-  KNIFFEL: "Yatzy",
+  KNIFFEL: "Alle Fünfe",
   CHANCE: "Chance",
 };
 

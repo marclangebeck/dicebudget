@@ -24,7 +24,7 @@ export type FieldDto = {
   fieldType: FieldTypeId;
   score: number | null;
   rollsUsed: number;
-  /** Würfel-Augenzahl bei Yatzy (50 Punkte), für Strichliste auf dem Zettel. */
+  /** Würfel-Augenzahl bei Alle Fünfe (50 Punkte), für Strichliste auf dem Zettel. */
   yatzyDieValue?: number | null;
   rolls: RollDto[];
 };
@@ -35,7 +35,7 @@ export type GameSummaryDto = {
   ergebnisOben: number | null;
   lowerSum: number;
   extraYatzyBonus: number;
-  /** Augenzahlen der Zusatz-Yatzy-Klicks (+100) auf diesem Spielblock. */
+  /** Augenzahlen der Zusatz-Alle-Fünfe-Klicks (+100) auf diesem Spielblock. */
   extraYatzyDieValues?: number[];
   gameTotal: number;
 };

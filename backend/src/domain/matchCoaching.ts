@@ -273,7 +273,7 @@ function buildTraits(
       pushTrait(
         candidates,
         "strength",
-        "Sicheres Yatzy",
+        "Sichere Alle Fünfe",
         `${viewer.yatzyHits} Treffer, ${viewer.yatzyMisses} gestrichen.`,
         viewer.yatzyHits * 12,
       );
@@ -281,8 +281,8 @@ function buildTraits(
       pushTrait(
         candidates,
         "weakness",
-        "Yatzy-Risiko",
-        `${viewer.yatzyMisses}× Yatzy gestrichen.`,
+        "Alle-Fünfe-Risiko",
+        `${viewer.yatzyMisses}× Alle Fünfe gestrichen.`,
         viewer.yatzyMisses * 14,
       );
     }
@@ -431,7 +431,7 @@ function buildLeaderNarrative(
     },
     { label: "Obere Sektion", diff: viewer.upperSumTotal - leader.upperSumTotal },
     { label: "Untere Sektion", diff: viewer.lowerSumTotal - leader.lowerSumTotal },
-    { label: "Zusatz-Yatzy", diff: viewer.extraYatzyTotal - leader.extraYatzyTotal },
+    { label: "Zusatz Alle Fünfe", diff: viewer.extraYatzyTotal - leader.extraYatzyTotal },
   ]
     .filter((r) => r.diff !== 0)
     .sort((a, b) => Math.abs(a.diff) - Math.abs(b.diff))
@@ -483,15 +483,15 @@ function buildTips(
     tips.push({
       impact: 30,
       title: "Pool sparsamer einsetzen",
-      body: "Kaufe Pool-Würfe vor allem für Felder mit hoher Punktewahrscheinlichkeit (Full House, Straßen, Yatzy) — nicht für kleine obere Felder.",
+      body: "Kaufe Pool-Würfe vor allem für Felder mit hoher Punktewahrscheinlichkeit (Full House, Straßen, Alle Fünfe) — nicht für kleine obere Felder.",
     });
   }
 
   if (viewer.yatzyMisses >= 1 && (yatzyHitRate(viewer) ?? 1) < 0.5) {
     tips.push({
       impact: viewer.yatzyMisses * 15,
-      title: "Yatzy-Timing",
-      body: "Yatzy erst streichen, wenn du ein anderes Feld mit ähnlicher Erwartung hast — oder bewusst früh riskieren, wenn oben noch Lücken sind.",
+      title: "Alle-Fünfe-Timing",
+      body: "Alle Fünfe erst streichen, wenn du ein anderes Feld mit ähnlicher Erwartung hast — oder bewusst früh riskieren, wenn oben noch Lücken sind.",
     });
   }
 

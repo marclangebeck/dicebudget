@@ -25,6 +25,6 @@ export function assertExtraYatzyDieValue(yatzyDieValue: number): void {
     yatzyDieValue < 1 ||
     yatzyDieValue > 6
   ) {
-    throw new Error("yatzyDieValue must be an integer from 1 to 6 for Yatzy");
+    throw new Error("yatzyDieValue must be an integer from 1 to 6 for Alle Fünfe");
   }
 }

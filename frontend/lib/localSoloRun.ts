@@ -186,10 +186,10 @@ export function completeLocalSoloField(
       yatzyDieValue < 1 ||
       yatzyDieValue > 6
     ) {
-      throw new Error("yatzyDieValue must be between 1 and 6 for Yatzy");
+      throw new Error("yatzyDieValue must be between 1 and 6 for Alle Fünfe");
     }
   } else if (yatzyDieValue !== undefined) {
-    throw new Error("yatzyDieValue is only allowed for Yatzy (50 points)");
+    throw new Error("yatzyDieValue is only allowed for Alle Fünfe (50 points)");
   }
 
   if (run.useStrategyRules) {
@@ -264,7 +264,7 @@ export function incrementLocalSoloExtraYatzy(runId: string, yatzyDieValue: numbe
     yatzyDieValue < 1 ||
     yatzyDieValue > 6
   ) {
-    throw new Error("yatzyDieValue must be between 1 and 6 for Yatzy");
+    throw new Error("yatzyDieValue must be between 1 and 6 for Alle Fünfe");
   }
   const state = getState(runId);
   const run = state.run;
@@ -273,7 +273,7 @@ export function incrementLocalSoloExtraYatzy(runId: string, yatzyDieValue: numbe
   run.extraYatzyCount += 1;
   const gameIndex = gameIndexForExtraYatzyClick(run.extraYatzyCount, run.gameCount);
   const targetGame = run.games.find((g) => g.index === gameIndex);
-  if (!targetGame) throw new Error("Game not found for extra yatzy");
+  if (!targetGame) throw new Error("Game not found for extra Alle Fünfe");
   targetGame.summary.extraYatzyBonus += 100;
   const dieValues = targetGame.summary.extraYatzyDieValues ?? [];
   targetGame.summary.extraYatzyDieValues = [...dieValues, yatzyDieValue];

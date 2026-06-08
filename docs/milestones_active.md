@@ -2,7 +2,7 @@
 
 **Stand:** 2026-06-08  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `3c03592`  
+**Produktcode-HEAD:** `80892e5`  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -19,26 +19,49 @@ Technische Basis ist erledigt:
 - Native App startet direkt auf `/app`.
 - Native API-Basis zeigt auf `https://dicebudget.bottle-trade.de/api`.
 - TestFlight ist aktiv, aktueller Build ist `2.0 (21)`.
-- Naechster Upload ist `2.0 (22)` und muss alles seit `2.0 (21)` enthalten: **Yatzy-Miniwürfel**, **Zusatz-Yatzy-Würfelwahl**, **Spiel-Feedback**, **Spielanalyse-Coaching**, **Einstellungen-Rücknavigation**.
+- Naechster Upload ist `2.0 (22)` und muss alles seit `2.0 (21)` enthalten: **Alle-Fünfe-Miniwürfel**, **Zusatz-Alle-Fünfe-Würfelwahl**, **Spiel-Feedback** (Gaming-Politur), **Erfolg teilen**, **Alle-Fünfe-Branding**, **Spielanalyse-Coaching**, **Einstellungen-Rücknavigation**.
 
 Offen:
 
-- iOS-Build `2.0 (22)` auf dem Mac bauen und hochladen (Yatzy-UX seit `cb101f6`).
+- iOS-Build `2.0 (22)` auf dem Mac bauen und hochladen (Alle-Fünfe-UX seit `cb101f6`, Share/Branding seit `a93e462`).
 - Startscreen, `/solo`, `/multi`, `/settings`, `/stats`, `/datenschutz`, `/impressum` und `/play` in iOS/Capacitor auf iPhone pruefen: Footer-Tabbar muss auf App-/Setup-/Legal-Screens unten sitzen; `/play` muss footerfrei sein und der Zettel muss die volle Screenhoehe nutzen.
 - iPad-Tischmodus in TestFlight auf iPad Querformat testen; iPhone-Flow muss unveraendert bleiben.
-- TestFlight `2.0 (22)` nach Upload testen (Yatzy-Miniwürfel, Zusatz-Yatzy-Würfelwahl); Regression in `2.0 (21)` (Multi-Statistik-Toggle, Spielanalyse, Footer/`/play`).
+- TestFlight `2.0 (22)` nach Upload testen (Share, Alle-Fünfe-Branding, Miniwürfel, Zusatz-Würfelwahl, Spiel-Feedback); Regression in `2.0 (21)` (Multi-Statistik-Toggle, Spielanalyse, Footer/`/play`).
 - App Store Connect fuer kostenpflichtigen Release fertigstellen.
 
 Details: `docs/ios_current.md`.
 
 ## Letzte Abgeschlossene Milestones
 
+### Erfolg teilen + Alle-Fünfe-Branding 2026-06-08
+
+**Status:** erledigt im Produktcode (`80892e5`), Frontend gebaut; Backend-Deploy fuer Coaching-/Fehlertexte durch Nutzer; noch nicht in iOS `2.0 (21)`.
+
+- **Erfolg teilen:** Canvas-Share-Karte mit App-Branding; WhatsApp, Instagram Story (Bild), System-Teilen auf Erfolgs-Overlays, Abschluss-Screen, Spielanalyse, Paarungs-Bilanz, Startscreen-Bilanz, iPad-Tischmodus-Duell.
+- **Alle Fünfe (UI):** Nutzer-sichtbare Texte statt „Yatzy“ (Zettel, Eintrag, Zusatz-Bonus, Feedback, Analyse/Coaching, Fehlermeldungen); technische IDs unveraendert.
+
+Technische Hinweise:
+
+- `frontend/lib/shareSocial.ts`, `shareCanvasUtils.ts`, `achievementShare.ts`, `matchResultShare.ts`
+- `frontend/components/ShareActionBar.tsx`, `AchievementShareBar.tsx`
+- `frontend/lib/labels.ts` (`KNIFFEL: "Alle Fünfe"`)
+- Backend: `matchCoaching.ts`, `matchAnalysis.ts`, `playField.ts`, `extraYatzyDieValues.ts` (Fehlertexte)
+
+### Spiel-Feedback Gaming-Politur 2026-06-08
+
+**Status:** erledigt im Produktcode (`a93e462`), Frontend gebaut; noch nicht in iOS `2.0 (21)`.
+
+- Dunkle Gaming-Overlays (Glas-Karte, typ-spezifische Szenen: obere Sektion, Ring, Combo, Alle-Fünfe-Shake/Flash).
+- Layered Web-Audio mit Riser, Kicks, Stereo-Panning, Noise-Bursts.
+
+Dateien: `AchievementOverlay.tsx`, `achievementSound.ts`, `globals.css`
+
 ### Spielanalyse-Coaching + Spiel-Feedback 2026-06-08
 
 **Status:** erledigt im Produktcode (`3c03592`), Frontend gebaut; Backend-Deploy durch Nutzer fuer Multi-Coaching in API; noch nicht in iOS `2.0 (21)`.
 
 - **Coaching:** Narrative (Sieg/Niederlage), Stärken/Schwächen, Pool-Report (Strategy), Feld-Differenzen, bis zu 3 Tipps; UI-Sektionen im dunklen Dashboard-Look.
-- **Spiel-Feedback:** Erfolgs-Overlays + synthetische Sounds bei Bonus, unterer Spalte voll, Große Straße, Yatzy; Toggle „Spiel-Feedback“.
+- **Spiel-Feedback (Basis):** Erfolgs-Overlays + synthetische Sounds bei Bonus, unterer Spalte voll, Große Straße, Alle Fünfe; Toggle „Spiel-Feedback“.
 - **Einstellungen:** Rücknavigation von Solo/Multi mit `?from=solo|multi`.
 
 Technische Hinweise:
@@ -48,13 +71,13 @@ Technische Hinweise:
 - `frontend/components/AchievementOverlay.tsx`, `frontend/lib/achievementFeedback.ts`, `frontend/lib/achievementSound.ts`
 - `frontend/lib/settingsReturn.ts`
 
-### Yatzy-Markierung und Zusatz-Yatzy 2026-06-08
+### Alle-Fünfe-Markierung und Zusatz-Alle-Fünfe 2026-06-08
 
 **Status:** erledigt im Produktcode (`cb101f6`), Frontend gebaut; Backend-Deploy durch Nutzer (Migration `extra_yatzy_die_values`); noch nicht in iOS `2.0 (21)`.
 
-- Yatzy-Eintrag (50 Pkt.): Würfelwahl 1–6; Markierung als **Mini-Würfel** (50 % Feldhöhe) neben dem passenden Feld-Würfel.
-- Ab 6. Yatzy gleicher Augenzahl: **Umbruch** (Grid max. 5 pro Zeile), Label-Spalte mit `overflow: hidden`.
-- **Zusatz-Yatzy (+100):** Plus-Button bei Yatzy → Würfelwahl → Bonus; Augenzahl in `games.extra_yatzy_die_values` (JSON), erscheint in der Markierung.
+- Alle-Fünfe-Eintrag (50 Pkt.): Würfelwahl 1–6; Markierung als **Mini-Würfel** (50 % Feldhöhe) neben dem passenden Feld-Würfel.
+- Ab 6. Alle Fünfe gleicher Augenzahl: **Umbruch** (Grid max. 5 pro Zeile), Label-Spalte mit `overflow: hidden`.
+- **Zusatz-Alle-Fünfe (+100):** Plus-Button bei Alle Fünfe → Würfelwahl → Bonus; Augenzahl in `games.extra_yatzy_die_values` (JSON), erscheint in der Markierung.
 - Popover-Auswahl per Portal (`ExtraYatzyPickerOverlay`) — nicht mehr vom Zettel abgeschnitten.
 
 Technische Hinweise:
@@ -78,7 +101,7 @@ Dateien:
 
 - Nach Multi/Solo-Abschluss optional **Spielanalyse** (Button auf `RunFinishScreen`, nicht automatisch).
 - Verfuegbar nach Pool-Endspiel bzw. direkt wenn kein Pool-Endspiel.
-- **2 Spieler:** Head-to-Head mit Attribution (Bonus, oben/unten, Zusatz-Yatzy), Insights, Gegner-Metriken.
+- **2 Spieler:** Head-to-Head mit Attribution (Bonus, oben/unten, Zusatz-Alle-Fünfe), Insights, Gegner-Metriken.
 - **3–6 Spieler:** Runden-Ranking, Platz/Abstand zur Spitze, Direktbilanz, aufklappbare Direktvergleiche je Mitspieler.
 - **Solo:** lokale Eigenanalyse aus `RunDto`.
 - **Historie:** `/stats/pairing` → App-Runde antippen → `/stats/match-analysis?invite=…`.
@@ -103,7 +126,7 @@ Dateien:
 
 - Spielzettel: Ergebnis 1 und Ergebnis 2 mit dunklem Hintergrund wie der restliche Zettel.
 - Multiplayer: Switch „Werten“ / „Nicht werten“ (Settings-Design) auf Abschluss-Screen; Paarungs-Statistik erst nach `POST /sessions/invite/:code/finalize-stats` beim Verlassen.
-- Yatzy: Wuerfel-Abfrage (1–6) bei 50 Punkten; Markierung als Mini-Wuerfel auf dem Zettel (`yatzy_die_value`; erweitert in Yatzy-Milestone 2026-06-08).
+- Alle Fünfe: Wuerfel-Abfrage (1–6) bei 50 Punkten; Markierung als Mini-Wuerfel auf dem Zettel (`yatzy_die_value`; erweitert in Alle-Fünfe-Milestone 2026-06-08).
 - Toggles app-weit blassgruen/blassrot (`.app-toggle`).
 - Startscreen-3D-Icons ca. +75 % (CSS).
 - `/settings` gruppiert (Allgemein, Solo, Multi, iPad); iPad-Namen nur bei aktivem Tischmodus editierbar.
@@ -233,10 +256,10 @@ Dateien:
 ## Offene Aufgaben
 
 1. **Backend deployen** (Coaching-API + ggf. Migration `extra_yatzy_die_values`).
-2. iOS/TestFlight `2.0 (22)` bereitstellen (Yatzy-UX seit `cb101f6`).
+2. iOS/TestFlight `2.0 (22)` bereitstellen (Alle-Fünfe-UX, Share, Branding seit `a93e462`).
 3. App Store Connect: Paid Applications Agreement, Bank/Steuer.
 4. Preis `1,19 EUR`, Screenshots, Beschreibung DE, Datenschutzfragebogen.
-5. TestFlight `2.0 (22)`: Yatzy-Miniwürfel, Zusatz-Yatzy-Würfelwahl; Footer/Pool/Multi bereits in `2.0 (21)` regressionsprüfen.
+5. TestFlight `2.0 (22)`: Share, Alle-Fünfe-Branding, Miniwürfel, Zusatz-Würfelwahl, Spiel-Feedback; Footer/Pool/Multi bereits in `2.0 (21)` regressionsprüfen.
 6. Optional: Auto-Refresh nach Pool-Endspiel fuer Statistik-Toggle.
 7. Optional: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschraenken.
 8. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
@@ -253,7 +276,7 @@ Dateien:
 ## Aktuelle Prioritaeten
 
 1. Backend deployen (Migration `extra_yatzy_die_values`).
-2. iOS/TestFlight `2.0 (22)` bereitstellen (Yatzy-UX seit `cb101f6`).
+2. iOS/TestFlight `2.0 (22)` bereitstellen (Alle-Fünfe-UX, Share, Branding seit `a93e462`).
 3. iPad-Tischmodus auf iPad Querformat, neue Start-/Setup-/Lobby-/Settings-/Legal-Optik, Footer-Tabbar in iOS, footerfreie `/play`-Zettel und iPhone-Regression testen.
 4. Store-Connect-Freigaben und Metadaten abschliessen.
 5. Danach erst optionale Sicherheits-/Auth-Verfeinerung der Stats-Endpunkte planen.
@@ -264,6 +287,9 @@ Dateien:
 - `HANDOVER.md`
 - `docs/ios_current.md`
 - `docs/decisions.md`
+- `frontend/lib/shareSocial.ts`, `frontend/lib/shareCanvasUtils.ts`, `frontend/lib/achievementShare.ts`, `frontend/lib/matchResultShare.ts`
+- `frontend/components/ShareActionBar.tsx`, `frontend/components/AchievementShareBar.tsx`
+- `frontend/lib/labels.ts`
 - `frontend/components/MatchAnalysisView.tsx`
 - `backend/src/domain/matchAnalysis.ts`
 - `backend/src/services/matchAnalysisService.ts`

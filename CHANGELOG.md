@@ -34,8 +34,12 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Pool-Endspiel ausführbar (M33-Fix):** Beendete der Pool-Sieger seinen Run **vor** den Mitspielern, erschien die Verbesserungs-Phase nie (ohne Polling kein Nachladen). Der Abschluss-Screen zeigt jetzt „Pool-Endspiel läuft" mit Aktualisieren-Tap; zusammen mit dem Focus-Refresh erhält der Sieger die Verbesserung zuverlässig. Datei: `PlayBoard.tsx`
 - **Stats zusammenführen bei Alias:** Spieler-IDs mit demselben lokalen Alias werden in der Statistik wieder als dieselbe Person zusammengeführt (Übersicht + Detail), rein lokal/clientseitig ohne Klarnamen. Neu: `lib/pairingMerge.ts`; angepasst: `app/stats/page.tsx`, `app/stats/pairing/page.tsx`
 
+### Added
+- **Erfolg teilen:** Screenshot-freundliche Share-Karte mit App-Branding; Share-Leiste (WhatsApp, Instagram Story, System-Teilen) auf **Erfolgs-Overlays**, **Abschluss-Screen**, **Spielanalyse**, **Paarungs-Bilanz** (`/stats/pairing`), **Startscreen-Bilanz** und **iPad-Tischmodus-Duell** (inkl. Spielanalyse im Tischmodus)
+
 ### Changed
-- **Spiel-Feedback Gaming-Politur:** Erfolgs-Overlays im dunklen Dashboard-Look (Glas-Karte, Gold-Kicker, typ-spezifische Szenen: obere Sektion-Slots, Ring-Siegel, Combo-Würfelkette, Yatzy-Shake/Flash); Layered Web-Audio mit Riser, Kicks, Stereo-Panning und Noise-Bursts; „Tippen zum Schließen“-Hinweis
+- **Markenwort „Yatzy“ entfernt:** Nutzer-sichtbare Texte heißen jetzt **Alle Fünfe** (Zettelzeile, Eintrag, Zusatz-Bonus, Spiel-Feedback, Spielanalyse/Coaching, Fehlermeldungen)
+- **Spiel-Feedback Gaming-Politur:** Erfolgs-Overlays im dunklen Dashboard-Look (Glas-Karte, Gold-Kicker, typ-spezifische Szenen: obere Sektion-Slots, Ring-Siegel, Combo-Würfelkette, Alle-Fünfe-Shake/Flash); Layered Web-Audio mit Riser, Kicks, Stereo-Panning und Noise-Bursts; „Außerhalb tippen zum Schließen“
 - **Bonus-Einblendung → Spiel-Feedback:** Einstellungs-Toggle steuert jetzt alle Erfolgs-Animationen und Sounds (lokal, gleicher Storage-Key)
 - **Multi-Statistik-Toggle wie Einstellungen:** „Werten“ / „Nicht werten“ nutzt jetzt denselben Switch (`.app-toggle`) und Karten-Stil wie die Toggles unter `/settings`
 - **Spielzettel Ergebnis 1/2 dunkel:** Zeilen- und Zellenhintergrund von „Ergebnis 1“ und „Ergebnis 2“ an den dunklen Spielzettel angeglichen (kein Hellgrau mehr)
@@ -64,12 +68,12 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **M29 entfernt:** Würfel-Zähler, Wurf vergleichen, `DiceThrowOverlay`, `CommittedThrowBanner`, `FixedFieldChoiceBanner`
 
 ### iOS
-- App Store Connect ist bei **Version 2.0**; aktueller TestFlight-Build **2.0 (21)** (Upload durch Nutzer). Build-Nummern zählen pro Versionsstring · nächster Upload = **2.0 (22)** mit Yatzy-UX, Spiel-Feedback, Coaching-Analyse, Einstellungen-Rücknavigation (seit `3c03592`)
-- M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard + Spiel-UX + Spielanalyse (Basis) sind in **2.0 (21)**; alles seit `48a65f1`/`3c03592` noch nicht im iOS-Build
+- App Store Connect ist bei **Version 2.0**; aktueller TestFlight-Build **2.0 (21)** (Upload durch Nutzer). Build-Nummern zählen pro Versionsstring · nächster Upload = **2.0 (22)** mit Alle-Fünfe-UX, Share, Branding, Spiel-Feedback Gaming, Coaching-Analyse, Einstellungen-Rücknavigation (seit `a93e462`)
+- M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard + Spiel-UX + Spielanalyse (Basis) sind in **2.0 (21)**; alles seit `48a65f1`/`3c03592`/`a93e462` noch nicht im iOS-Build
 - (zuvor, Version 2.0) Build **6** — vor M34-Fixes · (Version 1.0) Build **18** — M33 + Würfe-Standard 3 · **17** — M31 + M32 · **16** — M29 + M30 · **15** — M29
 
 ### Docs
-- HANDOVER, docs/milestones_active, docs/ios_current, GOiOS, milestones: Übergabe auf HEAD **`3c03592`** (Coaching, Spiel-Feedback, Einstellungen-Rücknavigation); neuer Übergabeprompt
+- HANDOVER, docs/milestones_active, docs/ios_current, GOiOS, milestones, projektbeschreibung: Übergabe auf HEAD **`80892e5`** (Share, Alle-Fünfe-Branding, Gaming-Politur); neuer Übergabeprompt
 - HANDOVER, docs/milestones_active, docs/ios_current, GOiOS, milestones, CHANGELOG: TestFlight-Stand auf **2.0 (21)** aktualisiert; nächster Upload **2.0 (22)** (Yatzy-UX seit `cb101f6`)
 - HANDOVER, docs/milestones_active, docs/ios_current, CHANGELOG: Stand 2026-06-04 — zentraler Footer für Home/Setup/Play, dunkles Grau als App-Hintergrund, kompakter iPhone-Footer ohne Safe-Area-Abstand, zentrale `/settings`-Seite und Startscreen mit `Multiplayer`, `Einzelspiel`, `Statistik`, `Einstellungen`; iOS-Upload 2.0 (7) enthält M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-Finalisierung
 - HANDOVER, docs/milestones_active, docs/ios_current, GOiOS, milestones, CHANGELOG: Stand Produktcode **`0b2e25c`** — M34 Bugfixes + Stats-Reset, **M35 Paarungen bearbeiten**, **UI-Politur** und **iPad-Tischmodus**; iOS-Upload 2.0 (7) enthält M34 + M35 + UI-Politur + iPad-Tischmodus

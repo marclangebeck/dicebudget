@@ -12,10 +12,16 @@ import {
   type MergedPairingSummary,
 } from "@/lib/pairingMerge";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
+import { ShareActionBar } from "@/components/ShareActionBar";
 import { getOrCreatePlayerId, normalizePublicPlayerId, playerLabel } from "@/lib/playerIdentity";
 import { loadPlayerAliases, setPlayerAlias, type PlayerAliasMap } from "@/lib/playerAliases";
 import { PlayerAliasOverlay } from "@/components/PlayerAliasOverlay";
 import { PairingEditOverlay } from "@/components/PairingEditOverlay";
+import {
+  buildPairingShareText,
+  renderPairingShareImage,
+  type PairingShareParams,
+} from "@/lib/matchResultShare";
 
 function formatDateTime(iso: string | null): string {
   if (!iso) return "—";
@@ -129,6 +135,24 @@ function PairingDetailInner() {
 
   const netDiff = pairing ? pairing.playerABonusPoints - pairing.playerBBonusPoints : 0;
 
+  const pairingShareParams: PairingShareParams | null = pairing
+    ? {
+        playerAName: playerLabel(pairing.playerA, ownPlayerId, aliases),
+        playerBName: playerLabel(pairing.playerB, ownPlayerId, aliases),
+        playerAWins: pairing.playerAWins,
+        playerBWins: pairing.playerBWins,
+        ties: pairing.ties,
+        roundsPlayed: pairing.roundsPlayed,
+      }
+    : null;
+
+  const buildPairingShare = () =>
+    pairingShareParams ? buildPairingShareText(pairingShareParams) : "";
+  const renderPairingShare = () => {
+    if (!pairingShareParams) throw new Error("Paarung nicht geladen");
+    return renderPairingShareImage(pairingShareParams);
+  };
+
   return (
     <div className="stats-screen flex flex-col gap-3 pb-2">
       <AppScreenHeader
@@ -190,6 +214,17 @@ function PairingDetailInner() {
               </p>
             </div>
           </section>
+
+          {pairingShareParams && (
+            <ShareActionBar
+              label="Bilanz teilen"
+              shareSuffix="Paarung"
+              filename="dicebudget-paarung.png"
+              buildText={buildPairingShare}
+              buildImage={renderPairingShare}
+              prominent
+            />
+          )}
 
           <section>
             <h2 className="stats-section-title">

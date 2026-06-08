@@ -3,9 +3,14 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { ShareActionBar } from "@/components/ShareActionBar";
 import { StatsRatingToggle } from "@/components/StatsRatingToggle";
 import { clearActiveGame } from "@/lib/activeGame";
 import { APP_HOME_PATH } from "@/lib/branding";
+import {
+  buildRunFinishShareText,
+  renderRunFinishShareImage,
+} from "@/lib/matchResultShare";
 import { runHasOpenFields } from "@/lib/runUtils";
 import type { RunDto } from "@/lib/types";
 
@@ -40,6 +45,8 @@ export function RunFinishScreen({
 
   const abandoned = runHasOpenFields(run);
   const maxRolls = run.useStrategyRules ? run.gameCount * 39 : null;
+  const buildShareText = () => buildRunFinishShareText(run);
+  const buildShareImage = () => renderRunFinishShareImage(run);
   const finishedLabel = run.finishedAt
     ? new Date(run.finishedAt).toLocaleString("de-DE", {
         dateStyle: "medium",
@@ -76,6 +83,15 @@ export function RunFinishScreen({
         Gesamtpunkte · {run.gameCount} {run.gameCount === 1 ? "Spiel" : "Spiele"}
       </p>
       {finishedLabel && <p className="text-subtle mt-1 text-[11px]">{finishedLabel}</p>}
+
+      <ShareActionBar
+        label="Ergebnis teilen"
+        shareSuffix="Ergebnis"
+        filename="dicebudget-ergebnis.png"
+        buildText={buildShareText}
+        buildImage={buildShareImage}
+        prominent
+      />
 
       {multiplayer && onFinalizeStats && (
         <div className="mt-5 text-left">

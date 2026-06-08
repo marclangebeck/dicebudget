@@ -66,7 +66,7 @@ export function achievementVisual(
       return {
         kicker: "Jackpot",
         badge: "+50",
-        title: "YATZY!",
+        title: "ALLE FÜNFE!",
         subtitle: `Fünf gleiche${gameSuffix} — legendärer Treffer`,
         confettiColors: ["#fef08a", "#facc15", "#fde047", "#f472b6", "#ffffff", "#e5c07b"],
       };

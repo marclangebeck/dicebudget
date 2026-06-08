@@ -124,7 +124,7 @@ function buildSoloInsights(metrics: PlayerRunMetricsDto): string[] {
     );
   }
   if (metrics.yatzyHits + metrics.yatzyMisses > 0) {
-    insights.push(`Yatzy: ${metrics.yatzyHits}× Treffer, ${metrics.yatzyMisses}× gestrichen.`);
+    insights.push(`Alle Fünfe: ${metrics.yatzyHits}× Treffer, ${metrics.yatzyMisses}× gestrichen.`);
   }
   if (metrics.zeroEntries > 0) {
     insights.push(`${metrics.zeroEntries} Null-Einträge.`);

@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { ShareActionBar } from "@/components/ShareActionBar";
 import { fieldLabelForAnalysis } from "@/lib/matchAnalysis";
+import {
+  buildMatchAnalysisShareText,
+  renderMatchAnalysisShareImage,
+} from "@/lib/matchResultShare";
 import {
   EMPTY_MATCH_COACHING,
   type HeadToHeadAnalysisDto,
@@ -113,7 +118,7 @@ function MetricsCompact({ metrics }: { metrics: PlayerRunMetricsDto }) {
         </>
       )}
       <div>
-        <dt>Yatzy</dt>
+        <dt>Alle Fünfe</dt>
         <dd className="tabular-nums">
           {metrics.yatzyHits}/{metrics.yatzyMisses}
         </dd>
@@ -228,6 +233,20 @@ export function MatchAnalysisView({
       ? playerLabel(sessionMeta.opponentName, ownPlayerId, aliases)
       : opponentLabel;
 
+  const buildShareText = () =>
+    buildMatchAnalysisShareText({
+      analysis,
+      viewerLabel: resolvedViewerLabel,
+      opponentLabel: resolvedOpponentLabel,
+    });
+
+  const buildShareImage = () =>
+    renderMatchAnalysisShareImage({
+      analysis,
+      viewerLabel: resolvedViewerLabel,
+      opponentLabel: resolvedOpponentLabel,
+    });
+
   const heroScore = !isMultiRound && h2h
     ? formatSigned(h2h.scoreDiff)
     : String(analysis.viewer.totalScore);
@@ -272,6 +291,15 @@ export function MatchAnalysisView({
           </p>
         )}
       </section>
+
+      <ShareActionBar
+        label="Analyse teilen"
+        shareSuffix="Spielanalyse"
+        filename="dicebudget-analyse.png"
+        buildText={buildShareText}
+        buildImage={buildShareImage}
+        prominent
+      />
 
       {(hasCoaching || analysis.insights.length > 0) && (
         <Panel kicker="Auswertung" title="Warum so?">

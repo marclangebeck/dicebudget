@@ -107,7 +107,7 @@ function YatzyRowLabel({
       {extraYatzyCount > 0 && (
         <span
           className="rounded bg-emerald-100 px-1 py-px text-[9px] font-bold leading-none text-emerald-900"
-          title={`${extraYatzyCount} Zusatz-Yatzy`}
+          title={`${extraYatzyCount} Zusatz Alle Fünfe`}
         >
           +{extraYatzyCount}
         </span>
@@ -120,8 +120,8 @@ function YatzyRowLabel({
           e.stopPropagation();
           openPicker();
         }}
-        title="Zusatz-Yatzy: +100 Punkte auf Ergebnis Spiel (nächste Spalte)"
-        aria-label="Zusatz-Yatzy Bonus hinzufügen"
+        title="Zusatz Alle Fünfe: +100 Punkte auf Ergebnis Spiel (nächste Spalte)"
+        aria-label="Zusatz Alle Fünfe Bonus hinzufügen"
         className="flex h-5 min-w-5 items-center justify-center rounded border border-emerald-700 bg-emerald-600 px-0.5 text-[11px] font-bold leading-none text-white disabled:opacity-40"
       >
         +
@@ -198,8 +198,8 @@ function FieldRowLabel({
         {yatzyMarkCount !== undefined && yatzyMarkCount > 0 && (
           <span
             className="play-yatzy-mark"
-            title={`${yatzyMarkCount}× Yatzy mit dieser Augenzahl`}
-            aria-label={`${yatzyMarkCount} Yatzy-Markierungen`}
+            title={`${yatzyMarkCount}× Alle Fünfe mit dieser Augenzahl`}
+            aria-label={`${yatzyMarkCount} Alle-Fünfe-Markierungen`}
           >
             {Array.from({ length: yatzyMarkCount }, (_, i) => (
               <DiceFace
@@ -316,7 +316,7 @@ function SummaryTile({
       }`}
       title={
         extraYatzyBonus && extraYatzyBonus > 0
-          ? `inkl. ${extraYatzyBonus} Zusatz-Yatzy`
+          ? `inkl. ${extraYatzyBonus} Zusatz Alle Fünfe`
           : undefined
       }
     >

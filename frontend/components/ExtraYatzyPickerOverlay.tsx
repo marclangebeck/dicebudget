@@ -77,9 +77,9 @@ export function ExtraYatzyPickerOverlay({
         className="play-yatzy-picker-popover"
         style={{ top: position.top, left: position.left }}
         role="dialog"
-        aria-label="Yatzy mit Würfel wählen"
+        aria-label="Alle Fünfe mit Würfel wählen"
       >
-        <p className="play-yatzy-picker-label">Yatzy mit Würfel</p>
+        <p className="play-yatzy-picker-label">Alle Fünfe mit Würfel</p>
         <YatzyDiePicker
           compact
           disabled={disabled}

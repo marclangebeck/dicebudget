@@ -50,7 +50,7 @@ Backend muss laufen (`npm run dev` in `backend/` — danach `Ctrl+C`).
 | `GET` | `/runs/:id` | MP: Header `X-Player-Secret` |
 | `POST` | `/runs/:runId/fields/:fieldId/complete` | `{ "score", "rollsUsed" }` |
 | `POST` | `/runs/:runId/fields/:fieldId/clear` | Nur **letztes** eingetragenes Feld (MP: Secret) |
-| `POST` | `/runs/:runId/extra-yatzy` | Zusatz-Yatzy (+100 rotierend pro Spielblock) |
+| `POST` | `/runs/:runId/extra-yatzy` | Zusatz Alle Fünfe (+100 rotierend pro Spielblock) |
 | `POST` | `/runs/:runId/finish` | Alle Felder bewertet |
 | `POST` | `/runs/:runId/abandon` | Vorzeitig beenden |
 | `GET` | `/stats` | Persönliche Rekorde (abgeschlossene Runs) |
@@ -155,7 +155,7 @@ Nach Deploy: Hard-Refresh im Browser, falls alte JS-Chunks gecacht sind.
 | 1–6 | Grundgerüst, Scoring, Abschluss | erledigt |
 | 7–10 | Statistik (Basis), Multiplayer | erledigt |
 | 11–14 | UX, Modi, Validierung, Tests | erledigt |
-| 15–19 | Liga, Paarungsstatistik, Namen, Feld löschen, Zusatz-Yatzy | erledigt |
+| 15–19 | Liga, Paarungsstatistik, Namen, Feld löschen, Zusatz Alle Fünfe | erledigt |
 | 20 | UI-Modernisierung (Bento, Statistik, Setup, Spielzettel) | erledigt |
 | 21 | iOS-App (Capacitor), TestFlight Build 18, Legal live | in Arbeit (Store) — **[GOiOS.md](./GOiOS.md)** |
 | 22 | Datenschutz-Umbau (pseudonym, lokales Solo) | erledigt |

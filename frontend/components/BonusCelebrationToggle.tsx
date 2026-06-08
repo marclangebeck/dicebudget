@@ -30,7 +30,7 @@ export function BonusCelebrationToggle({ disabled }: Props) {
         <div className="min-w-0 flex-1">
           <p className="text-strong text-sm font-semibold">Spiel-Feedback</p>
           <p className="text-muted mt-0.5 text-xs leading-snug">
-            Kurze Erfolgs-Animation und Sound bei Bonus, unterer Spalte, Große Straße und Yatzy
+            Kurze Erfolgs-Animation und Sound bei Bonus, unterer Spalte, Große Straße und Alle Fünfe
           </p>
         </div>
         <button

@@ -63,7 +63,7 @@ export default function DatenschutzPage() {
         <section>
           <h2>3. Überblick</h2>
           <p>
-            {APP_NAME} ist ein Würfelspiel (Yatzy-Variante) mit
+            {APP_NAME} ist ein Würfelspiel mit
             app-zentrierter Nutzung. Es gibt
             <strong> kein Benutzerkonto</strong> und keine Registrierung mit
             E-Mail-Adresse.

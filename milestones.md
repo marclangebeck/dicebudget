@@ -23,11 +23,11 @@ Nur bei Bedarf:
 ## Aktueller Kurzstand
 
 - Branch: `milestone-22-prep`
-- Produktcode-HEAD: `3c03592`
+- Produktcode-HEAD: `80892e5`
 - Web/API live: https://dicebudget.bottle-trade.de
 - iOS: TestFlight `2.0 (21)`, naechster Upload `2.0 (22)`
 - In TestFlight `2.0 (21)`: M34, M35, UI-Politur, iPad-Tischmodus, Spiel-UX, Spielanalyse (Basis).
-- Noch nicht in iOS `2.0 (21)`: Yatzy-Miniwürfel, Zusatz-Yatzy, Spiel-Feedback, Coaching-Analyse, Einstellungen-Rücknavigation.
+- Noch nicht in iOS `2.0 (21)`: Alle-Fünfe-Miniwürfel, Zusatz-Alle-Fünfe, Spiel-Feedback (Gaming), Erfolg teilen, Alle-Fünfe-Branding, Coaching-Analyse, Einstellungen-Rücknavigation.
 
 ## Offene Prioritaeten
 

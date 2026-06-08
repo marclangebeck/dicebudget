@@ -2,7 +2,7 @@
 
 **Stand:** 2026-06-08
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `3c03592`
+**Produktcode-HEAD:** `80892e5`
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-/App-Store-Stand. Aeltere iOS-Historie steht in `docs/ios_archive.md`.
@@ -13,16 +13,18 @@ Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-
 - Aktueller TestFlight-Build ist **2.0 (21)**.
 - Naechster Upload ist **2.0 (22)**.
 - M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons + Spiel-UX Juni 2026 + Spielanalyse sind in TestFlight `2.0 (21)`.
-- **Yatzy-Miniwürfel / Zusatz-Yatzy-Würfelwahl** (`cb101f6`) sind **noch nicht** in TestFlight `2.0 (21)` — geplant fuer Upload `2.0 (22)`.
+- **Alle-Fünfe-Miniwürfel / Zusatz-Alle-Fünfe-Würfelwahl** (`cb101f6`), **Spiel-Feedback Gaming-Politur** (`a93e462`), **Erfolg teilen** und **Alle-Fünfe-Branding** sind **noch nicht** in TestFlight `2.0 (21)` — geplant fuer Upload `2.0 (22)`.
 - Web/API sind live unter https://dicebudget.bottle-trade.de.
 
 ## Was In 2.0 (22) Enthalten Sein Muss
 
-- Yatzy-Markierung als Mini-Würfel (50 % Feldhöhe); Zusatz-Yatzy mit Würfelwahl (+100); Portal-Popover.
-- Spiel-Feedback: Erfolgs-Overlays + Sound (Bonus, untere Spalte, Große Straße, Yatzy).
+- Alle-Fünfe-Markierung als Mini-Würfel (50 % Feldhöhe); Zusatz-Alle-Fünfe mit Würfelwahl (+100); Portal-Popover.
+- UI-Branding: Nutzer-sichtbar **Alle Fünfe** statt „Yatzy“ (technische IDs unveraendert).
+- Erfolg teilen: Canvas-Karte + WhatsApp/Instagram/System auf Overlays, Abschluss, Analyse, Bilanz, Tischmodus.
+- Spiel-Feedback: Gaming-Overlays + Layered Web-Audio (Bonus, untere Spalte, Große Straße, Alle Fünfe).
 - Spielanalyse-Coaching: Narrative, Stärken/Schwächen, Pool-Report, Tipps (Multi nach Backend-Deploy).
 - Einstellungen-Rücknavigation von Solo/Multi.
-- Backend: Migration `extra_yatzy_die_values` (falls noch nicht deployed), Coaching-API.
+- Backend: Migration `extra_yatzy_die_values` (falls noch nicht deployed), Coaching-API, Alle-Fünfe-Fehlertexte.
 
 ## Bereits In 2.0 (21)
 
@@ -31,7 +33,7 @@ Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-
 - UI-Politur (Punktwahl gelb, volle Zettelhöhe, Ergebnis-Zeilen)
 - iPad-Tischmodus (2 Spieler auf einem iPad)
 - Game-Dashboard-Design, Footer-Tabbar, footerfreie `/play`
-- Spiel-UX Juni 2026 (Werten/Nicht werten, Yatzy-Würfel-Abfrage beim Eintrag, dunkle Ergebniszeilen)
+- Spiel-UX Juni 2026 (Werten/Nicht werten, Alle-Fünfe-Würfel-Abfrage beim Eintrag, dunkle Ergebniszeilen)
 - Spielanalyse (optional nach Spielende, Historie unter `/stats/pairing`)
 
 ## Mac-Workflow Fuer Naechsten Upload
@@ -67,11 +69,13 @@ In Xcode:
 
 ## TestFlight-Pruefung Fuer 2.0 (22)
 
-- Yatzy-Miniwürfel neben Feld-Würfeln; Umbruch ab 6. Yatzy gleicher Augenzahl.
-- Zusatz-Yatzy (+): Würfelwahl sichtbar, Popover nicht abgeschnitten.
+- Alle-Fünfe-Miniwürfel neben Feld-Würfeln; Umbruch ab 6. Alle Fünfe gleicher Augenzahl.
+- Zusatz-Alle-Fünfe (+): Würfelwahl sichtbar, Popover nicht abgeschnitten; UI-Text „Alle Fünfe“.
+- Erfolg teilen auf Overlay, Abschluss, Analyse, Bilanz, Tischmodus-Duell.
+- Spiel-Feedback: Gaming-Overlays + Sound bei Bonus, untere Spalte, Große Straße, Alle Fünfe.
 - iPhone: bestehender Solo-/Multiplayer-Flow unveraendert.
 - iPhone: Footer-Tabbar auf Start-, Setup-, Settings-, Statistik-, Legal-Screens; `/play` footerfrei.
-- iPad Querformat: Tischmodus mit zwei anklickbaren Zetteln.
+- iPad Querformat: Tischmodus mit zwei anklickbaren Zetteln + Share/Spielanalyse.
 - Spielanalyse nach Abschluss und unter `/stats/pairing`.
 
 ## App Store Connect Offen

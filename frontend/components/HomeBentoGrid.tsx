@@ -4,11 +4,17 @@ import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { getPairingSummaries, getStats } from "@/lib/api";
 import { APP_SHORT } from "@/lib/branding";
+import {
+  buildHomeRecordShareText,
+  renderHomeRecordShareImage,
+  type HomeRecordShareParams,
+} from "@/lib/matchResultShare";
 import { mergePairingSummaries } from "@/lib/pairingMerge";
 import type { PairingSummaryDto } from "@/lib/pairingTypes";
 import { getOrCreatePlayerId, normalizePublicPlayerId, playerLabel } from "@/lib/playerIdentity";
 import { loadPlayerAliases, type PlayerAliasMap } from "@/lib/playerAliases";
 import type { StatsDto } from "@/lib/statsTypes";
+import { ShareActionBar } from "@/components/ShareActionBar";
 
 type NavTileProps = {
   href: string;
@@ -157,6 +163,17 @@ export function HomeBentoGrid() {
   const recordWinsLabel = hasOwnRecord && ownRecord !== null ? String(ownRecord.wins) : "—";
   const recordLossesLabel = hasOwnRecord && ownRecord !== null ? String(ownRecord.losses) : "—";
 
+  const homeShareParams: HomeRecordShareParams = {
+    recordTitle,
+    wins: ownRecord?.wins ?? 0,
+    losses: ownRecord?.losses ?? 0,
+    ties: ownRecord?.ties ?? 0,
+    bestScore: stats?.bestTotalScore ?? null,
+    pairingGames: totalPairingRounds,
+  };
+  const buildHomeShare = () => buildHomeRecordShareText(homeShareParams);
+  const renderHomeShare = () => renderHomeRecordShareImage(homeShareParams);
+
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2.5 overflow-hidden">
       <header className="home-hero-banner shrink-0">
@@ -208,6 +225,14 @@ export function HomeBentoGrid() {
             <div className="home-hero-record-track-win" style={{ width: `${winShare}%` }} />
             <div className="home-hero-record-track-loss" style={{ width: `${100 - winShare}%` }} />
           </div>
+          <ShareActionBar
+            label="Bilanz teilen"
+            shareSuffix="Bilanz"
+            filename="dicebudget-bilanz.png"
+            buildText={buildHomeShare}
+            buildImage={renderHomeShare}
+            prominent
+          />
         </div>
       </header>
 

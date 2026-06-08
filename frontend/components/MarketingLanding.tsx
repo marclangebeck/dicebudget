@@ -26,7 +26,7 @@ export function MarketingLanding() {
 
       <ul className="landing-features">
         <li>Einzelspiel oder Raum mit Einladungscode</li>
-        <li>Strategy mit Wurf-Pool oder klassisches Yatzy</li>
+        <li>Strategy mit Wurf-Pool oder klassischer Modus</li>
         <li>1 bis 6 Spielblöcke pro Partie</li>
         <li>Statistik und Multiplayer-Serien</li>
       </ul>

@@ -125,7 +125,7 @@ export function gameIndexForExtraYatzyClick(
   gameCount: number,
 ): number {
   if (gameCount < 1 || extraYatzyCountAfterClick < 1) {
-    throw new Error("invalid extra yatzy assignment");
+    throw new Error("invalid extra Alle Fünfe assignment");
   }
   return ((extraYatzyCountAfterClick - 1) % gameCount) + 1;
 }

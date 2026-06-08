@@ -17,7 +17,7 @@ Die App unterstützt zwei **Spielmodi**:
 - **Singleplayer:** `/solo` → Spielanzahl und Modus → `/play`
 - **Multiplayer:** 2–6 Spieler, Einladungscode, optional **Serie** (Liga) über mehrere Runden
 
-**Branding:** Produktname und PWA **DiceBudget**; Zettelzeile „Yatzy“ (kein Markenname Kniffel in der UI).
+**Branding:** Produktname und PWA **DiceBudget**; Zettelzeile **Alle Fünfe** (kein Markenname Kniffel/Yatzy in der UI).
 
 ---
 
@@ -51,7 +51,7 @@ Pro Spielblock (Spalte auf dem Zettel):
 
 - Obere 6 Felder → Summe; ab 63 Punkten oben: Bonus +35 → **Ergebnis 1** (Backend: `ergebnisOben`)
 - Untere 7 Felder → Summe → **Ergebnis 2** (`lowerSum`)
-- **Ergebnis Spiel** = Ergebnis 1 + untere Summe + optional **Zusatz-Yatzy-Bonus** (`extraYatzyBonus`)
+- **Ergebnis Spiel** = Ergebnis 1 + untere Summe + optional **Zusatz-Alle-Fünfe-Bonus** (`extraYatzyBonus`)
 
 **Gesamtpunktzahl Run** = Summe aller `gameTotal` über alle Spiele (`run.totalScore`).
 
@@ -59,10 +59,10 @@ Pro Spielblock (Spalte auf dem Zettel):
 
 **Bonus-Einblendung (M31):** Schließt eine obere Reihe vollständig (6/6) mit ≥63 ab, erscheint ein kurzes Glückwunsch-Overlay („Bonus erreicht! +35“) mit Animation, das nach 2,5 s automatisch schließt (oder per Tippen). Erkennung über `upperBonusAchieved` in `gameScoring.ts`, Anzeige via `BonusOverlay`. Pro Gerät abschaltbar (`lib/uiPrefs.ts`, Toggle auf `/solo` + `/multi`; kein Backend). Respektiert `prefers-reduced-motion`.
 
-### 2.4 Zusatz-Yatzy
+### 2.4 Zusatz-Alle-Fünfe
 
-Ab dem 7. Yatzy-Eintrag (über alle Spielblöcke): per `POST /runs/:id/extra-yatzy` jeweils **+100** auf „Ergebnis Spiel“, rotierend Sp1 → Sp2 → …  
-UI: `+`-Button an der Yatzy-Zeile, Anzeige `+N` Zusatz-Yatzy.
+Ab dem 7. Alle-Fünfe-Eintrag (über alle Spielblöcke): per `POST /runs/:id/extra-yatzy` jeweils **+100** auf „Ergebnis Spiel“, rotierend Sp1 → Sp2 → …  
+UI: `+`-Button an der Alle-Fünfe-Zeile, Anzeige `+N` Zusatz Alle Fünfe.
 
 ### 2.5 Letzten Eintrag löschen
 
@@ -182,7 +182,7 @@ Tabelle `player_name_aliases` (`aliasName` → `canonicalName`):
 | `PlayTopBar` | Zurück (Start/Lobby), eigener Pool + optionaler Gegner-Pool (M32) |
 | `BonusOverlay` | Bonus-Einblendung bei erreichtem Oberbonus (M31) |
 | `FitScoreSheet` | Skaliert Zettel auf verfügbare Höhe |
-| `ScoreSheetTable` | Zettel inkl. Zusatz-Yatzy und Bonus-Delta („Ergebnis 1“) |
+| `ScoreSheetTable` | Zettel inkl. Zusatz Alle Fünfe und Bonus-Delta („Ergebnis 1“) |
 | `ScoreEntryPanel` | Fixiertes Panel unten; Würfe nur bei Strategy |
 | `RunCompleteOverlay` | Nach letztem Feld |
 | `RunFinishScreen` | Nach `finish` (darf scrollen) |
@@ -213,7 +213,7 @@ Tabelle `player_name_aliases` (`aliasName` → `canonicalName`):
 | `POST` | `/runs/:runId/fields/:fieldId/rolls` | Optional; Strategy: Pool ab 4. Wurf |
 | `POST` | `/runs/:runId/fields/:fieldId/complete` | `{ "score", "rollsUsed" }` — validiert Feldtyp |
 | `POST` | `/runs/:runId/fields/:fieldId/clear` | Letztes Feld zurücksetzen |
-| `POST` | `/runs/:runId/extra-yatzy` | Zusatz-Yatzy +100 |
+| `POST` | `/runs/:runId/extra-yatzy` | Zusatz Alle Fünfe +100 |
 | `POST` | `/runs/:runId/finish` | Alle Felder bewertet |
 | `POST` | `/runs/:runId/abandon` | Vorzeitig beenden |
 
@@ -272,7 +272,7 @@ Multiplayer-Runs: Header **`X-Player-Secret`**.
 ### Umgesetzt
 
 - Singleplayer + Multiplayer, Strategy + Klassisch
-- Wurf-Pool (Strategy), Zusatz-Yatzy, letzten Eintrag löschen
+- Wurf-Pool (Strategy), Zusatz Alle Fünfe, letzten Eintrag löschen
 - Serien/Ligapunkte, neue Runde in derselben Serie
 - Statistik: Rekorde, Paarungen, Namen zusammenführen, manuelle Baselines
 - Server-Validierung Scores, Backend-Tests (`npm test`)
@@ -298,10 +298,10 @@ Multiplayer-Runs: Header **`X-Player-Secret`**.
 
 ## 9. Glossar
 
-- **Spielanzahl (`game_count`):** Anzahl Yatzy-Blöcke (Spalten) pro Run (1–6)
+- **Spielanzahl (`game_count`):** Anzahl Spielblöcke (Spalten) pro Run (1–6)
 - **Run:** ein Spieler-Durchlauf über alle Spalten
 - **Serie / Liga:** `leagueCode` — mehrere Multiplayer-Runden mit fortlaufenden Serienpunkten
 - **Siegpunkt / Bonus:** Ligapunkte (nicht Kniffel-Punkte auf dem Zettel)
 - **Paarung:** Head-to-Head zweier Spieler über gemeinsame abgeschlossene Runden
-- **Ergebnis Spiel:** Punkte eines Blocks (Spalte) inkl. Zusatz-Yatzy
+- **Ergebnis Spiel:** Punkte eines Blocks (Spalte) inkl. Zusatz Alle Fünfe
 - **Gesamtergebnis:** `total_score` = Summe aller Ergebnis-Spiel-Werte

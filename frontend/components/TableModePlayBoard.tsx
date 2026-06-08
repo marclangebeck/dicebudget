@@ -15,6 +15,7 @@ import {
   finishRun,
   getRun,
   getSessionLobby,
+  getSessionMatchAnalysis,
   incrementExtraYatzy,
   resolvePoolEndgame,
 } from "@/lib/api";
@@ -26,7 +27,14 @@ import {
   notifyAchievement,
   type AchievementOverlayState,
 } from "@/lib/achievementFeedback";
+import type { SessionMatchAnalysisDto } from "@/lib/matchAnalysisTypes";
+import {
+  buildTableModeShareText,
+  renderTableModeShareImage,
+  type TableModeShareParams,
+} from "@/lib/matchResultShare";
 import { allFieldsScored, getLastScoredFieldId } from "@/lib/runUtils";
+import { loadPlayerAliases } from "@/lib/playerAliases";
 import {
   loadTableModeSession,
   type TableModePlayer,
@@ -36,6 +44,8 @@ import { normalizePublicPlayerId } from "@/lib/playerIdentity";
 import type { SessionLobbyDto } from "@/lib/sessionTypes";
 import type { FieldDto, RunDto } from "@/lib/types";
 import { AchievementOverlay } from "@/components/AchievementOverlay";
+import { MatchAnalysisView } from "@/components/MatchAnalysisView";
+import { ShareActionBar } from "@/components/ShareActionBar";
 
 type Props = {
   inviteCode: string;
@@ -70,6 +80,9 @@ export function TableModePlayBoard({ inviteCode }: Props) {
   const [yatzyDieValue, setYatzyDieValue] = useState<number | null>(null);
   const [includeInStats, setIncludeInStats] = useState(true);
   const [leavingHome, setLeavingHome] = useState(false);
+  const [showMatchAnalysis, setShowMatchAnalysis] = useState(false);
+  const [matchAnalysis, setMatchAnalysis] = useState<SessionMatchAnalysisDto | null>(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
 
   const load = useCallback(async () => {
     const stored = loadTableModeSession(inviteCode);
@@ -275,7 +288,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
       );
       await refreshAfterChange(side, updated);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Zusatz-Yatzy fehlgeschlagen");
+      setError(e instanceof Error ? e.message : "Zusatz Alle Fünfe fehlgeschlagen");
     } finally {
       setBusy(false);
     }
@@ -347,6 +360,21 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     }
   }
 
+  async function handleViewAnalysis() {
+    if (!players) return;
+    setAnalysisLoading(true);
+    setError(null);
+    try {
+      const { analysis } = await getSessionMatchAnalysis(inviteCode, players[0].playerId);
+      setMatchAnalysis(analysis);
+      setShowMatchAnalysis(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Analyse fehlgeschlagen");
+    } finally {
+      setAnalysisLoading(false);
+    }
+  }
+
   if (!players) {
     return (
       <div className="play-message-card">
@@ -362,6 +390,43 @@ export function TableModePlayBoard({ inviteCode }: Props) {
 
   const allFinished = players.every((p) => runs[p.side]?.status === "FINISHED");
   const sessionFinished = allFinished && !poolEndgamePending;
+  const leftRun = runs.left;
+  const rightRun = runs.right;
+  const tableShareParams: TableModeShareParams | null =
+    sessionFinished && leftRun && rightRun
+      ? {
+          leftLabel: players[0].label,
+          rightLabel: players[1].label,
+          leftScore: leftRun.totalScore,
+          rightScore: rightRun.totalScore,
+          inviteCode,
+        }
+      : null;
+
+  if (showMatchAnalysis && matchAnalysis) {
+    return (
+      <div className="play-table-mode relative flex min-h-0 flex-1 flex-col gap-1.5 overflow-hidden">
+        <div className="play-table-mode-header shrink-0">
+          <div>
+            <p className="play-table-mode-kicker">iPad-Tischmodus · Spielanalyse</p>
+            <p className="play-table-mode-title">
+              {players[0].label} vs. {players[1].label}
+            </p>
+          </div>
+        </div>
+        {error && <p className="glass-alert-error shrink-0 px-3 py-2 text-sm">{error}</p>}
+        <div className="min-h-0 flex-1 overflow-y-auto px-1 pb-2">
+          <MatchAnalysisView
+            analysis={matchAnalysis}
+            ownPlayerId={players[0].playerId}
+            aliases={loadPlayerAliases()}
+            onBack={() => setShowMatchAnalysis(false)}
+            backLabel="Zurück zum Duell"
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="play-table-mode relative flex min-h-0 flex-1 flex-col gap-1.5 overflow-hidden">
@@ -472,6 +537,38 @@ export function TableModePlayBoard({ inviteCode }: Props) {
 
       {sessionFinished && (
         <div className="play-table-finish-footer shrink-0">
+          {leftRun && rightRun && (
+            <div className="play-table-duel-summary">
+              <p className="play-table-duel-summary-title">Duell beendet</p>
+              <div className="play-table-duel-scores tabular-nums">
+                <span>
+                  <strong>{players[0].label}</strong> {leftRun.totalScore}
+                </span>
+                <span className="play-table-duel-vs">:</span>
+                <span>
+                  <strong>{players[1].label}</strong> {rightRun.totalScore}
+                </span>
+              </div>
+            </div>
+          )}
+          {tableShareParams && (
+            <ShareActionBar
+              label="Duell teilen"
+              shareSuffix="iPad-Duell"
+              filename="dicebudget-tisch-duell.png"
+              buildText={() => buildTableModeShareText(tableShareParams)}
+              buildImage={() => renderTableModeShareImage(tableShareParams)}
+              prominent
+            />
+          )}
+          <button
+            type="button"
+            disabled={analysisLoading}
+            onClick={() => void handleViewAnalysis()}
+            className="play-table-analysis-btn mt-2 disabled:opacity-50"
+          >
+            {analysisLoading ? "Lade Analyse …" : "Spielanalyse"}
+          </button>
           <StatsRatingToggle
             includeInStats={includeInStats}
             onChange={setIncludeInStats}

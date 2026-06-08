@@ -81,7 +81,7 @@ export function setBonusCelebrationEnabled(enabled: boolean): void {
   setGameFeedbackEnabled(enabled);
 }
 
-/** Animation + Sound bei Spiel-Erfolgen (Bonus, untere Spalte, Große Straße, Yatzy). */
+/** Animation + Sound bei Spiel-Erfolgen (Bonus, untere Spalte, Große Straße, Alle Fünfe). */
 export function getGameFeedbackEnabled(): boolean {
   if (typeof window === "undefined") return true;
   return window.localStorage.getItem(BONUS_CELEBRATION_KEY) !== "0";

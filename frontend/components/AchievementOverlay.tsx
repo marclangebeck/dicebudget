@@ -1,7 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
+import { AchievementShareBar } from "@/components/AchievementShareBar";
 import { DiceFace } from "@/components/DiceFace";
+import { APP_NAME, SITE_URL } from "@/lib/branding";
 import {
   ACHIEVEMENT_CONFETTI_COUNT,
   achievementVisual,
@@ -22,6 +24,7 @@ const CONFETTI_SHAPES = ["rect", "star", "pip"] as const;
 export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: Props) {
   const visual = achievementVisual(type, gameIndex);
   const confettiCount = ACHIEVEMENT_CONFETTI_COUNT[type];
+  const siteLabel = SITE_URL.replace(/^https:\/\//, "");
 
   const confetti = useMemo(
     () =>
@@ -86,7 +89,15 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
         ))}
       </div>
 
-      <div className="achievement-overlay-card relative z-10 text-center">
+      <div
+        className="achievement-overlay-card achievement-share-frame relative z-10 text-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="achievement-share-brand" aria-hidden>
+          <img src="/apple-touch-icon.png" alt="" className="achievement-share-brand-icon" />
+          <span className="achievement-share-brand-name">{APP_NAME}</span>
+        </div>
+
         <p className="achievement-overlay-kicker">{visual.kicker}</p>
 
         {type === "bonus" && (
@@ -153,7 +164,15 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
 
         <p className="achievement-overlay-title">{visual.title}</p>
         <p className="achievement-overlay-sub">{visual.subtitle}</p>
-        <p className="achievement-overlay-hint">Tippen zum Schließen</p>
+
+        <footer className="achievement-share-footer">
+          <span className="achievement-share-footer-app">{APP_NAME}</span>
+          <span className="achievement-share-footer-url">{siteLabel}</span>
+        </footer>
+
+        <AchievementShareBar type={type} visual={visual} yatzyDieValue={yatzyDieValue} />
+
+        <p className="achievement-overlay-hint">Außerhalb tippen zum Schließen</p>
       </div>
     </div>
   );

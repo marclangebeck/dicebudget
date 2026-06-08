@@ -141,7 +141,7 @@ const FIELD_LABELS: Record<FieldTypeId, string> = {
   FULL_HOUSE: "Full House",
   SMALL_STRAIGHT: "Kl. Straße",
   LARGE_STRAIGHT: "Gr. Straße",
-  KNIFFEL: "Yatzy",
+  KNIFFEL: "Alle Fünfe",
   CHANCE: "Chance",
 };
 
@@ -288,7 +288,7 @@ function buildHeadToHead(
     },
     {
       key: "extraYatzy",
-      label: "Zusatz-Yatzy",
+      label: "Zusatz Alle Fünfe",
       viewerValue: viewer.extraYatzyTotal,
       opponentValue: opponent.extraYatzyTotal,
       diff: viewer.extraYatzyTotal - opponent.extraYatzyTotal,
@@ -359,7 +359,7 @@ function buildSoloInsights(metrics: PlayerRunMetrics): string[] {
     insights.push(`Bonus in ${metrics.bonusCount}/${metrics.gameCount} Spiel${metrics.gameCount === 1 ? "" : "en"}.`);
   }
   if (metrics.yatzyHits + metrics.yatzyMisses > 0) {
-    insights.push(`Yatzy: ${metrics.yatzyHits}× Treffer, ${metrics.yatzyMisses}× gestrichen.`);
+    insights.push(`Alle Fünfe: ${metrics.yatzyHits}× Treffer, ${metrics.yatzyMisses}× gestrichen.`);
   }
   if (metrics.zeroEntries > 0) {
     insights.push(`${metrics.zeroEntries} Null-Einträge.`);
@@ -416,7 +416,7 @@ function buildTwoPlayerInsights(
 
   if (viewer.yatzyHits !== opponent.yatzyHits || viewer.yatzyMisses !== opponent.yatzyMisses) {
     insights.push(
-      `Yatzy: ${viewer.yatzyHits}/${viewer.yatzyMisses} (Treffer/Null) vs. ${opponent.yatzyHits}/${opponent.yatzyMisses}.`,
+      `Alle Fünfe: ${viewer.yatzyHits}/${viewer.yatzyMisses} (Treffer/Null) vs. ${opponent.yatzyHits}/${opponent.yatzyMisses}.`,
     );
   }
 

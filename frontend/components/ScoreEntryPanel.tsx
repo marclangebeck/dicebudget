@@ -124,7 +124,7 @@ export function ScoreEntryPanel({
 
           {needsYatzyDie && onYatzyDieValue && (
             <div className="play-entry-section">
-              <p className="play-entry-section-label mb-1.5">Yatzy mit Würfel</p>
+              <p className="play-entry-section-label mb-1.5">Alle Fünfe mit Würfel</p>
               <YatzyDiePicker
                 disabled={run.status !== "ACTIVE" || busy}
                 selected={yatzyDieValue}

@@ -239,7 +239,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         : (await incrementExtraYatzy(runId, yatzyDieValue, playerSecret)).run;
       setRun(updated);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Zusatz-Yatzy fehlgeschlagen");
+      setError(e instanceof Error ? e.message : "Zusatz Alle Fünfe fehlgeschlagen");
     } finally {
       setBusy(false);
     }

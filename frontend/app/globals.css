@@ -771,6 +771,17 @@ html.legal-route body {
   box-shadow: 0 0 16px rgba(185, 132, 82, 0.3);
 }
 
+.home-hero-record .share-action-bar {
+  margin-top: 0.55rem;
+  padding-top: 0;
+  border-top: none;
+}
+
+.home-hero-record .share-action-bar--prominent {
+  margin-top: 0.65rem;
+  padding: 0.55rem 0.45rem 0.4rem;
+}
+
 .home-bento-brand-icon {
   width: 2.75rem;
   height: 2.75rem;
@@ -2535,6 +2546,237 @@ html.legal-route body {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: rgba(148, 163, 184, 0.65);
+}
+
+.achievement-share-frame {
+  border-width: 1px;
+}
+
+.achievement-share-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  margin-bottom: 0.45rem;
+}
+
+.achievement-share-brand-icon {
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 0.35rem;
+  object-fit: cover;
+}
+
+.achievement-share-brand-name {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #e5c07b;
+}
+
+.achievement-share-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin-top: 0.55rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(214, 168, 90, 0.22);
+}
+
+.achievement-share-footer-app {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #e5c07b;
+}
+
+.achievement-share-footer-url {
+  font-size: 0.65rem;
+  color: #64748b;
+}
+
+.achievement-share-bar {
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.achievement-share-label {
+  margin: 0 0 0.45rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.achievement-share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.achievement-share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-height: 2rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(15, 23, 42, 0.55);
+  color: #e2e8f0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+}
+
+.achievement-share-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.55);
+}
+
+.achievement-share-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.achievement-share-btn--whatsapp {
+  border-color: rgba(37, 211, 102, 0.45);
+  color: #bbf7d0;
+  background: rgba(4, 47, 28, 0.72);
+}
+
+.achievement-share-btn--instagram {
+  border-color: rgba(236, 72, 153, 0.4);
+  color: #fbcfe8;
+  background: rgba(59, 18, 42, 0.65);
+}
+
+.achievement-share-btn--more {
+  border-color: rgba(214, 168, 90, 0.35);
+  color: #fde68a;
+}
+
+.achievement-share-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+}
+
+.achievement-share-status {
+  margin: 0.45rem 0 0;
+  font-size: 0.62rem;
+  color: #7dd3fc;
+  line-height: 1.35;
+}
+
+.share-action-bar {
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.share-action-bar--prominent {
+  margin-top: 0.85rem;
+  padding: 0.75rem 0.65rem 0.55rem;
+  border: 1px solid rgba(214, 168, 90, 0.22);
+  border-radius: 0.85rem;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(62, 106, 137, 0.22), transparent 42%),
+    linear-gradient(160deg, rgba(26, 35, 50, 0.92), rgba(20, 28, 40, 0.96));
+}
+
+.share-action-label {
+  margin: 0 0 0.45rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.share-action-bar--prominent .share-action-label {
+  color: #e5c07b;
+}
+
+.share-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.share-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-height: 2rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(15, 23, 42, 0.55);
+  color: #e2e8f0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+}
+
+.share-action-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.55);
+}
+
+.share-action-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.share-action-btn--whatsapp {
+  border-color: rgba(37, 211, 102, 0.45);
+  color: #bbf7d0;
+  background: rgba(4, 47, 28, 0.72);
+}
+
+.share-action-btn--instagram {
+  border-color: rgba(236, 72, 153, 0.4);
+  color: #fbcfe8;
+  background: rgba(59, 18, 42, 0.65);
+}
+
+.share-action-btn--more {
+  border-color: rgba(214, 168, 90, 0.35);
+  color: #fde68a;
+}
+
+.share-action-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+}
+
+.share-action-status {
+  margin: 0.45rem 0 0;
+  font-size: 0.62rem;
+  color: #7dd3fc;
+  line-height: 1.35;
+}
+
+.play-finish-card .share-action-bar--prominent,
+.match-analysis-screen .share-action-bar--prominent,
+.stats-screen .share-action-bar--prominent,
+.home-hero-record .share-action-bar--prominent,
+.play-table-finish-footer .share-action-bar--prominent {
+  text-align: center;
 }
 
 .achievement-upper-slots {
@@ -4383,6 +4625,49 @@ html.legal-route body {
   flex-direction: column;
   gap: 0.35rem;
   padding: 0.35rem 0.25rem 0.15rem;
+}
+
+.play-table-duel-summary {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(214, 168, 90, 0.24);
+  background: rgba(15, 23, 42, 0.55);
+  padding: 0.55rem 0.65rem;
+  text-align: center;
+}
+
+.play-table-duel-summary-title {
+  margin: 0;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #e5c07b;
+}
+
+.play-table-duel-scores {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  margin-top: 0.35rem;
+  font-size: 0.95rem;
+  color: #f8fafc;
+}
+
+.play-table-duel-vs {
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.play-table-analysis-btn {
+  width: 100%;
+  min-height: 2.35rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(15, 23, 42, 0.72);
+  color: #e2e8f0;
+  font-size: 0.8125rem;
+  font-weight: 700;
 }
 
 .settings-section-card {
