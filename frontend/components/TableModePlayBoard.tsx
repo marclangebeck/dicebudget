@@ -21,18 +21,9 @@ import {
 } from "@/lib/api";
 import { APP_HOME_PATH } from "@/lib/branding";
 import { poolDeltaForComplete } from "@/lib/gameRules";
-import {
-  achievementDurationMs,
-  buildAchievementAfterField,
-  notifyAchievement,
-  type AchievementOverlayState,
-} from "@/lib/achievementFeedback";
-import { playProgressMilestoneSound } from "@/lib/achievementSound";
-import {
-  buildProgressMilestoneAfterField,
-  RUN_PROGRESS_DURATION_MS,
-  type RunProgressOverlayState,
-} from "@/lib/runProgressFeedback";
+import { buildAchievementAfterField } from "@/lib/achievementFeedback";
+import { useQueuedFeedbackOverlays } from "@/lib/feedbackOverlayQueue";
+import { buildProgressMilestoneAfterField } from "@/lib/runProgressFeedback";
 import type { SessionMatchAnalysisDto } from "@/lib/matchAnalysisTypes";
 import { allFieldsScored, getLastScoredFieldId } from "@/lib/runUtils";
 import { loadPlayerAliases } from "@/lib/playerAliases";
@@ -75,10 +66,14 @@ export function TableModePlayBoard({ inviteCode }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [endgameFieldId, setEndgameFieldId] = useState<string | null>(null);
   const [endgameScoreInput, setEndgameScoreInput] = useState("");
-  const [achievementOverlay, setAchievementOverlay] = useState<AchievementOverlayState | null>(
-    null,
-  );
-  const [progressOverlay, setProgressOverlay] = useState<RunProgressOverlayState | null>(null);
+  const {
+    achievementOverlay,
+    progressOverlay,
+    closeAchievementOverlay,
+    closeProgressOverlay,
+    presentFeedbackAfterField,
+    clearAllFeedbackOverlays,
+  } = useQueuedFeedbackOverlays();
   const shownProgressByRunRef = useRef<Record<string, Set<number>>>({});
   const [yatzyDieValue, setYatzyDieValue] = useState<number | null>(null);
   const [includeInStats, setIncludeInStats] = useState(true);
@@ -109,21 +104,6 @@ export function TableModePlayBoard({ inviteCode }: Props) {
       setError(e instanceof Error ? e.message : "Tischspiel konnte nicht geladen werden"),
     );
   }, [load]);
-
-  useEffect(() => {
-    if (!achievementOverlay) return;
-    const timer = window.setTimeout(
-      () => setAchievementOverlay(null),
-      achievementDurationMs(achievementOverlay.type),
-    );
-    return () => window.clearTimeout(timer);
-  }, [achievementOverlay]);
-
-  useEffect(() => {
-    if (!progressOverlay) return;
-    const timer = window.setTimeout(() => setProgressOverlay(null), RUN_PROGRESS_DURATION_MS);
-    return () => window.clearTimeout(timer);
-  }, [progressOverlay]);
 
   const activeRun = activeSide ? runs[activeSide] : null;
   const activePlayer = useMemo(
@@ -257,14 +237,10 @@ export function TableModePlayBoard({ inviteCode }: Props) {
       }
       const progress = buildProgressMilestoneAfterField(activeRun, updated, shownSet);
       await refreshAfterChange(activeSide, updated);
-      if (achievement) {
-        notifyAchievement(achievement);
-        setAchievementOverlay(achievement);
-      } else if (progress) {
+      if (progress) {
         shownSet.add(progress.percent);
-        playProgressMilestoneSound(progress.percent);
-        setProgressOverlay(progress);
       }
+      presentFeedbackAfterField(achievement, progress);
       resetEntry();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Eintrag fehlgeschlagen");
@@ -284,6 +260,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
         activePlayer.playerSecret,
       );
       await refreshAfterChange(activeSide, updated);
+      clearAllFeedbackOverlays();
       resetEntry();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Löschen fehlgeschlagen");
@@ -605,14 +582,14 @@ export function TableModePlayBoard({ inviteCode }: Props) {
           type={achievementOverlay.type}
           gameIndex={achievementOverlay.gameIndex}
           yatzyDieValue={achievementOverlay.yatzyDieValue}
-          onClose={() => setAchievementOverlay(null)}
+          onClose={closeAchievementOverlay}
         />
       )}
 
-      {progressOverlay && !achievementOverlay && (
+      {progressOverlay && (
         <RunProgressOverlay
           percent={progressOverlay.percent}
-          onClose={() => setProgressOverlay(null)}
+          onClose={closeProgressOverlay}
         />
       )}
 
