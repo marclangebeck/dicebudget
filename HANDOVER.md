@@ -28,8 +28,8 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 | Branch | `milestone-22-prep` |
 | Produktcode | HEAD `cb101f6`; Frontend `out/` gebaut; **Backend-Deploy** für Zusatz-Yatzy-Migration + geänderten Endpunkt durch Nutzer (siehe unten) |
 | Backend | Migrationen `20260605120000_pairing_stats_yatzy_die`, **`20260608120000_extra_yatzy_die_values`**; `finalize-stats`, `GET /sessions/invite/:code/match-analysis`; `POST /runs/:id/extra-yatzy` mit `{ yatzyDieValue }` |
-| iOS/TestFlight | Version `2.0`, aktueller Build `2.0 (6)`, nächster Upload `2.0 (7)` |
-| Noch nicht in iOS `2.0 (6)` | M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard + Footer/Legal + 3D-Icons + Spiel-UX Juni 2026 + Spielanalyse + **Yatzy-Miniwürfel / Zusatz-Yatzy-Würfelwahl** |
+| iOS/TestFlight | Version `2.0`, aktueller Build `2.0 (21)`, nächster Upload `2.0 (22)` |
+| Noch nicht in iOS `2.0 (21)` | **Yatzy-Miniwürfel / Zusatz-Yatzy-Würfelwahl** (`cb101f6`) |
 
 ## Neu Seit Letzter Übergabe (2026-06-08)
 
@@ -66,8 +66,8 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 ## Offene Prioritäten
 
 1. **Backend deployen** (Migration `extra_yatzy_die_values` + geänderter `extra-yatzy`-Endpunkt): Nutzer per SSH `sudo bash …/deploy-backend-prod.sh`.
-2. iOS-Build `2.0 (7)` auf dem Mac (alles seit `2.0 (6)` inkl. Spielanalyse + Yatzy-UX).
-3. TestFlight: Yatzy-Markierung, Zusatz-Yatzy-Würfelwahl, Spielanalyse, Multi-Abschluss, Pool-Endspiel, Footer/`/play`.
+2. iOS-Build `2.0 (22)` auf dem Mac (Yatzy-Miniwürfel + Zusatz-Yatzy-Würfelwahl seit `cb101f6`).
+3. TestFlight `2.0 (22)`: Yatzy-Markierung, Zusatz-Yatzy-Würfelwahl; Regression in `2.0 (21)` (Spielanalyse, Multi-Abschluss, Pool-Endspiel, Footer/`/play`).
 4. Optional: Pool-Endspiel Auto-Refresh; Spielanalyse iPad-Tischmodus.
 5. App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
 
@@ -110,7 +110,7 @@ Aktueller Kurzstand:
 - Branch: milestone-22-prep
 - Produktcode-HEAD: cb101f6 (Yatzy-Miniwürfel, Zusatz-Yatzy mit Würfelwahl, Portal-Popover)
 - Web/API live: https://dicebudget.bottle-trade.de
-- iOS: Version 2.0, TestFlight 2.0 (6), nächster Upload 2.0 (7)
+- iOS: Version 2.0, TestFlight 2.0 (21), nächster Upload 2.0 (22)
 - Backend: finalize-stats; GET /sessions/invite/:code/match-analysis; POST /runs/:id/extra-yatzy mit yatzyDieValue; Migration extra_yatzy_die_values
 - Yatzy: Mini-Würfel neben Feld-Würfeln (50% Höhe), max. 5 pro Zeile dann Umbruch; + bei Yatzy mit Würfelwahl (+100)
 - Spielanalyse: optional nach Spielende und unter /stats/pairing; 2P/3–6P/Solo

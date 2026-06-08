@@ -18,15 +18,15 @@ Technische Basis ist erledigt:
 - Capacitor 7, iOS-Projekt und Bundle `de.bottletrade.dicebudget` sind vorhanden.
 - Native App startet direkt auf `/app`.
 - Native API-Basis zeigt auf `https://dicebudget.bottle-trade.de/api`.
-- TestFlight ist aktiv, aktueller Build ist `2.0 (6)`.
-- Naechster Upload ist `2.0 (7)` und muss M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons + Spiel-UX Juni 2026 + Spielanalyse + **Yatzy-Miniwürfel / Zusatz-Yatzy-Würfelwahl** enthalten.
+- TestFlight ist aktiv, aktueller Build ist `2.0 (21)`.
+- Naechster Upload ist `2.0 (22)` und muss **Yatzy-Miniwürfel / Zusatz-Yatzy-Würfelwahl** (`cb101f6`) enthalten.
 
 Offen:
 
-- iOS-Build `2.0 (7)` auf dem Mac bauen und hochladen.
+- iOS-Build `2.0 (22)` auf dem Mac bauen und hochladen (Yatzy-UX seit `cb101f6`).
 - Startscreen, `/solo`, `/multi`, `/settings`, `/stats`, `/datenschutz`, `/impressum` und `/play` in iOS/Capacitor auf iPhone pruefen: Footer-Tabbar muss auf App-/Setup-/Legal-Screens unten sitzen; `/play` muss footerfrei sein und der Zettel muss die volle Screenhoehe nutzen.
 - iPad-Tischmodus in TestFlight auf iPad Querformat testen; iPhone-Flow muss unveraendert bleiben.
-- TestFlight nach Upload erneut testen (inkl. Multi-Statistik-Toggle, Yatzy-Miniwürfel, Zusatz-Yatzy-Würfelwahl, Spielanalyse).
+- TestFlight `2.0 (22)` nach Upload testen (Yatzy-Miniwürfel, Zusatz-Yatzy-Würfelwahl); Regression in `2.0 (21)` (Multi-Statistik-Toggle, Spielanalyse, Footer/`/play`).
 - App Store Connect fuer kostenpflichtigen Release fertigstellen.
 
 Details: `docs/ios_current.md`.
@@ -35,7 +35,7 @@ Details: `docs/ios_current.md`.
 
 ### Yatzy-Markierung und Zusatz-Yatzy 2026-06-08
 
-**Status:** erledigt im Produktcode (`cb101f6`), Frontend gebaut; Backend-Deploy durch Nutzer (Migration `extra_yatzy_die_values`); noch nicht in iOS `2.0 (6)`.
+**Status:** erledigt im Produktcode (`cb101f6`), Frontend gebaut; Backend-Deploy durch Nutzer (Migration `extra_yatzy_die_values`); noch nicht in iOS `2.0 (21)`.
 
 - Yatzy-Eintrag (50 Pkt.): Würfelwahl 1–6; Markierung als **Mini-Würfel** (50 % Feldhöhe) neben dem passenden Feld-Würfel.
 - Ab 6. Yatzy gleicher Augenzahl: **Umbruch** (Grid max. 5 pro Zeile), Label-Spalte mit `overflow: hidden`.
@@ -59,7 +59,7 @@ Dateien:
 
 ### Spielanalyse 2026-06-06
 
-**Status:** erledigt im Produktcode (`d00059f`), Frontend gebaut; Backend-Deploy durch Nutzer falls Endpunkt live noch fehlt; noch nicht in iOS `2.0 (6)`.
+**Status:** erledigt im Produktcode (`d00059f`), Frontend gebaut; in TestFlight `2.0 (21)`.
 
 - Nach Multi/Solo-Abschluss optional **Spielanalyse** (Button auf `RunFinishScreen`, nicht automatisch).
 - Verfuegbar nach Pool-Endspiel bzw. direkt wenn kein Pool-Endspiel.
@@ -84,7 +84,7 @@ Dateien:
 
 ### Spiel-UX-Politur 2026-06-05
 
-**Status:** erledigt und Web/Backend deployed, noch nicht in iOS `2.0 (6)`.
+**Status:** erledigt und Web/Backend deployed, in TestFlight `2.0 (21)`.
 
 - Spielzettel: Ergebnis 1 und Ergebnis 2 mit dunklem Hintergrund wie der restliche Zettel.
 - Multiplayer: Switch „Werten“ / „Nicht werten“ (Settings-Design) auf Abschluss-Screen; Paarungs-Statistik erst nach `POST /sessions/invite/:code/finalize-stats` beim Verlassen.
@@ -112,7 +112,7 @@ Dateien:
 
 ### M34 - Bugfixes + Stats-Reset
 
-**Status:** erledigt und Web/Backend deployed, noch nicht in iOS `2.0 (6)`.
+**Status:** erledigt und Web/Backend deployed, in TestFlight `2.0 (21)`.
 
 - Bonus-Konfetti im Bonus-Overlay.
 - Support-Link im Start-Footer.
@@ -129,7 +129,7 @@ Technische Hinweise:
 
 ### M35 - Paarungen Bearbeiten
 
-**Status:** erledigt und Web/Backend deployed, noch nicht in iOS `2.0 (6)`.
+**Status:** erledigt und Web/Backend deployed, in TestFlight `2.0 (21)`.
 
 - Auf `/stats/pairing` koennen Siege je Spieler und eine Netto-Punktedifferenz nachgetragen werden.
 - Statistik zeigt App-Runden und manuelle Werte als eine kombinierte Gesamtuebersicht.
@@ -144,7 +144,7 @@ Technische Hinweise:
 
 ### UI-Politur 2026-06-01
 
-**Status:** erledigt und Web deployed, noch nicht in iOS `2.0 (6)`.
+**Status:** erledigt und Web deployed, in TestFlight `2.0 (21)`.
 
 - Gewaehlter Punktwert im Eintrags-Overlay ist gelb gefuellt.
 - Spielzettel fuellt die volle Bildschirmhoehe.
@@ -159,7 +159,7 @@ Dateien:
 
 ### iPad-Tischmodus 2026-06-02
 
-**Status:** erledigt und Web deployed, noch nicht in iOS `2.0 (6)`.
+**Status:** erledigt und Web deployed, in TestFlight `2.0 (21)`.
 
 - Host-Option auf `/multi`: `iPad-Tischmodus`.
 - Erstellt ein 2-Spieler-Spiel auf einem iPad und oeffnet `/play?table=1&invite=...`.
@@ -181,7 +181,7 @@ Dateien:
 
 ### Game-Dashboard-Design 2026-06-03
 
-**Status:** erledigt und Frontend gebaut, noch nicht in iOS `2.0 (6)`.
+**Status:** erledigt und Frontend gebaut, in TestFlight `2.0 (21)`.
 
 - Startscreen wirkt als modernes Game-Dashboard mit dunklem Premium-/Strategiespiel-Look.
 - Aktuelle Startscreen-Hauptkarten: `Multiplayer`, `Einzelspiel`, `Statistik`, `Einstellungen`; `Raum beitreten` ist in `/multi` integriert.
@@ -218,10 +218,10 @@ Dateien:
 ## Offene Aufgaben
 
 1. **Backend deployen** (Migration `extra_yatzy_die_values`, falls Zusatz-Yatzy live noch fehlschlaegt).
-2. iOS/TestFlight `2.0 (7)` bereitstellen.
+2. iOS/TestFlight `2.0 (22)` bereitstellen (Yatzy-UX seit `cb101f6`).
 3. App Store Connect: Paid Applications Agreement, Bank/Steuer.
 4. Preis `1,19 EUR`, Screenshots, Beschreibung DE, Datenschutzfragebogen.
-5. TestFlight: Yatzy-Miniwürfel, Zusatz-Yatzy-Würfelwahl, Footer-Tabbar, footerfreie `/play`, Multi-Statistik-Toggle, Pool-Endspiel-Flow.
+5. TestFlight `2.0 (22)`: Yatzy-Miniwürfel, Zusatz-Yatzy-Würfelwahl; Footer/Pool/Multi bereits in `2.0 (21)` regressionsprüfen.
 6. Optional: Auto-Refresh nach Pool-Endspiel fuer Statistik-Toggle.
 7. Optional: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschraenken.
 8. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
@@ -238,7 +238,7 @@ Dateien:
 ## Aktuelle Prioritaeten
 
 1. Backend deployen (Migration `extra_yatzy_die_values`).
-2. iOS/TestFlight `2.0 (7)` bereitstellen.
+2. iOS/TestFlight `2.0 (22)` bereitstellen (Yatzy-UX seit `cb101f6`).
 3. iPad-Tischmodus auf iPad Querformat, neue Start-/Setup-/Lobby-/Settings-/Legal-Optik, Footer-Tabbar in iOS, footerfreie `/play`-Zettel und iPhone-Regression testen.
 4. Store-Connect-Freigaben und Metadaten abschliessen.
 5. Danach erst optionale Sicherheits-/Auth-Verfeinerung der Stats-Endpunkte planen.

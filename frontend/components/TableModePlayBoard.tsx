@@ -20,8 +20,12 @@ import {
 } from "@/lib/api";
 import { APP_HOME_PATH } from "@/lib/branding";
 import { poolDeltaForComplete } from "@/lib/gameRules";
-import { upperBonusAchieved } from "@/lib/gameScoring";
-import { getBonusCelebrationEnabled } from "@/lib/uiPrefs";
+import {
+  achievementDurationMs,
+  buildAchievementAfterField,
+  notifyAchievement,
+  type AchievementOverlayState,
+} from "@/lib/achievementFeedback";
 import { allFieldsScored, getLastScoredFieldId } from "@/lib/runUtils";
 import {
   loadTableModeSession,
@@ -31,7 +35,7 @@ import {
 import { normalizePublicPlayerId } from "@/lib/playerIdentity";
 import type { SessionLobbyDto } from "@/lib/sessionTypes";
 import type { FieldDto, RunDto } from "@/lib/types";
-import { BonusOverlay } from "@/components/BonusOverlay";
+import { AchievementOverlay } from "@/components/AchievementOverlay";
 
 type Props = {
   inviteCode: string;
@@ -60,10 +64,9 @@ export function TableModePlayBoard({ inviteCode }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [endgameFieldId, setEndgameFieldId] = useState<string | null>(null);
   const [endgameScoreInput, setEndgameScoreInput] = useState("");
-  const [bonusOverlay, setBonusOverlay] = useState<{
-    side: TableModeSide;
-    gameIndex: number | null;
-  } | null>(null);
+  const [achievementOverlay, setAchievementOverlay] = useState<AchievementOverlayState | null>(
+    null,
+  );
   const [yatzyDieValue, setYatzyDieValue] = useState<number | null>(null);
   const [includeInStats, setIncludeInStats] = useState(true);
   const [leavingHome, setLeavingHome] = useState(false);
@@ -92,10 +95,13 @@ export function TableModePlayBoard({ inviteCode }: Props) {
   }, [load]);
 
   useEffect(() => {
-    if (!bonusOverlay) return;
-    const timer = window.setTimeout(() => setBonusOverlay(null), 2500);
+    if (!achievementOverlay) return;
+    const timer = window.setTimeout(
+      () => setAchievementOverlay(null),
+      achievementDurationMs(achievementOverlay.type),
+    );
     return () => window.clearTimeout(timer);
-  }, [bonusOverlay]);
+  }, [achievementOverlay]);
 
   const activeRun = activeSide ? runs[activeSide] : null;
   const activePlayer = useMemo(
@@ -212,17 +218,21 @@ export function TableModePlayBoard({ inviteCode }: Props) {
       const gameAfter = updated.games.find((g) =>
         g.fields.some((f) => f.id === activeFieldId),
       );
-      const bonusJustAchieved =
-        !!gameBefore &&
-        !!gameAfter &&
-        !upperBonusAchieved(gameBefore.fields) &&
-        upperBonusAchieved(gameAfter.fields);
+      const achievement =
+        activeFieldType && gameBefore && gameAfter
+          ? buildAchievementAfterField(
+              activeFieldType,
+              score,
+              gameBefore.fields,
+              gameAfter.fields,
+              updated.gameCount > 1 ? (gameAfter.index ?? null) : null,
+              yatzyArg ?? null,
+            )
+          : null;
       await refreshAfterChange(activeSide, updated);
-      if (bonusJustAchieved && getBonusCelebrationEnabled()) {
-        setBonusOverlay({
-          side: activeSide,
-          gameIndex: updated.gameCount > 1 ? gameAfter?.index ?? null : null,
-        });
+      if (achievement) {
+        notifyAchievement(achievement);
+        setAchievementOverlay(achievement);
       }
       resetEntry();
     } catch (e) {
@@ -495,10 +505,12 @@ export function TableModePlayBoard({ inviteCode }: Props) {
         </div>
       )}
 
-      {bonusOverlay && (
-        <BonusOverlay
-          gameIndex={bonusOverlay.gameIndex}
-          onClose={() => setBonusOverlay(null)}
+      {achievementOverlay && (
+        <AchievementOverlay
+          type={achievementOverlay.type}
+          gameIndex={achievementOverlay.gameIndex}
+          yatzyDieValue={achievementOverlay.yatzyDieValue}
+          onClose={() => setAchievementOverlay(null)}
         />
       )}
 

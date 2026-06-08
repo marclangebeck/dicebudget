@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { StatsRatingToggle } from "@/components/StatsRatingToggle";
-import { BonusOverlay } from "@/components/BonusOverlay";
+import { AchievementOverlay } from "@/components/AchievementOverlay";
 import { RunCompleteOverlay } from "@/components/RunCompleteOverlay";
 import { MatchAnalysisView } from "@/components/MatchAnalysisView";
 import { RunFinishScreen } from "@/components/RunFinishScreen";
@@ -28,9 +28,13 @@ import {
 } from "@/lib/api";
 import type { SessionLobbyDto } from "@/lib/sessionTypes";
 import { poolDeltaForComplete } from "@/lib/gameRules";
-import { upperBonusAchieved } from "@/lib/gameScoring";
+import {
+  achievementDurationMs,
+  buildAchievementAfterField,
+  notifyAchievement,
+  type AchievementOverlayState,
+} from "@/lib/achievementFeedback";
 import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
-import { getBonusCelebrationEnabled } from "@/lib/uiPrefs";
 import { APP_HOME_PATH } from "@/lib/branding";
 import {
   abandonLocalSoloRun,
@@ -68,7 +72,9 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   const [busy, setBusy] = useState(false);
   const [showCompleteOverlay, setShowCompleteOverlay] = useState(false);
   const [sheetReviewAfterComplete, setSheetReviewAfterComplete] = useState(false);
-  const [bonusOverlayGame, setBonusOverlayGame] = useState<number | null>(null);
+  const [achievementOverlay, setAchievementOverlay] = useState<AchievementOverlayState | null>(
+    null,
+  );
   const [opponentPool, setOpponentPool] = useState<number | null>(null);
   const [lobby, setLobby] = useState<SessionLobbyDto | null>(null);
   const [endgameFieldId, setEndgameFieldId] = useState<string | null>(null);
@@ -178,10 +184,13 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   }, [run, runId, inviteCode, playerSecret]);
 
   useEffect(() => {
-    if (bonusOverlayGame === null) return;
-    const timer = window.setTimeout(() => setBonusOverlayGame(null), 2500);
+    if (!achievementOverlay) return;
+    const timer = window.setTimeout(
+      () => setAchievementOverlay(null),
+      achievementDurationMs(achievementOverlay.type),
+    );
     return () => window.clearTimeout(timer);
-  }, [bonusOverlayGame]);
+  }, [achievementOverlay]);
 
   const activeField: FieldDto | undefined = run?.games
     .flatMap((g) => g.fields)
@@ -303,11 +312,17 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       const gameAfter = updated.games.find((g) =>
         g.fields.some((f) => f.id === activeFieldId),
       );
-      const bonusJustAchieved =
-        !!gameBefore &&
-        !!gameAfter &&
-        !upperBonusAchieved(gameBefore.fields) &&
-        upperBonusAchieved(gameAfter.fields);
+      const achievement =
+        activeFieldType && gameBefore && gameAfter
+          ? buildAchievementAfterField(
+              activeFieldType,
+              score,
+              gameBefore.fields,
+              gameAfter.fields,
+              updated.gameCount > 1 ? (gameAfter.index ?? null) : null,
+              yatzyArg ?? null,
+            )
+          : null;
       setRun(updated);
       resetEntry();
       setActiveFieldId(null);
@@ -323,8 +338,9 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         }
         setSheetReviewAfterComplete(false);
         setShowCompleteOverlay(true);
-      } else if (bonusJustAchieved && getBonusCelebrationEnabled()) {
-        setBonusOverlayGame(gameAfter?.index ?? null);
+      } else if (achievement) {
+        notifyAchievement(achievement);
+        setAchievementOverlay(achievement);
       }
       void refreshLobby();
     } catch (e) {
@@ -347,7 +363,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       resetEntry();
       setShowCompleteOverlay(false);
       setSheetReviewAfterComplete(false);
-      setBonusOverlayGame(null);
+      setAchievementOverlay(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Löschen fehlgeschlagen");
     } finally {
@@ -730,10 +746,12 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         </div>
       </div>
 
-      {bonusOverlayGame !== null && !showCompleteOverlay && (
-        <BonusOverlay
-          gameIndex={run.gameCount > 1 ? bonusOverlayGame : null}
-          onClose={() => setBonusOverlayGame(null)}
+      {achievementOverlay && !showCompleteOverlay && (
+        <AchievementOverlay
+          type={achievementOverlay.type}
+          gameIndex={achievementOverlay.gameIndex}
+          yatzyDieValue={achievementOverlay.yatzyDieValue}
+          onClose={() => setAchievementOverlay(null)}
         />
       )}
 

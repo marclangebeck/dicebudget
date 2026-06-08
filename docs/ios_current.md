@@ -1,8 +1,8 @@
 # iOS Aktuell - dice.budget
 
-**Stand:** 2026-06-06
+**Stand:** 2026-06-08
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `d00059f`
+**Produktcode-HEAD:** `cb101f6`
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-/App-Store-Stand. Aeltere iOS-Historie steht in `docs/ios_archive.md`.
@@ -10,62 +10,28 @@ Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-
 ## Aktueller Stand
 
 - App Store Connect ist bei **Version 2.0**.
-- Aktueller TestFlight-Build ist **2.0 (6)**.
-- Naechster Upload ist **2.0 (7)**.
-- M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons sind **noch nicht** in TestFlight `2.0 (6)`.
-- Der Upload `2.0 (7)` muss M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons enthalten.
+- Aktueller TestFlight-Build ist **2.0 (21)**.
+- Naechster Upload ist **2.0 (22)**.
+- M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons + Spiel-UX Juni 2026 + Spielanalyse sind in TestFlight `2.0 (21)`.
+- **Yatzy-Miniwürfel / Zusatz-Yatzy-Würfelwahl** (`cb101f6`) sind **noch nicht** in TestFlight `2.0 (21)` — geplant fuer Upload `2.0 (22)`.
 - Web/API sind live unter https://dicebudget.bottle-trade.de.
 
-## Was In 2.0 (7) Enthalten Sein Muss
+## Was In 2.0 (22) Enthalten Sein Muss
 
-- M34 Bugfixes + Stats-Reset:
-  - Bonus-Konfetti
-  - Support-Link
-  - Gegner-Pool-Refresh ohne Polling
-  - Pool-Endspiel-Fix
-  - Stats-Alias-Merge
-  - serverseitiges Stats-Zuruecksetzen
-  - Capacitor-Fix fuer Paarungs-Detail
-- M35 Paarungen bearbeiten:
-  - Siege je Spieler editierbar
-  - Netto-Punktedifferenz editierbar
-  - `POST /stats/pairings/baseline`
-- UI-Politur:
-  - Punktwahl gelb gefuellt
-  - Spielzettel fuellt volle Bildschirmhoehe
-  - Ergebnis-Zeilen moderater; `Ergebnis 1` mit besser lesbarem `+/-`-Delta
-- iPad-Tischmodus:
-  - Host-Option auf `/multi`
-  - genau 2 Spieler auf einem iPad im Querformat
-  - Namen fuer linken/rechten Spieler eingebbar
-  - technische Spieler-IDs sind gueltige UUIDs
-  - lokale Aliase sorgen fuer Anzeige/Statistik-Zuordnung
-  - Gegner-Pool sichtbar und Pool-Endspiel bleiben waehlbar
-  - Pool-Endspiel im Zwei-Zettel-Screen aufloesbar
-- Game-Dashboard-Design:
-  - Startscreen mit dunklem Strategiespiel-/Premium-Look
-  - Hauptfunktionen: `Multiplayer`, `Einzelspiel`, `Statistik`, `Einstellungen`
-  - Hauptkarten nutzen 3D-PNG-Icons aus `frontend/public/home-icons/`
-  - `Raum beitreten` ist in `/multi` integriert
-  - `/solo`, `/multi`, `/multi/join` und `/settings` optisch modernisiert
-  - Spielzettel zum Eintragen bewusst unveraendert
-  - Startscreen zaehlt Paarungs-Spiele aus `/stats/pairings`
-  - Startscreen-Bilanz zeigt gewonnen/verloren aus lokal zusammengefuehrten Paarungsdaten
-  - App-Hintergrund ist dunkles Grau
-  - Home-/Setup-/Stats-/Settings-/Legal-Screens nutzen unten eine dunkle Footer-Tabbar mit `Home`, `Datenschutz`, `Impressum`, `Support`
-  - `/datenschutz` und `/impressum` sind an das App-Screen-Layout angeglichen
-  - `/play` zeigt bewusst keinen Footer, damit Solo-, Multiplayer- und Tischmodus-Zettel die volle Screenhoehe nutzen
-  - Der Footer nutzt bewusst kein `safe-area-inset-bottom`
-- Spiel-UX Juni 2026:
-  - Werten/Nicht werten auf Abschluss-Screen
-  - Yatzy-Wuerfel-Strichliste
-  - dunkle Ergebniszeilen, Settings-Gruppen, vergroesserte Start-Icons
-- Spielanalyse:
-  - optional nach Spielende (Button auf RunFinishScreen)
-  - 2 Spieler Head-to-Head, 3–6 Spieler Ranking + Direktvergleiche
-  - Solo-Eigenanalyse
-  - Historie unter `/stats/pairing` → Runde antippen
-  - Backend: `GET /sessions/invite/:code/match-analysis` (nach Backend-Deploy auf Server)
+- Yatzy-Markierung als Mini-Würfel (50 % Feldhöhe) neben dem passenden Feld-Würfel; ab 6. Yatzy pro Augenzahl Umbruch (max. 5 pro Zeile).
+- Zusatz-Yatzy (+100): Würfelwahl (1–6) vor dem Bonus; Augenzahl in `games.extra_yatzy_die_values`.
+- Popover-Auswahl per Portal (`ExtraYatzyPickerOverlay`).
+- Backend: Migration `extra_yatzy_die_values`, `POST /runs/:id/extra-yatzy` mit `{ yatzyDieValue }` (nach Nutzer-Deploy auf Server).
+
+## Bereits In 2.0 (21)
+
+- M34 Bugfixes + Stats-Reset
+- M35 Paarungen bearbeiten
+- UI-Politur (Punktwahl gelb, volle Zettelhöhe, Ergebnis-Zeilen)
+- iPad-Tischmodus (2 Spieler auf einem iPad)
+- Game-Dashboard-Design, Footer-Tabbar, footerfreie `/play`
+- Spiel-UX Juni 2026 (Werten/Nicht werten, Yatzy-Würfel-Abfrage beim Eintrag, dunkle Ergebniszeilen)
+- Spielanalyse (optional nach Spielende, Historie unter `/stats/pairing`)
 
 ## Mac-Workflow Fuer Naechsten Upload
 
@@ -93,21 +59,19 @@ In Xcode:
 1. `App.xcworkspace` verwenden, nicht `.xcodeproj`.
 2. Signing-Team pruefen.
 3. Version `2.0` lassen.
-4. Build auf `7` setzen.
+4. Build auf `22` setzen.
 5. Ziel `Any iOS Device`.
 6. `Product -> Archive`.
 7. Upload zu App Store Connect.
 
-## TestFlight-Pruefung Fuer 2.0 (7)
+## TestFlight-Pruefung Fuer 2.0 (22)
 
+- Yatzy-Miniwürfel neben Feld-Würfeln; Umbruch ab 6. Yatzy gleicher Augenzahl.
+- Zusatz-Yatzy (+): Würfelwahl sichtbar, Popover nicht abgeschnitten.
 - iPhone: bestehender Solo-/Multiplayer-Flow unveraendert.
-- iPhone: Startscreen darf nicht unerwuenscht scrollen; `Einzelspiel`/`Statistik` duerfen nicht gequetscht wirken; `/solo`, `/multi`, `/multi/join` und `/settings` im neuen Design pruefen.
-- iPhone: Footer-Tabbar auf Start-, Solo-Setup-, Multiplayer-, Settings-, Statistik-, Datenschutz- und Impressum-Screens pruefen. Content darf nur oberhalb davon scrollen.
-- iPhone: `/play` pruefen: kein Footer, Zettel fuellt die volle Screenhoehe und bleibt eintragbar.
-- iPad Hochformat: Tischmodus zeigt Dreh-Hinweis.
-- iPad Querformat: Tischmodus zeigt zwei anklickbare Zettel nebeneinander.
-- Tischmodus: Namen links/rechts eingeben und pruefen, ob Statistik/Paarung diese Aliase nutzt.
-- Tischmodus Strategy: Gegner-Pool sichtbar und Pool-Endspiel pruefen.
+- iPhone: Footer-Tabbar auf Start-, Setup-, Settings-, Statistik-, Legal-Screens; `/play` footerfrei.
+- iPad Querformat: Tischmodus mit zwei anklickbaren Zetteln.
+- Spielanalyse nach Abschluss und unter `/stats/pairing`.
 
 ## App Store Connect Offen
 

@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useState, type ReactNode } from "react";
+import { useSearchParams } from "next/navigation";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
+import { parseSettingsReturn } from "@/lib/settingsReturn";
 import { BonusCelebrationToggle } from "@/components/BonusCelebrationToggle";
 import { StrategyModeToggle } from "@/components/StrategyModeToggle";
 import {
@@ -101,7 +103,9 @@ function SettingsSection({
   );
 }
 
-export default function SettingsPage() {
+function SettingsPageInner() {
+  const searchParams = useSearchParams();
+  const returnTarget = parseSettingsReturn(searchParams.get("from"));
   const [settings, setSettingsState] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
 
   useEffect(() => {
@@ -123,6 +127,8 @@ export default function SettingsPage() {
         section="Einstellungen"
         title="App-Einstellungen"
         subtitle="Lege die Standardwerte für Solo, Multiplayer und Tischmodus fest."
+        backHref={returnTarget?.href}
+        backLabel={returnTarget ? `Zurück zu ${returnTarget.label}` : undefined}
       />
 
       <SettingsSection title="Allgemein">
@@ -248,5 +254,13 @@ export default function SettingsPage() {
         </div>
       </SettingsSection>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={null}>
+      <SettingsPageInner />
+    </Suspense>
   );
 }

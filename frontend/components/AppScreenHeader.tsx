@@ -1,15 +1,20 @@
+import Link from "next/link";
 import { APP_SHORT } from "@/lib/branding";
 
 type Props = {
   section: string;
   title: string;
   subtitle?: string;
+  backHref?: string;
+  backLabel?: string;
 };
 
 export function AppScreenHeader({
   section,
   title,
   subtitle,
+  backHref,
+  backLabel,
 }: Props) {
   const tone =
     section === "Einzelspiel"
@@ -22,6 +27,14 @@ export function AppScreenHeader({
 
   return (
     <header className={`app-screen-header app-screen-header--${tone} shrink-0`}>
+      {backHref && backLabel && (
+        <Link href={backHref} className="app-nav-btn app-nav-btn--header">
+          <span aria-hidden className="app-nav-btn-icon">
+            ←
+          </span>
+          <span>{backLabel}</span>
+        </Link>
+      )}
       <div className="app-screen-header-row">
         <img
           src="/apple-touch-icon.png"

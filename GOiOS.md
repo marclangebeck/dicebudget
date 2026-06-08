@@ -13,9 +13,9 @@ Diese Datei ist ein Kompatibilitaets-Index. Fuer aktuellen iOS-/TestFlight-/App-
 
 - Bundle ID: `de.bottletrade.dicebudget`
 - Version in App Store Connect: `2.0`
-- Aktueller TestFlight-Build: `2.0 (6)`
-- Naechster Upload: `2.0 (7)`
-- M34 + M35 + UI-Politur + iPad-Tischmodus sind noch nicht im aktuellen TestFlight-Build.
+- Aktueller TestFlight-Build: `2.0 (21)`
+- Naechster Upload: `2.0 (22)` (Yatzy-Miniwürfel / Zusatz-Yatzy-Würfelwahl seit `cb101f6`)
+- M34 + M35 + UI-Politur + iPad-Tischmodus + Spiel-UX + Spielanalyse sind in `2.0 (21)`.
 
 ## Wichtig
 

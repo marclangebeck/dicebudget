@@ -5,6 +5,8 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **Einstellungen: Rücknavigation** — Von `/solo` und `/multi` öffnet „Einstellungen“ mit `?from=solo|multi`; auf `/settings` erscheint „Zurück zu Einzelspiel/Multiplayer“ statt Umweg über den Startscreen
+- **Spiel-Feedback (Erfolgs-Overlays + Sound):** Einheitliches `AchievementOverlay` bei Bonus, unterer Spalte voll, Große Straße (40 Pkt.) und Yatzy (50 Pkt.) — typabhängige Farben, Konfetti, Würfel-Motive; synthetisierte Web-Audio-Sounds; Toggle „Spiel-Feedback“ in Einstellungen (ersetzt „Bonus-Einblendung“)
 - **Spielanalyse (Head-to-Head):** Nach Multi-Abschluss optional „Spielanalyse“ — abgeleitete Kennzahlen (Attribution, Pool-Effektivität, Yatzy, entscheidender Block/Feld). **2 Spieler:** ein Head-to-Head wie bisher. **3–6 Spieler:** Runden-Ranking, Direktvergleich vs. jeden Mitspieler, Platz/Differenz zur Spitze. Solo analog. Nachträglich unter `/stats/pairing`. Backend: `GET /sessions/invite/:code/match-analysis`
 - **Multiplayer: Werten / Nicht werten:** Auf dem Ergebnis-Screen (und beim Verlassen aus der Zettelansicht) steht ein Toggle „Werten“ / „Nicht werten“. Erst beim Verlassen zur Startseite wird die Session finalisiert; bei „Werten“ fließen Liga- und Paarungs-Statistik ein, bei „Nicht werten“ nicht (`include_in_pairing_stats` auf `GameSession`, Endpoint `POST /sessions/invite/:code/finalize-stats`). Bestehende Sessions bleiben durch Default `true` kompatibel
 - **Yatzy-Würfel-Strichliste:** Beim Eintrag eines Yatzy (50 Punkte) fragt das Overlay die Augenzahl (1–6) ab; auf dem Zettel erscheint hinter dem passenden Würfel eine Markierung als kleiner Würfel. Beim Zusatz-Yatzy (+100) ebenfalls Würfelwahl vor dem Bonus. Backend: `fields.yatzy_die_value`, `games.extra_yatzy_die_values` (Migration)
@@ -32,6 +34,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Stats zusammenführen bei Alias:** Spieler-IDs mit demselben lokalen Alias werden in der Statistik wieder als dieselbe Person zusammengeführt (Übersicht + Detail), rein lokal/clientseitig ohne Klarnamen. Neu: `lib/pairingMerge.ts`; angepasst: `app/stats/page.tsx`, `app/stats/pairing/page.tsx`
 
 ### Changed
+- **Bonus-Einblendung → Spiel-Feedback:** Einstellungs-Toggle steuert jetzt alle Erfolgs-Animationen und Sounds (lokal, gleicher Storage-Key)
 - **Multi-Statistik-Toggle wie Einstellungen:** „Werten“ / „Nicht werten“ nutzt jetzt denselben Switch (`.app-toggle`) und Karten-Stil wie die Toggles unter `/settings`
 - **Spielzettel Ergebnis 1/2 dunkel:** Zeilen- und Zellenhintergrund von „Ergebnis 1“ und „Ergebnis 2“ an den dunklen Spielzettel angeglichen (kein Hellgrau mehr)
 - **Toggles blassgrün/blassrot:** Einheitliche `.app-toggle`-Klasse auf Settings, Setup und Strategy/Bonus-Toggles
@@ -59,11 +62,12 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **M29 entfernt:** Würfel-Zähler, Wurf vergleichen, `DiceThrowOverlay`, `CommittedThrowBanner`, `FixedFieldChoiceBanner`
 
 ### iOS
-- App Store Connect ist bei **Version 2.0**; aktueller TestFlight-Build **2.0 (6)** (Upload durch Nutzer). Build-Nummern zählen pro Versionsstring · nächster Upload = **2.0 (7)** mit M34-Fixes
-- M34-Fixes (u. a. Capacitor-Paarungs-Detail) sind **noch nicht** in einem iOS-Build — erst ab 2.0 (7)
-- (zuvor, Version 1.0) Build **18** — M33 + Würfe-Standard 3 · **17** — M31 + M32 · **16** — M29 + M30 · **15** — M29
+- App Store Connect ist bei **Version 2.0**; aktueller TestFlight-Build **2.0 (21)** (Upload durch Nutzer). Build-Nummern zählen pro Versionsstring · nächster Upload = **2.0 (22)** mit Yatzy-Miniwürfel / Zusatz-Yatzy-Würfelwahl (`cb101f6`)
+- M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard + Spiel-UX + Spielanalyse sind in **2.0 (21)**; Yatzy-Markierung (`cb101f6`) noch nicht im iOS-Build
+- (zuvor, Version 2.0) Build **6** — vor M34-Fixes · (Version 1.0) Build **18** — M33 + Würfe-Standard 3 · **17** — M31 + M32 · **16** — M29 + M30 · **15** — M29
 
 ### Docs
+- HANDOVER, docs/milestones_active, docs/ios_current, GOiOS, milestones, CHANGELOG: TestFlight-Stand auf **2.0 (21)** aktualisiert; nächster Upload **2.0 (22)** (Yatzy-UX seit `cb101f6`)
 - HANDOVER, docs/milestones_active, docs/ios_current, CHANGELOG: Stand 2026-06-04 — zentraler Footer für Home/Setup/Play, dunkles Grau als App-Hintergrund, kompakter iPhone-Footer ohne Safe-Area-Abstand, zentrale `/settings`-Seite und Startscreen mit `Multiplayer`, `Einzelspiel`, `Statistik`, `Einstellungen`; iOS-Upload 2.0 (7) enthält M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-Finalisierung
 - HANDOVER, docs/milestones_active, docs/ios_current, GOiOS, milestones, CHANGELOG: Stand Produktcode **`0b2e25c`** — M34 Bugfixes + Stats-Reset, **M35 Paarungen bearbeiten**, **UI-Politur** und **iPad-Tischmodus**; iOS-Upload 2.0 (7) enthält M34 + M35 + UI-Politur + iPad-Tischmodus
 - AGENT_RULES (Sektion 9: Abgleich-Workflow git+server+lokal) unverändert gültig

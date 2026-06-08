@@ -8,6 +8,7 @@ import { JoinByCodeForm } from "@/components/JoinByCodeForm";
 import { createGameSession, joinSession } from "@/lib/api";
 import { saveActiveGame } from "@/lib/activeGame";
 import { setPlayerAlias } from "@/lib/playerAliases";
+import { settingsHrefWithReturn } from "@/lib/settingsReturn";
 import { DEFAULT_APP_SETTINGS, getAppSettings, type AppSettings } from "@/lib/uiPrefs";
 import {
   createTableModePlayerId,
@@ -139,7 +140,7 @@ export default function MultiHostPage() {
               {settings.tableRightName || "Rechts"}
             </p>
           )}
-          <Link href="/settings" className="settings-inline-link">
+          <Link href={settingsHrefWithReturn("multi")} className="settings-inline-link">
             Einstellungen ändern
           </Link>
         </section>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { saveActiveGame } from "@/lib/activeGame";
 import { createLocalSoloRun } from "@/lib/localSoloRun";
+import { settingsHrefWithReturn } from "@/lib/settingsReturn";
 import { DEFAULT_APP_SETTINGS, getAppSettings, type AppSettings } from "@/lib/uiPrefs";
 
 export function GameSetup() {
@@ -54,7 +55,7 @@ export function GameSetup() {
         <p className="setup-host-success-hint">
           Standardwerte aenderst du zentral in den App-Einstellungen.
         </p>
-        <Link href="/settings" className="settings-inline-link">
+        <Link href={settingsHrefWithReturn("solo")} className="settings-inline-link">
           Einstellungen öffnen
         </Link>
       </section>
