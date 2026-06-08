@@ -1825,12 +1825,24 @@ html.legal-route body {
   color: #94a3b8;
 }
 
+.play-dice-label {
+  padding-left: 0.2rem;
+}
+
 .play-yatzy-mark {
-  color: #fbbf24;
-  font-size: 0.625rem;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.08em;
+  display: inline-flex;
+  align-items: stretch;
+  gap: 2px;
+  margin-left: 0.15rem;
+  padding-left: 0.1rem;
+}
+
+.play-yatzy-mark-bar {
+  width: 2px;
+  height: 1.25rem;
+  flex-shrink: 0;
+  border-radius: 1px;
+  background: #0f172a;
 }
 
 .play-entry-sheet {

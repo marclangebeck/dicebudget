@@ -149,7 +149,7 @@ function FieldRowLabel({
   const diceValue = diceValueForField(row.fieldType);
   if (diceValue !== null) {
     return (
-      <span className="play-dice-label inline-flex items-center gap-0.5">
+      <span className="play-dice-label inline-flex items-center">
         <DiceFace
           value={diceValue}
           pipClassName="bg-slate-800"
@@ -157,11 +157,13 @@ function FieldRowLabel({
         />
         {yatzyMarkCount !== undefined && yatzyMarkCount > 0 && (
           <span
-            className="play-yatzy-mark tabular-nums"
+            className="play-yatzy-mark"
             title={`${yatzyMarkCount}× Yatzy mit dieser Augenzahl`}
             aria-label={`${yatzyMarkCount} Yatzy-Markierungen`}
           >
-            {"|".repeat(yatzyMarkCount)}
+            {Array.from({ length: yatzyMarkCount }, (_, i) => (
+              <span key={i} className="play-yatzy-mark-bar" aria-hidden />
+            ))}
           </span>
         )}
       </span>
