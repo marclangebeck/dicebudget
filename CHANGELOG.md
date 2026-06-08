@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **Spielanalyse-Coaching (Multi):** Regelbasierte Auswertung mit Narrative (Sieg/Niederlage), Stärken/Schwächen, Pool-Report (Strategy), Feld-Differenzen, bis zu 3 Tipps; UI im dunklen App-Dashboard-Design mit klaren Sektionen (Warum · Profil · Pool · Felder · Nächstes Mal · Details)
 - **Einstellungen: Rücknavigation** — Von `/solo` und `/multi` öffnet „Einstellungen“ mit `?from=solo|multi`; auf `/settings` erscheint „Zurück zu Einzelspiel/Multiplayer“ statt Umweg über den Startscreen
 - **Spiel-Feedback (Erfolgs-Overlays + Sound):** Einheitliches `AchievementOverlay` bei Bonus, unterer Spalte voll, Große Straße (40 Pkt.) und Yatzy (50 Pkt.) — typabhängige Farben, Konfetti, Würfel-Motive; synthetisierte Web-Audio-Sounds; Toggle „Spiel-Feedback“ in Einstellungen (ersetzt „Bonus-Einblendung“)
 - **Spielanalyse (Head-to-Head):** Nach Multi-Abschluss optional „Spielanalyse“ — abgeleitete Kennzahlen (Attribution, Pool-Effektivität, Yatzy, entscheidender Block/Feld). **2 Spieler:** ein Head-to-Head wie bisher. **3–6 Spieler:** Runden-Ranking, Direktvergleich vs. jeden Mitspieler, Platz/Differenz zur Spitze. Solo analog. Nachträglich unter `/stats/pairing`. Backend: `GET /sessions/invite/:code/match-analysis`

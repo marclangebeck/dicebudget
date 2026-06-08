@@ -3,6 +3,7 @@ import {
   UPPER_BONUS_POINTS,
 } from "@/lib/gameScoring";
 import { FIELD_LABELS, LOWER_FIELD_TYPES } from "@/lib/labels";
+import { buildMatchCoaching } from "@/lib/matchCoaching";
 import type {
   MatchAnalysisDto,
   PlayerRunMetricsDto,
@@ -151,6 +152,13 @@ export function buildSoloMatchAnalysis(run: RunDto): MatchAnalysisDto {
     comparisons: [],
     insights: finished ? buildSoloInsights(viewer) : [],
     allPlayers: [viewer],
+    coaching: finished
+      ? buildMatchCoaching({
+          mode: "solo",
+          viewer,
+          viewerRun: run,
+        })
+      : undefined,
   };
 }
 

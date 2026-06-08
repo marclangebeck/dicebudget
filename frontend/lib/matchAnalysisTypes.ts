@@ -59,6 +59,67 @@ export type PlayerComparisonDto = {
   headToHead: HeadToHeadAnalysisDto;
 };
 
+export type CoachingTraitDto = {
+  kind: "strength" | "weakness";
+  title: string;
+  detail: string;
+};
+
+export type CoachingTipDto = {
+  title: string;
+  body: string;
+};
+
+export type PoolPurchaseRowDto = {
+  fieldLabel: string;
+  gameIndex: number;
+  poolCost: number;
+  points: number;
+  pointsPerRoll: number;
+};
+
+export type PoolCoachingReportDto = {
+  endPool: number;
+  poolSpared: number;
+  poolSpent: number;
+  netBalance: number;
+  pointsPerPoolRoll: number | null;
+  opponentEndPool: number | null;
+  poolLeadVsOpponent: number | null;
+  headline: string;
+  bestPurchases: PoolPurchaseRowDto[];
+  weakPurchases: PoolPurchaseRowDto[];
+  notes: string[];
+};
+
+export type FieldComparisonCellDto = {
+  fieldType: string;
+  label: string;
+  viewer: number;
+  reference: number;
+  diff: number;
+};
+
+export type MatchCoachingDto = {
+  narrative: string;
+  playStyle: string | null;
+  strengths: CoachingTraitDto[];
+  weaknesses: CoachingTraitDto[];
+  tips: CoachingTipDto[];
+  pool: PoolCoachingReportDto | null;
+  fieldComparison: FieldComparisonCellDto[];
+};
+
+export const EMPTY_MATCH_COACHING: MatchCoachingDto = {
+  narrative: "",
+  playStyle: null,
+  strengths: [],
+  weaknesses: [],
+  tips: [],
+  pool: null,
+  fieldComparison: [],
+};
+
 export type MatchAnalysisDto = {
   mode: "solo" | "multi";
   ready: boolean;
@@ -76,6 +137,7 @@ export type MatchAnalysisDto = {
   comparisons: PlayerComparisonDto[];
   insights: string[];
   allPlayers: PlayerRunMetricsDto[];
+  coaching?: MatchCoachingDto;
 };
 
 export type SessionMatchAnalysisDto = MatchAnalysisDto & {

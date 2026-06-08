@@ -4,6 +4,7 @@ import {
   type GameBreakdown,
 } from "./gameScoring.js";
 import { FIELD_TYPES_PER_GAME, type FieldTypeId } from "./fieldTypes.js";
+import { buildMatchCoaching, type MatchCoachingReport } from "./matchCoaching.js";
 
 export type AnalysisField = {
   fieldType: string;
@@ -115,7 +116,10 @@ export type MatchAnalysisResult = {
   insights: string[];
   /** Metriken aller Teilnehmer in Session-Reihenfolge. */
   allPlayers: PlayerRunMetrics[];
+  coaching: MatchCoachingReport;
 };
+
+export type { MatchCoachingReport } from "./matchCoaching.js";
 
 const LOWER_COMBO_TYPES: FieldTypeId[] = [
   "THREE_OF_A_KIND",
@@ -466,9 +470,19 @@ function buildMultiPlayerSessionInsights(
   return insights.slice(0, 7);
 }
 
+const EMPTY_COACHING: MatchCoachingReport = {
+  narrative: "",
+  playStyle: null,
+  strengths: [],
+  weaknesses: [],
+  tips: [],
+  pool: null,
+  fieldComparison: [],
+};
+
 function emptyMultiShell(viewer: PlayerRunMetrics, allPlayers: PlayerRunMetrics[]): Omit<
   MatchAnalysisResult,
-  "mode" | "ready" | "unavailableReason" | "insights"
+  "mode" | "ready" | "unavailableReason" | "insights" | "coaching"
 > {
   return {
     playerCount: allPlayers.length,
@@ -503,10 +517,12 @@ export function buildMatchAnalysis(input: {
         ready: false,
         unavailableReason: input.unavailableReason ?? "Analyse noch nicht verfügbar.",
         insights: [],
+        coaching: EMPTY_COACHING,
         ...emptyMultiShell(viewer, allPlayers),
         playerCount: 1,
       };
     }
+    const viewerRun = input.viewerRun;
     return {
       mode: "solo",
       ready: true,
@@ -524,6 +540,11 @@ export function buildMatchAnalysis(input: {
       comparisons: [],
       insights: buildSoloInsights(viewer),
       allPlayers,
+      coaching: buildMatchCoaching({
+        mode: "solo",
+        viewer,
+        viewerRun,
+      }),
     };
   }
 
@@ -540,12 +561,14 @@ export function buildMatchAnalysis(input: {
       ready: false,
       unavailableReason: input.unavailableReason ?? "Analyse noch nicht verfügbar.",
       insights: [],
+      coaching: EMPTY_COACHING,
       ...emptyMultiShell(viewer, allPlayers),
       playerCount: participants.length,
     };
   }
 
   if (!viewerParticipant || participants.length < 2) {
+    const soloRun = viewerParticipant?.run ?? input.viewerRun;
     return {
       mode: "solo",
       ready: true,
@@ -563,6 +586,9 @@ export function buildMatchAnalysis(input: {
       comparisons: [],
       insights: buildSoloInsights(viewer),
       allPlayers,
+      coaching: soloRun
+        ? buildMatchCoaching({ mode: "solo", viewer, viewerRun: soloRun })
+        : EMPTY_COACHING,
     };
   }
 
@@ -600,6 +626,7 @@ export function buildMatchAnalysis(input: {
   }
 
   const soleComparison = comparisons.length === 1 ? comparisons[0]! : null;
+  const leaderParticipant = participants.find((p) => p.playerId === leader.playerId);
   const insights =
     comparisons.length === 1 && soleComparison
       ? buildTwoPlayerInsights(viewer, soleComparison.opponent, soleComparison.headToHead)
@@ -613,6 +640,34 @@ export function buildMatchAnalysis(input: {
           viewer,
           leader.totalScore,
         );
+
+  const coaching =
+    comparisons.length === 1 && soleComparison
+      ? buildMatchCoaching({
+          mode: "multi",
+          viewer,
+          viewerRun: viewerParticipant.run,
+          opponent: soleComparison.opponent,
+          opponentRun: others[0]!.run,
+          headToHead: soleComparison.headToHead,
+          opponentName: soleComparison.opponentName,
+          playerCount: 2,
+          viewerRank,
+          pointsBehindLeader,
+        })
+      : buildMatchCoaching({
+          mode: "multi",
+          viewer,
+          viewerRun: viewerParticipant.run,
+          reference: leaderParticipant
+            ? analyzePlayerRun(leaderParticipant.run)
+            : null,
+          referenceRun: leaderParticipant?.run ?? null,
+          referenceName: leader.playerName,
+          playerCount: participants.length,
+          viewerRank,
+          pointsBehindLeader,
+        });
 
   return {
     mode: "multi",
@@ -631,5 +686,6 @@ export function buildMatchAnalysis(input: {
     comparisons,
     insights,
     allPlayers,
+    coaching,
   };
 }

@@ -84,6 +84,8 @@ describe("buildMatchAnalysis", () => {
     assert.equal(result.headToHead!.scoreDiff, 20);
     assert.equal(result.viewerRank, 1);
     assert.ok(result.insights.length > 0);
+    assert.ok(result.coaching.narrative.length > 0);
+    assert.ok(result.coaching.tips.length > 0);
   });
 
   it("liefert Ranking und mehrere Direktvergleiche bei 3 Spielern", () => {
@@ -122,5 +124,6 @@ describe("buildMatchAnalysis", () => {
     assert.equal(result.mode, "solo");
     assert.equal(result.headToHead, null);
     assert.ok(result.insights.length > 0);
+    assert.ok(result.coaching.narrative.length > 0);
   });
 });
