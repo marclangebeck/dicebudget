@@ -1,8 +1,8 @@
 # iOS Aktuell - dice.budget
 
-**Stand:** 2026-06-08
+**Stand:** 2026-06-08  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `5f90ad8`
+**Produktcode-HEAD:** `de0f8f2`  
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-/App-Store-Stand. Aeltere iOS-Historie steht in `docs/ios_archive.md`.
@@ -12,19 +12,19 @@ Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-
 - App Store Connect ist bei **Version 2.0**.
 - Aktueller TestFlight-Build ist **2.0 (21)**.
 - Naechster Upload ist **2.0 (22)**.
-- M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons + Spiel-UX Juni 2026 + Spielanalyse sind in TestFlight `2.0 (21)`.
-- **Alle-Fünfe-Miniwürfel / Zusatz-Alle-Fünfe-Würfelwahl** (`cb101f6`), **Spiel-Feedback Gaming-Politur** (`a93e462`), **Erfolg teilen** und **Alle-Fünfe-Branding** sind **noch nicht** in TestFlight `2.0 (21)` — geplant fuer Upload `2.0 (22)`.
+- M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons + Spiel-UX Juni 2026 + Spielanalyse (Basis) sind in TestFlight `2.0 (21)`.
+- **Alles seit `2.0 (21)`** (Alle-Fünfe-UX, Gaming-Feedback II, Punkte-Duell, Teilen vereinfacht, Coaching, Branding) ist **noch nicht** in TestFlight — geplant fuer Upload `2.0 (22)`.
 - Web/API sind live unter https://dicebudget.bottle-trade.de.
 
 ## Was In 2.0 (22) Enthalten Sein Muss
 
-- Alle-Fünfe-Markierung als Mini-Würfel (50 % Feldhöhe); Zusatz-Alle-Fünfe mit Würfelwahl (+100); Portal-Popover.
-- UI-Branding: Nutzer-sichtbar **Alle Fünfe** statt „Yatzy“ (technische IDs unveraendert).
-- Erfolg teilen: Canvas-Karte + WhatsApp/Instagram/System auf Overlays, Abschluss, Analyse, Bilanz, Tischmodus.
-- Spiel-Feedback: Gaming-Overlays + Layered Web-Audio (Bonus, untere Spalte, Große Straße, Alle Fünfe).
-- Spielanalyse-Coaching: Narrative, Stärken/Schwächen, Pool-Report, Tipps (Multi nach Backend-Deploy).
+- Alle-Fünfe-Markierung als Mini-Würfel; Zusatz-Alle-Fünfe mit Würfelwahl (+100); Portal-Popover.
+- UI-Branding: Nutzer-sichtbar **Alle Fünfe** statt „Yatzy“.
+- **Teilen:** nur Spielende + Startscreen-Bilanz; ein Teilen-Button → System-Share (PNG).
+- Spiel-Feedback II: Gaming-Overlays + Layered Web-Audio (Bonus, Ergebnis 2/unten voll, Große Straße, Alle Fünfe); **kein** Share in Overlays.
+- Spielanalyse: Coaching + **Punkte-Duell-Graphik** (Multi; Backend-Deploy `scoreProgression`).
 - Einstellungen-Rücknavigation von Solo/Multi.
-- Backend: Migration `extra_yatzy_die_values` (falls noch nicht deployed), Coaching-API, Alle-Fünfe-Fehlertexte.
+- Backend: Migration `extra_yatzy_die_values`, Coaching-API, `scoreProgression` (falls noch nicht deployed).
 
 ## Bereits In 2.0 (21)
 
@@ -49,58 +49,19 @@ brew unlink rsync
 env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
 ```
 
-Falls `git pull` wegen Xcode-Projektdatei blockiert:
+In Xcode: Team pruefen, Build-Nummer auf **22** erhoehen, **Any iOS Device** → **Product → Archive** → Upload.
 
-```bash
-cd /Users/marclangebeck/projects/kniffel
-git restore frontend/ios/App/App.xcodeproj/project.pbxproj
-git pull origin milestone-22-prep
-```
+## TestFlight-Checkliste 2.0 (22)
 
-In Xcode:
+- Startscreen: Bilanz-Teilen-Button, Nav-Karten voll sichtbar (Multiplayer, Statistik, Einzelspiel, Einstellungen).
+- Spielende: Teilen-Button mit System-Share.
+- Erfolgs-Overlays: **kein** Share; Gaming-Animation + Sound.
+- Spielanalyse: Punkte-Duell-Graph (Multi, nach Backend-Deploy).
+- Alle-Fünfe-Miniwürfel, Zusatz-Würfelwahl, Branding „Alle Fünfe“.
+- Regression: Footer auf Setup/Legal/Stats; `/play` footerfrei; Multi-Abschluss, Pool-Endspiel.
 
-1. `App.xcworkspace` verwenden, nicht `.xcodeproj`.
-2. Signing-Team pruefen.
-3. Version `2.0` lassen.
-4. Build auf `22` setzen.
-5. Ziel `Any iOS Device`.
-6. `Product -> Archive`.
-7. Upload zu App Store Connect.
+## App Store Connect (offen)
 
-## TestFlight-Pruefung Fuer 2.0 (22)
-
-- Alle-Fünfe-Miniwürfel neben Feld-Würfeln; Umbruch ab 6. Alle Fünfe gleicher Augenzahl.
-- Zusatz-Alle-Fünfe (+): Würfelwahl sichtbar, Popover nicht abgeschnitten; UI-Text „Alle Fünfe“.
-- Erfolg teilen auf Overlay, Abschluss, Analyse, Bilanz, Tischmodus-Duell.
-- Spiel-Feedback: Gaming-Overlays + Sound bei Bonus, untere Spalte, Große Straße, Alle Fünfe.
-- iPhone: bestehender Solo-/Multiplayer-Flow unveraendert.
-- iPhone: Footer-Tabbar auf Start-, Setup-, Settings-, Statistik-, Legal-Screens; `/play` footerfrei.
-- iPad Querformat: Tischmodus mit zwei anklickbaren Zetteln + Share/Spielanalyse.
-- Spielanalyse nach Abschluss und unter `/stats/pairing`.
-
-## App Store Connect Offen
-
-- Paid Applications Agreement abschliessen.
-- Bankdaten hinterlegen.
-- Steuerdaten hinterlegen.
-- Preis auf `1,19 EUR` setzen.
-- Screenshots hochladen.
-- Beschreibung auf Deutsch eintragen.
-- Datenschutzfragebogen ausfuellen.
-- Datenschutz-URL: https://dicebudget.bottle-trade.de/datenschutz
-- Support-URL: https://dicebudget.bottle-trade.de
-
-## Stolpersteine
-
-- Web-Deploy aktualisiert nicht die iOS-App.
-- `frontend/ios/App/App/public/` ist gitignored; `npm run build:ios` auf dem Mac ist Pflicht.
-- `DEVELOPMENT_TEAM` wird nicht im Git gepflegt; nach Pull in Xcode pruefen.
-- Bei `Copy failed` / `rsync error`: `brew unlink rsync` und Xcode mit System-PATH starten.
-- Alten App-Store-Connect-Eintrag `com.mlangebeck.mobileapp` ignorieren.
-- App muss `de.bottletrade.dicebudget` verwenden.
-
-## Relevante Dokus
-
-- `docs/ios_archive.md` fuer alte Build-/TestFlight-Historie.
-- `docs/testflight-app-store.md` fuer Schritt-fuer-Schritt-App-Store-Connect.
-- `docs/ios-xcode-anleitung.md` fuer Xcode-Einsteiger-Anleitung.
+- Paid Applications Agreement, Bank/Steuer.
+- Preis **1,19 EUR**.
+- Screenshots, Beschreibung DE, Datenschutzfragebogen.

@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `5f90ad8` (Erfolg teilen, Alle-Fünfe-Branding, Doku-Übergabe)  
+**Produktcode-HEAD:** `de0f8f2`  
 **Sprache:** Deutsch
 
 Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milestones_active.md`. iOS/App Store: `docs/ios_current.md`. Dauerhafte Projektentscheidungen nur bei Bedarf: `docs/decisions.md`.
@@ -26,64 +26,61 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
 | Branch | `milestone-22-prep` |
-| Produktcode | HEAD `5f90ad8`; Frontend `out/` gebaut; **Backend-Deploy** für Coaching-Texte + Fehlermeldungen durch Nutzer |
-| Backend | `finalize-stats`, `GET /sessions/invite/:code/match-analysis` inkl. **`coaching`**; `POST /runs/:id/extra-yatzy` mit `{ yatzyDieValue }`; Migration `extra_yatzy_die_values` |
-| UI-Branding | Nutzer-sichtbar **Alle Fünfe** statt „Yatzy“; technische IDs (`yatzyDieValue`, `extra-yatzy`, CSS `.play-yatzy-*`) unverändert |
-| iOS/TestFlight | Version `2.0`, aktueller Build `2.0 (21)`, nächster Upload `2.0 (22)` |
-| Noch nicht in iOS `2.0 (21)` | Alle-Fünfe-Miniwürfel, Zusatz-Alle-Fünfe-Würfelwahl, **Spiel-Feedback** (Gaming-Politur), **Erfolg teilen**, **Spielanalyse-Coaching**, Einstellungen-Rücknavigation (alles seit `48a65f1` / `3c03592` / `a93e462`) |
+| Produktcode | HEAD `de0f8f2`; Frontend `out/` gebaut; **Backend-Deploy** für `scoreProgression` + Coaching-API + Migration `extra_yatzy_die_values` durch Nutzer |
+| Backend | `GET …/match-analysis` inkl. **`coaching`** und **`scoreProgression`**; `scoredSequence` in Run-DTO; `POST /runs/:id/extra-yatzy` mit `{ yatzyDieValue }` |
+| UI-Branding | Nutzer-sichtbar **Alle Fünfe** statt „Yatzy“; technische IDs unverändert |
+| Teilen | **Nur** Spielende (`RunFinishScreen`) + Startscreen-Bilanz; ein **Teilen**-Button → System-Share (PNG) bzw. Download; **kein** Share in Erfolgs-Overlays/Spielanalyse |
+| iOS/TestFlight | Version `2.0`, Build `2.0 (21)`, nächster Upload `2.0 (22)` |
+| Noch nicht in iOS `2.0 (21)` | Alles seit `2.0 (21)`: Alle-Fünfe-UX, Gaming-Feedback II, Punkte-Duell-Graphik, Teilen-Vereinfachung, Coaching, Einstellungen-Rücknavigation |
 
 ## Neu Seit Letzter Übergabe (2026-06-08)
 
-### Erfolg teilen (Share)
+### Spielanalyse: Punkte-Duell-Graphik (`f2d061c`)
 
-- Screenshot-freundliche Share-Karte mit App-Branding (Canvas).
-- Share-Leiste: WhatsApp, Instagram Story (Bild-Share), System-Teilen (`ShareActionBar`).
-- Eingebunden auf: **Erfolgs-Overlays**, **Abschluss-Screen**, **Spielanalyse**, **Paarungs-Bilanz** (`/stats/pairing`), **Startscreen-Bilanz**, **iPad-Tischmodus-Duell** (inkl. Spielanalyse-Button im Tischmodus).
-- Dateien: `frontend/lib/shareSocial.ts`, `shareCanvasUtils.ts`, `achievementShare.ts`, `matchResultShare.ts`, `ShareActionBar.tsx`, `AchievementShareBar.tsx`.
+- SVG-Verlauf Spieler 1 vs. Spieler 2 (Session-Reihenfolge) in der Multi-Spielanalyse.
+- Backend: `scoreProgression` in `GET /sessions/invite/:code/match-analysis` (benötigt `scoredSequence`, **Backend-Deploy**).
+- Dateien: `backend/src/domain/scoreProgression.ts`, `frontend/components/ScoreProgressionChart.tsx`, `MatchAnalysisView.tsx`.
 
-### Alle Fünfe (Markenwort „Yatzy“ entfernt)
+### Spiel-Feedback Gaming-Politur II (`f2d061c`)
 
-- Zentral: `frontend/lib/labels.ts` → `KNIFFEL: "Alle Fünfe"`.
-- UI: Zettelzeile, Eintrag, Zusatz-Bonus, Spiel-Feedback (`ALLE FÜNFE!`), Spielanalyse/Coaching, Datenschutz/Marketing, Fehlermeldungen.
-- Technische Bezeichner bleiben (`yatzyDieValue`, API `extra-yatzy`, Achievement-Typ `"yatzy"`, CSS-Klassen).
+- Reichere Overlays: Aurora, Schockwellen, Orbit-Partikel, typ-spezifische Szenen (Münzregen, Hex-Grid, Blitze, Jackpot-Strahlen/Krone).
+- Aufwändigere Web-Audio (Shimmer, Power-Up-Kaskaden, Jackpot-Fanfare).
+- **Kein** Share in Overlays (Bonus, Ergebnis 2/unten voll, Große Straße, Alle Fünfe).
 
-### Spiel-Feedback Gaming-Politur (`a93e462`)
+### Teilen vereinfacht (`82e2a01` … `de0f8f2`)
 
-- Dunkle Gaming-Overlays (Glas-Karte, Gold-Kicker, typ-spezifische Szenen).
-- Layered Web-Audio (Riser, Kicks, Stereo-Panning, Noise-Bursts).
-- „Außerhalb tippen zum Schließen“.
+- Startscreen-Bilanz: kompakter **Teilen**-Button in der Bilanz-Zeile (nicht mehr volle Share-Leiste).
+- Teilen **nur** bei Spielende + Startscreen-Bilanz; entfernt aus Overlays, Spielanalyse, iPad-Duell, Paarungs-Detail.
+- WhatsApp/Instagram-Separat-Buttons entfernt (direkter App-Sprung mit Bild aus Web nicht zuverlässig); ein Button nutzt `navigator.share`.
+- Dateien: `ShareActionBar.tsx` (`compact` / `prominent`), `shareSocial.ts`, `HomeBentoGrid.tsx`, `RunFinishScreen.tsx`.
 
-## Bereits Vorher (Coaching + Basis-Feedback, `3c03592`)
+## Bereits Vorher (Basis-Features, teils in Web live)
 
-- **Spielanalyse-Coaching:** Narrative, Stärken/Schwächen, Pool-Report, Feld-Differenzen, bis zu 3 Tipps; API-Feld `coaching` (Multi nach Backend-Deploy; Solo clientseitig).
-- **Spiel-Feedback (Basis):** `AchievementOverlay` + Sound bei Bonus, unterer Spalte, Große Straße, Alle Fünfe.
-- **Einstellungen-Rücknavigation:** `?from=solo|multi` → „Zurück zu Einzelspiel/Multiplayer“.
-
-## Bereits Vorher (Alle-Fünfe-UX technisch, `cb101f6`)
-
-- Mini-Würfel-Markierung (50 % Höhe), Umbruch ab 6. gleicher Augenzahl; Zusatz-Alle-Fünfe mit Würfelwahl (+100); Portal-Popover `ExtraYatzyPickerOverlay`.
-- Migration `20260608120000_extra_yatzy_die_values`.
+- **Alle Fünfe (UI):** `labels.ts`, Coaching, Fehlermeldungen.
+- **Alle-Fünfe-UX:** Mini-Würfel, Zusatz-Würfelwahl (+100), Portal-Popover (`cb101f6`).
+- **Spielanalyse-Coaching:** Narrative, Stärken/Schwächen, Pool-Report, Tipps (`3c03592`; Multi live nach Backend-Deploy).
+- **Spiel-Feedback (Basis):** `AchievementOverlay` + Sound; Toggle „Spiel-Feedback“.
+- **Einstellungen-Rücknavigation:** `?from=solo|multi`.
 
 ## Bekanntes UX-Thema (offen)
 
 - **Pool-Endspiel + Statistik-Toggle:** Nicht-Sieger müssen ggf. **Aktualisieren** tippen, bevor Abschluss-Screen mit Toggle erscheint.
-- **Multi-Coaching live:** Volles Coaching nach Multi-Spielende erst nach **Backend-Deploy** (`coaching` in API); Solo-Coaching läuft clientseitig sofort.
+- **Punkte-Duell live:** Graphik in Multi-Analyse erst nach **Backend-Deploy** (`scoreProgression` in API).
 
 ## Wichtige Dateien
 
-- Share: `frontend/lib/shareSocial.ts`, `shareCanvasUtils.ts`, `achievementShare.ts`, `matchResultShare.ts`, `ShareActionBar.tsx`
-- Labels/Branding: `frontend/lib/labels.ts`, `frontend/lib/achievementTypes.ts`
-- Spiel-Feedback: `frontend/components/AchievementOverlay.tsx`, `frontend/lib/achievementSound.ts`, `frontend/app/globals.css`
-- Analyse/Coaching: `frontend/components/MatchAnalysisView.tsx`, `frontend/lib/matchCoaching.ts`, `backend/src/domain/matchCoaching.ts`
-- Zettel: `frontend/components/ScoreSheetTable.tsx`, `ExtraYatzyPickerOverlay.tsx`, `YatzyDiePicker.tsx`
-- Abschluss/Play: `RunFinishScreen.tsx`, `PlayBoard.tsx`, `TableModePlayBoard.tsx`, `HomeBentoGrid.tsx`
+- Teilen: `frontend/lib/shareSocial.ts`, `matchResultShare.ts`, `ShareActionBar.tsx`, `HomeBentoGrid.tsx`, `RunFinishScreen.tsx`
+- Analyse/Graph: `ScoreProgressionChart.tsx`, `backend/src/domain/scoreProgression.ts`, `MatchAnalysisView.tsx`
+- Spiel-Feedback: `AchievementOverlay.tsx`, `achievementSound.ts`, `achievementTypes.ts`, `globals.css`
+- Coaching: `backend/src/domain/matchCoaching.ts`, `frontend/lib/matchCoaching.ts`
+- Zettel: `ScoreSheetTable.tsx`, `ExtraYatzyPickerOverlay.tsx`
 - `CHANGELOG.md`, `docs/milestones_active.md`, `docs/ios_current.md`
 
 ## Offene Prioritäten
 
-1. **Backend deployen** (Coaching-API + Migration `extra_yatzy_die_values` + Alle-Fünfe-Fehlertexte): Nutzer per SSH `sudo bash …/deploy-backend-prod.sh`.
+1. **Backend deployen** (Coaching-API + `scoreProgression` + Migration `extra_yatzy_die_values`): Nutzer per SSH `sudo bash …/deploy-backend-prod.sh`.
 2. iOS-Build **`2.0 (22)`** auf dem Mac (alles seit `2.0 (21)`).
-3. TestFlight: Share, Alle-Fünfe-Branding, Spiel-Feedback-Gaming, Coaching, Mini-Würfel, Einstellungen-Rücknavigation, Regression Footer/`/play`, Multi-Abschluss.
+3. TestFlight: Punkte-Duell, Gaming-Feedback II, Teilen (Spielende/Bilanz), Alle-Fünfe-Branding, Mini-Würfel, Regression Footer/`/play`.
 4. Optional: Pool-Endspiel Auto-Refresh.
 5. App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
 
@@ -124,14 +121,14 @@ Wichtige Regeln:
 
 Aktueller Kurzstand:
 - Branch: milestone-22-prep
-- Produktcode: Share-Funktion, Alle-Fünfe-Branding (UI), Spiel-Feedback Gaming-Politur (a93e462), Coaching (3c03592); HEAD 5f90ad8
+- Produktcode-HEAD: de0f8f2
 - Web/API live: https://dicebudget.bottle-trade.de
 - iOS: Version 2.0, TestFlight 2.0 (21), nächster Upload 2.0 (22)
 - UI-Branding: Nutzer-sichtbar „Alle Fünfe“ statt Yatzy; technische IDs (yatzyDieValue, extra-yatzy) unverändert
-- Erfolg teilen: Canvas-Karte + WhatsApp/Instagram/System auf Overlays, Abschluss, Analyse, Bilanz, Tischmodus-Duell
-- Spiel-Feedback: dunkle Gaming-Overlays + Layered Web-Audio; Toggle „Spiel-Feedback“
-- Spielanalyse-Coaching: Narrative, Stärken/Schwächen, Pool-Report, Tipps (Multi nach Backend-Deploy)
-- Alle-Fünfe-UX: Mini-Würfel-Markierung, Zusatz-Alle-Fünfe-Würfelwahl (+100), Portal-Popover
+- Spielanalyse: Coaching + Punkte-Duell-Graphik (Multi; scoreProgression nach Backend-Deploy)
+- Spiel-Feedback: Gaming-Overlays II + Layered Web-Audio; kein Share in Overlays
+- Teilen: nur Spielende (RunFinishScreen) + Startscreen-Bilanz; ein Teilen-Button → System-Share (PNG)
+- Alle-Fünfe-UX: Mini-Würfel, Zusatz-Würfelwahl (+100), Portal-Popover
 - Einstellungen: ?from=solo|multi → Zurück zu Einzelspiel/Multiplayer
 - Multi: maxPlayers Default 2, Cap 2–6; Werten/Nicht werten; Pool-Endspiel (Nicht-Sieger ggf. Aktualisieren)
 - Backend-Neustart (bei Backend-Änderung): Nutzer per SSH:

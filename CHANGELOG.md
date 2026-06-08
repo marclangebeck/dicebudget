@@ -36,7 +36,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Stats zusammenführen bei Alias:** Spieler-IDs mit demselben lokalen Alias werden in der Statistik wieder als dieselbe Person zusammengeführt (Übersicht + Detail), rein lokal/clientseitig ohne Klarnamen. Neu: `lib/pairingMerge.ts`; angepasst: `app/stats/page.tsx`, `app/stats/pairing/page.tsx`
 
 ### Added
-- **Erfolg teilen:** Screenshot-freundliche Share-Karte mit App-Branding; Share-Leiste (WhatsApp, Instagram Story, System-Teilen) auf **Erfolgs-Overlays**, **Abschluss-Screen**, **Spielanalyse**, **Paarungs-Bilanz** (`/stats/pairing`), **Startscreen-Bilanz** und **iPad-Tischmodus-Duell** (inkl. Spielanalyse im Tischmodus)
+- **Erfolg teilen (Canvas-Karte):** PNG-Share-Karte mit App-Branding; eingesetzt auf **Spielende** und **Startscreen-Bilanz** (Scope seit `9f120f5`/`de0f8f2` reduziert)
 
 ### Changed
 - **Startscreen-Bilanz:** Große Share-Leiste („Bilanz teilen“ mit WhatsApp/Instagram) entfernt — stattdessen kompakter **Teilen**-Button in der Bilanz-Zeile (System-Teilen mit Bilanz-Bild als PNG)
