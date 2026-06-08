@@ -28,6 +28,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **M29 Punktwahl-Eintrag:** Feld antippen → Overlay mit feldtypabhängiger Punktwahl + Würfe → Eintragen (`FieldScoreChoiceGrid`, `ScoreEntryPanel`)
 
 ### Fixed
+- **Fortschritt nach Erfolgs-Overlay:** 25/50/75 %-Hinweis erscheint jetzt auch, wenn zuvor eine Erfolgsanimation (z. B. Alle Fünfe) lief — nacheinander über `feedbackOverlayQueue.ts`
 - **Yatzy-Strichliste am Würfel:** Markierung neben der Augenzahl sind kleine Würfel (50 % der Feld-Würfelhöhe) mit der tatsächlichen Augenzahl; ab dem 6. Yatzy pro Augenzahl Umbruch in die nächste Zeile (max. 5 pro Zeile), damit nichts in die Wertespalten ragt
 - **Zusatz-Yatzy-Auswahl:** Popover per Portal über den Zettel (`ExtraYatzyPickerOverlay`) — Fix für Abschneiden durch `overflow: hidden` und `FitScoreSheet`-Skalierung
 - **Multi-Abschluss „Internal Server Error“:** Beim Klick „Spiel beenden“ auf `finalize-stats` schlug die Session bei nur einem Spieler im Multi-Raum oder offenem Pool-Endspiel fehl; `SessionNotReadyError` wurde nicht im Error-Handler abgefangen (500). Jetzt Abschluss ab einem Spieler, Paarungs-Statistik erst ab zwei, **409** mit deutscher Meldung, Fehlertext auf `RunFinishScreen`. Dateien: `backend/src/services/sessionService.ts`, `backend/src/middleware/errorHandler.ts`, `frontend/components/RunFinishScreen.tsx`

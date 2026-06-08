@@ -2,7 +2,7 @@
 
 **Stand:** 2026-06-08  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `de0f8f2`  
+**Produktcode-HEAD:** `66e715a`  
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-/App-Store-Stand. Aeltere iOS-Historie steht in `docs/ios_archive.md`.
@@ -10,31 +10,30 @@ Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-
 ## Aktueller Stand
 
 - App Store Connect ist bei **Version 2.0**.
-- Aktueller TestFlight-Build ist **2.0 (21)**.
-- Naechster Upload ist **2.0 (22)**.
-- M34 + M35 + UI-Politur + iPad-Tischmodus + Game-Dashboard-/Footer-/Legal-Finalisierung + 3D-Startscreen-Icons + Spiel-UX Juni 2026 + Spielanalyse (Basis) sind in TestFlight `2.0 (21)`.
-- **Alles seit `2.0 (21)`** (Alle-Fünfe-UX, Gaming-Feedback II, Punkte-Duell, Teilen vereinfacht, Coaching, Branding) ist **noch nicht** in TestFlight — geplant fuer Upload `2.0 (22)`.
+- Aktueller TestFlight-Build ist **`2.0 (25)`**.
+- Naechster Upload ist **`2.0 (26)`** (falls Produktcode `66e715a` noch nicht in `2.0 (25)` enthalten).
+- In TestFlight `2.0 (25)`: M34, M35, UI-Politur, iPad-Tischmodus, Game-Dashboard, Spiel-UX, Spielanalyse (Basis), Alle-Fünfe-UX, Gaming-Feedback, Teilen, Coaching, Branding (je nach Upload-Historie Builds 22–25).
+- Produktcode `66e715a` enthaelt zusaetzlich: **Zettel-Ergebnis-Farben**, **Raum-Code teilen**, **Fortschritt 25/50/75 %**, **granulares Spiel-Feedback**, **Fortschritt-Warteschlange nach Erfolgs-Overlays**.
 - Web/API sind live unter https://dicebudget.bottle-trade.de.
 
-## Was In 2.0 (22) Enthalten Sein Muss
+## Was In 2.0 (26) Enthalten Sein Soll (falls noch nicht in 25)
 
-- Alle-Fünfe-Markierung als Mini-Würfel; Zusatz-Alle-Fünfe mit Würfelwahl (+100); Portal-Popover.
-- UI-Branding: Nutzer-sichtbar **Alle Fünfe** statt „Yatzy“.
-- **Teilen:** nur Spielende + Startscreen-Bilanz; ein Teilen-Button → System-Share (PNG).
-- Spiel-Feedback II: Gaming-Overlays + Layered Web-Audio (Bonus, Ergebnis 2/unten voll, Große Straße, Alle Fünfe); **kein** Share in Overlays.
-- Spielanalyse: Coaching + **Punkte-Duell-Graphik** (Multi; Backend-Deploy `scoreProgression`).
-- Einstellungen-Rücknavigation von Solo/Multi.
-- Backend: Migration `extra_yatzy_die_values`, Coaching-API, `scoreProgression` (falls noch nicht deployed).
+- Zettel: Ergebnis 1/2/Spiel in Feld-Spalte mit gleichen Farben wie Wertespalten.
+- Multi: **Code teilen** (System-Share) statt kopieren.
+- Fortschritt 25/50/75 %: Overlay + Sound; nacheinander nach Erfolgs-Overlays.
+- Spiel-Feedback granular: `/settings/feedback` (Animationen, Sounds, Fortschritt).
+- Backend (falls noch offen): Coaching-API, `scoreProgression`, Migration `extra_yatzy_die_values`.
 
-## Bereits In 2.0 (21)
+## Bereits In TestFlight (bis 2.0 (25))
 
 - M34 Bugfixes + Stats-Reset
 - M35 Paarungen bearbeiten
-- UI-Politur (Punktwahl gelb, volle Zettelhöhe, Ergebnis-Zeilen)
-- iPad-Tischmodus (2 Spieler auf einem iPad)
-- Game-Dashboard-Design, Footer-Tabbar, footerfreie `/play`
-- Spiel-UX Juni 2026 (Werten/Nicht werten, Alle-Fünfe-Würfel-Abfrage beim Eintrag, dunkle Ergebniszeilen)
-- Spielanalyse (optional nach Spielende, Historie unter `/stats/pairing`)
+- UI-Politur, iPad-Tischmodus, Game-Dashboard, Footer-Tabbar, footerfreie `/play`
+- Spiel-UX Juni 2026 (Werten/Nicht werten, Alle-Fünfe-Würfel-Abfrage)
+- Spielanalyse (optional nach Spielende)
+- Alle-Fünfe-Miniwürfel, Zusatz-Würfelwahl, Branding „Alle Fünfe“
+- Gaming-Feedback II, Teilen (Spielende/Bilanz), Coaching, Punkte-Duell (nach Backend-Deploy)
+- Einstellungen-Rücknavigation `?from=solo|multi`
 
 ## Mac-Workflow Fuer Naechsten Upload
 
@@ -49,16 +48,15 @@ brew unlink rsync
 env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
 ```
 
-In Xcode: Team pruefen, Build-Nummer auf **22** erhoehen, **Any iOS Device** → **Product → Archive** → Upload.
+In Xcode: Team pruefen, Build-Nummer auf **26** erhoehen, **Any iOS Device** → **Product → Archive** → Upload.
 
-## TestFlight-Checkliste 2.0 (22)
+## TestFlight-Checkliste 2.0 (26)
 
-- Startscreen: Bilanz-Teilen-Button, Nav-Karten voll sichtbar (Multiplayer, Statistik, Einzelspiel, Einstellungen).
-- Spielende: Teilen-Button mit System-Share.
-- Erfolgs-Overlays: **kein** Share; Gaming-Animation + Sound.
-- Spielanalyse: Punkte-Duell-Graph (Multi, nach Backend-Deploy).
-- Alle-Fünfe-Miniwürfel, Zusatz-Würfelwahl, Branding „Alle Fünfe“.
-- Regression: Footer auf Setup/Legal/Stats; `/play` footerfrei; Multi-Abschluss, Pool-Endspiel.
+- Zettel: Ergebnis 1/2/Spiel links mit korrekten Farben (grün/dunkel).
+- Multi: Raum anlegen → **Code teilen** (nicht kopieren).
+- Fortschritt: 25/50/75 %-Overlay; auch nach Alle-Fünfe-Animation nacheinander.
+- Einstellungen → Spiel-Feedback → einzelne Toggles.
+- Regression: Footer auf Setup/Legal/Stats; `/play` footerfrei; Pool-Endspiel; Teilen Spielende/Bilanz.
 
 ## App Store Connect (offen)
 

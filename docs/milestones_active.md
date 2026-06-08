@@ -2,7 +2,7 @@
 
 **Stand:** 2026-06-08  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `de0f8f2`  
+**Produktcode-HEAD:** `66e715a`  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -18,20 +18,31 @@ Technische Basis ist erledigt:
 - Capacitor 7, iOS-Projekt und Bundle `de.bottletrade.dicebudget` sind vorhanden.
 - Native App startet direkt auf `/app`.
 - Native API-Basis zeigt auf `https://dicebudget.bottle-trade.de/api`.
-- TestFlight ist aktiv, aktueller Build ist `2.0 (21)`.
-- Naechster Upload ist `2.0 (22)` und muss alles seit `2.0 (21)` enthalten: **Alle-Fünfe-Miniwürfel**, **Zusatz-Alle-Fünfe-Würfelwahl**, **Spiel-Feedback II**, **Punkte-Duell-Graphik**, **Teilen** (Spielende/Bilanz), **Alle-Fünfe-Branding**, **Spielanalyse-Coaching**, **Einstellungen-Rücknavigation**.
+- TestFlight ist aktiv, aktueller Build ist **`2.0 (25)`**.
+- Naechster Upload ist **`2.0 (26)`** fuer Stand `66e715a` (Zettel-Farben, Code teilen, Fortschritt-Overlay, granulares Feedback, Warteschlange).
 
 Offen:
 
-- iOS-Build `2.0 (22)` auf dem Mac bauen und hochladen (Alle-Fünfe-UX seit `cb101f6`, Share/Branding seit `a93e462`).
+- iOS-Build `2.0 (26)` auf dem Mac bauen und hochladen, falls `66e715a` noch nicht in `2.0 (25)` enthalten.
 - Startscreen, `/solo`, `/multi`, `/settings`, `/stats`, `/datenschutz`, `/impressum` und `/play` in iOS/Capacitor auf iPhone pruefen: Footer-Tabbar muss auf App-/Setup-/Legal-Screens unten sitzen; `/play` muss footerfrei sein und der Zettel muss die volle Screenhoehe nutzen.
 - iPad-Tischmodus in TestFlight auf iPad Querformat testen; iPhone-Flow muss unveraendert bleiben.
-- TestFlight `2.0 (22)` nach Upload testen (Punkte-Duell, Gaming-Feedback II, Teilen, Alle-Fünfe-Branding, Miniwürfel, Zusatz-Würfelwahl); Regression in `2.0 (21)` (Multi-Statistik-Toggle, Spielanalyse, Footer/`/play`).
+- TestFlight `2.0 (26)` nach Upload testen (Fortschritt-Overlay, Code teilen, Feedback-Toggles, Zettel-Farben); Regression Footer/`/play`, Pool-Endspiel.
 - App Store Connect fuer kostenpflichtigen Release fertigstellen.
 
 Details: `docs/ios_current.md`.
 
 ## Letzte Abgeschlossene Milestones
+
+### UX-Politur Zettel + Multi-Teilen + Fortschritt + Feedback 2026-06-08
+
+**Status:** erledigt im Produktcode (`66e715a`), Frontend gebaut; TestFlight `2.0 (25)` bzw. naechster Upload `2.0 (26)`.
+
+- **Zettel:** Ergebnis 1/2/Spiel in Feld-Spalte mit gleichen Farben wie Wertespalten (inkl. lesbarer Schrift auf gruen).
+- **Multi:** Raum-Code **teilen** (System-Share) statt kopieren.
+- **Fortschritt 25/50/75 %:** Kurzes Overlay + Sound; erscheint auch **nach** Erfolgs-Overlays nacheinander (`feedbackOverlayQueue.ts`).
+- **Spiel-Feedback granular:** `/settings/feedback` — Animationen, Sounds, Fortschritt einzeln schaltbar.
+
+Dateien: `ScoreSheetTable.tsx`, `globals.css`, `multi/page.tsx`, `shareSocial.ts`, `runProgressFeedback.ts`, `feedbackOverlayQueue.ts`, `RunProgressOverlay.tsx`, `gameFeedbackPrefs.ts`, `settings/feedback/page.tsx`, `PlayBoard.tsx`, `TableModePlayBoard.tsx`
 
 ### Teilen vereinfacht + Startscreen-Bilanz 2026-06-08
 
@@ -273,11 +284,11 @@ Dateien:
 
 ## Offene Aufgaben
 
-1. **Backend deployen** (Coaching-API + `scoreProgression` + Migration `extra_yatzy_die_values`): Nutzer per SSH `sudo bash …/deploy-backend-prod.sh`.
-2. iOS/TestFlight `2.0 (22)` auf dem Mac bauen und hochladen (Punkte-Duell, Gaming-Feedback II, Teilen, Alle-Fünfe-UX); Mac-Workflow in `HANDOVER.md` und `docs/ios_current.md`.
+1. **Backend deployen** (falls noch offen): Coaching-API + `scoreProgression` + Migration `extra_yatzy_die_values` — Nutzer per SSH `sudo bash …/deploy-backend-prod.sh`.
+2. iOS/TestFlight **`2.0 (26)`** auf dem Mac bauen und hochladen (Stand `66e715a`); Mac-Workflow in `HANDOVER.md` und `docs/ios_current.md`.
 3. App Store Connect: Paid Applications Agreement, Bank/Steuer.
 4. Preis `1,19 EUR`, Screenshots, Beschreibung DE, Datenschutzfragebogen.
-5. TestFlight `2.0 (22)`: Punkte-Duell, Gaming-Feedback II, Teilen (Spielende/Bilanz), Alle-Fünfe-Branding; Footer/Pool/Multi in `2.0 (21)` regressionsprüfen.
+5. TestFlight-Regression: Fortschritt-Overlay, Code teilen, Feedback-Toggles, Zettel-Farben, Footer/`/play`, Pool-Endspiel.
 6. Optional: Auto-Refresh nach Pool-Endspiel fuer Statistik-Toggle.
 7. Optional: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschraenken.
 8. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
@@ -293,9 +304,9 @@ Dateien:
 
 ## Aktuelle Prioritaeten
 
-1. Backend deployen (`scoreProgression` + Migration `extra_yatzy_die_values`).
-2. iOS/TestFlight `2.0 (22)` bereitstellen.
-3. iPad-Tischmodus auf iPad Querformat, neue Start-/Setup-/Lobby-/Settings-/Legal-Optik, Footer-Tabbar in iOS, footerfreie `/play`-Zettel und iPhone-Regression testen.
+1. Backend deployen (falls noch offen: `scoreProgression` + Migration `extra_yatzy_die_values`).
+2. iOS/TestFlight **`2.0 (26)`** bereitstellen (falls `66e715a` noch nicht in `2.0 (25)`).
+3. TestFlight-Regression inkl. Fortschritt-Warteschlange, Code teilen, granulares Feedback.
 4. Store-Connect-Freigaben und Metadaten abschliessen.
 5. Danach erst optionale Sicherheits-/Auth-Verfeinerung der Stats-Endpunkte planen.
 
@@ -305,7 +316,9 @@ Dateien:
 - `HANDOVER.md`
 - `docs/ios_current.md`
 - `docs/decisions.md`
-- `frontend/lib/shareSocial.ts`, `frontend/lib/shareCanvasUtils.ts`, `frontend/lib/achievementShare.ts`, `frontend/lib/matchResultShare.ts`
+- `frontend/lib/shareSocial.ts`, `frontend/lib/gameFeedbackPrefs.ts`, `frontend/lib/feedbackOverlayQueue.ts`, `frontend/lib/runProgressFeedback.ts`
+- `frontend/lib/shareCanvasUtils.ts`, `frontend/lib/achievementShare.ts`, `frontend/lib/matchResultShare.ts`
+- `frontend/components/RunProgressOverlay.tsx`, `frontend/app/settings/feedback/page.tsx`
 - `frontend/components/ShareActionBar.tsx`, `frontend/components/AchievementShareBar.tsx`
 - `frontend/lib/labels.ts`
 - `frontend/components/MatchAnalysisView.tsx`

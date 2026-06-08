@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `de0f8f2`  
+**Produktcode-HEAD:** `66e715a`  
 **Sprache:** Deutsch
 
 Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milestones_active.md`. iOS/TestFlight/App Store: `docs/ios_current.md`. Dauerhafte Projektentscheidungen nur bei Bedarf: `docs/decisions.md`.
@@ -12,7 +12,7 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 
 - `AGENT_RULES.md` hat Vorrang vor allen anderen Dokumenten.
 - `AGENT_RULES.md` Sektion 9 ist Pflicht: Nach jeder Code-Änderung GitHub, Server und Mac synchronisieren und nummerierte `[Server]`-/`[Mac]`-Befehle ausgeben.
-- Keine Commits ohne ausdrückliche Nutzer-Anweisung.
+- Keine Commits ohne ausdrückliche Nutzer-Anweisung — **außer** wenn der Nutzer explizit Commit/Push anweist.
 - Kein `sudo` durch den Agent; sudo-Schritte sind immer Nutzer-Aufgabe **auf dem Server** (per SSH), nicht auf dem Mac.
 - Keine Watcher, kein Polling, keine Dauerprozesse, kein Auto-Deploy.
 - Agent arbeitet nur auf dem Server unter `/home/bottleadmin/projects/kniffel`.
@@ -26,50 +26,51 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
 | Branch | `milestone-22-prep` |
-| Produktcode | HEAD `de0f8f2`; Frontend `out/` gebaut; **Backend-Deploy** für `scoreProgression` + Coaching-API + Migration `extra_yatzy_die_values` durch Nutzer |
-| Backend | `GET …/match-analysis` inkl. **`coaching`** und **`scoreProgression`**; `scoredSequence` in Run-DTO; `POST /runs/:id/extra-yatzy` mit `{ yatzyDieValue }` |
+| Produktcode | HEAD `66e715a`; Frontend `out/` gebaut |
+| Backend | Coaching-API, `scoreProgression`, Migration `extra_yatzy_die_values` — Deploy-Status durch Nutzer prüfen |
 | UI-Branding | Nutzer-sichtbar **Alle Fünfe** statt „Yatzy“; technische IDs unverändert |
-| Teilen | **Nur** Spielende (`RunFinishScreen`) + Startscreen-Bilanz; ein **Teilen**-Button → System-Share (PNG) bzw. Download; **kein** Share in Erfolgs-Overlays/Spielanalyse |
-| iOS/TestFlight | Version `2.0`, Build `2.0 (21)`, nächster Upload `2.0 (22)` |
-| Noch nicht in iOS `2.0 (21)` | Alles seit `2.0 (21)`: Alle-Fünfe-UX, Gaming-Feedback II, Punkte-Duell-Graphik, Teilen-Vereinfachung, Coaching, Einstellungen-Rücknavigation |
+| Teilen | **Nur** Spielende (`RunFinishScreen`) + Startscreen-Bilanz; ein **Teilen**-Button → System-Share (PNG) |
+| Multi-Raum | **Code teilen** (System-Share) statt Kopieren nach Raum-Anlegen |
+| Spiel-Feedback | Granular unter `/settings/feedback`: Animationen, Sounds, Fortschritt 25/50/75 % |
+| Fortschritt | Overlay + Sound bei 25/50/75 % der Felder; **Warteschlange** hinter Erfolgs-Overlays |
+| Zettel | Ergebnis 1/2/Spiel in Feld-Spalte mit gleichen Farben wie Wertespalten |
+| iOS/TestFlight | Version `2.0`, aktueller Build **`2.0 (25)`**, nächster Upload **`2.0 (26)`** |
 
-## Produktstand Seit TestFlight 2.0 (21)
+## Letzte Produktänderungen (Commits `02e0857` … `66e715a`)
 
-Alle folgenden Features sind im Produktcode (`de0f8f2`) und Web-Frontend gebaut; warten auf iOS-Upload `2.0 (22)` und teils Backend-Deploy:
-
-| Feature | Commit(s) | Backend-Deploy nötig |
-|---------|-----------|----------------------|
-| Alle-Fünfe-Miniwürfel, Zusatz-Würfelwahl (+100), Portal-Popover | `cb101f6` | Ja (`extra_yatzy_die_values`) |
-| Spielanalyse-Coaching | `3c03592` | Ja (`coaching` in API) |
-| Einstellungen-Rücknavigation `?from=solo\|multi` | `3c03592` | Nein |
-| Spiel-Feedback Gaming (Basis) | `a93e462` | Nein |
-| Alle-Fünfe-Branding, Erfolg teilen (Canvas) | `5f90ad8` | Nein |
-| Punkte-Duell-Graphik + Gaming-Feedback II | `f2d061c` | Ja (`scoreProgression`) |
-| Teilen vereinfacht (nur Spielende + Bilanz, System-Share) | `82e2a01` … `de0f8f2` | Nein |
+| Feature | Commit | Backend nötig |
+|---------|--------|---------------|
+| Zettel: Ergebnis-Zeilen Farben in Feld-Spalte | `02e0857` | Nein |
+| Multi: Raum-Code teilen | `02e0857` | Nein |
+| Fortschritt 25/50/75 % Overlay + Sound | `02e0857` | Nein |
+| Spiel-Feedback granular (`/settings/feedback`) | `02e0857` | Nein |
+| Fortschritt nach Erfolgs-Overlay (Warteschlange) | `66e715a` | Nein |
 
 ## Bekanntes UX-Thema (offen)
 
 - **Pool-Endspiel + Statistik-Toggle:** Nicht-Sieger müssen ggf. **Aktualisieren** tippen, bevor Abschluss-Screen mit Toggle erscheint.
-- **Punkte-Duell live:** Graphik in Multi-Analyse erst nach **Backend-Deploy** (`scoreProgression` in API).
+- **Punkte-Duell live:** Graphik in Multi-Analyse erst nach **Backend-Deploy** (`scoreProgression` in API), falls noch nicht deployed.
 
 ## Wichtige Dateien
 
-- Teilen: `frontend/lib/shareSocial.ts`, `matchResultShare.ts`, `ShareActionBar.tsx`, `HomeBentoGrid.tsx`, `RunFinishScreen.tsx`
-- Analyse/Graph: `ScoreProgressionChart.tsx`, `backend/src/domain/scoreProgression.ts`, `MatchAnalysisView.tsx`
-- Spiel-Feedback: `AchievementOverlay.tsx`, `achievementSound.ts`, `achievementTypes.ts`, `globals.css`
-- Coaching: `backend/src/domain/matchCoaching.ts`, `frontend/lib/matchCoaching.ts`
-- Zettel: `ScoreSheetTable.tsx`, `ExtraYatzyPickerOverlay.tsx`
+- Zettel: `ScoreSheetTable.tsx`, `globals.css`
+- Multi-Teilen: `multi/page.tsx`, `shareSocial.ts`
+- Fortschritt: `runProgressFeedback.ts`, `feedbackOverlayQueue.ts`, `RunProgressOverlay.tsx`, `PlayBoard.tsx`, `TableModePlayBoard.tsx`
+- Feedback-Einstellungen: `gameFeedbackPrefs.ts`, `settings/feedback/page.tsx`, `BonusCelebrationToggle.tsx`
+- Spiel-Feedback: `AchievementOverlay.tsx`, `achievementSound.ts`, `achievementFeedback.ts`
+- Teilen: `ShareActionBar.tsx`, `HomeBentoGrid.tsx`, `RunFinishScreen.tsx`
+- Analyse: `MatchAnalysisView.tsx`, `ScoreProgressionChart.tsx`, `backend/src/domain/scoreProgression.ts`
 - `CHANGELOG.md`, `docs/milestones_active.md`, `docs/ios_current.md`
 
 ## Offene Prioritäten
 
-1. **Backend deployen** (Coaching-API + `scoreProgression` + Migration `extra_yatzy_die_values`): Nutzer per SSH `sudo bash /home/bottleadmin/projects/kniffel/infra/scripts/deploy-backend-prod.sh`.
-2. **iOS-Build `2.0 (22)`** auf dem Mac (siehe Mac-Befehle unten und `docs/ios_current.md`).
-3. TestFlight: Punkte-Duell, Gaming-Feedback II, Teilen (Spielende/Bilanz), Alle-Fünfe-Branding, Mini-Würfel, Regression Footer/`/play`.
+1. **Backend deployen** (falls noch offen): Coaching + `scoreProgression` + Migration `extra_yatzy_die_values` — Nutzer per SSH `sudo bash /home/bottleadmin/projects/kniffel/infra/scripts/deploy-backend-prod.sh`.
+2. **iOS-Build `2.0 (26)`** auf dem Mac, falls Produktcode `66e715a` noch nicht in TestFlight `2.0 (25)` enthalten ist.
+3. TestFlight-Regression: Footer, `/play`, Pool-Endspiel, Fortschritt-Overlay, Code teilen, Feedback-Toggles.
 4. Optional: Pool-Endspiel Auto-Refresh.
 5. App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
 
-## Mac: iOS-Build 2.0 (22)
+## Mac: iOS-Build 2.0 (26)
 
 ```bash
 cd /Users/marclangebeck/projects/kniffel
@@ -92,7 +93,7 @@ brew unlink rsync
 env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
 ```
 
-In Xcode: Team prüfen, Build-Nummer **22**, **Any iOS Device** → **Product → Archive** → Upload.
+In Xcode: Team prüfen, Build-Nummer **26**, **Any iOS Device** → **Product → Archive** → Upload.
 
 ## Pflicht-Lesereihenfolge
 
@@ -131,12 +132,15 @@ Wichtige Regeln:
 
 Aktueller Kurzstand:
 - Branch: milestone-22-prep
-- Produktcode-HEAD: de0f8f2
+- Produktcode-HEAD: 66e715a
 - Web/API live: https://dicebudget.bottle-trade.de
-- iOS: Version 2.0, TestFlight 2.0 (21), nächster Upload 2.0 (22)
+- iOS: Version 2.0, TestFlight 2.0 (25), nächster Upload 2.0 (26)
 - UI-Branding: Nutzer-sichtbar „Alle Fünfe“ statt Yatzy; technische IDs (yatzyDieValue, extra-yatzy) unverändert
+- Zettel: Ergebnis 1/2/Spiel in Feld-Spalte mit gleichen Farben wie Wertespalten
+- Multi: Raum-Code teilen (System-Share) statt kopieren
+- Fortschritt: Overlay + Sound bei 25/50/75 %; erscheint auch nach Erfolgs-Overlays nacheinander
+- Spiel-Feedback: granular unter /settings/feedback (Animationen, Sounds, Fortschritt)
 - Spielanalyse: Coaching + Punkte-Duell-Graphik (Multi; scoreProgression nach Backend-Deploy)
-- Spiel-Feedback: Gaming-Overlays II + Layered Web-Audio; kein Share in Overlays
 - Teilen: nur Spielende (RunFinishScreen) + Startscreen-Bilanz; ein Teilen-Button → System-Share (PNG)
 - Alle-Fünfe-UX: Mini-Würfel, Zusatz-Würfelwahl (+100), Portal-Popover
 - Einstellungen: ?from=solo|multi → Zurück zu Einzelspiel/Multiplayer
@@ -145,16 +149,16 @@ Aktueller Kurzstand:
   sudo bash /home/bottleadmin/projects/kniffel/infra/scripts/deploy-backend-prod.sh
   (Nicht auf dem Mac mit /home/bottleadmin/… ausführen.)
 
-Mac iOS-Build 2.0 (22):
+Mac iOS-Build 2.0 (26):
 cd /Users/marclangebeck/projects/kniffel && git pull origin milestone-22-prep
 cd frontend && npm run build:ios && brew unlink rsync
 env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
-(Xcode: Build-Nummer 22, Archive, Upload)
+(Xcode: Build-Nummer 26, Archive, Upload)
 
 Offene Prioritäten:
-1. Backend deployen (Coaching + scoreProgression + Migration extra_yatzy_die_values)
-2. iOS TestFlight 2.0 (22) bauen und hochladen
-3. TestFlight-Regression (Footer, /play, Pool-Endspiel, neue Features)
+1. Backend deployen (falls noch offen: Coaching + scoreProgression + Migration extra_yatzy_die_values)
+2. iOS TestFlight 2.0 (26) bauen und hochladen (falls 66e715a noch nicht in 2.0 (25))
+3. TestFlight-Regression (Footer, /play, Pool-Endspiel, Fortschritt, Code teilen, Feedback-Toggles)
 4. Optional: Pool-Endspiel Auto-Refresh
 5. App Store Connect (Agreement, Bank/Steuer, Preis 1,19 EUR)
 

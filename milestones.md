@@ -23,11 +23,10 @@ Nur bei Bedarf:
 ## Aktueller Kurzstand
 
 - Branch: `milestone-22-prep`
-- Produktcode-HEAD: `de0f8f2`
+- Produktcode-HEAD: `66e715a`
 - Web/API live: https://dicebudget.bottle-trade.de
-- iOS: TestFlight `2.0 (21)`, naechster Upload `2.0 (22)`
-- In TestFlight `2.0 (21)`: M34, M35, UI-Politur, iPad-Tischmodus, Spiel-UX, Spielanalyse (Basis).
-- Noch nicht in iOS `2.0 (21)`: Alle-Fünfe-UX, Gaming-Feedback II, Punkte-Duell, Teilen (Spielende/Bilanz), Coaching, Branding, Einstellungen-Rücknavigation.
+- iOS: TestFlight `2.0 (25)`, naechster Upload `2.0 (26)`
+- Letzte Features (`02e0857` … `66e715a`): Zettel-Ergebnis-Farben, Raum-Code teilen, Fortschritt 25/50/75 %, granulares Spiel-Feedback, Fortschritt-Warteschlange.
 
 ## Offene Prioritaeten
 
