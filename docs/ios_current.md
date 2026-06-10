@@ -1,8 +1,8 @@
 # iOS Aktuell - dice.budget
 
-**Stand:** 2026-06-08  
+**Stand:** 2026-06-10  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `66e715a`  
+**Produktcode-HEAD:** Commit-Batch 2026-06-10 auf `milestone-22-prep`  
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-/App-Store-Stand. Aeltere iOS-Historie steht in `docs/ios_archive.md`.
@@ -11,15 +11,19 @@ Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-
 
 - App Store Connect ist bei **Version 2.0**.
 - Aktueller TestFlight-Build ist **`2.0 (25)`**.
-- Naechster Upload ist **`2.0 (26)`** (falls Produktcode `66e715a` noch nicht in `2.0 (25)` enthalten).
-- In TestFlight `2.0 (25)`: M34, M35, UI-Politur, iPad-Tischmodus, Game-Dashboard, Spiel-UX, Spielanalyse (Basis), Alle-Fünfe-UX, Gaming-Feedback, Teilen, Coaching, Branding (je nach Upload-Historie Builds 22–25).
-- Produktcode `66e715a` enthaelt zusaetzlich: **Zettel-Ergebnis-Farben**, **Raum-Code teilen**, **Fortschritt 25/50/75 %**, **granulares Spiel-Feedback**, **Fortschritt-Warteschlange nach Erfolgs-Overlays**.
+- Naechster Upload ist **`2.0 (26)`** (Stand ab `f29cf7d` / `b17b9f5` + Arena-Commit).
+- Produktcode ab `f29cf7d` enthaelt zusaetzlich: **Code teilen nur Code**, **Vollbild-Erfolgs-Animationen**, **DiceBudget-Branding/Intro**, **Card-Dashboards** (Abschluss/Analyse), **Footer-Menü mit Screenshot**, **Startscreen-Arena** (Multi vs. Solo).
+- Produktcode `66e715a` … `b17b9f5`: Zettel-Ergebnis-Farben, Fortschritt 25/50/75 %, granulares Spiel-Feedback, Fortschritt-Warteschlange.
 - Web/API sind live unter https://dicebudget.bottle-trade.de.
 
 ## Was In 2.0 (26) Enthalten Sein Soll (falls noch nicht in 25)
 
+- Startscreen-Arena: zwei Vollbild-Kacheln Multi vs. Solo, VS-Badge, Aurora/Glow.
+- Footer: `Home · Statistik · Einstellungen · Menü` mit Screenshot teilen.
+- DiceBudget-Branding + Intro-Logo; Intro-Key v2.
+- Multi: **Code teilen** nur Code (kein Einladungstext).
+- Erfolgs-Animationen Vollbild; Abschluss/Analyse als Card-Dashboards.
 - Zettel: Ergebnis 1/2/Spiel in Feld-Spalte mit gleichen Farben wie Wertespalten.
-- Multi: **Code teilen** (System-Share) statt kopieren.
 - Fortschritt 25/50/75 %: Overlay + Sound; nacheinander nach Erfolgs-Overlays.
 - Spiel-Feedback granular: `/settings/feedback` (Animationen, Sounds, Fortschritt).
 - Backend (falls noch offen): Coaching-API, `scoreProgression`, Migration `extra_yatzy_die_values`.

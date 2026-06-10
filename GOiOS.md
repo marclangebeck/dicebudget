@@ -14,7 +14,7 @@ Diese Datei ist ein Kompatibilitaets-Index. Fuer aktuellen iOS-/TestFlight-/App-
 - Bundle ID: `de.bottletrade.dicebudget`
 - Version in App Store Connect: `2.0`
 - Aktueller TestFlight-Build: `2.0 (25)`
-- Naechster Upload: `2.0 (26)` (Stand `66e715a`: Zettel-Farben, Code teilen, Fortschritt-Overlay, granulares Feedback, Warteschlange)
+- Naechster Upload: `2.0 (26)` (Stand ab `f29cf7d`: Vollbild-Erfolge, DiceBudget-Branding, Card-Dashboards, Footer-Menü, Startscreen-Arena)
 - Details und Checkliste: `docs/ios_current.md`
 
 ## Wichtig

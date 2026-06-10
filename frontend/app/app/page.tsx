@@ -5,7 +5,7 @@ import { AppIntroSplash } from "@/components/AppIntroSplash";
 import { HomeBentoGrid } from "@/components/HomeBentoGrid";
 import { ResumeActiveGame } from "@/components/ResumeActiveGame";
 
-const INTRO_SHOWN_KEY = "dicebudget.introShown.v1";
+const INTRO_SHOWN_KEY = "dicebudget.introShown.v2";
 const INTRO_DURATION_MS = 1700;
 
 export default function AppHomePage() {

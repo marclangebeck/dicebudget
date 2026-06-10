@@ -5,8 +5,12 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
-- **Footer-Menü:** Support durch Hamburger-Menü ersetzt (Screenshot teilen, Support, Datenschutz, Impressum, bottle-trade.de); Footer-Buttons Datenschutz/Impressum durch Statistik und Einstellungen
-- **Intro-Splash:** DiceBudget-Logo mittig über dem App-Namen; Schreibweise überall **DiceBudget**
+- **Startscreen Arena:** Zwei Vollbild-Kacheln (Multi vs. Solo) mit zentralem VS-Badge, Aurora-Hintergrund, schwebenden 3D-Icons, Glow-Ring, Glas-Dock und Play-CTAs („Lobby öffnen“ / „Run starten“); kompakter Hero „Wähle deinen Modus“
+- **Footer-Tabbar:** `Home · Statistik · Einstellungen · Menü` — Hamburger-Menü mit Screenshot teilen, Support, Datenschutz, Impressum, bottle-trade.de (via `AppFooterMenu`, `html-to-image`)
+- **Footer-Menü:** Schriftgröße „Menü“ an andere Footer-Labels angeglichen
+- **Startscreen:** Nur noch zwei große Kacheln (Multiplayer + Einzelspiel); Statistik und Einstellungen nur noch im Footer
+- **Intro-Splash:** DiceBudget-Logo mittig über dem App-Namen; Schreibweise überall **DiceBudget**; Intro-Key `v2` (Splash einmalig nach Logo-Update)
+- **Deploy/Nginx:** `Cache-Control: no-cache` für HTML; `_next/static/` mit `immutable` — behebt veraltete UI in Safari nach Frontend-Deploy (nginx reload durch Nutzer)
 - **Multi: Raum-Code teilen:** System-Share und Zwischenablage liefern nur noch den Code — ohne Einladungstext oder App-Link (WhatsApp-Kopieren)
 - **Erfolgs-Animationen:** Bonus, Große Straße, Alle Fünfe und untere Spalte voll feiern über den gesamten Bildschirm — größere Karte, Würfel, Ring, Schockwellen, Strahlen und Konfetti
 - **Multispiel-Abschluss & Spielanalyse:** Card-Dashboard mit klar getrennten Bereichen — Ergebnis, Ranking, Teilen, Statistik-Toggle, Spielblöcke, Pool, Aktionen; Analyse mit Sektionen, Kennzahlen-Karten, getrennten Stärken/Schwächen- und Coaching-Cards

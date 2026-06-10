@@ -1,8 +1,8 @@
 # Aktive Milestones - dice.budget
 
-**Stand:** 2026-06-08  
+**Stand:** 2026-06-10  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `66e715a`  
+**Produktcode-HEAD:** `b17b9f5` (+ Commit-Batch 2026-06-10: Arena, nginx, Doku)  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -19,19 +19,33 @@ Technische Basis ist erledigt:
 - Native App startet direkt auf `/app`.
 - Native API-Basis zeigt auf `https://dicebudget.bottle-trade.de/api`.
 - TestFlight ist aktiv, aktueller Build ist **`2.0 (25)`**.
-- Naechster Upload ist **`2.0 (26)`** fuer Stand `66e715a` (Zettel-Farben, Code teilen, Fortschritt-Overlay, granulares Feedback, Warteschlange).
+- Naechster Upload ist **`2.0 (26)`** fuer Stand ab `f29cf7d` (Vollbild-Erfolge, DiceBudget-Branding, Card-Dashboards, Footer-Menü, Startscreen-Arena).
 
 Offen:
 
-- iOS-Build `2.0 (26)` auf dem Mac bauen und hochladen, falls `66e715a` noch nicht in `2.0 (25)` enthalten.
-- Startscreen, `/solo`, `/multi`, `/settings`, `/stats`, `/datenschutz`, `/impressum` und `/play` in iOS/Capacitor auf iPhone pruefen: Footer-Tabbar muss auf App-/Setup-/Legal-Screens unten sitzen; `/play` muss footerfrei sein und der Zettel muss die volle Screenhoehe nutzen.
-- iPad-Tischmodus in TestFlight auf iPad Querformat testen; iPhone-Flow muss unveraendert bleiben.
-- TestFlight `2.0 (26)` nach Upload testen (Fortschritt-Overlay, Code teilen, Feedback-Toggles, Zettel-Farben); Regression Footer/`/play`, Pool-Endspiel.
+- iOS-Build `2.0 (26)` auf dem Mac bauen und hochladen.
+- Startscreen-Arena, Footer/Menü, `/solo`, `/multi`, `/settings`, `/stats`, `/datenschutz`, `/impressum` und `/play` in iOS/Capacitor pruefen: Footer-Tabbar unten; `/play` footerfrei.
+- nginx Cache-Header auf dem Server deployen und reloaden (Safari-Cache-Thema).
+- TestFlight `2.0 (26)` nach Upload testen (Arena-Startscreen, Footer-Menü/Screenshot, Fortschritt, Code teilen, Feedback-Toggles); Regression Footer/`/play`, Pool-Endspiel.
 - App Store Connect fuer kostenpflichtigen Release fertigstellen.
 
 Details: `docs/ios_current.md`.
 
 ## Letzte Abgeschlossene Milestones
+
+### UX Startscreen-Arena + Footer-Menü + Branding 2026-06-10
+
+**Status:** erledigt im Produktcode (Commit-Batch 2026-06-10); Frontend gebaut; TestFlight `2.0 (26)`.
+
+- **Startscreen Arena:** Zwei Vollbild-Kacheln Multi vs. Solo, VS-Badge, Aurora, Glow-Ring, Glas-Dock, Play-CTAs.
+- **Footer:** `Home · Statistik · Einstellungen · Menü` — Hamburger mit Screenshot teilen, Support, Legal, bottle-trade.de.
+- **Branding:** DiceBudget-Logo im Intro-Splash; Intro-Key v2.
+- **Multi:** Code teilen nur Code.
+- **Erfolgs-Animationen:** Vollbild.
+- **Abschluss/Analyse:** Card-Dashboards.
+- **Nginx:** HTML no-cache, `_next/static/` immutable.
+
+Dateien: `HomeBentoGrid.tsx`, `globals.css`, `AppLegalFooter.tsx`, `AppFooterMenu.tsx`, `screenCapture.ts`, `AppIntroSplash.tsx`, `RunFinishScreen.tsx`, `MatchAnalysisView.tsx`, `AchievementOverlay.tsx`, `shareSocial.ts`, `infra/nginx/dicebudget.bottle-trade.de.conf`
 
 ### UX-Politur Zettel + Multi-Teilen + Fortschritt + Feedback 2026-06-08
 
@@ -285,13 +299,14 @@ Dateien:
 ## Offene Aufgaben
 
 1. **Backend deployen** (falls noch offen): Coaching-API + `scoreProgression` + Migration `extra_yatzy_die_values` — Nutzer per SSH `sudo bash …/deploy-backend-prod.sh`.
-2. iOS/TestFlight **`2.0 (26)`** auf dem Mac bauen und hochladen (Stand `66e715a`); Mac-Workflow in `HANDOVER.md` und `docs/ios_current.md`.
-3. App Store Connect: Paid Applications Agreement, Bank/Steuer.
-4. Preis `1,19 EUR`, Screenshots, Beschreibung DE, Datenschutzfragebogen.
-5. TestFlight-Regression: Fortschritt-Overlay, Code teilen, Feedback-Toggles, Zettel-Farben, Footer/`/play`, Pool-Endspiel.
-6. Optional: Auto-Refresh nach Pool-Endspiel fuer Statistik-Toggle.
-7. Optional: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschraenken.
-8. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
+2. iOS/TestFlight **`2.0 (26)`** auf dem Mac bauen und hochladen (Stand ab `b17b9f5` + Arena-Commit); Mac-Workflow in `HANDOVER.md` und `docs/ios_current.md`.
+3. nginx reload nach Cache-Header-Deploy (Nutzer sudo).
+4. App Store Connect: Paid Applications Agreement, Bank/Steuer.
+5. Preis `1,19 EUR`, Screenshots, Beschreibung DE, Datenschutzfragebogen.
+6. TestFlight-Regression: Startscreen-Arena, Footer/Menü, Fortschritt, Code teilen, Feedback-Toggles, Footer/`/play`, Pool-Endspiel.
+7. Optional: Auto-Refresh nach Pool-Endspiel fuer Statistik-Toggle.
+8. Optional: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschraenken.
+9. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
 
 ## Bekannte Technische Schulden
 
@@ -304,11 +319,11 @@ Dateien:
 
 ## Aktuelle Prioritaeten
 
-1. Backend deployen (falls noch offen: `scoreProgression` + Migration `extra_yatzy_die_values`).
-2. iOS/TestFlight **`2.0 (26)`** bereitstellen (falls `66e715a` noch nicht in `2.0 (25)`).
-3. TestFlight-Regression inkl. Fortschritt-Warteschlange, Code teilen, granulares Feedback.
-4. Store-Connect-Freigaben und Metadaten abschliessen.
-5. Danach erst optionale Sicherheits-/Auth-Verfeinerung der Stats-Endpunkte planen.
+1. Commit/Push + Frontend-Build; nginx reload (Cache-Header).
+2. Backend deployen (falls noch offen: `scoreProgression` + Migration `extra_yatzy_die_values`).
+3. iOS/TestFlight **`2.0 (26)`** bereitstellen (Stand ab `b17b9f5` + Arena-Commit).
+4. TestFlight-Regression inkl. Startscreen-Arena, Footer/Menü, Fortschritt, Code teilen.
+5. Store-Connect-Freigaben und Metadaten abschliessen.
 
 ## Wichtige Dateien Fuer Aktuelle Arbeit
 

@@ -35,7 +35,7 @@ Lokal zeigt das Frontend auf `http://127.0.0.1:3020` (ohne `/api`-Prefix). Produ
 | URL | Inhalt |
 |-----|--------|
 | `/` | Landingpage **dice.budget** |
-| `/app` | Spiel-Start (Bento) |
+| `/app` | Spiel-Start (Arena: Multi vs. Solo) |
 | `/datenschutz` | Datenschutzerklärung (App Store) |
 | `/impressum` | Impressum |
 

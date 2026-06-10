@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { getPairingSummaries, getStats } from "@/lib/api";
 import { APP_SHORT } from "@/lib/branding";
 import {
@@ -19,44 +19,44 @@ import { ShareActionBar } from "@/components/ShareActionBar";
 type NavTileProps = {
   href: string;
   area: string;
-  tone: "multi" | "stats" | "solo" | "settings";
+  tone: "multi" | "solo";
+  modeTag: string;
   title: string;
   subtitle: string;
-  badge: string;
   cta: string;
   iconSrc: string;
-  footer?: ReactNode;
 };
 
 function NavTile({
   href,
   area,
   tone,
+  modeTag,
   title,
   subtitle,
-  badge,
   cta,
   iconSrc,
-  footer,
 }: NavTileProps) {
   return (
     <Link
       href={href}
-      className={`home-bento-tile home-bento-tile--${tone} flex min-h-0 flex-col no-underline`}
+      className={`home-bento-tile home-bento-tile--arena home-bento-tile--${tone} flex min-h-0 flex-col no-underline`}
       style={{ gridArea: area }}
     >
-      <span className="home-bento-badge">{badge}</span>
+      <div className="home-bento-scene" aria-hidden />
+      <span className="home-bento-mode-tag">{modeTag}</span>
       <span className="home-bento-tile-arrow" aria-hidden>
         →
       </span>
       <div className="home-bento-poster-art">
+        <span className="home-bento-icon-glow" aria-hidden />
+        <span className="home-bento-icon-ring" aria-hidden />
         <img src={iconSrc} alt="" className="home-bento-motif" loading="eager" decoding="async" />
       </div>
-      <div className="home-bento-tile-footer shrink-0">
+      <div className="home-bento-dock shrink-0">
         <p className="home-bento-title">{title}</p>
         <p className="home-bento-subtitle">{subtitle}</p>
-        {footer}
-        <p className="home-bento-cta">{cta}</p>
+        <span className="home-bento-play-btn">{cta}</span>
       </div>
     </Link>
   );
@@ -64,7 +64,6 @@ function NavTile({
 
 export function HomeBentoGrid() {
   const [stats, setStats] = useState<StatsDto | null>(null);
-  const [statsError, setStatsError] = useState<string | null>(null);
   const [pairings, setPairings] = useState<PairingSummaryDto[] | null>(null);
   const [pairingsError, setPairingsError] = useState<string | null>(null);
   const [ownPlayerId, setOwnPlayerId] = useState("");
@@ -78,9 +77,7 @@ export function HomeBentoGrid() {
   useEffect(() => {
     void getStats()
       .then(({ stats: data }) => setStats(data))
-      .catch((e) =>
-        setStatsError(e instanceof Error ? e.message : "Statistik nicht geladen"),
-      );
+      .catch(() => setStats(null));
   }, []);
 
   useEffect(() => {
@@ -90,17 +87,6 @@ export function HomeBentoGrid() {
         setPairingsError(e instanceof Error ? e.message : "Paarungen nicht geladen"),
       );
   }, []);
-
-  const statsFooter =
-    statsError !== null ? (
-      <p className="text-[10px] font-medium text-red-800 mt-1">—</p>
-    ) : stats === null ? (
-      <p className="home-bento-mini-stat">Lade...</p>
-    ) : stats.finishedRuns === 0 ? (
-      <p className="home-bento-mini-stat">Noch kein Rekord</p>
-    ) : (
-      <p className="home-bento-stat-value mt-1 tabular-nums">{stats.bestTotalScore}</p>
-    );
 
   const mergedPairings =
     pairings === null ? null : mergePairingSummaries(pairings, aliases, ownPlayerId);
@@ -188,8 +174,8 @@ export function HomeBentoGrid() {
           />
           <div className="home-hero-copy">
             <p className="home-hero-kicker">{APP_SHORT} · Strategy Edition</p>
-            <h1 className="home-hero-title">Bereit für die nächste Runde?</h1>
-            <p className="home-hero-subtitle">Risiko, Timing und Rivalität in jedem Wurf.</p>
+            <h1 className="home-hero-title">Wähle deinen Modus</h1>
+            <p className="home-hero-subtitle">Duell am Tisch oder Solo-Run — volle Strategy-Power.</p>
           </div>
         </div>
         <div className="home-hero-stats" aria-label="Spielübersicht">
@@ -220,65 +206,44 @@ export function HomeBentoGrid() {
               />
             </div>
           </div>
-          <div className="home-hero-record-metrics">
-            <span className="home-hero-record-win">
-              <strong>{recordWinsLabel}</strong>
-              Gewonnen
-            </span>
-            <span className="home-hero-record-loss">
-              <strong>{recordLossesLabel}</strong>
-              Verloren
-            </span>
-          </div>
           <div className="home-hero-record-track" aria-hidden>
             <div className="home-hero-record-track-win" style={{ width: `${winShare}%` }} />
             <div className="home-hero-record-track-loss" style={{ width: `${100 - winShare}%` }} />
           </div>
+          <div className="home-hero-record-legend tabular-nums" aria-hidden>
+            <span>Siege {recordWinsLabel}</span>
+            <span>Niederlagen {recordLossesLabel}</span>
+          </div>
         </div>
       </header>
 
-      <div className="home-bento-grid min-h-0">
-        <NavTile
-          href="/multi"
-          area="multi"
-          tone="multi"
-          title="Multiplayer"
-          subtitle="Erstelle einen Raum oder tritt per Code bei."
-          badge="Multiplayer"
-          cta="Zum Mehrspieler"
-          iconSrc="/home-icons/multiplayer.png"
-        />
-        <NavTile
-          href="/stats"
-          area="stats"
-          tone="stats"
-          title="Statistik"
-          subtitle="Rekorde, Duelle und Erfolge auf einen Blick."
-          badge="Rangliste"
-          cta="Erfolge ansehen"
-          iconSrc="/home-icons/stats.png"
-          footer={statsFooter}
-        />
-        <NavTile
-          href="/solo"
-          area="solo"
-          tone="solo"
-          title="Einzelspiel"
-          subtitle="Trainiere deinen Run mit taktischem Fokus."
-          badge="Solo"
-          cta="Run starten"
-          iconSrc="/home-icons/solo.png"
-        />
-        <NavTile
-          href="/settings"
-          area="settings"
-          tone="settings"
-          title="Einstellungen"
-          subtitle="Standards für Solo, Multiplayer und Tischmodus."
-          badge="App"
-          cta="Defaults setzen"
-          iconSrc="/home-icons/settings.png"
-        />
+      <div className="home-play-arena min-h-0 flex-1">
+        <div className="home-bento-grid min-h-0">
+          <NavTile
+            href="/multi"
+            area="multi"
+            tone="multi"
+            modeTag="2–6 Spieler"
+            title="Multiplayer"
+            subtitle="Raum erstellen, Code teilen, Rivalen schlagen."
+            cta="Lobby öffnen"
+            iconSrc="/home-icons/multiplayer.png"
+          />
+          <NavTile
+            href="/solo"
+            area="solo"
+            tone="solo"
+            modeTag="Solo · Strategy"
+            title="Einzelspiel"
+            subtitle="Pool, Bonus, Alle Fünfe — in deinem Tempo."
+            cta="Run starten"
+            iconSrc="/home-icons/solo.png"
+          />
+        </div>
+        <div className="home-play-arena-center" aria-hidden>
+          <span className="home-play-arena-dice">⚄</span>
+          <span className="home-play-arena-vs">vs</span>
+        </div>
       </div>
 
     </div>

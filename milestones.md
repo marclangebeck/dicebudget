@@ -23,16 +23,18 @@ Nur bei Bedarf:
 ## Aktueller Kurzstand
 
 - Branch: `milestone-22-prep`
-- Produktcode-HEAD: `66e715a`
+- Produktcode-HEAD: Commit-Batch 2026-06-10 auf `milestone-22-prep` (Parent `b17b9f5`)
 - Web/API live: https://dicebudget.bottle-trade.de
 - iOS: TestFlight `2.0 (25)`, naechster Upload `2.0 (26)`
-- Letzte Features (`02e0857` … `66e715a`): Zettel-Ergebnis-Farben, Raum-Code teilen, Fortschritt 25/50/75 %, granulares Spiel-Feedback, Fortschritt-Warteschlange.
+- Letzte Features (`f29cf7d` … `b17b9f5` + ausstehend): Code nur teilen, Vollbild-Erfolge, DiceBudget-Branding, Card-Dashboards, Footer-Menü/Screenshot, Startscreen-Arena, nginx Cache.
 
 ## Offene Prioritaeten
 
-1. Backend deployen (Coaching-API + `scoreProgression` + Migration `extra_yatzy_die_values`).
-2. iOS-Build `2.0 (22)` auf dem Mac bauen und hochladen (Mac-Befehle in `HANDOVER.md` und `docs/ios_current.md`).
-3. App Store Connect: Paid Agreement, Bank/Steuer, Preis `1,19 EUR`.
-4. TestFlight auf iPhone und iPad pruefen.
-5. Optional: Stats-Reset-/Baseline-Endpunkte absichern.
-6. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main`.
+1. Commit/Push ausstehender Aenderungen; Frontend-Build auf dem Server.
+2. nginx reload (Cache-Header).
+3. Backend deployen (Coaching-API + `scoreProgression` + Migration `extra_yatzy_die_values`).
+4. iOS-Build `2.0 (26)` auf dem Mac bauen und hochladen (Mac-Befehle in `HANDOVER.md` und `docs/ios_current.md`).
+5. App Store Connect: Paid Agreement, Bank/Steuer, Preis `1,19 EUR`.
+6. TestFlight auf iPhone und iPad pruefen (Arena-Startscreen, Footer/Menü).
+7. Optional: Stats-Reset-/Baseline-Endpunkte absichern.
+8. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main`.
