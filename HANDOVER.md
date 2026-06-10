@@ -160,7 +160,7 @@ Offene Prioritäten:
 2. iOS TestFlight 2.0 (26) bauen und hochladen (falls 66e715a noch nicht in 2.0 (25))
 3. TestFlight-Regression (Footer, /play, Pool-Endspiel, Fortschritt, Code teilen, Feedback-Toggles)
 4. Optional: Pool-Endspiel Auto-Refresh
-5. App Store Connect (Agreement, Bank/Steuer, Preis 1,19 EUR)
+5. App Store Connect (Agreement, Bank/Steuer, Preis 1,99 EUR)
 
 Auftrag:
 <hier konkrete Aufgabe einfügen>

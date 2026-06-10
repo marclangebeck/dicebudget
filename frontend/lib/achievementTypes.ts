@@ -17,10 +17,10 @@ export const ACHIEVEMENT_DURATION_MS: Record<AchievementType, number> = {
 };
 
 export const ACHIEVEMENT_CONFETTI_COUNT: Record<AchievementType, number> = {
-  bonus: 52,
-  lower_complete: 58,
-  large_straight: 64,
-  yatzy: 88,
+  bonus: 72,
+  lower_complete: 80,
+  large_straight: 88,
+  yatzy: 120,
 };
 
 export type AchievementVisual = {

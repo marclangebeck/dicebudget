@@ -12,14 +12,18 @@ type Props = {
   value: 1 | 2 | 3 | 4 | 5 | 6;
   className?: string;
   pipClassName?: string;
-  /** field = Zettel-Feld (1,25 rem); mini = halbe Größe für Yatzy-Markierung */
-  size?: "default" | "field" | "mini";
+  /** field = Zettel-Feld (1,25 rem); mini = halbe Größe für Yatzy-Markierung; hero = Erfolgs-Overlay */
+  size?: "default" | "field" | "mini" | "hero";
 };
 
 const SIZE_STYLES = {
   default: {
     shell: "h-7 w-7 gap-0.5 p-0.5 md:h-6 md:w-6",
     pip: "size-1.5 md:size-1",
+  },
+  hero: {
+    shell: "h-14 w-14 gap-1 p-1 sm:h-16 sm:w-16",
+    pip: "size-3 sm:size-3.5",
   },
   field: {
     shell: "h-5 w-5 gap-[2px] p-[2px]",

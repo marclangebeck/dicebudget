@@ -4,6 +4,10 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
+### Changed
+- **Multi: Raum-Code teilen:** System-Share und Zwischenablage liefern nur noch den Code — ohne Einladungstext oder App-Link (WhatsApp-Kopieren)
+- **Erfolgs-Animationen:** Bonus, Große Straße, Alle Fünfe und untere Spalte voll feiern über den gesamten Bildschirm — größere Karte, Würfel, Ring, Schockwellen, Strahlen und Konfetti
+
 ### Added
 - **Zettel: Ergebnis-Zeilen in Feld-Spalte:** Die Label-Zellen „Ergebnis 1“, „Ergebnis 2“ und „Ergebnis Spiel“ nutzen dieselben Hintergrund- und Schriftfarben wie die Wertezellen in den Spielspalten (dunkel bzw. grün hervorgehoben)
 - **Multi: Raum-Code teilen:** Nach dem Anlegen eines Raums ersetzt „Code teilen“ das Kopieren — System-Share mit Einladungstext (Fallback: Zwischenablage)

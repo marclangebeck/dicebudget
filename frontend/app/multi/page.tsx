@@ -8,8 +8,7 @@ import { JoinByCodeForm } from "@/components/JoinByCodeForm";
 import { createGameSession, joinSession } from "@/lib/api";
 import { saveActiveGame } from "@/lib/activeGame";
 import { setPlayerAlias } from "@/lib/playerAliases";
-import { APP_NAME } from "@/lib/branding";
-import { sharePlainText } from "@/lib/shareSocial";
+import { shareInviteCode } from "@/lib/shareSocial";
 import { settingsHrefWithReturn } from "@/lib/settingsReturn";
 import { DEFAULT_APP_SETTINGS, getAppSettings, type AppSettings } from "@/lib/uiPrefs";
 import {
@@ -90,10 +89,7 @@ export default function MultiHostPage() {
 
   async function shareCode() {
     if (!inviteCode) return;
-    const result = await sharePlainText({
-      title: `${APP_NAME} — Raum-Code`,
-      text: `Komm in meinen ${APP_NAME}-Raum!\n\nRaum-Code: ${inviteCode}\n\nMultiplayer → Code eingeben`,
-    });
+    const result = await shareInviteCode(inviteCode);
     if (result === "shared") {
       setShareState("shared");
       window.setTimeout(() => setShareState("idle"), 2000);

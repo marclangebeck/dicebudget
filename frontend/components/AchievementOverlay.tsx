@@ -20,9 +20,9 @@ const STRAIGHT_DICE = [2, 3, 4, 5, 6] as const;
 const UPPER_DICE = [1, 2, 3, 4, 5, 6] as const;
 const CONFETTI_SHAPES = ["rect", "star", "pip"] as const;
 
-const SCENE_SPARK_COUNT = 18;
-const ORBIT_COUNT = 10;
-const COIN_COUNT = 14;
+const SCENE_SPARK_COUNT = 28;
+const ORBIT_COUNT = 14;
+const COIN_COUNT = 22;
 
 export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: Props) {
   const visual = achievementVisual(type, gameIndex);
@@ -37,7 +37,7 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
         color: visual.confettiColors[i % visual.confettiColors.length],
         rotate: Math.round(Math.random() * 360),
         drift: Math.round((Math.random() - 0.5) * 110),
-        width: 5 + Math.random() * 7,
+        width: 8 + Math.random() * 12,
         shape: CONFETTI_SHAPES[i % CONFETTI_SHAPES.length],
       })),
     [confettiCount, visual.confettiColors],
@@ -59,7 +59,7 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
     () =>
       Array.from({ length: ORBIT_COUNT }, (_, i) => ({
         delay: i * 0.07,
-        radius: 7.5 + (i % 3) * 1.2,
+        radius: 14 + (i % 3) * 5,
         duration: 2.4 + (i % 4) * 0.35,
       })),
     [],
@@ -72,7 +72,7 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
             left: 12 + ((i * 17) % 76) + Math.random() * 8,
             delay: 0.1 + (i % 4) * 0.08 + Math.random() * 0.45,
             duration: 1.4 + Math.random() * 0.9,
-            size: 0.55 + Math.random() * 0.45,
+            size: 0.9 + Math.random() * 0.75,
             spin: Math.round(Math.random() * 360),
           }))
         : [],
@@ -89,7 +89,7 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
 
   return (
     <div
-      className={`achievement-overlay achievement-overlay--${type} fixed inset-0 z-50 flex items-center justify-center p-4`}
+      className={`achievement-overlay achievement-overlay--${type} achievement-overlay--celebrate fixed inset-0 z-50 flex items-center justify-center`}
       role="status"
       aria-live="polite"
       onClick={onClose}
@@ -209,7 +209,7 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
               {
                 animationDelay: `${orbit.delay}s`,
                 animationDuration: `${orbit.duration}s`,
-                "--orbit-radius": `${orbit.radius}rem`,
+                "--orbit-radius": `${orbit.radius}vmin`,
               } as React.CSSProperties
             }
           />
@@ -251,7 +251,7 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
                 className="achievement-upper-slot"
                 style={{ "--slot-i": i } as React.CSSProperties}
               >
-                <DiceFace value={value} size="mini" pipClassName="bg-emerald-200" />
+                <DiceFace value={value} size="default" pipClassName="bg-emerald-200" />
               </span>
             ))}
           </div>
@@ -265,7 +265,7 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
                 className="achievement-dice-roll"
                 style={{ "--dice-i": i } as React.CSSProperties}
               >
-                <DiceFace value={yatzyFace} size="default" pipClassName="bg-amber-200" />
+                <DiceFace value={yatzyFace} size="hero" pipClassName="bg-amber-200" />
               </span>
             ))}
           </div>
@@ -280,7 +280,7 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
                   className="achievement-dice-roll"
                   style={{ "--dice-i": i } as React.CSSProperties}
                 >
-                  <DiceFace value={value} size="default" pipClassName="bg-amber-200" />
+                  <DiceFace value={value} size="hero" pipClassName="bg-amber-200" />
                 </span>
               ))}
             </div>
