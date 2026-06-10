@@ -16,6 +16,9 @@ export const MODE_CLASSIC_LABEL = "DiceBudget Klassisch";
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://dicebudget.bottle-trade.de";
 
+/** Mutterprojekt / Betreiber */
+export const BOTTLE_TRADE_URL = "https://bottle-trade.de";
+
 export const APP_HOME_PATH = "/app";
 
 export const PRIVACY_PATH = "/datenschutz";

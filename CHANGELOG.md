@@ -5,7 +5,8 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
-- **Intro-Splash:** DiceBudget-Logo (`logo-source.png`) mittig über dem App-Namen; Schreibweise überall **DiceBudget** statt „dice.budget“
+- **Footer-Menü:** Support durch Hamburger-Menü ersetzt (Screenshot teilen, Support, Datenschutz, Impressum, bottle-trade.de); Footer-Buttons Datenschutz/Impressum durch Statistik und Einstellungen
+- **Intro-Splash:** DiceBudget-Logo mittig über dem App-Namen; Schreibweise überall **DiceBudget**
 - **Multi: Raum-Code teilen:** System-Share und Zwischenablage liefern nur noch den Code — ohne Einladungstext oder App-Link (WhatsApp-Kopieren)
 - **Erfolgs-Animationen:** Bonus, Große Straße, Alle Fünfe und untere Spalte voll feiern über den gesamten Bildschirm — größere Karte, Würfel, Ring, Schockwellen, Strahlen und Konfetti
 - **Multispiel-Abschluss & Spielanalyse:** Card-Dashboard mit klar getrennten Bereichen — Ergebnis, Ranking, Teilen, Statistik-Toggle, Spielblöcke, Pool, Aktionen; Analyse mit Sektionen, Kennzahlen-Karten, getrennten Stärken/Schwächen- und Coaching-Cards
