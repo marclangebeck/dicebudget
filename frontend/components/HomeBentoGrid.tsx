@@ -16,48 +16,28 @@ import { loadPlayerAliases, type PlayerAliasMap } from "@/lib/playerAliases";
 import type { StatsDto } from "@/lib/statsTypes";
 import { ShareActionBar } from "@/components/ShareActionBar";
 
-type NavTileProps = {
+type ArenaPaneProps = {
   href: string;
-  area: string;
   tone: "multi" | "solo";
-  modeTag: string;
-  title: string;
-  subtitle: string;
+  label: string;
   cta: string;
   iconSrc: string;
 };
 
-function NavTile({
-  href,
-  area,
-  tone,
-  modeTag,
-  title,
-  subtitle,
-  cta,
-  iconSrc,
-}: NavTileProps) {
+function ArenaPane({ href, tone, label, cta, iconSrc }: ArenaPaneProps) {
   return (
     <Link
       href={href}
-      className={`home-bento-tile home-bento-tile--arena home-bento-tile--${tone} flex min-h-0 flex-col no-underline`}
-      style={{ gridArea: area }}
+      className={`home-arena-pane home-bento-tile home-bento-tile--arena home-bento-tile--${tone} home-arena-pane--${tone} flex min-h-0 flex-col no-underline`}
     >
       <div className="home-bento-scene" aria-hidden />
-      <span className="home-bento-mode-tag">{modeTag}</span>
-      <span className="home-bento-tile-arrow" aria-hidden>
-        →
-      </span>
-      <div className="home-bento-poster-art">
+      <span className="home-arena-pane-label">{label}</span>
+      <div className={`home-arena-pane-icon home-arena-pane-icon--${tone}`}>
         <span className="home-bento-icon-glow" aria-hidden />
         <span className="home-bento-icon-ring" aria-hidden />
         <img src={iconSrc} alt="" className="home-bento-motif" loading="eager" decoding="async" />
       </div>
-      <div className="home-bento-dock shrink-0">
-        <p className="home-bento-title">{title}</p>
-        <p className="home-bento-subtitle">{subtitle}</p>
-        <span className="home-bento-play-btn">{cta}</span>
-      </div>
+      <span className="home-arena-pane-cta home-bento-play-btn">{cta}</span>
     </Link>
   );
 }
@@ -218,45 +198,31 @@ export function HomeBentoGrid() {
       </header>
 
       <div className="home-play-arena min-h-0 flex-1">
-        <div className="home-bento-grid home-bento-grid--arena min-h-0">
-          <NavTile
-            href="/multi"
-            area="multi"
-            tone="multi"
-            modeTag="2–6 Spieler"
-            title="Multiplayer"
-            subtitle="Raum erstellen, Code teilen, Rivalen schlagen."
-            cta="Lobby öffnen"
-            iconSrc="/home-icons/multiplayer.png"
+        <ArenaPane
+          href="/multi"
+          tone="multi"
+          label="Multi"
+          cta="Lobby öffnen"
+          iconSrc="/home-icons/multiplayer.png"
+        />
+        <ArenaPane
+          href="/solo"
+          tone="solo"
+          label="Solo"
+          cta="Run starten"
+          iconSrc="/home-icons/solo.png"
+        />
+        <div className="home-play-arena-brand" aria-hidden>
+          <div className="home-play-arena-brand-scene" />
+          <img
+            src="/logo-source.png"
+            alt=""
+            width={96}
+            height={96}
+            className="home-play-arena-brand-logo"
+            decoding="async"
           />
-          <div className="home-play-arena-hub" aria-hidden>
-            <div className="home-play-arena-hub-scene" />
-            <div className="home-play-arena-hub-stage">
-              <div className="home-play-arena-hub-emblem">
-                <span className="home-play-arena-hub-glow" />
-                <span className="home-play-arena-hub-ring" />
-                <img
-                  src="/logo-source.png"
-                  alt=""
-                  width={80}
-                  height={80}
-                  className="home-play-arena-hub-logo"
-                  decoding="async"
-                />
-              </div>
-            </div>
-            <span className="home-play-arena-hub-vs">vs</span>
-          </div>
-          <NavTile
-            href="/solo"
-            area="solo"
-            tone="solo"
-            modeTag="Solo · Strategy"
-            title="Einzelspiel"
-            subtitle="Pool, Bonus, Alle Fünfe — in deinem Tempo."
-            cta="Run starten"
-            iconSrc="/home-icons/solo.png"
-          />
+          <span className="home-play-arena-brand-name">{APP_SHORT}</span>
         </div>
       </div>
 

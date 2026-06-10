@@ -5,7 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
-- **Startscreen Arena:** DiceBudget-Logo in eigener Mittelsäule zwischen Multi- und Solo-Kachel (Glas-Hub, Aurora, Glow-Ring, VS-Badge) — kein Overlay über den Play-Kacheln
+- **Startscreen Arena:** Wireframe-Layout — zwei volle Spalten (Multi | Solo) mit Label, Icon und CTA; DiceBudget-Logo zentriert auf der Trennlinie, Icons flankieren das Logo
 - **Startscreen Arena:** Zwei Vollbild-Kacheln (Multi vs. Solo) mit Aurora-Hintergrund, schwebenden 3D-Icons, Glow-Ring, Glas-Dock und Play-CTAs („Lobby öffnen“ / „Run starten“); kompakter Hero „Wähle deinen Modus“
 - **Footer-Tabbar:** `Home · Statistik · Einstellungen · Menü` — Hamburger-Menü mit Screenshot teilen, Support, Datenschutz, Impressum, bottle-trade.de (via `AppFooterMenu`, `html-to-image`)
 - **Footer-Menü:** Schriftgröße „Menü“ an andere Footer-Labels angeglichen
