@@ -218,7 +218,7 @@ export function HomeBentoGrid() {
       </header>
 
       <div className="home-play-arena min-h-0 flex-1">
-        <div className="home-bento-grid min-h-0">
+        <div className="home-bento-grid home-bento-grid--arena min-h-0">
           <NavTile
             href="/multi"
             area="multi"
@@ -229,6 +229,22 @@ export function HomeBentoGrid() {
             cta="Lobby öffnen"
             iconSrc="/home-icons/multiplayer.png"
           />
+          <div className="home-play-arena-hub" aria-hidden>
+            <div className="home-play-arena-hub-scene" />
+            <div className="home-play-arena-hub-emblem">
+              <span className="home-play-arena-hub-glow" />
+              <span className="home-play-arena-hub-ring" />
+              <img
+                src="/logo-source.png"
+                alt=""
+                width={80}
+                height={80}
+                className="home-play-arena-hub-logo"
+                decoding="async"
+              />
+            </div>
+            <span className="home-play-arena-hub-vs">vs</span>
+          </div>
           <NavTile
             href="/solo"
             area="solo"
@@ -238,16 +254,6 @@ export function HomeBentoGrid() {
             subtitle="Pool, Bonus, Alle Fünfe — in deinem Tempo."
             cta="Run starten"
             iconSrc="/home-icons/solo.png"
-          />
-        </div>
-        <div className="home-play-arena-center" aria-hidden>
-          <img
-            src="/logo-source.png"
-            alt=""
-            width={128}
-            height={128}
-            className="home-play-arena-logo"
-            decoding="async"
           />
         </div>
       </div>
