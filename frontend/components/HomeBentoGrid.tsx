@@ -241,8 +241,14 @@ export function HomeBentoGrid() {
           />
         </div>
         <div className="home-play-arena-center" aria-hidden>
-          <span className="home-play-arena-dice">⚄</span>
-          <span className="home-play-arena-vs">vs</span>
+          <img
+            src="/logo-source.png"
+            alt=""
+            width={128}
+            height={128}
+            className="home-play-arena-logo"
+            decoding="async"
+          />
         </div>
       </div>
 

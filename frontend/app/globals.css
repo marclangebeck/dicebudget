@@ -851,48 +851,21 @@ html.legal-route body {
   top: 54%;
   z-index: 4;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.12rem;
+  justify-content: center;
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
 
-.home-play-arena-dice {
-  display: inline-flex;
-  width: 1.65rem;
-  height: 1.65rem;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.45rem;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: rgba(15, 23, 42, 0.82);
+.home-play-arena-logo {
+  width: 7rem;
+  height: 7rem;
+  border-radius: 1.15rem;
+  object-fit: cover;
   box-shadow:
-    0 8px 18px -10px rgba(0, 0, 0, 0.85),
-    0 0 18px rgba(250, 204, 21, 0.22);
-  color: #fde68a;
-  font-size: 1rem;
-  line-height: 1;
-  animation: home-arena-dice-spin 6s ease-in-out infinite;
-}
-
-.home-play-arena-vs {
-  display: inline-flex;
-  min-width: 1.85rem;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  border: 1px solid rgba(214, 168, 90, 0.42);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04)),
-    rgba(15, 23, 42, 0.88);
-  padding: 0.18rem 0.42rem;
-  color: #e5c07b;
-  font-size: 0.52rem;
-  font-weight: 900;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  box-shadow: 0 6px 16px -10px rgba(0, 0, 0, 0.8);
+    0 16px 40px -14px rgba(0, 0, 0, 0.92),
+    0 0 0 1px rgba(148, 163, 184, 0.24),
+    0 0 32px rgba(250, 204, 21, 0.2);
 }
 
 .home-bento-brand-icon {
@@ -1902,10 +1875,10 @@ html.legal-route body {
     top: 52%;
   }
 
-  .home-play-arena-dice {
-    width: 1.45rem;
-    height: 1.45rem;
-    font-size: 0.88rem;
+  .home-play-arena-logo {
+    width: 5.25rem;
+    height: 5.25rem;
+    border-radius: 0.95rem;
   }
 
   .home-bento-dock {
@@ -3236,8 +3209,7 @@ html.legal-route body {
 
   .home-bento-tile--arena .home-bento-scene,
   .home-bento-tile--arena .home-bento-motif,
-  .home-bento-tile--arena .home-bento-icon-ring,
-  .home-play-arena-dice {
+  .home-bento-tile--arena .home-bento-icon-ring {
     animation: none;
   }
 
