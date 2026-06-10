@@ -841,19 +841,22 @@ html.legal-route body {
 .home-play-arena {
   --arena-logo-size: clamp(5.25rem, 34vw, 7.25rem);
   --arena-logo-half: calc(var(--arena-logo-size) / 2);
+  --arena-float-gap: 0.72rem;
   position: relative;
   display: grid;
   min-height: 0;
   flex: 1 1 0;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr);
-  gap: 0;
+  gap: var(--arena-float-gap);
+  padding: 0.38rem 0.32rem;
 }
 
 .home-arena-pane {
   position: relative;
   z-index: 1;
   min-height: 0;
+  filter: drop-shadow(0 14px 34px rgba(0, 0, 0, 0.46));
 }
 
 .home-arena-pane--multi {
@@ -896,8 +899,25 @@ html.legal-route body {
   display: flex;
   min-height: 0;
   flex-direction: column;
-  gap: 0.32rem;
-  padding-bottom: 0.15rem;
+  gap: 0.36rem;
+  padding-bottom: 0.2rem;
+}
+
+.home-arena-pane--multi .home-arena-pane-head {
+  align-items: flex-start;
+  padding-left: 0.35rem;
+  padding-right: 0.15rem;
+}
+
+.home-arena-pane--solo .home-arena-pane-head {
+  align-items: flex-end;
+  padding-right: 0.35rem;
+  padding-left: 0.15rem;
+  text-align: right;
+}
+
+.home-arena-pane--solo .home-arena-pane-tagline {
+  text-align: right;
 }
 
 .home-arena-pane-head-gfx {
@@ -956,23 +976,22 @@ html.legal-route body {
 }
 
 .home-arena-pane--multi .home-arena-pane-head-line {
-  left: 0.35rem;
-  right: calc(var(--arena-logo-half) + 0.2rem);
+  left: 0.55rem;
+  right: calc(var(--arena-logo-half) + var(--arena-float-gap) * 0.35 + 0.25rem);
 }
 
 .home-arena-pane--solo .home-arena-pane-head-line {
-  left: calc(var(--arena-logo-half) + 0.2rem);
-  right: 0.35rem;
+  left: calc(var(--arena-logo-half) + var(--arena-float-gap) * 0.35 + 0.25rem);
+  right: 0.55rem;
 }
 
 .home-arena-pane-label {
   position: relative;
   z-index: 1;
-  align-self: flex-start;
-  font-size: 1.05rem;
+  font-size: 1.48rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
-  line-height: 1.05;
+  letter-spacing: 0.07em;
+  line-height: 1;
   text-transform: uppercase;
 }
 
@@ -1002,6 +1021,10 @@ html.legal-route body {
   display: flex;
   flex-wrap: wrap;
   gap: 0.28rem;
+}
+
+.home-arena-pane--solo .home-arena-pane-badges {
+  justify-content: flex-end;
 }
 
 .home-arena-pane-badge {
@@ -1040,13 +1063,15 @@ html.legal-route body {
 }
 
 .home-arena-pane-icon--multi {
-  justify-content: flex-end;
-  padding-right: calc(var(--arena-logo-half) + 0.15rem);
+  justify-content: center;
+  padding-left: 1.05rem;
+  padding-right: calc(var(--arena-logo-half) + var(--arena-float-gap) * 0.45 + 0.45rem);
 }
 
 .home-arena-pane-icon--solo {
-  justify-content: flex-start;
-  padding-left: calc(var(--arena-logo-half) + 0.15rem);
+  justify-content: center;
+  padding-right: 1.05rem;
+  padding-left: calc(var(--arena-logo-half) + var(--arena-float-gap) * 0.45 + 0.45rem);
 }
 
 .home-arena-pane-icon .home-bento-icon-ring {
@@ -1085,67 +1110,19 @@ html.legal-route body {
   grid-row: 1;
   justify-self: center;
   align-self: center;
-  display: flex;
+  display: block;
   width: var(--arena-logo-size);
   height: var(--arena-logo-size);
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.18rem;
-  padding: 0.42rem;
-  border-radius: 0.55rem;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background:
-    linear-gradient(
-      180deg,
-      rgba(56, 189, 248, 0.14) 0%,
-      rgba(15, 23, 42, 0.82) 48%,
-      rgba(52, 211, 153, 0.14) 100%
-    ),
-    rgba(8, 12, 20, 0.94);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 22px 44px -18px rgba(0, 0, 0, 0.9);
-  overflow: hidden;
-  isolation: isolate;
   pointer-events: none;
-}
-
-.home-play-arena-brand-scene {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  border-radius: inherit;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 0% 50%, rgba(56, 189, 248, 0.34), transparent 58%),
-    radial-gradient(circle at 100% 50%, rgba(52, 211, 153, 0.32), transparent 58%);
-  animation: home-tile-aurora 9s ease-in-out infinite alternate;
 }
 
 .home-play-arena-brand-logo {
-  position: relative;
-  z-index: 1;
-  width: calc(var(--arena-logo-size) - 1.35rem);
-  height: calc(var(--arena-logo-size) - 1.35rem);
-  max-width: 100%;
-  border-radius: 0.62rem;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 0.82rem;
   object-fit: cover;
-  box-shadow:
-    0 10px 24px -12px rgba(0, 0, 0, 0.88),
-    0 0 0 1px rgba(148, 163, 184, 0.24);
-}
-
-.home-play-arena-brand-name {
-  position: relative;
-  z-index: 1;
-  font-size: 0.5rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  line-height: 1;
-  text-transform: uppercase;
-  color: #f8fafc;
+  filter: drop-shadow(0 18px 36px rgba(0, 0, 0, 0.62));
 }
 
 .home-bento-brand-icon {
@@ -1177,11 +1154,17 @@ html.legal-route body {
 }
 
 .home-arena-pane--multi.home-bento-tile--arena {
-  padding-right: calc(var(--arena-logo-half) + 0.42rem);
+  padding-top: 0.78rem;
+  padding-bottom: 0.68rem;
+  padding-left: 0.95rem;
+  padding-right: calc(var(--arena-logo-half) + var(--arena-float-gap) * 0.35 + 0.55rem);
 }
 
 .home-arena-pane--solo.home-bento-tile--arena {
-  padding-left: calc(var(--arena-logo-half) + 0.42rem);
+  padding-top: 0.78rem;
+  padding-bottom: 0.68rem;
+  padding-right: 0.95rem;
+  padding-left: calc(var(--arena-logo-half) + var(--arena-float-gap) * 0.35 + 0.55rem);
 }
 
 .home-bento-tile--arena .home-bento-scene {
@@ -2116,14 +2099,24 @@ html.legal-route body {
 
   .home-play-arena {
     --arena-logo-size: clamp(4.35rem, 30vw, 5.75rem);
+    --arena-float-gap: 0.55rem;
+    padding: 0.28rem 0.22rem;
   }
 
   .home-arena-pane-head {
     gap: 0.24rem;
   }
 
+  .home-arena-pane--multi .home-arena-pane-head {
+    padding-left: 0.28rem;
+  }
+
+  .home-arena-pane--solo .home-arena-pane-head {
+    padding-right: 0.28rem;
+  }
+
   .home-arena-pane-label {
-    font-size: 0.92rem;
+    font-size: 1.18rem;
   }
 
   .home-arena-pane-tagline {
@@ -2143,19 +2136,16 @@ html.legal-route body {
     max-height: 11.5rem;
   }
 
-  .home-play-arena-brand {
-    padding: 0.32rem;
-    border-radius: 0.48rem;
+  .home-arena-pane-icon--multi {
+    padding-left: 0.82rem;
+  }
+
+  .home-arena-pane-icon--solo {
+    padding-right: 0.82rem;
   }
 
   .home-play-arena-brand-logo {
-    width: calc(var(--arena-logo-size) - 1.1rem);
-    height: calc(var(--arena-logo-size) - 1.1rem);
-    border-radius: 0.52rem;
-  }
-
-  .home-play-arena-brand-name {
-    font-size: 0.44rem;
+    border-radius: 0.68rem;
   }
 
   .home-bento-tile {
@@ -3532,8 +3522,7 @@ html.legal-route body {
   .home-bento-tile--arena .home-bento-scene,
   .home-bento-tile--arena .home-bento-motif,
   .home-bento-tile--arena .home-bento-icon-ring,
-  .home-arena-pane-icon .home-bento-motif,
-  .home-play-arena-brand-scene {
+  .home-arena-pane-icon .home-bento-motif {
     animation: none;
   }
 

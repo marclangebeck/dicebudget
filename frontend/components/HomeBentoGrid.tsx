@@ -234,16 +234,14 @@ export function HomeBentoGrid() {
           iconSrc="/home-icons/solo.png"
         />
         <div className="home-play-arena-brand" aria-hidden>
-          <div className="home-play-arena-brand-scene" />
           <img
             src="/logo-source.png"
             alt=""
-            width={96}
-            height={96}
+            width={116}
+            height={116}
             className="home-play-arena-brand-logo"
             decoding="async"
           />
-          <span className="home-play-arena-brand-name">{APP_SHORT}</span>
         </div>
       </div>
 
