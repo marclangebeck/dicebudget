@@ -5,7 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
-- **Startscreen Arena:** Ausgesparte Multi-/Solo-Kacheln mit freistehendem Logo (ohne Container), Float-Abstand zwischen Kacheln und Logo; größere Überschriften, Würfel-Icons zentriert weg vom Rand
+- **Startscreen Arena:** Zwei gleichwertige Kacheln ohne Mittel-Logo; zentrierte Texte, dominante 3D-Würfel-Icons (Multi/Solo) im Kachelzentrum
 - **Startscreen Arena:** Zwei Vollbild-Kacheln (Multi vs. Solo) mit Aurora-Hintergrund, schwebenden 3D-Icons, Glow-Ring, Glas-Dock und Play-CTAs („Lobby öffnen“ / „Run starten“); kompakter Hero „Wähle deinen Modus“
 - **Footer-Tabbar:** `Home · Statistik · Einstellungen · Menü` — Hamburger-Menü mit Screenshot teilen, Support, Datenschutz, Impressum, bottle-trade.de (via `AppFooterMenu`, `html-to-image`)
 - **Footer-Menü:** Schriftgröße „Menü“ an andere Footer-Labels angeglichen

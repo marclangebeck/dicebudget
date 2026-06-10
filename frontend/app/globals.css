@@ -839,91 +839,37 @@ html.legal-route body {
 }
 
 .home-play-arena {
-  --arena-logo-size: clamp(5.25rem, 34vw, 7.25rem);
-  --arena-logo-half: calc(var(--arena-logo-size) / 2);
-  --arena-float-gap: 0.72rem;
-  position: relative;
   display: grid;
   min-height: 0;
   flex: 1 1 0;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr);
-  gap: var(--arena-float-gap);
-  padding: 0.38rem 0.32rem;
+  gap: 0.65rem;
+  padding: 0.35rem 0.3rem;
 }
 
 .home-arena-pane {
   position: relative;
   z-index: 1;
   min-height: 0;
-  filter: drop-shadow(0 14px 34px rgba(0, 0, 0, 0.46));
-}
-
-.home-arena-pane--multi {
-  grid-column: 1;
-  grid-row: 1;
-  clip-path: polygon(
-    0 0,
-    100% 0,
-    100% calc(50% - var(--arena-logo-half)),
-    calc(100% - var(--arena-logo-half)) calc(50% - var(--arena-logo-half)),
-    calc(100% - var(--arena-logo-half)) calc(50% + var(--arena-logo-half)),
-    100% calc(50% + var(--arena-logo-half)),
-    100% 100%,
-    0 100%
-  );
-}
-
-.home-arena-pane--solo {
-  grid-column: 2;
-  grid-row: 1;
-  clip-path: polygon(
-    0 0,
-    100% 0,
-    100% 100%,
-    0 100%,
-    0 calc(50% + var(--arena-logo-half)),
-    var(--arena-logo-half) calc(50% + var(--arena-logo-half)),
-    var(--arena-logo-half) calc(50% - var(--arena-logo-half)),
-    0 calc(50% - var(--arena-logo-half))
-  );
-}
-
-.home-arena-pane .home-bento-scene {
-  clip-path: inherit;
 }
 
 .home-arena-pane-head {
   position: relative;
   z-index: 2;
   display: flex;
-  min-height: 0;
+  flex-shrink: 0;
   flex-direction: column;
-  gap: 0.36rem;
-  padding-bottom: 0.2rem;
-}
-
-.home-arena-pane--multi .home-arena-pane-head {
-  align-items: flex-start;
-  padding-left: 0.35rem;
-  padding-right: 0.15rem;
-}
-
-.home-arena-pane--solo .home-arena-pane-head {
-  align-items: flex-end;
-  padding-right: 0.35rem;
-  padding-left: 0.15rem;
-  text-align: right;
-}
-
-.home-arena-pane--solo .home-arena-pane-tagline {
-  text-align: right;
+  align-items: center;
+  gap: 0.38rem;
+  padding-bottom: 0.4rem;
+  text-align: center;
 }
 
 .home-arena-pane-head-gfx {
   position: absolute;
-  inset: -0.15rem 0 auto;
-  height: 3.6rem;
+  inset: 0 0 auto;
+  height: 4.2rem;
   overflow: hidden;
   pointer-events: none;
 }
@@ -931,67 +877,62 @@ html.legal-route body {
 .home-arena-pane-orb {
   position: absolute;
   border-radius: 999px;
-  filter: blur(18px);
-  opacity: 0.72;
+  filter: blur(20px);
+  opacity: 0.75;
 }
 
 .home-arena-pane--multi .home-arena-pane-orb--a {
-  top: 0.1rem;
-  left: 0.2rem;
-  width: 3.2rem;
-  height: 2.2rem;
-  background: rgba(56, 189, 248, 0.42);
+  top: 0.15rem;
+  left: 12%;
+  width: 3.8rem;
+  height: 2.4rem;
+  background: rgba(56, 189, 248, 0.44);
 }
 
 .home-arena-pane--multi .home-arena-pane-orb--b {
-  top: 0.55rem;
-  right: calc(var(--arena-logo-half) + 0.35rem);
-  width: 2.4rem;
-  height: 1.8rem;
-  background: rgba(214, 168, 90, 0.32);
+  top: 0.5rem;
+  right: 12%;
+  width: 3rem;
+  height: 2rem;
+  background: rgba(214, 168, 90, 0.34);
 }
 
 .home-arena-pane--solo .home-arena-pane-orb--a {
-  top: 0.1rem;
-  right: 0.2rem;
-  width: 3.2rem;
-  height: 2.2rem;
-  background: rgba(52, 211, 153, 0.38);
+  top: 0.15rem;
+  right: 12%;
+  width: 3.8rem;
+  height: 2.4rem;
+  background: rgba(52, 211, 153, 0.4);
 }
 
 .home-arena-pane--solo .home-arena-pane-orb--b {
-  top: 0.55rem;
-  left: calc(var(--arena-logo-half) + 0.35rem);
-  width: 2.4rem;
-  height: 1.8rem;
-  background: rgba(45, 212, 191, 0.3);
+  top: 0.5rem;
+  left: 12%;
+  width: 3rem;
+  height: 2rem;
+  background: rgba(45, 212, 191, 0.32);
 }
 
 .home-arena-pane-head-line {
   position: absolute;
-  top: 1.55rem;
+  top: auto;
+  bottom: 0;
+  left: 0.85rem;
+  right: 0.85rem;
   height: 1px;
-  opacity: 0.45;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.42), transparent);
-}
-
-.home-arena-pane--multi .home-arena-pane-head-line {
-  left: 0.55rem;
-  right: calc(var(--arena-logo-half) + var(--arena-float-gap) * 0.35 + 0.25rem);
-}
-
-.home-arena-pane--solo .home-arena-pane-head-line {
-  left: calc(var(--arena-logo-half) + var(--arena-float-gap) * 0.35 + 0.25rem);
-  right: 0.55rem;
+  opacity: 0.42;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
 }
 
 .home-arena-pane-label {
   position: relative;
   z-index: 1;
-  font-size: 1.48rem;
+  width: 100%;
+  font-size: 1.38rem;
   font-weight: 800;
-  letter-spacing: 0.07em;
-  line-height: 1;
+  letter-spacing: 0.08em;
+  line-height: 1.05;
+  text-align: center;
   text-transform: uppercase;
 }
 
@@ -1008,11 +949,14 @@ html.legal-route body {
 .home-arena-pane-tagline {
   position: relative;
   z-index: 1;
+  width: 100%;
+  max-width: 13.5rem;
   margin: 0;
-  font-size: 0.6rem;
+  font-size: 0.62rem;
   font-weight: 600;
-  line-height: 1.3;
-  color: rgba(226, 232, 240, 0.88);
+  line-height: 1.35;
+  text-align: center;
+  color: rgba(226, 232, 240, 0.9);
 }
 
 .home-arena-pane-badges {
@@ -1020,11 +964,8 @@ html.legal-route body {
   z-index: 1;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.28rem;
-}
-
-.home-arena-pane--solo .home-arena-pane-badges {
-  justify-content: flex-end;
+  justify-content: center;
+  gap: 0.3rem;
 }
 
 .home-arena-pane-badge {
@@ -1052,46 +993,43 @@ html.legal-route body {
   color: #a7f3d0;
 }
 
-.home-arena-pane-icon {
+.home-arena-pane-hero {
   position: relative;
   z-index: 1;
   display: flex;
-  min-height: 5.5rem;
+  min-height: 7rem;
   flex: 1 1 0;
   align-items: center;
-  padding: 0.2rem 0 0.35rem;
-}
-
-.home-arena-pane-icon--multi {
   justify-content: center;
-  padding-left: 1.05rem;
-  padding-right: calc(var(--arena-logo-half) + var(--arena-float-gap) * 0.45 + 0.45rem);
+  padding: 0.15rem 0.25rem 0.3rem;
 }
 
-.home-arena-pane-icon--solo {
-  justify-content: center;
-  padding-right: 1.05rem;
-  padding-left: calc(var(--arena-logo-half) + var(--arena-float-gap) * 0.45 + 0.45rem);
+.home-arena-pane-hero .home-bento-icon-glow {
+  width: 88%;
+  height: 74%;
 }
 
-.home-arena-pane-icon .home-bento-icon-ring {
-  width: min(92%, 13.5rem);
+.home-arena-pane-hero .home-bento-icon-ring {
+  width: min(92%, 12.5rem);
 }
 
-.home-arena-pane-icon .home-bento-motif {
+.home-arena-pane-hero .home-bento-motif {
   position: relative;
   z-index: 2;
-  width: min(108%, 14.5rem);
-  max-height: 14.5rem;
+  display: block;
+  width: min(130%, 17.5rem);
+  height: auto;
+  max-height: min(44vh, 17.5rem);
+  object-fit: contain;
   animation: home-motif-float 4.5s ease-in-out infinite;
-  filter: drop-shadow(0 22px 28px rgba(0, 0, 0, 0.42));
+  filter: drop-shadow(0 24px 32px rgba(0, 0, 0, 0.48));
 }
 
-.home-arena-pane-icon--multi .home-bento-motif {
+.home-arena-pane--multi .home-arena-pane-hero .home-bento-motif {
   animation-delay: 0.15s;
 }
 
-.home-arena-pane-icon--solo .home-bento-motif {
+.home-arena-pane--solo .home-arena-pane-hero .home-bento-motif {
   animation-delay: 0.75s;
 }
 
@@ -1101,28 +1039,6 @@ html.legal-route body {
   flex-shrink: 0;
   width: 100%;
   margin-top: 0;
-}
-
-.home-play-arena-brand {
-  position: relative;
-  z-index: 5;
-  grid-column: 1 / -1;
-  grid-row: 1;
-  justify-self: center;
-  align-self: center;
-  display: block;
-  width: var(--arena-logo-size);
-  height: var(--arena-logo-size);
-  pointer-events: none;
-}
-
-.home-play-arena-brand-logo {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: 0.82rem;
-  object-fit: cover;
-  filter: drop-shadow(0 18px 36px rgba(0, 0, 0, 0.62));
 }
 
 .home-bento-brand-icon {
@@ -1153,18 +1069,8 @@ html.legal-route body {
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-.home-arena-pane--multi.home-bento-tile--arena {
-  padding-top: 0.78rem;
-  padding-bottom: 0.68rem;
-  padding-left: 0.95rem;
-  padding-right: calc(var(--arena-logo-half) + var(--arena-float-gap) * 0.35 + 0.55rem);
-}
-
-.home-arena-pane--solo.home-bento-tile--arena {
-  padding-top: 0.78rem;
-  padding-bottom: 0.68rem;
-  padding-right: 0.95rem;
-  padding-left: calc(var(--arena-logo-half) + var(--arena-float-gap) * 0.35 + 0.55rem);
+.home-arena-pane.home-bento-tile--arena {
+  padding: 0.78rem 0.62rem 0.68rem;
 }
 
 .home-bento-tile--arena .home-bento-scene {
@@ -2098,54 +2004,38 @@ html.legal-route body {
   }
 
   .home-play-arena {
-    --arena-logo-size: clamp(4.35rem, 30vw, 5.75rem);
-    --arena-float-gap: 0.55rem;
+    gap: 0.5rem;
     padding: 0.28rem 0.22rem;
   }
 
   .home-arena-pane-head {
-    gap: 0.24rem;
-  }
-
-  .home-arena-pane--multi .home-arena-pane-head {
-    padding-left: 0.28rem;
-  }
-
-  .home-arena-pane--solo .home-arena-pane-head {
-    padding-right: 0.28rem;
+    gap: 0.28rem;
+    padding-bottom: 0.32rem;
   }
 
   .home-arena-pane-label {
-    font-size: 1.18rem;
+    font-size: 1.12rem;
   }
 
   .home-arena-pane-tagline {
     font-size: 0.54rem;
   }
 
-  .home-arena-pane-icon {
-    min-height: 4rem;
+  .home-arena-pane-hero {
+    min-height: 5.5rem;
   }
 
-  .home-arena-pane-icon .home-bento-icon-ring {
-    width: min(90%, 10.5rem);
+  .home-arena-pane-hero .home-bento-icon-ring {
+    width: min(90%, 10rem);
   }
 
-  .home-arena-pane-icon .home-bento-motif {
-    width: min(105%, 11.5rem);
-    max-height: 11.5rem;
+  .home-arena-pane-hero .home-bento-motif {
+    width: min(125%, 13.5rem);
+    max-height: min(38vh, 13.5rem);
   }
 
-  .home-arena-pane-icon--multi {
-    padding-left: 0.82rem;
-  }
-
-  .home-arena-pane-icon--solo {
-    padding-right: 0.82rem;
-  }
-
-  .home-play-arena-brand-logo {
-    border-radius: 0.68rem;
+  .home-arena-pane.home-bento-tile--arena {
+    padding: 0.62rem 0.5rem 0.55rem;
   }
 
   .home-bento-tile {
@@ -3522,7 +3412,7 @@ html.legal-route body {
   .home-bento-tile--arena .home-bento-scene,
   .home-bento-tile--arena .home-bento-motif,
   .home-bento-tile--arena .home-bento-icon-ring,
-  .home-arena-pane-icon .home-bento-motif {
+  .home-arena-pane-hero .home-bento-motif {
     animation: none;
   }
 

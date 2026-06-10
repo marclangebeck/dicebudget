@@ -49,7 +49,7 @@ function ArenaPane({ href, tone, label, tagline, badges, cta, iconSrc }: ArenaPa
           ))}
         </div>
       </div>
-      <div className={`home-arena-pane-icon home-arena-pane-icon--${tone}`}>
+      <div className="home-arena-pane-hero">
         <span className="home-bento-icon-glow" aria-hidden />
         <span className="home-bento-icon-ring" aria-hidden />
         <img src={iconSrc} alt="" className="home-bento-motif" loading="eager" decoding="async" />
@@ -233,16 +233,6 @@ export function HomeBentoGrid() {
           cta="Run starten"
           iconSrc="/home-icons/solo.png"
         />
-        <div className="home-play-arena-brand" aria-hidden>
-          <img
-            src="/logo-source.png"
-            alt=""
-            width={116}
-            height={116}
-            className="home-play-arena-brand-logo"
-            decoding="async"
-          />
-        </div>
       </div>
 
     </div>
