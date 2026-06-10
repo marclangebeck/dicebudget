@@ -231,17 +231,19 @@ export function HomeBentoGrid() {
           />
           <div className="home-play-arena-hub" aria-hidden>
             <div className="home-play-arena-hub-scene" />
-            <div className="home-play-arena-hub-emblem">
-              <span className="home-play-arena-hub-glow" />
-              <span className="home-play-arena-hub-ring" />
-              <img
-                src="/logo-source.png"
-                alt=""
-                width={80}
-                height={80}
-                className="home-play-arena-hub-logo"
-                decoding="async"
-              />
+            <div className="home-play-arena-hub-stage">
+              <div className="home-play-arena-hub-emblem">
+                <span className="home-play-arena-hub-glow" />
+                <span className="home-play-arena-hub-ring" />
+                <img
+                  src="/logo-source.png"
+                  alt=""
+                  width={80}
+                  height={80}
+                  className="home-play-arena-hub-logo"
+                  decoding="async"
+                />
+              </div>
             </div>
             <span className="home-play-arena-hub-vs">vs</span>
           </div>
