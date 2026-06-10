@@ -689,6 +689,8 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
             onFinalizeStats={
               inviteCode && playerSecret ? finalizeStatsIfMulti : undefined
             }
+            lobby={lobby}
+            ownPlayerId={getOrCreatePlayerId()}
           />
         </div>
       </div>

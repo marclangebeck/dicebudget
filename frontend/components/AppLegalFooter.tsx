@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { APP_HOME_PATH, CONTACT_EMAIL, IMPRESSUM_PATH, PRIVACY_PATH } from "@/lib/branding";
+import {
+  APP_HOME_PATH,
+  APP_NAME,
+  CONTACT_EMAIL,
+  IMPRESSUM_PATH,
+  PRIVACY_PATH,
+} from "@/lib/branding";
 
 function HomeIcon() {
   return (
@@ -57,7 +63,7 @@ export function AppLegalFooter() {
         <span>Impressum</span>
       </Link>
       <a
-        href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("dice.budget Support")}`}
+        href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`${APP_NAME} Support`)}`}
         className="app-legal-link"
       >
         <SupportIcon />

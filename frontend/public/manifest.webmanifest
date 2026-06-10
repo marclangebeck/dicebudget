@@ -1,6 +1,6 @@
 {
-  "name": "dice.budget — Strategy Edition",
-  "short_name": "dice.budget",
+  "name": "DiceBudget — Strategy Edition",
+  "short_name": "DiceBudget",
   "description": "Strategisches Würfelspiel mit Wurf-Pool und wählbarer Spielanzahl",
   "start_url": "/app",
   "display": "standalone",

@@ -58,25 +58,48 @@ function outcomeBadge(
   };
 }
 
-function Panel({
+function AnalysisCard({
   kicker,
   title,
   children,
   className = "",
+  tone = "default",
 }: {
   kicker: string;
   title: string;
   children: ReactNode;
   className?: string;
+  tone?: "default" | "highlight" | "strength" | "weakness" | "tip";
 }) {
   return (
-    <section className={`match-analysis-panel ${className}`.trim()}>
-      <header className="match-analysis-panel-head">
-        <p className="match-analysis-panel-kicker">{kicker}</p>
-        <h3 className="match-analysis-panel-title">{title}</h3>
+    <section
+      className={`match-analysis-card match-analysis-card--${tone} ${className}`.trim()}
+    >
+      <header className="match-analysis-card-head">
+        <p className="match-analysis-card-kicker">{kicker}</p>
+        <h3 className="match-analysis-card-title">{title}</h3>
       </header>
-      <div className="match-analysis-panel-body">{children}</div>
+      <div className="match-analysis-card-body">{children}</div>
     </section>
+  );
+}
+
+function SectionGroup({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="match-analysis-section-group">
+      <h2 className="match-analysis-section-heading">{title}</h2>
+      <div className="match-analysis-section-cards">{children}</div>
+    </div>
+  );
+}
+
+function StatCard({ label, value, hint }: { label: string; value: string; hint?: string }) {
+  return (
+    <article className="match-analysis-stat-card">
+      <p className="match-analysis-stat-label">{label}</p>
+      <p className="match-analysis-stat-value tabular-nums">{value}</p>
+      {hint && <p className="match-analysis-stat-hint">{hint}</p>}
+    </article>
   );
 }
 
@@ -248,99 +271,170 @@ export function MatchAnalysisView({
     .sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff))
     .slice(0, 6);
 
+  const quickStats: { label: string; value: string; hint?: string }[] = [];
+
+  if (!isMultiRound && h2h) {
+    quickStats.push(
+      { label: "Deine Punkte", value: String(analysis.viewer.totalScore) },
+      { label: "Gegner", value: String(analysis.opponent?.totalScore ?? "—") },
+      { label: "Differenz", value: formatSigned(h2h.scoreDiff) },
+      {
+        label: "Alle Fünfe",
+        value: `${analysis.viewer.yatzyHits}/${analysis.viewer.yatzyMisses}`,
+      },
+    );
+  } else if (isMultiRound) {
+    quickStats.push(
+      {
+        label: "Platz",
+        value: analysis.viewerRank != null ? String(analysis.viewerRank) : "—",
+      },
+      { label: "Punkte", value: String(analysis.viewer.totalScore) },
+      {
+        label: "Direktbilanz",
+        value: `${analysis.directWins}–${analysis.directLosses}${
+          analysis.directTies > 0 ? `–${analysis.directTies}` : ""
+        }`,
+      },
+      {
+        label: "Zur Spitze",
+        value:
+          analysis.pointsBehindLeader != null && analysis.pointsBehindLeader > 0
+            ? `${analysis.pointsBehindLeader} Pkt.`
+            : "Spitze",
+      },
+    );
+  } else {
+    quickStats.push(
+      { label: "Punkte", value: String(analysis.viewer.totalScore) },
+      { label: "Bonus", value: String(analysis.viewer.bonusCount) },
+      {
+        label: "Alle Fünfe",
+        value: `${analysis.viewer.yatzyHits}/${analysis.viewer.yatzyMisses}`,
+      },
+      { label: "Nullen", value: String(analysis.viewer.zeroEntries) },
+    );
+  }
+
   return (
     <div className="match-analysis-screen">
-      <section className="match-analysis-hero">
-        <span className={`match-analysis-outcome match-analysis-outcome--${badge.tone}`}>
-          {badge.label}
-        </span>
-        <p className="match-analysis-hero-score tabular-nums">{heroScore}</p>
-        <p className="match-analysis-hero-caption">{heroCaption}</p>
-        {coaching.playStyle && (
-          <p className="match-analysis-play-style">{coaching.playStyle}</p>
-        )}
-        {subtitle && <p className="match-analysis-hero-meta">{subtitle}</p>}
-        {sessionMeta && (
-          <p className="match-analysis-hero-meta">
-            Serie {sessionMeta.leagueCode} · Runde {sessionMeta.roundNumber}
-            {analysis.playerCount > 1 && ` · ${analysis.playerCount} Spieler`}
-          </p>
-        )}
-        {isMultiRound && (
-          <p className="match-analysis-hero-meta tabular-nums">
-            Direktvergleiche {analysis.directWins}–{analysis.directLosses}
-            {analysis.directTies > 0 ? `–${analysis.directTies}` : ""}
-          </p>
-        )}
-      </section>
+      <SectionGroup title="Ergebnis">
+        <section className="match-analysis-hero">
+          <span className={`match-analysis-outcome match-analysis-outcome--${badge.tone}`}>
+            {badge.label}
+          </span>
+          <p className="match-analysis-hero-score tabular-nums">{heroScore}</p>
+          <p className="match-analysis-hero-caption">{heroCaption}</p>
+          {coaching.playStyle && (
+            <p className="match-analysis-play-style">{coaching.playStyle}</p>
+          )}
+          {subtitle && <p className="match-analysis-hero-meta">{subtitle}</p>}
+          {sessionMeta && (
+            <p className="match-analysis-hero-meta">
+              Serie {sessionMeta.leagueCode} · Runde {sessionMeta.roundNumber}
+              {analysis.playerCount > 1 && ` · ${analysis.playerCount} Spieler`}
+            </p>
+          )}
+        </section>
+
+        <div className="match-analysis-quick-stats">
+          {quickStats.map((stat) => (
+            <StatCard key={stat.label} {...stat} />
+          ))}
+        </div>
+      </SectionGroup>
 
       {analysis.mode === "multi" && analysis.scoreProgression && (
-        <Panel kicker="Verlauf" title="Punkte-Duell">
-          <ScoreProgressionChart
-            progression={analysis.scoreProgression}
-            highlightPlayerId={sessionMeta?.viewerPlayerId}
-          />
-        </Panel>
+        <SectionGroup title="Verlauf">
+          <AnalysisCard kicker="Duell" title="Punkte über die Runde">
+            <ScoreProgressionChart
+              progression={analysis.scoreProgression}
+              highlightPlayerId={sessionMeta?.viewerPlayerId}
+            />
+          </AnalysisCard>
+        </SectionGroup>
       )}
 
-      {(hasCoaching || analysis.insights.length > 0) && (
-        <Panel kicker="Auswertung" title="Warum so?">
-          <p className="match-analysis-narrative">
-            {hasCoaching ? coaching.narrative : analysis.insights.join(" ")}
-          </p>
-        </Panel>
-      )}
+      {(hasCoaching ||
+        coaching.strengths.length > 0 ||
+        coaching.weaknesses.length > 0 ||
+        analysis.insights.length > 0) && (
+        <SectionGroup title="Auswertung">
+          {(hasCoaching || analysis.insights.length > 0) && (
+            <AnalysisCard kicker="Zusammenfassung" title="Warum so?" tone="highlight">
+              <p className="match-analysis-narrative">
+                {hasCoaching ? coaching.narrative : analysis.insights.join(" ")}
+              </p>
+            </AnalysisCard>
+          )}
 
-      {(coaching.strengths.length > 0 || coaching.weaknesses.length > 0) && (
-        <Panel kicker="Profil" title="Stärken & Schwächen">
-          <div className="match-analysis-trait-grid">
-            {coaching.strengths.map((trait) => (
-              <article key={`s-${trait.title}`} className="match-analysis-trait match-analysis-trait--strength">
-                <p className="match-analysis-trait-title">{trait.title}</p>
-                <p className="match-analysis-trait-detail">{trait.detail}</p>
-              </article>
-            ))}
-            {coaching.weaknesses.map((trait) => (
-              <article key={`w-${trait.title}`} className="match-analysis-trait match-analysis-trait--weakness">
-                <p className="match-analysis-trait-title">{trait.title}</p>
-                <p className="match-analysis-trait-detail">{trait.detail}</p>
-              </article>
-            ))}
-          </div>
-        </Panel>
+          {coaching.strengths.length > 0 && (
+            <AnalysisCard kicker="Profil" title="Stärken" tone="strength">
+              <div className="match-analysis-trait-stack">
+                {coaching.strengths.map((trait) => (
+                  <article
+                    key={`s-${trait.title}`}
+                    className="match-analysis-trait match-analysis-trait--strength"
+                  >
+                    <p className="match-analysis-trait-title">{trait.title}</p>
+                    <p className="match-analysis-trait-detail">{trait.detail}</p>
+                  </article>
+                ))}
+              </div>
+            </AnalysisCard>
+          )}
+
+          {coaching.weaknesses.length > 0 && (
+            <AnalysisCard kicker="Profil" title="Schwächen" tone="weakness">
+              <div className="match-analysis-trait-stack">
+                {coaching.weaknesses.map((trait) => (
+                  <article
+                    key={`w-${trait.title}`}
+                    className="match-analysis-trait match-analysis-trait--weakness"
+                  >
+                    <p className="match-analysis-trait-title">{trait.title}</p>
+                    <p className="match-analysis-trait-detail">{trait.detail}</p>
+                  </article>
+                ))}
+              </div>
+            </AnalysisCard>
+          )}
+        </SectionGroup>
       )}
 
       {coaching.pool && (
-        <Panel kicker="Strategy" title="Pool-Report">
-          <p className="match-analysis-pool-headline">{coaching.pool.headline}</p>
-          <dl className="match-analysis-pool-kpis">
-            <div>
-              <dt>End-Pool</dt>
-              <dd className="tabular-nums">{coaching.pool.endPool}</dd>
-            </div>
-            <div>
-              <dt>Gespart</dt>
-              <dd className="tabular-nums">{coaching.pool.poolSpared}</dd>
-            </div>
-            <div>
-              <dt>Eingekauft</dt>
-              <dd className="tabular-nums">{coaching.pool.poolSpent}</dd>
-            </div>
-            <div>
-              <dt>Netto</dt>
-              <dd className="tabular-nums">{formatSigned(coaching.pool.netBalance)}</dd>
-            </div>
-          </dl>
-          {coaching.pool.notes.length > 0 && (
-            <ul className="match-analysis-bullet-list">
-              {coaching.pool.notes.map((note) => (
-                <li key={note}>{note}</li>
-              ))}
-            </ul>
-          )}
+        <SectionGroup title="Strategy">
+          <AnalysisCard kicker="Pool" title="Pool-Report">
+            <p className="match-analysis-pool-headline">{coaching.pool.headline}</p>
+            <dl className="match-analysis-pool-kpis">
+              <div>
+                <dt>End-Pool</dt>
+                <dd className="tabular-nums">{coaching.pool.endPool}</dd>
+              </div>
+              <div>
+                <dt>Gespart</dt>
+                <dd className="tabular-nums">{coaching.pool.poolSpared}</dd>
+              </div>
+              <div>
+                <dt>Eingekauft</dt>
+                <dd className="tabular-nums">{coaching.pool.poolSpent}</dd>
+              </div>
+              <div>
+                <dt>Netto</dt>
+                <dd className="tabular-nums">{formatSigned(coaching.pool.netBalance)}</dd>
+              </div>
+            </dl>
+            {coaching.pool.notes.length > 0 && (
+              <ul className="match-analysis-bullet-list">
+                {coaching.pool.notes.map((note) => (
+                  <li key={note}>{note}</li>
+                ))}
+              </ul>
+            )}
+          </AnalysisCard>
+
           {coaching.pool.bestPurchases.length > 0 && (
-            <div className="match-analysis-pool-block">
-              <p className="match-analysis-pool-label">Starke Pool-Käufe</p>
+            <AnalysisCard kicker="Käufe" title="Starke Pool-Käufe" tone="strength">
               <ul className="match-analysis-pool-rows">
                 {coaching.pool.bestPurchases.map((row) => (
                   <li key={`${row.gameIndex}-${row.fieldLabel}-best`}>
@@ -353,11 +447,11 @@ export function MatchAnalysisView({
                   </li>
                 ))}
               </ul>
-            </div>
+            </AnalysisCard>
           )}
+
           {coaching.pool.weakPurchases.length > 0 && (
-            <div className="match-analysis-pool-block">
-              <p className="match-analysis-pool-label">Teure Pool-Käufe</p>
+            <AnalysisCard kicker="Käufe" title="Teure Pool-Käufe" tone="weakness">
               <ul className="match-analysis-pool-rows">
                 {coaching.pool.weakPurchases.map((row) => (
                   <li key={`${row.gameIndex}-${row.fieldLabel}-weak`}>
@@ -370,161 +464,170 @@ export function MatchAnalysisView({
                   </li>
                 ))}
               </ul>
-            </div>
+            </AnalysisCard>
           )}
-        </Panel>
+        </SectionGroup>
       )}
 
       {topFieldDiffs.length > 0 && (
-        <Panel kicker="Felder" title="Größte Unterschiede">
-          <div className="match-analysis-field-grid">
-            {topFieldDiffs.map((cell) => (
-              <div
-                key={cell.fieldType}
-                className={`match-analysis-field-cell ${
-                  cell.diff > 0
-                    ? "match-analysis-field-cell--pos"
-                    : cell.diff < 0
-                      ? "match-analysis-field-cell--neg"
-                      : ""
-                }`}
-              >
-                <span className="match-analysis-field-label">{cell.label}</span>
-                <span className="match-analysis-field-diff tabular-nums">
-                  {formatSigned(cell.diff)}
-                </span>
-                <span className="match-analysis-field-sub tabular-nums">
-                  {cell.viewer} · {cell.reference}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Panel>
+        <SectionGroup title="Felder">
+          <AnalysisCard kicker="Vergleich" title="Größte Unterschiede">
+            <div className="match-analysis-field-grid">
+              {topFieldDiffs.map((cell) => (
+                <div
+                  key={cell.fieldType}
+                  className={`match-analysis-field-cell ${
+                    cell.diff > 0
+                      ? "match-analysis-field-cell--pos"
+                      : cell.diff < 0
+                        ? "match-analysis-field-cell--neg"
+                        : ""
+                  }`}
+                >
+                  <span className="match-analysis-field-label">{cell.label}</span>
+                  <span className="match-analysis-field-diff tabular-nums">
+                    {formatSigned(cell.diff)}
+                  </span>
+                  <span className="match-analysis-field-sub tabular-nums">
+                    {cell.viewer} · {cell.reference}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </AnalysisCard>
+        </SectionGroup>
       )}
 
       {coaching.tips.length > 0 && (
-        <Panel kicker="Coach" title="Nächstes Mal">
-          <ol className="match-analysis-tips">
+        <SectionGroup title="Coaching">
+          <div className="match-analysis-tip-grid">
             {coaching.tips.map((tip, index) => (
-              <li key={tip.title}>
+              <article key={tip.title} className="match-analysis-tip-card">
                 <span className="match-analysis-tip-index">{index + 1}</span>
                 <div>
                   <p className="match-analysis-tip-title">{tip.title}</p>
                   <p className="match-analysis-tip-body">{tip.body}</p>
                 </div>
-              </li>
+              </article>
             ))}
-          </ol>
-        </Panel>
+          </div>
+        </SectionGroup>
       )}
 
-      <section className="match-analysis-panel match-analysis-panel--details">
-        <button
-          type="button"
-          className="match-analysis-details-toggle"
-          aria-expanded={detailsOpen}
-          onClick={() => setDetailsOpen((v) => !v)}
-        >
-          <span>Details & Ranking</span>
-          <span aria-hidden>{detailsOpen ? "▾" : "▸"}</span>
-        </button>
-        {detailsOpen && (
-          <div className="match-analysis-panel-body match-analysis-details-body">
-            {isMultiRound && analysis.ranking.length > 0 && (
-              <div className="match-analysis-details-block">
-                <p className="match-analysis-details-label">Runden-Ranking</p>
-                <ol className="match-analysis-ranking">
-                  {analysis.ranking.map((entry) => {
-                    const label = playerLabel(entry.playerName, ownPlayerId, aliases);
-                    const isViewer = entry.playerId === sessionMeta?.viewerPlayerId;
-                    return (
-                      <li
-                        key={entry.playerId}
-                        className={isViewer ? "match-analysis-ranking-row--viewer" : undefined}
-                      >
-                        <span className="match-analysis-ranking-rank tabular-nums">
-                          {entry.rank}.
+      {isMultiRound && analysis.ranking.length > 0 && (
+        <SectionGroup title="Runde">
+          <AnalysisCard kicker="Ranking" title="Runden-Ranking">
+            <ol className="match-analysis-ranking">
+              {analysis.ranking.map((entry) => {
+                const label = playerLabel(entry.playerName, ownPlayerId, aliases);
+                const isViewer = entry.playerId === sessionMeta?.viewerPlayerId;
+                return (
+                  <li
+                    key={entry.playerId}
+                    className={isViewer ? "match-analysis-ranking-row--viewer" : undefined}
+                  >
+                    <span className="match-analysis-ranking-rank tabular-nums">
+                      {entry.rank}.
+                    </span>
+                    <span className="match-analysis-ranking-name">{label}</span>
+                    <span className="match-analysis-ranking-score tabular-nums">
+                      {entry.totalScore}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </AnalysisCard>
+
+          {analysis.comparisons.length > 0 && (
+            <AnalysisCard kicker="Duell" title="Direktvergleiche">
+              <div className="match-analysis-compare-list">
+                {analysis.comparisons.map((comparison, index) => (
+                  <ComparisonCard
+                    key={comparison.opponentPlayerId}
+                    comparison={comparison}
+                    ownPlayerId={ownPlayerId}
+                    aliases={aliases}
+                    defaultOpen={index === 0}
+                  />
+                ))}
+              </div>
+            </AnalysisCard>
+          )}
+        </SectionGroup>
+      )}
+
+      <SectionGroup title="Details">
+        <section className="match-analysis-card match-analysis-card--details">
+          <button
+            type="button"
+            className="match-analysis-details-toggle"
+            aria-expanded={detailsOpen}
+            onClick={() => setDetailsOpen((v) => !v)}
+          >
+            <span>
+              <span className="match-analysis-details-toggle-kicker">Metriken</span>
+              <span className="match-analysis-details-toggle-title">
+                Aufschlüsselung & Kennzahlen
+              </span>
+            </span>
+            <span aria-hidden>{detailsOpen ? "▾" : "▸"}</span>
+          </button>
+          {detailsOpen && (
+            <div className="match-analysis-card-body match-analysis-details-body">
+              {!isMultiRound && h2h && (
+                <div className="match-analysis-details-block">
+                  <p className="match-analysis-details-label">
+                    Aufschlüsselung vs. {resolvedOpponentLabel}
+                  </p>
+                  <ul className="match-analysis-attribution">
+                    {h2h.attribution.map((row) => (
+                      <li key={row.key}>
+                        <span className="match-analysis-attribution-label">{row.label}</span>
+                        <span className="match-analysis-attribution-values tabular-nums">
+                          {row.viewerValue} · {row.opponentValue}
                         </span>
-                        <span className="match-analysis-ranking-name">{label}</span>
-                        <span className="match-analysis-ranking-score tabular-nums">
-                          {entry.totalScore}
+                        <span
+                          className={`match-analysis-attribution-diff tabular-nums ${
+                            row.diff > 0
+                              ? "match-analysis-diff--pos"
+                              : row.diff < 0
+                                ? "match-analysis-diff--neg"
+                                : ""
+                          }`}
+                        >
+                          {formatSigned(row.diff)}
                         </span>
                       </li>
-                    );
-                  })}
-                </ol>
-              </div>
-            )}
-
-            {isMultiRound && analysis.comparisons.length > 0 && (
-              <div className="match-analysis-details-block">
-                <p className="match-analysis-details-label">Direktvergleiche</p>
-                <div className="match-analysis-compare-list">
-                  {analysis.comparisons.map((comparison, index) => (
-                    <ComparisonCard
-                      key={comparison.opponentPlayerId}
-                      comparison={comparison}
-                      ownPlayerId={ownPlayerId}
-                      aliases={aliases}
-                      defaultOpen={index === 0}
-                    />
-                  ))}
+                    ))}
+                  </ul>
+                  {h2h.decisiveFieldType && h2h.decisiveFieldDiff !== 0 && (
+                    <p className="match-analysis-note">
+                      Größte Feld-Differenz: {fieldLabelForAnalysis(h2h.decisiveFieldType)} (
+                      {formatSigned(h2h.decisiveFieldDiff)})
+                    </p>
+                  )}
                 </div>
-              </div>
-            )}
+              )}
 
-            {!isMultiRound && h2h && (
               <div className="match-analysis-details-block">
-                <p className="match-analysis-details-label">
-                  Aufschlüsselung vs. {resolvedOpponentLabel}
-                </p>
-                <ul className="match-analysis-attribution">
-                  {h2h.attribution.map((row) => (
-                    <li key={row.key}>
-                      <span className="match-analysis-attribution-label">{row.label}</span>
-                      <span className="match-analysis-attribution-values tabular-nums">
-                        {row.viewerValue} · {row.opponentValue}
-                      </span>
-                      <span
-                        className={`match-analysis-attribution-diff tabular-nums ${
-                          row.diff > 0
-                            ? "match-analysis-diff--pos"
-                            : row.diff < 0
-                              ? "match-analysis-diff--neg"
-                              : ""
-                        }`}
-                      >
-                        {formatSigned(row.diff)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                {h2h.decisiveFieldType && h2h.decisiveFieldDiff !== 0 && (
-                  <p className="match-analysis-note">
-                    Größte Feld-Differenz: {fieldLabelForAnalysis(h2h.decisiveFieldType)} (
-                    {formatSigned(h2h.decisiveFieldDiff)})
-                  </p>
-                )}
+                <p className="match-analysis-details-label">{resolvedViewerLabel}</p>
+                <MetricsCompact metrics={analysis.viewer} />
               </div>
-            )}
 
-            <div className="match-analysis-details-block">
-              <p className="match-analysis-details-label">{resolvedViewerLabel}</p>
-              <MetricsCompact metrics={analysis.viewer} />
+              {!isMultiRound && analysis.mode === "multi" && analysis.opponent && (
+                <div className="match-analysis-details-block">
+                  <p className="match-analysis-details-label">{resolvedOpponentLabel}</p>
+                  <MetricsCompact metrics={analysis.opponent} />
+                </div>
+              )}
             </div>
-
-            {!isMultiRound && analysis.mode === "multi" && analysis.opponent && (
-              <div className="match-analysis-details-block">
-                <p className="match-analysis-details-label">{resolvedOpponentLabel}</p>
-                <MetricsCompact metrics={analysis.opponent} />
-              </div>
-            )}
-          </div>
-        )}
-      </section>
+          )}
+        </section>
+      </SectionGroup>
 
       {onBack && (
-        <button type="button" onClick={onBack} className="btn-secondary mt-2 w-full">
+        <button type="button" onClick={onBack} className="btn-secondary mt-1 w-full">
           {backLabel}
         </button>
       )}

@@ -1,5 +1,7 @@
 "use client";
 
+import { APP_NAME } from "@/lib/branding";
+
 type Props = {
   progress: number;
 };
@@ -13,13 +15,16 @@ export function AppIntroSplash({ progress }: Props) {
   return (
     <div className="app-intro-splash fixed inset-0 z-50 flex items-center justify-center p-6">
       <div className="app-intro-shell">
-        <p className="app-intro-title">dice.budget</p>
+        <img
+          src="/logo-source.png"
+          alt=""
+          width={88}
+          height={88}
+          className="app-intro-logo"
+          decoding="async"
+        />
+        <p className="app-intro-title">{APP_NAME}</p>
         <p className="app-intro-subtitle">Strategy Edition</p>
-
-        <div className="app-intro-dice-row" aria-hidden>
-          <span className="app-intro-die">⚀</span>
-          <span className="app-intro-die">⚄</span>
-        </div>
 
         <div className="app-intro-progress-wrap">
           <svg viewBox="0 0 120 120" className="app-intro-progress-ring">
@@ -41,4 +46,3 @@ export function AppIntroSplash({ progress }: Props) {
     </div>
   );
 }
-

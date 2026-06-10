@@ -1,16 +1,16 @@
 /** Produkt- und App-Store-Name */
-export const APP_NAME = "dice.budget";
+export const APP_NAME = "DiceBudget";
 
 /** Vollständiger Titel (Store, Manifest) */
-export const APP_TITLE = "dice.budget — Strategy Edition";
+export const APP_TITLE = "DiceBudget — Strategy Edition";
 
-export const APP_SHORT = "dice.budget";
+export const APP_SHORT = "DiceBudget";
 
 export const APP_DESCRIPTION =
   "Strategisches Würfelspiel mit Wurf-Pool und wählbarer Spielanzahl";
 
-export const MODE_STRATEGY_LABEL = "dice.budget Strategy Edition";
-export const MODE_CLASSIC_LABEL = "dice.budget Klassisch";
+export const MODE_STRATEGY_LABEL = "DiceBudget Strategy Edition";
+export const MODE_CLASSIC_LABEL = "DiceBudget Klassisch";
 
 /** Öffentliche Website (Datenschutz, App Store) */
 export const SITE_URL =
