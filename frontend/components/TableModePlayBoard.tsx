@@ -168,6 +168,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     if (field.score !== null) {
       setScoreInput(String(field.score));
       setRollsUsed(run.useStrategyRules ? field.rollsUsed : 1);
+      setYatzyDieValue(field.yatzyDieValue ?? null);
       return;
     }
     setScoreInput("");
@@ -192,7 +193,10 @@ export function TableModePlayBoard({ inviteCode }: Props) {
   async function handleSubmit() {
     if (!activeSide || !activePlayer || !activeRun || !activeFieldId || scoreInput === "") return;
     const effectiveRolls = activeRun.useStrategyRules ? (rollsUsed ?? 0) : (rollsUsed ?? 1);
-    if (activeRun.useStrategyRules && rollsUsed === null) return;
+    if (activeRun.useStrategyRules && rollsUsed === null) {
+      setError("Bitte die Anzahl Würfe für dieses Feld wählen.");
+      return;
+    }
     if (effectiveRolls < 1) return;
     const score = Number(scoreInput);
     if (Number.isNaN(score)) return;
@@ -200,7 +204,10 @@ export function TableModePlayBoard({ inviteCode }: Props) {
       .flatMap((g) => g.fields)
       .find((f) => f.id === activeFieldId)?.fieldType;
     const needsYatzyDie = activeFieldType === "KNIFFEL" && score === 50;
-    if (needsYatzyDie && yatzyDieValue === null) return;
+    if (needsYatzyDie && yatzyDieValue === null) {
+      setError("Bitte den Würfel für Alle Fünfe (50 Punkte) wählen.");
+      return;
+    }
     const yatzyArg = needsYatzyDie ? yatzyDieValue! : undefined;
 
     setBusy(true);

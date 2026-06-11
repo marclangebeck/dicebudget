@@ -193,8 +193,8 @@ export function completeLocalSoloField(
   }
 
   if (run.useStrategyRules) {
-    if (!Number.isInteger(rollsUsed) || rollsUsed < 1 || rollsUsed > 20) {
-      throw new Error("rollsUsed must be between 1 and 20");
+    if (!Number.isInteger(rollsUsed) || rollsUsed < 1) {
+      throw new Error("rollsUsed must be a positive integer");
     }
     const currentPoolBeforeCorrection = field.score === null
       ? run.rollsInPool
@@ -205,6 +205,14 @@ export function completeLocalSoloField(
     const newDelta = poolDeltaForComplete(rollsUsed, true);
     if (newDelta.poolCost > currentPoolBeforeCorrection) {
       throw new Error("Not enough rolls in pool");
+    }
+    const oldRollsUsed = field.score !== null ? field.rollsUsed : 0;
+    const nextTotalRolls = run.totalRollsUsed - oldRollsUsed + rollsUsed;
+    const maxRolls = maxRollsForGameCount(run.gameCount);
+    if (nextTotalRolls > maxRolls) {
+      throw new Error(
+        `Not enough rolls left (need ${rollsUsed}, remaining ${maxRolls - run.totalRollsUsed + oldRollsUsed})`,
+      );
     }
     const oldDelta = field.score === null
       ? { spareToPool: 0, poolCost: 0 }

@@ -34,8 +34,13 @@ describe("assertRollsUsedForMode", () => {
     assert.throws(() => assertRollsUsedForMode(4, false), /1 to 3/);
   });
 
-  it("allows up to 20 rolls in strategy mode", () => {
+  it("allows any positive roll count in strategy mode", () => {
     assert.doesNotThrow(() => assertRollsUsedForMode(20, true));
-    assert.throws(() => assertRollsUsedForMode(21, true), /1 to 20/);
+    assert.doesNotThrow(() => assertRollsUsedForMode(23, true));
+    assert.doesNotThrow(() => assertRollsUsedForMode(39, true));
+  });
+
+  it("rejects non-positive rolls", () => {
+    assert.throws(() => assertRollsUsedForMode(0, true), /positive integer/);
   });
 });

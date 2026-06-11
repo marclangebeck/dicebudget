@@ -1,4 +1,6 @@
 /** Spiegel der Backend-Pool-Logik für Korrektur-Eingaben. */
+export const ROLLS_PER_FIELD = 3;
+
 export function poolDeltaForComplete(
   rollsUsed: number,
   useStrategyRules: boolean,
@@ -6,7 +8,23 @@ export function poolDeltaForComplete(
   if (!useStrategyRules) {
     return { spareToPool: 0, poolCost: 0 };
   }
-  const spareToPool = rollsUsed <= 3 ? 3 - rollsUsed : 0;
-  const poolCost = rollsUsed > 3 ? rollsUsed - 3 : 0;
+  const spareToPool = rollsUsed <= ROLLS_PER_FIELD ? ROLLS_PER_FIELD - rollsUsed : 0;
+  const poolCost = rollsUsed > ROLLS_PER_FIELD ? rollsUsed - ROLLS_PER_FIELD : 0;
   return { spareToPool, poolCost };
+}
+
+/**
+ * Wurf-Chips fürs Eintrag-Panel (Strategy): 1 … min(3+Pool, verbleibendes Gesamtbudget).
+ * Kein fixes Obergrenze pro Feld — Limit kommt aus Pool und Spielanzahl×39.
+ */
+export function strategyRollChipOptions(
+  rollsInPool: number,
+  maxRollsAllowed?: number,
+): number[] {
+  const poolCap = ROLLS_PER_FIELD + Math.max(0, rollsInPool);
+  const maxRoll =
+    maxRollsAllowed != null
+      ? Math.min(poolCap, Math.max(1, maxRollsAllowed))
+      : poolCap;
+  return Array.from({ length: maxRoll }, (_, i) => i + 1);
 }

@@ -5,12 +5,11 @@ export type RunRules = {
 };
 
 export function assertRollsUsedForMode(rollsUsed: number, useStrategyRules: boolean): void {
-  const max = useStrategyRules ? 20 : ROLLS_PER_FIELD;
-  if (!Number.isInteger(rollsUsed) || rollsUsed < 1 || rollsUsed > max) {
-    const msg = useStrategyRules
-      ? "rollsUsed must be an integer from 1 to 20"
-      : `rollsUsed must be an integer from 1 to ${ROLLS_PER_FIELD}`;
-    throw new Error(msg);
+  if (!Number.isInteger(rollsUsed) || rollsUsed < 1) {
+    throw new Error("rollsUsed must be a positive integer");
+  }
+  if (!useStrategyRules && rollsUsed > ROLLS_PER_FIELD) {
+    throw new Error(`rollsUsed must be an integer from 1 to ${ROLLS_PER_FIELD}`);
   }
 }
 

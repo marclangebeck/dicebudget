@@ -11,7 +11,7 @@
     "icons": "node --input-type=module -e \"import sharp from 'sharp'; await sharp('public/logo-source.png').resize(512,512,{fit:'cover',position:'centre'}).png().toFile('public/icon-512.png'); await sharp('public/icon-512.png').resize(180,180).toFile('public/apple-touch-icon.png'); await sharp('public/icon-512.png').resize(32,32).toFile('app/icon.png');\"",
     "start": "next start -p 3021",
     "lint": "eslint",
-    "test": "node --import tsx --test lib/gameScoring.test.ts lib/pairingMerge.test.ts lib/localSoloRun.test.ts",
+    "test": "node --import tsx --test lib/gameScoring.test.ts lib/pairingMerge.test.ts lib/localSoloRun.test.ts lib/gameRules.test.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

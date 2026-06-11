@@ -146,12 +146,12 @@ function assertManualEntry(
   if (!Number.isInteger(score) || score < 0 || score > 999) {
     throw new InvalidInputError("score must be an integer from 0 to 999");
   }
-  const maxRolls = useStrategyRules ? 20 : ROLLS_PER_FIELD;
-  if (!Number.isInteger(rollsUsed) || rollsUsed < 1 || rollsUsed > maxRolls) {
+  if (!Number.isInteger(rollsUsed) || rollsUsed < 1) {
+    throw new InvalidInputError("rollsUsed must be a positive integer");
+  }
+  if (!useStrategyRules && rollsUsed > ROLLS_PER_FIELD) {
     throw new InvalidInputError(
-      useStrategyRules
-        ? "rollsUsed must be an integer from 1 to 20"
-        : `rollsUsed must be an integer from 1 to ${ROLLS_PER_FIELD}`,
+      `rollsUsed must be an integer from 1 to ${ROLLS_PER_FIELD}`,
     );
   }
 }

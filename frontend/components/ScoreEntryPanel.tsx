@@ -2,6 +2,7 @@
 
 import { FieldScoreChoiceGrid } from "@/components/FieldScoreChoiceGrid";
 import { YatzyDiePicker } from "@/components/YatzyDiePicker";
+import { strategyRollChipOptions } from "@/lib/gameRules";
 import { FIELD_LABELS, fieldScoreChoices } from "@/lib/labels";
 import type { FieldDto, RunDto } from "@/lib/types";
 
@@ -48,8 +49,12 @@ export function ScoreEntryPanel({
 
   const strategy = run.useStrategyRules;
   const maxExtraRolls = rollsInPoolOverride ?? run.rollsInPool;
+  const maxRollsAllowed =
+    strategy && run.rollsRemaining != null
+      ? run.rollsRemaining + (isCorrection ? field.rollsUsed : 0)
+      : undefined;
   const rollOptions = strategy
-    ? [1, 2, 3, ...Array.from({ length: maxExtraRolls }, (_, i) => i + 4)]
+    ? strategyRollChipOptions(maxExtraRolls, maxRollsAllowed)
     : [1, 2, 3];
 
   const parsedScore = scoreInput === "" ? null : Number(scoreInput);
@@ -68,6 +73,17 @@ export function ScoreEntryPanel({
     yatzyDieOk &&
     (strategy ? rollsUsed !== null : true) &&
     !busy;
+
+  const entryBlockedHint =
+    run.status === "ACTIVE" && !busy && !canSubmit
+      ? !scoreOk
+        ? "Bitte einen gültigen Punktwert wählen."
+        : needsYatzyDie && !yatzyDieOk
+          ? "Bitte den Würfel für Alle Fünfe (50 Punkte) wählen."
+          : strategy && rollsUsed === null
+            ? "Bitte die Anzahl Würfe für dieses Feld wählen."
+            : null
+      : null;
 
   return (
     <div
@@ -158,7 +174,10 @@ export function ScoreEntryPanel({
                   </button>
                 ))}
               </div>
-              <p className="play-entry-hint">1–3 → Pool · ab 4. aus Pool</p>
+              <p className="play-entry-hint">
+                Anzahl Würfe auf diesem Feld (nicht die Gesamtwurfsnummer) · 1–3 → Pool · ab 4. aus
+                Pool
+              </p>
             </div>
           )}
 
@@ -182,6 +201,9 @@ export function ScoreEntryPanel({
               {isCorrection ? "Korrigieren" : "Eintragen"}
             </button>
           </div>
+          {entryBlockedHint && (
+            <p className="glass-alert-error mt-2 px-2 py-1.5 text-xs">{entryBlockedHint}</p>
+          )}
         </div>
       </div>
     </div>
