@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
+- **Doku:** HANDOVER, `docs/milestones_active.md`, `docs/ios_current.md`, `milestones.md`, `GOiOS.md` — Stand `66e8487`, iOS-Workflow mit `build:ios`-Pflicht, TestFlight `2.0 (27)`, Hinweis zu wirkungslosem Upload `2.0 (26)`
 - **Footer-Menü:** Dezenterer Hamburger-Trigger; Menü-Panel mit stärkerem Glas-Look (Blur, halbtransparent, weichere Typo)
 - **Startscreen Arena:** Zwei gleichwertige Kacheln ohne Mittel-Logo; zentrierte Texte, dominante 3D-Würfel-Icons (Multi/Solo) im Kachelzentrum
 - **Startscreen Arena:** Zwei Vollbild-Kacheln (Multi vs. Solo) mit Aurora-Hintergrund, schwebenden 3D-Icons, Glow-Ring, Glas-Dock und Play-CTAs („Lobby öffnen“ / „Run starten“); kompakter Hero „Wähle deinen Modus“

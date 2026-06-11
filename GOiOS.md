@@ -13,13 +13,14 @@ Diese Datei ist ein Kompatibilitaets-Index. Fuer aktuellen iOS-/TestFlight-/App-
 
 - Bundle ID: `de.bottletrade.dicebudget`
 - Version in App Store Connect: `2.0`
-- Aktueller TestFlight-Build: `2.0 (25)`
-- Naechster Upload: `2.0 (26)` (Stand ab `f29cf7d`: Vollbild-Erfolge, DiceBudget-Branding, Card-Dashboards, Footer-Menü, Startscreen-Arena)
+- Aktueller TestFlight-Build: `2.0 (25)` (verlässlich); `2.0 (26)` ohne `git pull` = noch `f29cf7d`
+- Naechster Upload: `2.0 (27)` (Stand `66e8487`: Arena ohne Mittel-Logo, Footer Glas-Morph, Card-Dashboards, …)
 - Details und Checkliste: `docs/ios_current.md`
 
 ## Wichtig
 
-- Web-Deploy und iOS-Release sind getrennt.
-- Nach UI-Aenderungen braucht iOS auf dem Mac `npm run build:ios` und danach Xcode Archive/Upload.
+- Web-Deploy und iOS-Release sind getrennt; `ios/App/App/public/` ist gitignored.
+- Nach UI-Aenderungen: Mac `git pull` auf `66e8487`, `npm run build:ios`, Bundle-Check (`grep home-arena-pane`), dann Xcode Archive/Upload.
+- Bei `git pull`-Fehler: `git restore frontend/package-lock.json` vor Pull.
 - Alter App-Store-Connect-Eintrag `com.mlangebeck.mobileapp` wird ignoriert.
 - Der verbindliche Sync-Workflow steht in `AGENT_RULES.md` Sektion 9.

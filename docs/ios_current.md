@@ -2,65 +2,94 @@
 
 **Stand:** 2026-06-10  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** Commit-Batch 2026-06-10 auf `milestone-22-prep`  
+**Produktcode-HEAD:** `66e8487`  
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-/App-Store-Stand. Aeltere iOS-Historie steht in `docs/ios_archive.md`.
 
 ## Aktueller Stand
 
-- App Store Connect ist bei **Version 2.0**.
-- Aktueller TestFlight-Build ist **`2.0 (25)`**.
-- Naechster Upload ist **`2.0 (26)`** (Stand ab `f29cf7d` / `b17b9f5` + Arena-Commit).
-- Produktcode ab `f29cf7d` enthaelt zusaetzlich: **Code teilen nur Code**, **Vollbild-Erfolgs-Animationen**, **DiceBudget-Branding/Intro**, **Card-Dashboards** (Abschluss/Analyse), **Footer-Menü mit Screenshot**, **Startscreen-Arena** (Multi vs. Solo).
-- Produktcode `66e715a` … `b17b9f5`: Zettel-Ergebnis-Farben, Fortschritt 25/50/75 %, granulares Spiel-Feedback, Fortschritt-Warteschlange.
-- Web/API sind live unter https://dicebudget.bottle-trade.de.
+- App Store Connect: **Version 2.0**.
+- TestFlight **`2.0 (25)`**: letzter Build mit verifiziertem älterem Stand.
+- TestFlight **`2.0 (26)`**: Build-Nummer erhöht, aber **ohne `git pull` auf `66e8487`** — UI entsprach noch `f29cf7d` (keine sichtbaren Arena-/Menü-Änderungen).
+- **Nächster Upload: `2.0 (27)`** — Pflicht-Stand **`66e8487`** (Arena ohne Mittel-Logo, Footer Glas-Morph, Card-Dashboards, Code nur teilen, …).
+- Web/API live: https://dicebudget.bottle-trade.de (nur Web; iOS-UI kommt aus lokalem Bundle).
 
-## Was In 2.0 (26) Enthalten Sein Soll (falls noch nicht in 25)
+## iOS-Bundle (kritisch)
 
-- Startscreen-Arena: zwei Vollbild-Kacheln Multi vs. Solo, VS-Badge, Aurora/Glow.
-- Footer: `Home · Statistik · Einstellungen · Menü` mit Screenshot teilen.
-- DiceBudget-Branding + Intro-Logo; Intro-Key v2.
-- Multi: **Code teilen** nur Code (kein Einladungstext).
-- Erfolgs-Animationen Vollbild; Abschluss/Analyse als Card-Dashboards.
-- Zettel: Ergebnis 1/2/Spiel in Feld-Spalte mit gleichen Farben wie Wertespalten.
-- Fortschritt 25/50/75 %: Overlay + Sound; nacheinander nach Erfolgs-Overlays.
-- Spiel-Feedback granular: `/settings/feedback` (Animationen, Sounds, Fortschritt).
-- Backend (falls noch offen): Coaching-API, `scoreProgression`, Migration `extra_yatzy_die_values`.
+| Schritt | Reicht für neue UI in TestFlight? |
+|---------|-----------------------------------|
+| `git pull` | Nein (nur Quellcode) |
+| `npm run build` auf Server | Nein (nur Web unter `frontend/out/`) |
+| **`npm run build:ios` auf Mac** | **Ja** (`cap sync` → `ios/App/App/public/`) |
+| Xcode Archive ohne `build:ios` | Nein |
 
-## Bereits In TestFlight (bis 2.0 (25))
+`frontend/ios/App/App/public/` ist in `.gitignore` — wird **nicht** mit `git pull` aktualisiert.
 
-- M34 Bugfixes + Stats-Reset
-- M35 Paarungen bearbeiten
-- UI-Politur, iPad-Tischmodus, Game-Dashboard, Footer-Tabbar, footerfreie `/play`
-- Spiel-UX Juni 2026 (Werten/Nicht werten, Alle-Fünfe-Würfel-Abfrage)
-- Spielanalyse (optional nach Spielende)
-- Alle-Fünfe-Miniwürfel, Zusatz-Würfelwahl, Branding „Alle Fünfe“
-- Gaming-Feedback II, Teilen (Spielende/Bilanz), Coaching, Punkte-Duell (nach Backend-Deploy)
-- Einstellungen-Rücknavigation `?from=solo|multi`
-
-## Mac-Workflow Fuer Naechsten Upload
-
-Auf dem Mac:
+## Mac-Workflow Für Upload 2.0 (27)
 
 ```bash
 cd /Users/marclangebeck/projects/kniffel
+git restore frontend/package-lock.json
 git pull origin milestone-22-prep
-cd frontend
+git log -1 --oneline
+```
+
+Erwartung: `66e8487 Footer-Menü: dezenterer Trigger und stärkerer Glas-Look`
+
+```bash
+cd /Users/marclangebeck/projects/kniffel/frontend
+npm ci
 npm run build:ios
 brew unlink rsync
+```
+
+Prüfung vor Xcode:
+
+```bash
+grep -c home-arena-pane ios/App/App/public/_next/static/css/*.css
+ls -lt ios/App/App/public/_next/static/css/ | head -3
+```
+
+`grep` muss mindestens eine Datei mit Zähler **≥ 1** liefern; CSS-Datum sollte aktuell sein.
+
+Xcode öffnen:
+
+```bash
 env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
 ```
 
-In Xcode: Team pruefen, Build-Nummer auf **26** erhoehen, **Any iOS Device** → **Product → Archive** → Upload.
+In Xcode:
 
-## TestFlight-Checkliste 2.0 (26)
+1. **Product → Clean Build Folder** (⇧⌘K)
+2. Build-Nummer **27**
+3. **Any iOS Device** → **Product → Archive** → Upload
+4. Auf dem iPhone TestFlight **Build 27** installieren (nicht 26)
 
-- Zettel: Ergebnis 1/2/Spiel links mit korrekten Farben (grün/dunkel).
-- Multi: Raum anlegen → **Code teilen** (nicht kopieren).
-- Fortschritt: 25/50/75 %-Overlay; auch nach Alle-Fünfe-Animation nacheinander.
-- Einstellungen → Spiel-Feedback → einzelne Toggles.
+## Was In 2.0 (27) Enthalten Sein Soll
+
+- **Startscreen:** Zwei Arena-Kacheln Multi/Solo, **kein** Mittel-Logo; zentrierte Überschriften/Taglines/Badges; dominante 3D-Würfel-Icons.
+- **Footer:** `Home · Statistik · Einstellungen · Menü`; Hamburger dezent; Menü-Overlay mit Glas-Morph; Screenshot teilen.
+- DiceBudget-Branding + Intro-Logo; Intro-Key v2.
+- Multi: **Code teilen** nur Code.
+- Erfolgs-Animationen Vollbild; Abschluss/Analyse Card-Dashboards.
+- Zettel: Ergebnis 1/2/Spiel-Farben; Fortschritt 25/50/75 %; granulares Spiel-Feedback.
+- Backend (API, nicht iOS-Bundle): Coaching, `scoreProgression`, Migration `extra_yatzy_die_values` — Deploy-Status prüfen.
+
+## TestFlight-Checkliste 2.0 (27)
+
+- Startscreen: Multi/Solo-Kacheln, große Würfel-Icons, kein Logo in der Mitte.
+- Footer-Menü: dezenter Trigger, Glas-Panel, Screenshot/Support/Legal.
+- Multi: Raum anlegen → **Code teilen** (nur Code).
+- Fortschritt 25/50/75 %; nach Erfolgs-Overlays nacheinander.
+- `/settings/feedback`: Toggles einzeln.
 - Regression: Footer auf Setup/Legal/Stats; `/play` footerfrei; Pool-Endspiel; Teilen Spielende/Bilanz.
+
+## Bekannte Mac-Fallen
+
+- **`git pull` blockiert** durch `frontend/package-lock.json` → `git restore frontend/package-lock.json` vor Pull.
+- **Xcode öffnet sich nicht** nach Build → explizit `open ios/App/App.xcworkspace` (siehe Workflow oben).
+- **Build-Nummer erhöht, UI unverändert** → `npm run build:ios` fehlte oder Pull nicht auf `66e8487`.
 
 ## App Store Connect (offen)
 

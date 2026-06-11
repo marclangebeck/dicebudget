@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** Branch `milestone-22-prep`, Stand 2026-06-10 (nach Commit: `git rev-parse --short HEAD`)  
+**Produktcode-HEAD:** `66e8487` (Stand 2026-06-10)  
 **Sprache:** Deutsch
 
 Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milestones_active.md`. iOS/TestFlight/App Store: `docs/ios_current.md`. Dauerhafte Projektentscheidungen nur bei Bedarf: `docs/decisions.md`.
@@ -26,43 +26,50 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
 | Branch | `milestone-22-prep` |
-| Produktcode | Stand 2026-06-10 auf `milestone-22-prep`; Frontend `out/` nach Build |
+| Produktcode-HEAD | `66e8487` — Frontend `out/` nach Build auf dem Server |
 | Backend | Coaching-API, `scoreProgression`, Migration `extra_yatzy_die_values` — Deploy-Status durch Nutzer prüfen |
 | Branding | Nutzer-sichtbar **DiceBudget** und **Alle Fünfe**; technische IDs unverändert |
-| Startscreen | Zwei Vollbild-Arena-Kacheln (Multi vs. Solo), Hero mit Bilanz; Statistik/Einstellungen nur im Footer |
-| Footer | `Home · Statistik · Einstellungen · Menü` — Menü: Screenshot, Support, Legal, bottle-trade.de |
-| Teilen | **Nur** Spielende (`RunFinishScreen`) + Startscreen-Bilanz; ein **Teilen**-Button → System-Share (PNG) |
+| Startscreen | Zwei Arena-Kacheln **Multi** / **Solo**, **ohne** Mittel-Logo; zentrierte Texte/Badges; dominante 3D-Würfel-Icons; Hero mit Bilanz |
+| Footer | `Home · Statistik · Einstellungen · Menü` — Hamburger dezent, Menü-Panel Glas-Morph; Screenshot, Support, Legal, bottle-trade.de |
+| Teilen | **Nur** Spielende (`RunFinishScreen`) + Startscreen-Bilanz; System-Share (PNG) |
 | Multi-Raum | **Code teilen** liefert **nur den Code** (kein Einladungstext/Link) |
 | Abschluss/Analyse | Card-Dashboards in `RunFinishScreen` und `MatchAnalysisView` |
 | Erfolgs-Animationen | Vollbild-Overlays (Bonus, Große Straße, Alle Fünfe, untere Spalte voll) |
 | Spiel-Feedback | Granular unter `/settings/feedback`: Animationen, Sounds, Fortschritt 25/50/75 % |
 | Fortschritt | Overlay + Sound bei 25/50/75 %; **Warteschlange** hinter Erfolgs-Overlays |
 | Nginx | HTML `no-cache`, `_next/static/` `immutable` — reload durch Nutzer nach Config-Deploy |
-| iOS/TestFlight | Version `2.0`, aktueller Build **`2.0 (25)`**, nächster Upload **`2.0 (26)`** |
+| iOS/TestFlight | Version `2.0`; letzter sinnvoller Stand in TF: **`2.0 (25)`**; Upload **`2.0 (26)`** hatte noch Code `f29cf7d` (ohne `git pull`); nächster Upload **`2.0 (27)`** ab `66e8487` |
 
-## Letzte Produktänderungen (Commit-Batch 2026-06-10)
+## Wichtig: iOS-Bundle ≠ Web-Deploy
 
-| Feature | Status | Backend nötig |
+- Die iOS-App lädt UI aus `frontend/ios/App/App/public/` (lokal im App-Bundle).
+- Dieser Ordner ist **gitignored** und wird nur durch **`npm run build:ios`** auf dem Mac befüllt (`next build` → `out/` → `cap sync ios`).
+- **`git pull` allein** oder **nur Xcode Archive** reichen **nicht** — ohne `npm run build:ios` bleibt alter Web-Stand in TestFlight.
+- Vor Archive prüfen: `git log -1` muss `66e8487` sein; `grep -c home-arena-pane` in `ios/App/App/public/_next/static/css/*.css` muss > 0 sein.
+
+## Letzte Produktänderungen (Commits bis `66e8487`)
+
+| Feature | Commit | Backend nötig |
 |---------|--------|---------------|
+| Footer-Menü Glas-Morph, dezenter Hamburger | `66e8487` | Nein |
+| Startscreen Arena ohne Mittel-Logo, zentriert, große 3D-Icons | `3f690d5` | Nein |
+| Footer-Menü + Screenshot teilen | `b17b9f5` | Nein |
 | Multi: Code teilen nur Code | `f29cf7d` | Nein |
 | Erfolgs-Animationen Vollbild | `f29cf7d` | Nein |
 | DiceBudget-Branding, Intro-Logo | `be566e5` | Nein |
 | Abschluss/Analyse Card-Dashboards | `be566e5` | Nein |
-| Footer-Menü + Screenshot teilen | `b17b9f5` | Nein |
-| Startscreen Arena (Multi vs. Solo) | dieser Commit | Nein |
-| nginx Cache-Header | dieser Commit | Nein (reload sudo) |
-| Intro-Key v2 | dieser Commit | Nein |
-| Doku-Sync (HANDOVER, milestones, CHANGELOG) | dieser Commit | Nein |
+| nginx Cache-Header | Arena-Batch | Nein (reload sudo) |
 
 ## Bekanntes UX-Thema (offen)
 
 - **Pool-Endspiel + Statistik-Toggle:** Nicht-Sieger müssen ggf. **Aktualisieren** tippen, bevor Abschluss-Screen mit Toggle erscheint.
 - **Punkte-Duell live:** Graphik in Multi-Analyse erst nach **Backend-Deploy** (`scoreProgression` in API), falls noch nicht deployed.
-- **Safari-Cache:** Nach Frontend-Deploy ggf. privates Fenster oder Hard-Reload; nginx reload für neue Cache-Header.
+- **Safari-/WebView-Cache:** Hard-Reload bzw. App-Neustart nach TestFlight-Update.
+- **Mac `git pull`:** Lokale Änderung an `frontend/package-lock.json` blockiert Pull — `git restore frontend/package-lock.json` vor Pull.
 
 ## Wichtige Dateien
 
-- Startscreen: `HomeBentoGrid.tsx`, `globals.css` (`.home-play-arena*`, `.home-bento-tile--arena`)
+- Startscreen: `HomeBentoGrid.tsx`, `globals.css` (`.home-play-arena`, `.home-arena-pane*`)
 - Footer/Menü: `AppLegalFooter.tsx`, `AppFooterMenu.tsx`, `screenCapture.ts`, `shareSocial.ts`
 - Intro: `AppIntroSplash.tsx`, `app/app/page.tsx` (`INTRO_SHOWN_KEY` v2)
 - Multi-Teilen: `multi/page.tsx`, `shareSocial.ts`
@@ -74,20 +81,23 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 
 ## Offene Prioritäten
 
-1. **Commit + Push** dieses Batches und `npm run build` auf dem Server.
-2. **nginx reload** (Nutzer sudo): nach Config-Deploy Cache-Header aktivieren.
+1. **iOS TestFlight `2.0 (27)`** auf dem Mac (nach `git pull` auf `66e8487`, `npm run build:ios`, Archive).
+2. TestFlight-Regression: Startscreen-Arena, Footer/Menü/Glas, `/play`, Pool-Endspiel, Fortschritt, Code teilen.
 3. **Backend deployen** (falls noch offen): Coaching + `scoreProgression` + Migration `extra_yatzy_die_values`.
-4. **iOS-Build `2.0 (26)`** auf dem Mac nach `git pull`.
-5. TestFlight-Regression: Startscreen-Arena, Footer/Menü, `/play`, Pool-Endspiel, Fortschritt, Code teilen.
+4. **nginx reload** (Nutzer sudo), falls Cache-Header noch nicht aktiv.
+5. App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
 6. Optional: Pool-Endspiel Auto-Refresh.
-7. App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
 
-## Mac: iOS-Build 2.0 (26)
+## Mac: iOS-Build 2.0 (27)
 
 ```bash
 cd /Users/marclangebeck/projects/kniffel
+git restore frontend/package-lock.json
 git pull origin milestone-22-prep
+git log -1 --oneline
 ```
+
+Erwartung: `66e8487 Footer-Menü: dezenterer Trigger und stärkerer Glas-Look`
 
 Bei Konflikt in der Xcode-Projektdatei:
 
@@ -96,16 +106,19 @@ git restore frontend/ios/App/App.xcodeproj/project.pbxproj
 git pull origin milestone-22-prep
 ```
 
-Build und Xcode:
+Build, Sync, Xcode öffnen (eine Zeile):
 
 ```bash
-cd /Users/marclangebeck/projects/kniffel/frontend
-npm run build:ios
-brew unlink rsync
-env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
+cd /Users/marclangebeck/projects/kniffel/frontend && npm ci && npm run build:ios && brew unlink rsync && env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
 ```
 
-In Xcode: Team prüfen, Build-Nummer **26**, **Any iOS Device** → **Product → Archive** → Upload.
+Bundle prüfen:
+
+```bash
+grep -c home-arena-pane /Users/marclangebeck/projects/kniffel/frontend/ios/App/App/public/_next/static/css/*.css
+```
+
+In Xcode: **⇧⌘K** (Clean), Build-Nummer **27**, **Any iOS Device** → **Product → Archive** → Upload.
 
 ## Pflicht-Lesereihenfolge
 
@@ -139,17 +152,18 @@ Wichtige Regeln:
 - Kein sudo durch den Agent; Backend-Deploy/nginx reload per SSH auf dem Server (Nutzer-Aufgabe).
 - Keine Watcher, kein Polling, keine Dauerprozesse.
 - Agent arbeitet auf dem Server unter /home/bottleadmin/projects/kniffel.
-- Mac-Clone: /Users/marclangebeck/projects/kniffel (git pull, Xcode/iOS).
+- Mac-Clone: /Users/marclangebeck/projects/kniffel (git pull, npm run build:ios, Xcode).
 - Reine Frontend-Änderungen: cd frontend && npm run build auf dem Server.
 
 Aktueller Kurzstand:
 - Branch: milestone-22-prep
-- Produktcode-HEAD: git log -1 --oneline nach git pull (Stand Juni 2026-06-10)
+- Produktcode-HEAD: 66e8487 (Stand 2026-06-10)
 - Web/API live: https://dicebudget.bottle-trade.de
-- iOS: Version 2.0, TestFlight 2.0 (25), nächster Upload 2.0 (26)
+- iOS: Version 2.0; TestFlight 2.0 (25) letzter verlässlicher Stand; 2.0 (26) ohne git pull = alter Code; nächster Upload 2.0 (27) ab 66e8487
+- iOS-Bundle: frontend/ios/App/App/public/ ist gitignored — UI nur via npm run build:ios auf dem Mac im TestFlight-Bundle
 - Branding: DiceBudget; UI „Alle Fünfe“ statt Yatzy; technische IDs unverändert
-- Startscreen: Zwei Vollbild-Arena-Kacheln Multi vs. Solo (VS-Badge, Aurora, Glow, Glas-Dock); Hero mit Bilanz; Statistik/Einstellungen nur im Footer
-- Footer: Home · Statistik · Einstellungen · Menü — Menü mit Screenshot teilen, Support, Datenschutz, Impressum, bottle-trade.de
+- Startscreen: Zwei Arena-Kacheln Multi/Solo, kein Mittel-Logo, zentrierte Texte/Badges, dominante 3D-Würfel-Icons; Hero mit Bilanz; Statistik/Einstellungen nur im Footer
+- Footer: Home · Statistik · Einstellungen · Menü — Hamburger dezent, Menü-Panel Glas-Morph, Screenshot teilen, Support, Legal, bottle-trade.de
 - Multi: Code teilen nur Code (kein Einladungstext/Link)
 - Erfolgs-Animationen: Vollbild (Bonus, Große Straße, Alle Fünfe, untere Spalte voll)
 - Abschluss/Analyse: Card-Dashboards (RunFinishScreen, MatchAnalysisView)
@@ -163,19 +177,22 @@ Aktueller Kurzstand:
 - nginx reload (nach infra/nginx-Änderung): Nutzer per SSH:
   sudo nginx -t && sudo systemctl reload nginx
 
-Mac iOS-Build 2.0 (26):
-cd /Users/marclangebeck/projects/kniffel && git pull origin milestone-22-prep
-cd frontend && npm run build:ios && brew unlink rsync
+Mac iOS-Build 2.0 (27):
+cd /Users/marclangebeck/projects/kniffel
+git restore frontend/package-lock.json
+git pull origin milestone-22-prep
+cd frontend && npm ci && npm run build:ios && brew unlink rsync
+grep -c home-arena-pane ios/App/App/public/_next/static/css/*.css
 env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
-(Xcode: Build-Nummer 26, Archive, Upload)
+(Xcode: Clean Build Folder, Build-Nummer 27, Archive, Upload)
 
 Offene Prioritäten:
-1. Backend deployen (falls offen: Coaching + scoreProgression + Migration extra_yatzy_die_values)
-2. nginx reload falls Cache-Header noch nicht aktiv
-3. iOS TestFlight 2.0 (26) bauen und hochladen
-4. TestFlight-Regression (Startscreen-Arena, Footer/Menü, /play, Pool-Endspiel, Fortschritt, Code teilen)
-5. Optional: Pool-Endspiel Auto-Refresh
-6. App Store Connect (Agreement, Bank/Steuer, Preis 1,19 EUR)
+1. iOS TestFlight 2.0 (27) mit 66e8487 bauen und hochladen
+2. TestFlight-Regression (Startscreen-Arena, Footer/Menü, /play, Pool-Endspiel, Fortschritt, Code teilen)
+3. Backend deployen (falls offen: Coaching + scoreProgression + Migration extra_yatzy_die_values)
+4. nginx reload falls Cache-Header noch nicht aktiv
+5. App Store Connect (Agreement, Bank/Steuer, Preis 1,19 EUR)
+6. Optional: Pool-Endspiel Auto-Refresh
 
 Auftrag:
 <hier konkrete Aufgabe einfügen>
