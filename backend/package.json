@@ -13,7 +13,8 @@
     "db:create-run": "tsx scripts/create-run.ts",
     "db:backfill-scored-sequences": "tsx scripts/backfill-scored-sequences.ts",
     "pretest": "DATABASE_URL=file:./prisma/test.db npx prisma migrate deploy && npx prisma generate",
-    "test": "DATABASE_URL=file:./prisma/test.db node --import tsx --test src/**/*.test.ts"
+    "test": "DATABASE_URL=file:./prisma/test.db node --import tsx --test src/**/*.test.ts",
+    "lint": "eslint src"
   },
   "engines": {
     "node": ">=20"
@@ -26,12 +27,18 @@
     "helmet": "^8.2.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/helmet": "^0.0.48",
     "@types/node": "^25.8.0",
+    "@types/supertest": "^7.2.0",
+    "eslint": "^10.4.1",
+    "prettier": "^3.8.4",
     "prisma": "^5.22.0",
+    "supertest": "^7.2.2",
     "tsx": "^4.22.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.0"
   }
 }

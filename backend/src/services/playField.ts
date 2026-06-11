@@ -77,6 +77,13 @@ export class FieldNotScoredError extends Error {
   }
 }
 
+export class InvalidYatzyDieValueError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "InvalidYatzyDieValueError";
+  }
+}
+
 export class NotLastScoredFieldError extends Error {
   constructor() {
     super("Only the last scored field can be cleared");
@@ -264,7 +271,9 @@ function assertYatzyDieValue(
 ): number | null {
   if (fieldType !== "KNIFFEL" || score !== 50) {
     if (yatzyDieValue !== undefined && yatzyDieValue !== null) {
-      throw new Error("yatzyDieValue is only allowed for a scored Alle Fünfe (50 points)");
+      throw new InvalidYatzyDieValueError(
+        "yatzyDieValue is only allowed for a scored Alle Fünfe (50 points)",
+      );
     }
     return null;
   }
@@ -274,7 +283,9 @@ function assertYatzyDieValue(
     yatzyDieValue < 1 ||
     yatzyDieValue > 6
   ) {
-    throw new Error("yatzyDieValue must be an integer from 1 to 6 for Alle Fünfe");
+    throw new InvalidYatzyDieValueError(
+      "yatzyDieValue must be an integer from 1 to 6 for Alle Fünfe",
+    );
   }
   return yatzyDieValue;
 }
@@ -409,7 +420,7 @@ export async function abandonRun(runId: string, playerSecret?: string) {
     await recalculateRunTotals(runId, tx);
     await tx.run.update({
       where: { id: runId },
-      data: { status: RUN_STATUS.FINISHED, finishedAt: new Date() },
+      data: { status: RUN_STATUS.ABANDONED, finishedAt: new Date() },
     });
   });
 

@@ -25,7 +25,7 @@ import { buildAchievementAfterField } from "@/lib/achievementFeedback";
 import { useQueuedFeedbackOverlays } from "@/lib/feedbackOverlayQueue";
 import { buildProgressMilestoneAfterField } from "@/lib/runProgressFeedback";
 import type { SessionMatchAnalysisDto } from "@/lib/matchAnalysisTypes";
-import { allFieldsScored, getLastScoredFieldId } from "@/lib/runUtils";
+import { allFieldsScored, getLastScoredFieldId, isRunEnded } from "@/lib/runUtils";
 import { loadPlayerAliases } from "@/lib/playerAliases";
 import {
   loadTableModeSession,
@@ -383,7 +383,10 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     );
   }
 
-  const allFinished = players.every((p) => runs[p.side]?.status === "FINISHED");
+  const allFinished = players.every((p) => {
+    const run = runs[p.side];
+    return !!run && isRunEnded(run);
+  });
   const sessionFinished = allFinished && !poolEndgamePending;
   const leftRun = runs.left;
   const rightRun = runs.right;
@@ -466,7 +469,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
                   <p className="play-table-player-label">{player.label}</p>
                   {run && (
                     <p className="play-table-player-meta tabular-nums">
-                      {run.status === "FINISHED"
+                      {isRunEnded(run)
                         ? `${run.totalScore} Punkte · fertig`
                         : run.useStrategyRules
                           ? `Pool ${run.rollsInPool}`
@@ -474,7 +477,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
                     </p>
                   )}
                 </div>
-                {completed && run?.status !== "FINISHED" && (
+                {completed && run && !isRunEnded(run) && (
                   <button
                     type="button"
                     disabled={busy}

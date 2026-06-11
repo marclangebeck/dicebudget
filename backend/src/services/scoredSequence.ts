@@ -1,22 +1,14 @@
-import { FIELD_TYPES_PER_GAME } from "../domain/fieldTypes.js";
+import { sortFields } from "../domain/fieldTypes.js";
 import { prisma } from "../db/prisma.js";
-
-const fieldOrder = new Map<string, number>(
-  FIELD_TYPES_PER_GAME.map((type, index) => [type, index]),
-);
-
-function sortFields<T extends { fieldType: string }>(fields: T[]): T[] {
-  return [...fields].sort(
-    (a, b) =>
-      (fieldOrder.get(a.fieldType) ?? 0) - (fieldOrder.get(b.fieldType) ?? 0),
-  );
-}
 
 type ScoredFieldRef = {
   id: string;
   score: number | null;
   scoredSequence: number | null;
+  fieldType: string;
 };
+
+type LastScoredFieldRef = ScoredFieldRef;
 
 /** True, wenn mindestens ein bewertetes Feld ohne scoredSequence existiert. */
 export function runNeedsScoredSequenceBackfill(
@@ -92,13 +84,6 @@ export async function backfillAllScoredSequences(): Promise<{ runsUpdated: numbe
   }
   return { runsUpdated: runIds.length };
 }
-
-type LastScoredFieldRef = {
-  id: string;
-  score: number | null;
-  scoredSequence: number | null;
-  fieldType: string;
-};
 
 export function findLastScoredFieldId(
   games: Array<{ index?: number; fields: LastScoredFieldRef[] }>,

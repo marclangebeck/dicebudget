@@ -1,20 +1,9 @@
 import { maxRollsForGameCount } from "../config.js";
 import { parseExtraYatzyDieValues } from "../domain/extraYatzyDieValues.js";
 import { computeGameBreakdown } from "../domain/gameScoring.js";
-import { FIELD_TYPES_PER_GAME } from "../domain/fieldTypes.js";
+import { sortFields } from "../domain/fieldTypes.js";
 import { prisma } from "../db/prisma.js";
 import { findLastScoredFieldId } from "./scoredSequence.js";
-
-const fieldOrder = new Map<string, number>(
-  FIELD_TYPES_PER_GAME.map((type, index) => [type, index]),
-);
-
-function sortFields<T extends { fieldType: string }>(fields: T[]): T[] {
-  return [...fields].sort(
-    (a, b) =>
-      (fieldOrder.get(a.fieldType) ?? 0) - (fieldOrder.get(b.fieldType) ?? 0),
-  );
-}
 
 const runInclude = {
   games: {

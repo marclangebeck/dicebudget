@@ -5,6 +5,11 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **M26 Backend-Qualität:** Zentrales `sortFields`/`isRunTerminal`; Run-Status `ABANDONED`; `InvalidYatzyDieValueError`; API `/player-names/aliases`
+- **M26 Tests:** Supertest-Setup (`httpSetup.ts`), Route-Tests runs/sessions/stats
+- **M26 Doku:** `backend/openapi.yaml`, `backend/README.md`, ESLint-Config
+
+### Added
 - **M25 Performance:** `getRunById` ein Query ohne Read-Backfill; Backfill-Skript `npm run db:backfill-scored-sequences`
 - **M25 Performance:** Run-Erstellung mit `field.createMany` pro Spiel; Indizes `Run.status`, `GameSession.pointsAwarded`
 - **M25 Performance:** `getStats` per DB-Aggregation; Pairing-Stats In-Memory-Cache (TTL 60s, Invalidierung bei reset/baseline)

@@ -45,7 +45,12 @@ import {
 } from "@/lib/localSoloRun";
 import { buildSoloMatchAnalysis } from "@/lib/matchAnalysis";
 import type { MatchAnalysisDto, SessionMatchAnalysisDto } from "@/lib/matchAnalysisTypes";
-import { ABANDON_RUN_CONFIRM, allFieldsScored, getLastScoredFieldId } from "@/lib/runUtils";
+import {
+  ABANDON_RUN_CONFIRM,
+  allFieldsScored,
+  getLastScoredFieldId,
+  isRunEnded,
+} from "@/lib/runUtils";
 import type { FieldDto, RunDto } from "@/lib/types";
 
 type Props = {
@@ -150,7 +155,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   }, [refreshLobby]);
 
   const poolEndgamePending =
-    run?.status === "FINISHED" &&
+    run && isRunEnded(run) &&
     !!lobby?.poolEndgameEnabled &&
     !lobby.poolEndgameResolved;
 
@@ -178,7 +183,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     if (!inviteCode) return;
     const onActive = () => {
       if (document.visibilityState !== "visible") return;
-      if (run?.status === "FINISHED" && lobby?.poolEndgameEnabled && !lobby.poolEndgameResolved) {
+      if (run && isRunEnded(run) && lobby?.poolEndgameEnabled && !lobby.poolEndgameResolved) {
         void refreshLobby();
         return;
       }
@@ -213,7 +218,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
 
   useEffect(() => {
     if (!run) return;
-    if (run.status === "FINISHED") {
+    if (isRunEnded(run)) {
       clearActiveGame();
       return;
     }
@@ -534,7 +539,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         })()
       : run.rollsInPool;
 
-  if (run.status === "FINISHED") {
+  if (isRunEnded(run)) {
     const analysisAvailable =
       !poolEndgamePending &&
       (isLocalSolo || !inviteCode || lobby == null || lobby.playerCount >= 2);

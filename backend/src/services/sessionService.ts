@@ -15,7 +15,7 @@ import {
 } from "../domain/playerIdentity.js";
 import { assertValidGameCount, instantiateRun, parseUseStrategyRules } from "./createRun.js";
 import { getRunById } from "./getRun.js";
-import { RUN_STATUS } from "../domain/fieldTypes.js";
+import { RUN_STATUS, isRunTerminal } from "../domain/fieldTypes.js";
 import { computeGameBreakdown } from "../domain/gameScoring.js";
 import { assertValidScoreForField } from "../domain/fieldScores.js";
 import { ForbiddenRunError } from "./runPlayerAuth.js";
@@ -294,14 +294,14 @@ export async function getSessionLobbyByInvite(inviteCode: string) {
       id: p.id,
       playerId: publicPlayerIdFromStoredName(p.name),
       orderIndex: p.orderIndex,
-      runFinished: p.run.status === RUN_STATUS.FINISHED,
+      runFinished: isRunTerminal(p.run.status),
       totalScore: p.run.totalScore,
       /** Pool nur offenlegen, wenn der Host es für die Partie erlaubt hat. */
       rollsInPool: session.showOpponentPool ? p.run.rollsInPool : null,
     })),
     allRunsFinished:
       session.players.length > 0 &&
-      session.players.every((p) => p.run.status === RUN_STATUS.FINISHED),
+      session.players.every((p) => isRunTerminal(p.run.status)),
     leagueStandings,
     /** Einladungs-Link (statischer Export: Query `?code=`). */
     joinPath: `/multi/join?code=${session.inviteCode}`,
@@ -407,7 +407,7 @@ export async function maybeFinishSessionForRun(runId: string) {
 
   const allDone =
     session.players.length > 0 &&
-    session.players.every((p) => p.run.status === RUN_STATUS.FINISHED);
+    session.players.every((p) => isRunTerminal(p.run.status));
 
   if (!allDone) return;
 
@@ -452,7 +452,7 @@ function assertSessionReadyForStatsFinalize(session: {
   if (session.players.length < 1) {
     throw new SessionNotReadyError("no_players");
   }
-  if (!session.players.every((p) => p.run.status === RUN_STATUS.FINISHED)) {
+  if (!session.players.every((p) => isRunTerminal(p.run.status))) {
     throw new SessionNotReadyError("runs_open");
   }
   if (

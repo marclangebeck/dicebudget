@@ -9,6 +9,11 @@ export function getLastScoredFieldId(run: RunDto): string | null {
   return null;
 }
 
+/** Run beendet (normal oder vorzeitig). */
+export function isRunEnded(run: RunDto): boolean {
+  return run.status === "FINISHED" || run.status === "ABANDONED";
+}
+
 export function runHasOpenFields(run: RunDto): boolean {
   return run.games.some((g) => g.fields.some((f) => f.score === null));
 }

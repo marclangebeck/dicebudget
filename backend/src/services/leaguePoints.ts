@@ -1,4 +1,4 @@
-import { RUN_STATUS } from "../domain/fieldTypes.js";
+import { isRunTerminal } from "../domain/fieldTypes.js";
 import { prisma } from "../db/prisma.js";
 import { publicPlayerIdFromStoredName } from "../domain/playerIdentity.js";
 
@@ -82,7 +82,7 @@ export async function awardSessionLeaguePoints(sessionId: string): Promise<void>
 
     const allDone =
       session.players.length >= 2 &&
-      session.players.every((p) => p.run.status === RUN_STATUS.FINISHED);
+      session.players.every((p) => isRunTerminal(p.run.status));
 
     if (!allDone) return;
 

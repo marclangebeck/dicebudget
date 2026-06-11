@@ -5,7 +5,7 @@
 **Basis:** Vollständige Projektanalyse (Backend, Frontend, Release)  
 **Branch:** `milestone-22-prep`  
 **Produktcode-HEAD:** `cce4996` (M23)  
-**Nächster Milestone:** **M26** (GO vom Nutzer ausstehend)  
+**Nächster Milestone:** **M27** (GO vom Nutzer ausstehend)  
 **Arbeitsweise:** Pro Milestone ein **GO** vom Nutzer, danach Umsetzung in Sprints, dann Abnahme.
 
 Dieses Dokument ergänzt `docs/milestones_active.md`. Nach Abschluss eines Milestones: Eintrag in `CHANGELOG.md`, Update `HANDOVER.md`, optional Archivierung hier.
@@ -19,8 +19,8 @@ Dieses Dokument ergänzt `docs/milestones_active.md`. Nach Abschluss eines Miles
 | **M23** | Sicherheit & API-Härtung | 3 | 1–2 Agent-Sessions | **Blocker App Store** — **abgenommen 2026-06-11** |
 | **M24** | UX-Blocker & Deploy-Verifikation | 3 | 1–2 Agent-Sessions | **Blocker App Store** — **abgenommen 2026-06-11** |
 | **M25** | Backend-Performance | 3 | 1–2 Agent-Sessions | Empfohlen vor Release — **abgenommen 2026-06-11** |
-| **M26** | Backend-Qualität & Tests | 3 | 2 Agent-Sessions | Empfohlen vor Release — **als Nächstes** |
-| **M27** | Frontend-Tests & Stabilität | 3 | 2 Agent-Sessions | Empfohlen vor Release |
+| **M26** | Backend-Qualität & Tests | 3 | 2 Agent-Sessions | Empfohlen vor Release — **abgenommen 2026-06-11** |
+| **M27** | Frontend-Tests & Stabilität | 3 | 2 Agent-Sessions | Empfohlen vor Release — **als Nächstes** |
 | **M28** | Frontend-Architektur & Bundle | 3 | 2–3 Agent-Sessions | Nach Release möglich |
 | **M29** | Technische Schulden & Security-Patch | 3 | 1–2 Agent-Sessions | Empfohlen vor Release |
 | **M30** | App Store Release (organisatorisch) | 3 | 1–2 Wochen (Nutzer + Apple) | **Release** |
@@ -186,6 +186,8 @@ Offen aus Nutzer-Diskussion (nicht Teil M24): Web-Zugang nach App-Store-Release 
 
 ## M25 — Backend-Performance
 
+**Status:** **abgenommen** 2026-06-11 · ein Query getRunById, createMany, DB-Aggregation, Pairing-Cache
+
 **Ziel:** Read/Write-Pfade und Aggregationen für wachsende Nutzung optimieren.
 
 ### Sprint 25.1 — getRunById & Backfill
@@ -214,17 +216,19 @@ Offen aus Nutzer-Diskussion (nicht Teil M24): Web-Zugang nach App-Store-Release 
 
 ### Abnahme M25
 
-- [ ] `getRunById` löst bei normalen Reads **keine** Schreiboperation aus
-- [ ] Run-Erstellung: gleiche Funktionalität, weniger DB-Roundtrips (Log/Timing dokumentiert)
-- [ ] `/stats` und `/stats/pairings` liefern identische Werte wie vorher
-- [ ] `npm test` grün
-- [ ] Nutzer: Backend-Deploy
+- [x] `getRunById` löst bei normalen Reads **keine** Schreiboperation aus
+- [x] Run-Erstellung: `createMany` pro Spiel (13 Felder → 1 Insert)
+- [x] `/stats` per `aggregate`/`groupBy`; `/stats/pairings` mit 60s-Cache
+- [x] `npm test` grün (68 Tests)
+- [ ] Nutzer: Backend-Deploy + `npx prisma migrate deploy` + optional `npm run db:backfill-scored-sequences`
 
-**Neuer Agent:** nach M25, vor M26.
+**Neuer Agent:** nach Nutzer-Deploy → M26.
 
 ---
 
 ## M26 — Backend-Qualität & Tests
+
+**Status:** **abgenommen** 2026-06-11 · OpenAPI, Supertest, sortFields, ABANDONED, player-names API
 
 **Ziel:** Wartbarkeit, API-Dokumentation, Testabdeckung erweitern.
 
@@ -256,12 +260,13 @@ Offen aus Nutzer-Diskussion (nicht Teil M24): Web-Zugang nach App-Store-Release 
 
 ### Abnahme M26
 
-- [ ] `npm test` inkl. Route-Tests grün
-- [ ] `openapi.yaml` deckt alle dokumentierten Endpunkte ab
-- [ ] Keine duplizierte `sortFields`-Implementierung
-- [ ] `playerNames` entweder API oder entfernt (kein toter Code)
+- [x] `npm test` inkl. Route-Tests grün (76 Tests)
+- [x] `openapi.yaml` deckt alle dokumentierten Endpunkte ab
+- [x] Keine duplizierte `sortFields`-Implementierung
+- [x] `playerNames` als API `/player-names/aliases` (GET/POST/DELETE)
+- [ ] Nutzer: Backend-Deploy
 
-**Neuer Agent:** nach M26, vor M27.
+**Neuer Agent:** nach Nutzer-Deploy → M27.
 
 ---
 

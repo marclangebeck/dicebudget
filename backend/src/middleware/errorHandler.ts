@@ -7,6 +7,7 @@ import {
   FieldNotScoredError,
   InvalidDiceError,
   InvalidInputError,
+  InvalidYatzyDieValueError,
   NotLastScoredFieldError,
   RollLimitError,
   RunNotActiveError,
@@ -81,6 +82,7 @@ export function errorHandler(
     err instanceof InvalidDiceError ||
     err instanceof InvalidInputError ||
     err instanceof InvalidFieldScoreError ||
+    err instanceof InvalidYatzyDieValueError ||
     err instanceof RollLimitError
   ) {
     res.status(400).json({ error: err.message });

@@ -1,0 +1,380 @@
+openapi: 3.0.3
+info:
+  title: DiceBudget API
+  version: 0.1.0
+  description: REST-API für DiceBudget (Kniffel Strategy Edition)
+servers:
+  - url: https://dicebudget.bottle-trade.de/api
+    description: Produktion
+  - url: http://127.0.0.1:3020
+    description: Lokal
+tags:
+  - name: health
+  - name: runs
+  - name: fields
+  - name: sessions
+  - name: stats
+  - name: player-names
+paths:
+  /health:
+    get:
+      tags: [health]
+      summary: Health-Check
+      responses:
+        "200":
+          description: OK
+  /runs:
+    post:
+      tags: [runs]
+      summary: Solo-Run anlegen
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [gameCount]
+              properties:
+                gameCount: { type: integer, minimum: 1, maximum: 6 }
+                useStrategyRules: { type: boolean, default: true }
+      responses:
+        "201": { description: Run erstellt (inkl. soloSecretToken) }
+        "400": { description: Ungültige gameCount }
+        "429": { description: Rate-Limit }
+  /runs/{runId}:
+    get:
+      tags: [runs]
+      summary: Run laden
+      parameters:
+        - $ref: "#/components/parameters/RunId"
+        - $ref: "#/components/parameters/PlayerSecret"
+      responses:
+        "200": { description: Run-DTO }
+        "403": { description: Fehlendes/ungültiges Spieler-Token }
+        "404": { description: Run nicht gefunden }
+  /runs/{runId}/finish:
+    post:
+      tags: [runs]
+      summary: Run abschließen (alle Felder bewertet)
+      parameters:
+        - $ref: "#/components/parameters/RunId"
+        - $ref: "#/components/parameters/PlayerSecret"
+      responses:
+        "200": { description: Run FINISHED }
+        "409": { description: Run nicht aktiv / unvollständig }
+  /runs/{runId}/abandon:
+    post:
+      tags: [runs]
+      summary: Run vorzeitig beenden
+      description: Setzt Status ABANDONED (offene Felder bleiben leer)
+      parameters:
+        - $ref: "#/components/parameters/RunId"
+        - $ref: "#/components/parameters/PlayerSecret"
+      responses:
+        "200": { description: Run ABANDONED }
+        "409": { description: Run nicht aktiv }
+  /runs/{runId}/extra-yatzy:
+    post:
+      tags: [runs]
+      summary: Zusatz Alle Fünfe (+100)
+      parameters:
+        - $ref: "#/components/parameters/RunId"
+        - $ref: "#/components/parameters/PlayerSecret"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [yatzyDieValue]
+              properties:
+                yatzyDieValue: { type: integer, minimum: 1, maximum: 6 }
+      responses:
+        "200": { description: Aktualisierter Run }
+  /runs/{runId}/match-analysis:
+    get:
+      tags: [runs]
+      summary: Solo-Spielanalyse
+      parameters:
+        - $ref: "#/components/parameters/RunId"
+        - $ref: "#/components/parameters/PlayerSecret"
+      responses:
+        "200": { description: Analyse-DTO }
+        "409": { description: Run noch nicht beendet }
+  /runs/{runId}/fields/{fieldId}/complete:
+    post:
+      tags: [fields]
+      summary: Feld bewerten oder korrigieren
+      parameters:
+        - $ref: "#/components/parameters/RunId"
+        - $ref: "#/components/parameters/FieldId"
+        - $ref: "#/components/parameters/PlayerSecret"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [score, rollsUsed]
+              properties:
+                score: { type: integer }
+                rollsUsed: { type: integer }
+                yatzyDieValue: { type: integer, minimum: 1, maximum: 6 }
+      responses:
+        "200": { description: Aktualisierter Run }
+        "400": { description: Ungültige Eingabe }
+  /runs/{runId}/fields/{fieldId}/clear:
+    post:
+      tags: [fields]
+      summary: Letzten Eintrag löschen
+      parameters:
+        - $ref: "#/components/parameters/RunId"
+        - $ref: "#/components/parameters/FieldId"
+        - $ref: "#/components/parameters/PlayerSecret"
+      responses:
+        "200": { description: Aktualisierter Run }
+        "409": { description: Nicht letztes Feld }
+  /runs/{runId}/fields/{fieldId}/rolls:
+    post:
+      tags: [fields]
+      summary: Würfelwurf protokollieren (optional)
+      parameters:
+        - $ref: "#/components/parameters/RunId"
+        - $ref: "#/components/parameters/FieldId"
+        - $ref: "#/components/parameters/PlayerSecret"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [diceValues]
+              properties:
+                diceValues:
+                  type: array
+                  items: { type: integer }
+      responses:
+        "200": { description: Aktualisierter Run }
+  /sessions:
+    post:
+      tags: [sessions]
+      summary: Multiplayer-Session anlegen
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [gameCount, maxPlayers]
+              properties:
+                gameCount: { type: integer }
+                maxPlayers: { type: integer }
+                useStrategyRules: { type: boolean }
+                showOpponentPool: { type: boolean }
+                poolEndgameEnabled: { type: boolean }
+                leagueCode: { type: string }
+      responses:
+        "201": { description: Session mit inviteCode }
+        "429": { description: Rate-Limit }
+  /sessions/invite/{inviteCode}:
+    get:
+      tags: [sessions]
+      summary: Lobby-Status
+      parameters:
+        - $ref: "#/components/parameters/InviteCode"
+      responses:
+        "200": { description: Session-Lobby }
+        "404": { description: Session nicht gefunden }
+  /sessions/invite/{inviteCode}/join:
+    post:
+      tags: [sessions]
+      summary: Session beitreten
+      parameters:
+        - $ref: "#/components/parameters/InviteCode"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [playerId]
+              properties:
+                playerId: { type: string, format: uuid }
+      responses:
+        "201": { description: Player + Run + playerSecret }
+        "409": { description: Duplikat / voll / beendet }
+  /sessions/invite/{inviteCode}/pool-endgame:
+    post:
+      tags: [sessions]
+      summary: Pool-Endspiel auflösen
+      parameters:
+        - $ref: "#/components/parameters/InviteCode"
+        - $ref: "#/components/parameters/PlayerSecret"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                keep: { type: boolean }
+                fieldId: { type: string }
+                score: { type: integer }
+      responses:
+        "200": { description: Aktualisierte Lobby }
+  /sessions/invite/{inviteCode}/finalize-stats:
+    post:
+      tags: [sessions]
+      summary: Statistik-Toggle speichern und Session abschließen
+      parameters:
+        - $ref: "#/components/parameters/InviteCode"
+        - $ref: "#/components/parameters/PlayerSecret"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                includeInPairingStats: { type: boolean, default: true }
+      responses:
+        "200": { description: Session abgeschlossen }
+  /sessions/invite/{inviteCode}/ranking:
+    get:
+      tags: [sessions]
+      summary: Runden-Ranking
+      parameters:
+        - $ref: "#/components/parameters/InviteCode"
+      responses:
+        "200": { description: Ranking }
+        "404": { description: Session nicht gefunden }
+  /sessions/invite/{inviteCode}/match-analysis:
+    get:
+      tags: [sessions]
+      summary: Multi-Spielanalyse
+      parameters:
+        - $ref: "#/components/parameters/InviteCode"
+        - name: viewerPlayerId
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: Session-Analyse }
+        "409": { description: Noch nicht bereit }
+  /stats:
+    get:
+      tags: [stats]
+      summary: Globale Statistik (abgeschlossene Runs)
+      responses:
+        "200": { description: StatsDto }
+  /stats/pairings:
+    get:
+      tags: [stats]
+      summary: Paarungs-Übersicht
+      responses:
+        "200": { description: PairingSummaryDto[] }
+  /stats/pairing:
+    get:
+      tags: [stats]
+      summary: Paarungs-Detail
+      parameters:
+        - name: key
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: PairingDetailDto }
+        "404": { description: Paarung nicht gefunden }
+  /stats/pairings/reset:
+    post:
+      tags: [stats]
+      summary: Paarungen zurücksetzen (Admin)
+      security:
+        - AdminKey: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [keys]
+              properties:
+                keys:
+                  type: array
+                  items: { type: string }
+      responses:
+        "200": { description: Gelöschte Sessions }
+        "401": { description: Admin-Key fehlt }
+  /stats/pairings/baseline:
+    post:
+      tags: [stats]
+      summary: Manuelle Paarungs-Baseline (Admin)
+      security:
+        - AdminKey: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [entries]
+              properties:
+                entries: { type: array, items: { type: object } }
+      responses:
+        "200": { description: Geschrieben/gelöscht }
+        "401": { description: Admin-Key fehlt }
+  /player-names/aliases:
+    get:
+      tags: [player-names]
+      summary: Namens-Aliase auflisten
+      responses:
+        "200": { description: Alias-Liste }
+    post:
+      tags: [player-names]
+      summary: Alias anlegen/aktualisieren (Admin)
+      security:
+        - AdminKey: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [aliasName, canonicalName]
+              properties:
+                aliasName: { type: string }
+                canonicalName: { type: string }
+      responses:
+        "201": { description: Alias gespeichert }
+  /player-names/aliases/{aliasName}:
+    delete:
+      tags: [player-names]
+      summary: Alias entfernen (Admin)
+      security:
+        - AdminKey: []
+      parameters:
+        - name: aliasName
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "204": { description: Gelöscht }
+        "404": { description: Alias nicht gefunden }
+components:
+  securitySchemes:
+    AdminKey:
+      type: apiKey
+      in: header
+      name: X-Admin-Key
+  parameters:
+    RunId:
+      name: runId
+      in: path
+      required: true
+      schema: { type: string }
+    FieldId:
+      name: fieldId
+      in: path
+      required: true
+      schema: { type: string }
+    InviteCode:
+      name: inviteCode
+      in: path
+      required: true
+      schema: { type: string }
+    PlayerSecret:
+      name: X-Player-Secret
+      in: header
+      required: false
+      schema: { type: string }
+      description: Multiplayer playerSecret oder Solo soloSecretToken

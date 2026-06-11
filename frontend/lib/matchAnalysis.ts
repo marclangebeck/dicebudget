@@ -134,7 +134,7 @@ function buildSoloInsights(metrics: PlayerRunMetricsDto): string[] {
 
 export function buildSoloMatchAnalysis(run: RunDto): MatchAnalysisDto {
   const viewer = analyzeRunDto(run);
-  const finished = run.status === "FINISHED";
+  const finished = run.status === "FINISHED" || run.status === "ABANDONED";
   return {
     mode: "solo",
     ready: finished,

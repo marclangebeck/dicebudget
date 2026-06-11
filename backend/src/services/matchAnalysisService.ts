@@ -1,6 +1,6 @@
 import { prisma } from "../db/prisma.js";
 import { computeGameBreakdown } from "../domain/gameScoring.js";
-import { FIELD_TYPES_PER_GAME } from "../domain/fieldTypes.js";
+import { isRunTerminal, sortFields } from "../domain/fieldTypes.js";
 import {
   buildMatchAnalysis,
   type AnalysisParticipant,
@@ -24,14 +24,6 @@ export class MatchAnalysisNotSupportedError extends Error {
     super(message);
     this.name = "MatchAnalysisNotSupportedError";
   }
-}
-
-function sortFields<T extends { fieldType: string }>(fields: T[]): T[] {
-  const order = new Map(FIELD_TYPES_PER_GAME.map((type, index) => [type, index]));
-  return [...fields].sort(
-    (a, b) => (order.get(a.fieldType as (typeof FIELD_TYPES_PER_GAME)[number]) ?? 0)
-      - (order.get(b.fieldType as (typeof FIELD_TYPES_PER_GAME)[number]) ?? 0),
-  );
 }
 
 function runDtoToAnalysisRun(run: NonNullable<Awaited<ReturnType<typeof getRunById>>>): AnalysisRun {
@@ -76,7 +68,7 @@ function assertSessionAnalysisReady(session: {
       "Analyse erst nach dem Pool-Endspiel verfügbar.",
     );
   }
-  const allFinished = session.players.every((p) => p.run.status === "FINISHED");
+  const allFinished = session.players.every((p) => isRunTerminal(p.run.status));
   if (!allFinished) {
     throw new MatchAnalysisNotReadyError(
       "Analyse erst verfügbar, wenn alle Spieler fertig sind.",
@@ -184,7 +176,7 @@ export async function getRunMatchAnalysisSolo(
     where: { id: runId },
     select: { status: true },
   });
-  if (!dbRun || dbRun.status !== "FINISHED") {
+  if (!dbRun || !isRunTerminal(dbRun.status)) {
     throw new MatchAnalysisNotReadyError("Analyse erst nach Run-Abschluss verfügbar.");
   }
 
