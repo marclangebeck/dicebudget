@@ -1,8 +1,8 @@
 # Aktive Milestones - dice.budget
 
-**Stand:** 2026-06-10  
+**Stand:** 2026-06-11  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `66e8487`  
+**Produktcode-HEAD:** `d8b5952`  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -18,13 +18,13 @@ Technische Basis ist erledigt:
 - Capacitor 7, iOS-Projekt und Bundle `de.bottletrade.dicebudget` sind vorhanden.
 - Native App startet direkt auf `/app`.
 - Native API-Basis zeigt auf `https://dicebudget.bottle-trade.de/api`.
-- TestFlight ist aktiv; **aktueller Build `2.0 (27)`** mit Produktcode **`66e8487`** (Arena ohne Mittel-Logo, Footer Glas-Morph, Card-Dashboards, …).
-- Historisch: **`2.0 (26)`** ohne `git pull`/`build:ios` wirkungslos (noch Code `f29cf7d`).
+- TestFlight ist aktiv; **aktueller Build `2.0 (28)`** mit Produktcode **`d8b5952`** (Cinematic Editorial Startscreen).
+- Zuvor: **`2.0 (27)`** mit `66e8487` (Arena Classic); **`2.0 (26)`** historisch wirkungslos.
 - iOS-UI kommt nur aus `npm run build:ios` auf dem Mac (`ios/App/App/public/` ist gitignored).
 
 Offen:
 
-- TestFlight-Regression: Startscreen-Arena, Footer/Menü/Glas, `/play`, Pool-Endspiel, Fortschritt, Code teilen.
+- TestFlight-Regression: Cinematic-Startscreen, Footer/Menü/Glas, `/play`, Pool-Endspiel, Fortschritt, Code teilen.
 - nginx Cache-Header reloaden (Safari-Cache-Thema).
 - Backend deployen (Coaching, `scoreProgression`, Migration `extra_yatzy_die_values`) — falls noch offen.
 - App Store Connect fuer kostenpflichtigen Release fertigstellen.
@@ -32,6 +32,16 @@ Offen:
 Details: `docs/ios_current.md`.
 
 ## Letzte Abgeschlossene Milestones
+
+### UX Startscreen Cinematic Editorial 2026-06-11
+
+**Status:** erledigt im Produktcode (`d8b5952`); Web/Server-Frontend gebaut; iOS TestFlight **`2.0 (28)`** (Upload 2026-06-11).
+
+- **Cinematic Editorial:** Gestapelte Poster-Kacheln Multi/Solo; große Modus-Typo; Mini-Chip; Würfel-Bühne rechts; integrierte Glas-CTA links.
+- **Bilanz:** Kompakter Chip oben, Stats aufklappbar (kein permanenter Hero).
+- **Rollback:** `HomeBentoGridClassic` per `NEXT_PUBLIC_HOME_LAYOUT=classic`, `set-home-layout.sh` oder `localStorage dicebudget.homeLayout`.
+
+Dateien: `HomeBentoGridCinematic.tsx`, `HomeBentoGridClassic.tsx`, `HomeBentoGrid.tsx`, `HomeHeroBanner.tsx`, `lib/homeLayout.ts`, `lib/useHomeHeroData.ts`, `globals.css`, `infra/scripts/set-home-layout.sh`
 
 ### UX Startscreen-Arena + Footer-Menü + Branding 2026-06-10
 

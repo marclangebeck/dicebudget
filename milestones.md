@@ -23,14 +23,14 @@ Nur bei Bedarf:
 ## Aktueller Kurzstand
 
 - Branch: `milestone-22-prep`
-- Produktcode-HEAD: `66e8487` (2026-06-10)
+- Produktcode-HEAD: `d8b5952` (2026-06-11)
 - Web/API live: https://dicebudget.bottle-trade.de
-- iOS: TestFlight `2.0 (27)` aktuell (Stand `66e8487`); `2.0 (26)` historisch wirkungslos
-- Letzte Features: Arena ohne Mittel-Logo, Footer Glas-Morph, Card-Dashboards, Code nur teilen, Vollbild-Erfolge, DiceBudget-Branding, nginx Cache.
+- iOS: TestFlight `2.0 (28)` aktuell (Stand `d8b5952`); zuvor `2.0 (27)` mit `66e8487`
+- Letzte Features: Cinematic Editorial Startscreen, Classic-Rollback, Footer Glas-Morph, Card-Dashboards, Code nur teilen.
 
 ## Offene Prioritaeten
 
-1. TestFlight-Regression (Arena-Startscreen, Footer/Menü/Glas).
+1. TestFlight-Regression (Cinematic-Startscreen, Footer/Menü/Glas).
 2. Backend deployen; nginx reload (Cache-Header).
 3. App Store Connect: Paid Agreement, Bank/Steuer, Preis `1,19 EUR`.
 4. Optional: Stats-Reset-/Baseline-Endpunkte absichern.
