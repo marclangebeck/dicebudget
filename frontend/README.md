@@ -35,7 +35,18 @@ npm run icons   # aus public/logo-source.png
 | Pfad | Shell | Inhalt |
 |------|-------|--------|
 | `/` | `landing-shell` | `MarketingLanding` |
-| `/app` | `HomeScreenShell` | `HomeBentoGrid`, Legal-Footer, Intro-Splash |
+| `/app` | `HomeScreenShell` | `HomeBentoGrid` (cinematic/classic), Legal-Footer, Intro-Splash |
+
+### Startscreen-Layout
+
+| Modus | Komponente | Umschalten |
+|-------|------------|------------|
+| `cinematic` (Standard) | `HomeBentoGridCinematic` | gestapelte Multi/Solo-Türen |
+| `classic` | `HomeBentoGridClassic` | zwei Arena-Kacheln + Hero |
+
+- **Production:** `NEXT_PUBLIC_HOME_LAYOUT=cinematic|classic` in `.env.production`, danach `npm run build`
+- **Ein Befehl:** `bash infra/scripts/set-home-layout.sh classic` (oder `cinematic`)
+- **Sofort im Browser (ohne Rebuild):** `localStorage.setItem('dicebudget.homeLayout','classic'); location.reload();` — Override entfernen: `localStorage.removeItem('dicebudget.homeLayout'); location.reload();`
 | `/datenschutz` | `LegalScrollShell` | Datenschutzerklärung |
 | `/impressum` | `LegalScrollShell` | Impressum |
 | `/solo` | `SetupScreenLayout` | `GameSetup`, `AppScreenHeader` |

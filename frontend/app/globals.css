@@ -848,6 +848,342 @@ html.legal-route body {
   padding: 0.35rem 0.3rem;
 }
 
+/* —— Startscreen Cinematic Doors —— */
+.home-cinematic {
+  gap: 0.45rem;
+}
+
+.home-cinematic-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.42rem;
+}
+
+.home-cinematic-kicker {
+  margin: 0;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: rgba(203, 213, 225, 0.78);
+}
+
+.home-cinematic-stats-toggle {
+  display: inline-flex;
+  width: 100%;
+  max-width: 20rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background:
+    radial-gradient(circle at 12% 50%, rgba(124, 183, 174, 0.16), transparent 42%),
+    rgba(15, 23, 42, 0.55);
+  padding: 0.42rem 0.72rem;
+  color: rgba(226, 232, 240, 0.92);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.2;
+  backdrop-filter: blur(14px);
+  box-shadow:
+    0 10px 24px -18px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+}
+
+.home-cinematic-stats-toggle strong {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.home-cinematic-stats-toggle-chevron {
+  flex-shrink: 0;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-right: 2px solid rgba(226, 232, 240, 0.85);
+  border-bottom: 2px solid rgba(226, 232, 240, 0.85);
+  transform: rotate(45deg) translateY(-0.12rem);
+  transition: transform 0.28s ease;
+}
+
+.home-cinematic-stats-toggle.is-open .home-cinematic-stats-toggle-chevron {
+  transform: rotate(-135deg) translateY(0.08rem);
+}
+
+.home-cinematic-stats-panel {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    max-height 0.38s ease,
+    opacity 0.28s ease;
+}
+
+.home-cinematic-stats-panel.is-open {
+  max-height: 28rem;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.home-cinematic-stats-panel .home-hero-banner {
+  margin-bottom: 0.15rem;
+}
+
+.home-hero-banner--compact .home-hero-brand-icon {
+  width: 2.85rem;
+  height: 2.85rem;
+}
+
+.home-hero-banner--compact .home-hero-title {
+  font-size: 1.05rem;
+}
+
+.home-cinematic-doors {
+  display: grid;
+  min-height: 0;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.55rem;
+  padding: 0.12rem 0.05rem 0.05rem;
+}
+
+.home-cinematic-door {
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  opacity: 0;
+  transform: translateY(10%) scale(0.97);
+  transition:
+    transform 0.58s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.48s ease,
+    box-shadow 0.24s ease;
+  transition-delay: var(--home-cinematic-enter-delay, 0ms);
+  box-shadow:
+    0 28px 52px -22px rgba(0, 0, 0, 0.88),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+.home-cinematic-door--solo {
+  z-index: 0;
+}
+
+.home-cinematic-door--editorial.home-bento-tile--arena {
+  padding: 0;
+}
+
+.home-cinematic-door--editorial .home-cinematic-door-scene {
+  opacity: 1;
+}
+
+.home-cinematic-door--multi.home-cinematic-door--editorial .home-cinematic-door-scene {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(56, 189, 248, 0.55), transparent 46%),
+    radial-gradient(circle at 92% 88%, rgba(214, 168, 90, 0.42), transparent 48%),
+    linear-gradient(155deg, #0c1a2e 0%, #12324a 42%, #1a2332 100%);
+}
+
+.home-cinematic-door--solo.home-cinematic-door--editorial .home-cinematic-door-scene {
+  background:
+    radial-gradient(circle at 14% 16%, rgba(45, 212, 191, 0.5), transparent 44%),
+    radial-gradient(circle at 90% 86%, rgba(16, 185, 129, 0.38), transparent 46%),
+    linear-gradient(155deg, #071f22 0%, #0f3438 44%, #111827 100%);
+}
+
+.home-cinematic-door-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(118deg, rgba(2, 6, 23, 0.62) 0%, rgba(2, 6, 23, 0.18) 42%, transparent 68%);
+}
+
+.home-cinematic-door-poster {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  gap: 0.28rem;
+  padding: 0.82rem 0.78rem 0.72rem;
+}
+
+.home-cinematic--entered .home-cinematic-door {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.home-cinematic-door:active {
+  transform: scale(0.985);
+}
+
+.home-cinematic--entered .home-cinematic-door:active {
+  transform: scale(0.985);
+}
+
+.home-cinematic-door-copy {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  max-width: 62%;
+  flex-direction: column;
+  gap: 0.38rem;
+}
+
+.home-cinematic-door-chip {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.22rem 0.52rem;
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+}
+
+.home-cinematic-door--multi .home-cinematic-door-chip {
+  border-color: rgba(125, 211, 252, 0.35);
+  color: #bae6fd;
+}
+
+.home-cinematic-door--solo .home-cinematic-door-chip {
+  border-color: rgba(110, 231, 183, 0.35);
+  color: #a7f3d0;
+}
+
+.home-cinematic-door-label {
+  font-size: clamp(1.85rem, 7.5vw, 2.35rem);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+
+.home-cinematic-door--multi .home-cinematic-door-label {
+  color: #f0f9ff;
+  text-shadow:
+    0 0 28px rgba(56, 189, 248, 0.45),
+    0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+.home-cinematic-door--solo .home-cinematic-door-label {
+  color: #ecfdf5;
+  text-shadow:
+    0 0 28px rgba(52, 211, 153, 0.4),
+    0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+.home-cinematic-door-tagline {
+  margin: 0;
+  max-width: 11.5rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.38;
+  color: rgba(241, 245, 249, 0.88);
+}
+
+.home-cinematic-door-stage {
+  position: relative;
+  z-index: 1;
+  min-height: 4.25rem;
+  flex: 1 1 0;
+  overflow: hidden;
+  margin-bottom: 0.15rem;
+}
+
+.home-cinematic-door-hero {
+  position: absolute;
+  top: 0;
+  right: -8%;
+  bottom: 0;
+  display: flex;
+  width: min(74%, 12.5rem);
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.home-cinematic-door-hero .home-bento-icon-glow {
+  width: 88%;
+  height: 72%;
+  opacity: 0.9;
+}
+
+.home-cinematic-door-hero .home-bento-icon-ring {
+  width: min(92%, 10.5rem);
+}
+
+.home-cinematic-door-hero .home-bento-motif {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 118%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+  transform: rotate(-7deg);
+  animation: home-motif-float 4.5s ease-in-out infinite;
+  filter: drop-shadow(0 28px 36px rgba(0, 0, 0, 0.52));
+}
+
+.home-cinematic-door--multi .home-cinematic-door-hero .home-bento-motif {
+  animation-delay: 0.15s;
+}
+
+.home-cinematic-door--solo .home-cinematic-door-hero .home-bento-motif {
+  animation-delay: 0.75s;
+}
+
+.home-cinematic-door-cta {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: min(58%, 11.25rem);
+  min-height: 2.15rem;
+  margin-top: auto;
+  border-radius: 0.75rem;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  line-height: 1;
+  text-transform: uppercase;
+  backdrop-filter: blur(12px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 10px 22px -14px rgba(0, 0, 0, 0.72);
+}
+
+.home-cinematic-door--multi .home-cinematic-door-cta {
+  border: 1px solid rgba(125, 211, 252, 0.28);
+  background:
+    linear-gradient(135deg, rgba(56, 189, 248, 0.18) 0%, rgba(214, 168, 90, 0.26) 100%),
+    rgba(255, 255, 255, 0.06);
+  color: #fde68a;
+}
+
+.home-cinematic-door--solo .home-cinematic-door-cta {
+  border: 1px solid rgba(110, 231, 183, 0.28);
+  background:
+    linear-gradient(135deg, rgba(45, 212, 191, 0.18) 0%, rgba(16, 185, 129, 0.26) 100%),
+    rgba(255, 255, 255, 0.06);
+  color: #ecfdf5;
+}
+
 .home-arena-pane {
   position: relative;
   z-index: 1;
@@ -2169,6 +2505,49 @@ html.legal-route body {
     width: 4.1rem;
     max-height: 2.15rem;
   }
+
+  .home-cinematic-doors {
+    gap: 0.38rem;
+  }
+
+  .home-cinematic-door-poster {
+    padding: 0.62rem 0.58rem 0.58rem;
+  }
+
+  .home-cinematic-door-copy {
+    max-width: 58%;
+    gap: 0.28rem;
+  }
+
+  .home-cinematic-door-label {
+    font-size: 1.62rem;
+    letter-spacing: 0.1em;
+  }
+
+  .home-cinematic-door-tagline {
+    font-size: 0.56rem;
+    max-width: 9.5rem;
+  }
+
+  .home-cinematic-door-stage {
+    min-height: 3.85rem;
+  }
+
+  .home-cinematic-door-hero {
+    right: -10%;
+    width: min(76%, 10rem);
+  }
+
+  .home-cinematic-door-cta {
+    width: min(56%, 10rem);
+    min-height: 1.95rem;
+    font-size: 0.58rem;
+  }
+
+  .home-cinematic-stats-toggle {
+    font-size: 0.62rem;
+    padding: 0.36rem 0.62rem;
+  }
 }
 
 .setup-screen-body {
@@ -3460,8 +3839,23 @@ html.legal-route body {
   .home-bento-tile--arena .home-bento-scene,
   .home-bento-tile--arena .home-bento-motif,
   .home-bento-tile--arena .home-bento-icon-ring,
-  .home-arena-pane-hero .home-bento-motif {
+  .home-arena-pane-hero .home-bento-motif,
+  .home-cinematic-door-hero .home-bento-motif {
     animation: none;
+  }
+
+  .home-cinematic-door,
+  .home-cinematic-door-hero .home-bento-motif {
+    transform: none;
+  }
+
+  .home-cinematic-door {
+    opacity: 1;
+    transition: none;
+  }
+
+  .home-cinematic-stats-panel {
+    transition: none;
   }
 
   .bonus-confetti,

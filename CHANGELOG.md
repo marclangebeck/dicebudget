@@ -5,6 +5,9 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
+- **Startscreen Cinematic Doors:** Multi und Solo als gestapelte Einstiegstore (Vorschlag 3) — Bilanz/Stats per Glas-Chip aufklappbar; Entrance-Animation; klassisches Arena-Layout bleibt als `HomeBentoGridClassic` per `NEXT_PUBLIC_HOME_LAYOUT=classic` oder `bash infra/scripts/set-home-layout.sh classic` wiederherstellbar; Browser-Override: `localStorage dicebudget.homeLayout`
+- **Startscreen Editorial Portal:** Cinematic-Kacheln als Vollflächen-Poster — große Modus-Typo, ein Mini-Chip, Würfel-Hero mit Rand-Überhang, Glas-CTA („Lobby öffnen“ / „Run starten“)
+- **Startscreen Editorial:** CTA links unter der Copy integriert (Glas-Pill in Kartenfarben, ohne separaten Dock-Streifen); Würfel-Bühne bleibt rechts getrennt
 - **Doku:** TestFlight `2.0 (27)` als aktueller Stand (Upload erledigt); offene Prioritäten ohne erneuten iOS-Build; Referenz-Workflow für künftige Uploads
 - **Doku:** HANDOVER, `docs/milestones_active.md`, `docs/ios_current.md`, `milestones.md`, `GOiOS.md` — Stand `66e8487`, iOS-Workflow mit `build:ios`-Pflicht, TestFlight `2.0 (27)`, Hinweis zu wirkungslosem Upload `2.0 (26)`
 - **Footer-Menü:** Dezenterer Hamburger-Trigger; Menü-Panel mit stärkerem Glas-Look (Blur, halbtransparent, weichere Typo)
