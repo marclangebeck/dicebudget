@@ -251,8 +251,10 @@ paths:
           in: query
           required: true
           schema: { type: string }
+        - $ref: "#/components/parameters/PlayerSecret"
       responses:
         "200": { description: Session-Analyse }
+        "403": { description: Kein Zugriff (Secret fehlt/ungültig) }
         "409": { description: Noch nicht bereit }
   /stats:
     get:

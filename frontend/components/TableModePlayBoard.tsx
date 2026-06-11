@@ -360,7 +360,11 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     setAnalysisLoading(true);
     setError(null);
     try {
-      const { analysis } = await getSessionMatchAnalysis(inviteCode, players[0].playerId);
+      const { analysis } = await getSessionMatchAnalysis(
+        inviteCode,
+        players[0].playerId,
+        players[0].playerSecret,
+      );
       setMatchAnalysis(analysis);
       setShowMatchAnalysis(true);
     } catch (e) {

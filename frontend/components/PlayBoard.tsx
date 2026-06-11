@@ -314,6 +314,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         const { analysis } = await getSessionMatchAnalysis(
           inviteCode,
           getOrCreatePlayerId(),
+          playerSecret,
         );
         setMatchAnalysis(analysis);
         setShowMatchAnalysis(true);

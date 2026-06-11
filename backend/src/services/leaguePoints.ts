@@ -130,3 +130,61 @@ export async function awardSessionLeaguePoints(sessionId: string): Promise<void>
     });
   });
 }
+
+/**
+ * Setzt Ligapunkte einer Liga aus allen verbleibenden Sessions mit `pointsAwarded`
+ * neu auf. Wird nach Stats-Reset aufgerufen, damit gelöschte Runden nicht mehr
+ * in der Serienwertung erscheinen (M29).
+ */
+export async function rebuildLeagueStandings(leagueId: string): Promise<void> {
+  await prisma.$transaction(async (tx) => {
+    await tx.leagueStanding.deleteMany({ where: { leagueId } });
+
+    const sessions = await tx.gameSession.findMany({
+      where: { leagueId, pointsAwarded: true },
+      include: {
+        players: {
+          orderBy: { orderIndex: "asc" },
+          include: { run: { select: { status: true, totalScore: true } } },
+        },
+      },
+    });
+
+    const totals = new Map<string, { winPoints: number; bonusPoints: number }>();
+
+    for (const session of sessions) {
+      const allDone =
+        session.players.length >= 2 &&
+        session.players.every((p) => isRunTerminal(p.run.status));
+      if (!allDone) continue;
+
+      const awards = computeRoundPoints(
+        session.players.map((p) => ({
+          name: p.name,
+          totalScore: p.run.totalScore,
+          orderIndex: p.orderIndex,
+        })),
+      );
+
+      for (const award of awards) {
+        const prev = totals.get(award.playerName) ?? { winPoints: 0, bonusPoints: 0 };
+        totals.set(award.playerName, {
+          winPoints: prev.winPoints + award.winPoints,
+          bonusPoints: prev.bonusPoints + award.bonusPoints,
+        });
+      }
+    }
+
+    for (const [playerName, points] of totals) {
+      if (points.winPoints === 0 && points.bonusPoints === 0) continue;
+      await tx.leagueStanding.create({
+        data: {
+          leagueId,
+          playerName,
+          winPoints: points.winPoints,
+          bonusPoints: points.bonusPoints,
+        },
+      });
+    }
+  });
+}

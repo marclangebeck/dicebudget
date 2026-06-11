@@ -1,5 +1,6 @@
 import { prisma } from "../db/prisma.js";
 import { publicPlayerIdFromStoredName } from "../domain/playerIdentity.js";
+import { rebuildLeagueStandings } from "./leaguePoints.js";
 
 export type PairingRoundDto = {
   inviteCode: string;
@@ -372,9 +373,11 @@ export function sessionResetAction(
  */
 export async function resetPairings(
   keys: string[],
-): Promise<{ deletedSessions: number; skippedMultiPlayer: number }> {
+): Promise<{ deletedSessions: number; skippedMultiPlayer: number; leaguesRebuilt: number }> {
   const targetKeys = normalizePairingKeys(keys);
-  if (targetKeys.size === 0) return { deletedSessions: 0, skippedMultiPlayer: 0 };
+  if (targetKeys.size === 0) {
+    return { deletedSessions: 0, skippedMultiPlayer: 0, leaguesRebuilt: 0 };
+  }
 
   invalidatePairingStatsCache();
 
@@ -390,6 +393,7 @@ export async function resetPairings(
 
   let deletedSessions = 0;
   let skippedMultiPlayer = 0;
+  const affectedLeagueIds = new Set<string>();
 
   for (const session of sessions) {
     const publicIds = session.players.map((p) =>
@@ -402,6 +406,7 @@ export async function resetPairings(
     }
     if (action !== "delete") continue;
 
+    affectedLeagueIds.add(session.leagueId);
     const runIds = session.players.map((p) => p.run.id);
     await prisma.$transaction(async (tx) => {
       await tx.gameSession.delete({ where: { id: session.id } });
@@ -412,7 +417,11 @@ export async function resetPairings(
     deletedSessions += 1;
   }
 
-  return { deletedSessions, skippedMultiPlayer };
+  for (const leagueId of affectedLeagueIds) {
+    await rebuildLeagueStandings(leagueId);
+  }
+
+  return { deletedSessions, skippedMultiPlayer, leaguesRebuilt: affectedLeagueIds.size };
 }
 
 export type PairingBaselineInput = {

@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { MatchAnalysisView } from "@/components/MatchAnalysisView";
 import { getSessionMatchAnalysis } from "@/lib/api";
+import { loadActiveGame } from "@/lib/activeGame";
 import { loadPlayerAliases } from "@/lib/playerAliases";
 import type { SessionMatchAnalysisDto } from "@/lib/matchAnalysisTypes";
 import { getOrCreatePlayerId } from "@/lib/playerIdentity";
@@ -36,9 +37,14 @@ function MatchAnalysisInner() {
     }
 
     const viewerId = perspectiveParam || getOrCreatePlayerId();
+    const stored = loadActiveGame();
+    const playerSecret =
+      stored?.type === "multi" && stored.inviteCode.toUpperCase() === invite
+        ? stored.playerSecret
+        : undefined;
     setLoading(true);
     setError(null);
-    void getSessionMatchAnalysis(invite, viewerId)
+    void getSessionMatchAnalysis(invite, viewerId, playerSecret)
       .then(({ analysis: data }) => setAnalysis(data))
       .catch((e) =>
         setError(e instanceof Error ? e.message : "Analyse konnte nicht geladen werden."),

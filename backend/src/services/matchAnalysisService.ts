@@ -87,9 +87,37 @@ export type SessionMatchAnalysisResponse = MatchAnalysisResult & {
   opponentName: string | null;
 };
 
+export class MatchAnalysisForbiddenError extends Error {
+  constructor(message = "Kein Zugriff auf diese Spielanalyse") {
+    super(message);
+    this.name = "MatchAnalysisForbiddenError";
+  }
+}
+
+function assertSessionMatchAnalysisAccess(
+  session: { status: string },
+  viewerPlayer: { secretToken: string },
+  playerSecret: string | undefined,
+): void {
+  const secret = playerSecret?.trim();
+  if (secret) {
+    if (secret !== viewerPlayer.secretToken) {
+      throw new MatchAnalysisForbiddenError();
+    }
+    return;
+  }
+
+  if (session.status !== "FINISHED") {
+    throw new MatchAnalysisForbiddenError(
+      "Spielanalyse nur mit Spieler-Geheimnis oder nach Abschluss der Session.",
+    );
+  }
+}
+
 export async function getSessionMatchAnalysis(
   inviteCode: string,
   viewerPlayerId: string,
+  playerSecret?: string,
 ): Promise<SessionMatchAnalysisResponse> {
   const session = await prisma.gameSession.findUnique({
     where: { inviteCode: inviteCode.toUpperCase() },
@@ -116,6 +144,8 @@ export async function getSessionMatchAnalysis(
   if (!viewerPlayer) {
     throw new MatchAnalysisNotSupportedError("Spieler gehört nicht zu dieser Session.");
   }
+
+  assertSessionMatchAnalysisAccess(session, viewerPlayer, playerSecret);
 
   if (session.players.length < 2) {
     throw new MatchAnalysisNotSupportedError(

@@ -81,7 +81,8 @@ export default function StatsPage() {
     const confirmed = window.confirm(
       `Folgende Paarungen wirklich endgültig zurücksetzen?\n\n${labels}\n\n` +
         "Die zugehörigen abgeschlossenen 2-Spieler-Runden werden serverseitig gelöscht " +
-        "und betreffen alle Geräte. Das kann nicht rückgängig gemacht werden.",
+        "und betreffen alle Geräte. Ligapunkte in betroffenen Serien werden neu berechnet. " +
+        "Das kann nicht rückgängig gemacht werden.",
     );
     if (!confirmed) return;
 
@@ -92,6 +93,9 @@ export default function StatsPage() {
     try {
       const result = await resetPairings(sourceKeys);
       let notice = `${result.deletedSessions} Runde(n) zurückgesetzt.`;
+      if (result.leaguesRebuilt > 0) {
+        notice += ` Ligapunkte in ${result.leaguesRebuilt} Serie(n) neu berechnet.`;
+      }
       if (result.skippedMultiPlayer > 0) {
         notice += ` ${result.skippedMultiPlayer} Mehr-Spieler-Runde(n) wurden zum Schutz anderer Paarungen nicht gelöscht.`;
       }

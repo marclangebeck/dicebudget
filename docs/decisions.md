@@ -82,6 +82,7 @@ npm run build
 - `POST /stats/pairings/reset` und `POST /stats/pairings/baseline` erfordern seit M23 den Header `X-Admin-Key` (Backend `ADMIN_API_KEY`, Frontend `NEXT_PUBLIC_ADMIN_API_KEY`). Ohne konfigurierten Key antworten die Endpunkte mit **503**.
 - API-erstellte Singleplayer-Runs (`POST /runs`) erhalten `soloSecretToken`; Schreibzugriffe brauchen `X-Player-Secret`. Legacy-Runs ohne Token bleiben offen.
 - Rate-Limit: max. 30 Requests/min/IP auf `POST /runs`, `POST /sessions`, `POST .../join`.
-- `LeagueStanding` wird nach Stats-Reset nicht rueckwirkend neu berechnet.
+- `LeagueStanding` wird nach Stats-Reset aus verbleibenden Sessions neu berechnet (M29, `rebuildLeagueStandings`).
+- `GET /sessions/invite/:code/match-analysis`: ohne `X-Player-Secret` nur bei Session-Status `FINISHED`; mit gültigem Secret des Viewers jederzeit (sofern Analyse bereit). Historie unter `/stats/match-analysis` nutzt FINISHED-Fallback.
 - Server validiert erlaubte Score-Werte je Feldtyp, aber nicht die physische Wuerfelrealitaet.
 - `playerSecret` liegt im Client-Kontext; Geraetewechsel erfordert erneuten Join.

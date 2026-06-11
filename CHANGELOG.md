@@ -5,6 +5,14 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **M29 Stats-Reset:** Nach `resetPairings` werden Ligapunkte betroffener Serien via `rebuildLeagueStandings` neu berechnet; UI-Hinweis in Statistik
+- **M29 Match-Analyse:** `GET .../match-analysis` erfordert `X-Player-Secret` des Viewers oder Session-Status `FINISHED`; Frontend sendet Secret aus aktivem Spiel
+
+### Security
+- **M29 Dependencies:** Next.js 15.5.19 (Security-Patches, kritische Advisories behoben); Backend `npm audit fix` (transitive `qs`, 0 Findings)
+- **Bekannt:** Frontend transitive `postcss` moderate (via Next.js) — kein sicherer Fix ohne Next-Major; statischer Export, kein Server-Rendering
+
+### Added
 - **M27 Frontend-Tests:** Playwright Smoke-Tests (`e2e/`, `npm run test:e2e`) — Solo, Multi-Join, Home `/app`
 - **M27 Stabilität:** `AppErrorBoundary` für `/app`, `/play`, `/stats` mit Fallback zur Startseite
 - **M27 Unit-Tests:** Node test runner für `gameScoring`, `pairingMerge`, `localSoloRun` (`npm run test`)

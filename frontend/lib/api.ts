@@ -164,13 +164,14 @@ export async function getPairingSummaries() {
 }
 
 export function resetPairings(keys: string[]) {
-  return request<{ deletedSessions: number; skippedMultiPlayer: number }>(
-    "/stats/pairings/reset",
-    {
-      method: "POST",
-      body: JSON.stringify({ keys }),
-    },
-  );
+  return request<{
+    deletedSessions: number;
+    skippedMultiPlayer: number;
+    leaguesRebuilt: number;
+  }>("/stats/pairings/reset", {
+    method: "POST",
+    body: JSON.stringify({ keys }),
+  });
 }
 
 export type PairingBaselineEntry = {
@@ -255,9 +256,14 @@ export function getSessionRanking(inviteCode: string) {
   );
 }
 
-export function getSessionMatchAnalysis(inviteCode: string, viewerPlayerId: string) {
+export function getSessionMatchAnalysis(
+  inviteCode: string,
+  viewerPlayerId: string,
+  playerSecret?: string,
+) {
   return request<{ analysis: SessionMatchAnalysisDto }>(
     `/sessions/invite/${encodeURIComponent(inviteCode)}/match-analysis?viewerPlayerId=${encodeURIComponent(viewerPlayerId)}`,
+    { playerSecret },
   );
 }
 

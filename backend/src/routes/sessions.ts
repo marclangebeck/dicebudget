@@ -3,6 +3,7 @@ import {
   createSessionLimiter,
   joinSessionLimiter,
 } from "../middleware/rateLimits.js";
+import { readPlayerSecret } from "./readPlayerSecret.js";
 import { getSessionMatchAnalysis } from "../services/matchAnalysisService.js";
 import {
   createGameSession,
@@ -12,7 +13,6 @@ import {
   joinSession,
   resolvePoolEndgame,
 } from "../services/sessionService.js";
-import { readPlayerSecret } from "./readPlayerSecret.js";
 
 export const sessionsRouter = Router();
 
@@ -134,6 +134,7 @@ sessionsRouter.get("/invite/:inviteCode/match-analysis", async (req, res, next) 
     const analysis = await getSessionMatchAnalysis(
       req.params.inviteCode,
       viewerPlayerId,
+      readPlayerSecret(req),
     );
     res.json({ analysis });
   } catch (error) {

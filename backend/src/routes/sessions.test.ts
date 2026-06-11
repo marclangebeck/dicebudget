@@ -84,4 +84,51 @@ describe("sessions routes", () => {
       await cleanupSession(inviteCode);
     }
   });
+
+  it("GET match-analysis returns 403 without player secret on open session", async () => {
+    const app = createTestApp();
+    const created = await request(app)
+      .post("/sessions")
+      .send({ gameCount: 1, maxPlayers: 2, useStrategyRules: false });
+    const inviteCode = created.body.session.inviteCode as string;
+    try {
+      await request(app)
+        .post(`/sessions/invite/${inviteCode}/join`)
+        .send({ playerId: PLAYER_A });
+      await request(app)
+        .post(`/sessions/invite/${inviteCode}/join`)
+        .send({ playerId: PLAYER_B });
+
+      const res = await request(app).get(
+        `/sessions/invite/${inviteCode}/match-analysis?viewerPlayerId=${PLAYER_A}`,
+      );
+      assert.equal(res.status, 403);
+    } finally {
+      await cleanupSession(inviteCode);
+    }
+  });
+
+  it("GET match-analysis accepts valid secret before session is finished", async () => {
+    const app = createTestApp();
+    const created = await request(app)
+      .post("/sessions")
+      .send({ gameCount: 1, maxPlayers: 2, useStrategyRules: false });
+    const inviteCode = created.body.session.inviteCode as string;
+    try {
+      const joined = await request(app)
+        .post(`/sessions/invite/${inviteCode}/join`)
+        .send({ playerId: PLAYER_A });
+      const secret = joined.body.player.secretToken as string;
+      await request(app)
+        .post(`/sessions/invite/${inviteCode}/join`)
+        .send({ playerId: PLAYER_B });
+
+      const res = await request(app)
+        .get(`/sessions/invite/${inviteCode}/match-analysis?viewerPlayerId=${PLAYER_A}`)
+        .set("X-Player-Secret", secret);
+      assert.equal(res.status, 409);
+    } finally {
+      await cleanupSession(inviteCode);
+    }
+  });
 });

@@ -16,6 +16,7 @@ import {
 } from "../services/playField.js";
 import { ForbiddenRunError } from "../services/runPlayerAuth.js";
 import {
+  MatchAnalysisForbiddenError,
   MatchAnalysisNotReadyError,
   MatchAnalysisNotSupportedError,
 } from "../services/matchAnalysisService.js";
@@ -64,6 +65,10 @@ export function errorHandler(
   }
   if (err instanceof MatchAnalysisNotSupportedError) {
     res.status(400).json({ error: err.message });
+    return;
+  }
+  if (err instanceof MatchAnalysisForbiddenError) {
+    res.status(403).json({ error: err.message });
     return;
   }
   if (err instanceof LeagueNotFoundError) {
