@@ -1,8 +1,11 @@
 # Milestone-Roadmap — Umsetzung Projektanalyse
 
 **Erstellt:** 2026-06-11  
+**Aktualisiert:** 2026-06-11 (M23 abgenommen)  
 **Basis:** Vollständige Projektanalyse (Backend, Frontend, Release)  
-**Branch:** `milestone-22-prep` (danach je Milestone eigener Branch oder weiter auf `milestone-22-prep`)  
+**Branch:** `milestone-22-prep`  
+**Produktcode-HEAD:** `cce4996` (M23)  
+**Nächster Milestone:** **M25** (GO vom Nutzer ausstehend)  
 **Arbeitsweise:** Pro Milestone ein **GO** vom Nutzer, danach Umsetzung in Sprints, dann Abnahme.
 
 Dieses Dokument ergänzt `docs/milestones_active.md`. Nach Abschluss eines Milestones: Eintrag in `CHANGELOG.md`, Update `HANDOVER.md`, optional Archivierung hier.
@@ -13,9 +16,9 @@ Dieses Dokument ergänzt `docs/milestones_active.md`. Nach Abschluss eines Miles
 
 | Milestone | Titel | Sprints | Geschätzte Dauer | Release-Relevanz |
 |-----------|-------|---------|------------------|------------------|
-| **M23** | Sicherheit & API-Härtung | 3 | 1–2 Agent-Sessions | **Blocker App Store** |
-| **M24** | UX-Blocker & Deploy-Verifikation | 3 | 1–2 Agent-Sessions | **Blocker App Store** |
-| **M25** | Backend-Performance | 3 | 1–2 Agent-Sessions | Empfohlen vor Release |
+| **M23** | Sicherheit & API-Härtung | 3 | 1–2 Agent-Sessions | **Blocker App Store** — **abgenommen 2026-06-11** |
+| **M24** | UX-Blocker & Deploy-Verifikation | 3 | 1–2 Agent-Sessions | **Blocker App Store** — **abgenommen 2026-06-11** |
+| **M25** | Backend-Performance | 3 | 1–2 Agent-Sessions | Empfohlen vor Release — **als Nächstes** |
 | **M26** | Backend-Qualität & Tests | 3 | 2 Agent-Sessions | Empfohlen vor Release |
 | **M27** | Frontend-Tests & Stabilität | 3 | 2 Agent-Sessions | Empfohlen vor Release |
 | **M28** | Frontend-Architektur & Bundle | 3 | 2–3 Agent-Sessions | Nach Release möglich |
@@ -43,6 +46,10 @@ Der Kontext eines Agent-Chats nähert sich bei **~80–90 %** der Kapazität an 
 | `[Server]` commit+push erledigt, neuer Milestone startet | Neuer Agent |
 
 ### Start-Prompt für Folge-Agent (kopieren)
+
+**Aktuell (M24):** siehe Abschnitt „Agent-Start M24“ unten.
+
+**Allgemeine Vorlage:**
 
 ```text
 Du arbeitest an dice.budget (kniffel). Lies AGENT_RULES.md und HANDOVER.md.
@@ -92,24 +99,61 @@ Nummerierte `[Server]`/`[Mac]`-Befehle gemäß `AGENT_RULES.md` Sektion 9 ausgeb
 
 ### Abnahme M23
 
-- [ ] `POST /stats/pairings/reset` ohne `X-Admin-Key` → **401/403**
-- [ ] `POST /stats/pairings/baseline` ohne Key → **401/403**
-- [ ] Mit gültigem Key funktionieren Reset und Baseline wie bisher
-- [ ] Rate-Limit: >30 Requests/min auf `/sessions` → **429**
-- [ ] Gleiche `playerId` zweiter Join → **409** mit deutscher Meldung
-- [ ] `npm test` im Backend grün
-- [ ] Nutzer: `sudo bash infra/scripts/deploy-backend-prod.sh`
-- [ ] `CHANGELOG.md` Eintrag
+- [x] `POST /stats/pairings/reset` ohne `X-Admin-Key` → **401/403**
+- [x] `POST /stats/pairings/baseline` ohne Key → **401/403**
+- [x] Mit gültigem Key funktionieren Reset und Baseline wie bisher
+- [x] Rate-Limit: >30 Requests/min auf `/sessions` → **429**
+- [x] Gleiche `playerId` zweiter Join → **409** mit deutscher Meldung
+- [x] `npm test` im Backend grün
+- [x] Nutzer: Backend-Deploy + `ADMIN_API_KEY` / `NEXT_PUBLIC_ADMIN_API_KEY` gesetzt
+- [x] `CHANGELOG.md` Eintrag
 
-**Status:** umgesetzt 2026-06-11 (Produktcode, Tests grün — Deploy/Env durch Nutzer).
+**Status:** **abgenommen** 2026-06-11 · Produktcode `cce4996` · Admin-Key per Env, kein UI-Prompt.
 
-**Neuer Agent:** nach Abnahme M23, vor M24.
+**Neuer Agent:** vor M24 (siehe Agent-Start M24).
+
+---
+
+## Agent-Start M24 (Übergabe an neuen Agent)
+
+```text
+Du arbeitest an dice.budget (kniffel).
+
+Pflicht-Lesereihenfolge:
+1. AGENT_RULES.md
+2. HANDOVER.md
+3. docs/milestone-roadmap-analysis.md — Abschnitt „M24 — UX-Blocker & Deploy-Verifikation“
+
+Kontext:
+- Branch milestone-22-prep, HEAD cce4996
+- M23 (Sicherheit & API-Härtung) ist abgenommen: Admin-Auth Stats, Rate-Limits, Join-Duplikat, Solo-Secret, helmet, Graceful Shutdown
+- ADMIN_API_KEY und NEXT_PUBLIC_ADMIN_API_KEY sind auf dem Server gesetzt und deployed
+
+Auftrag:
+- Umsetze Milestone M24 gemäß Roadmap (Sprints 24.1–24.3), sofern der Nutzer GO M24 gibt
+- Sprint 24.1 zuerst: Pool-Endspiel Auto-Refresh für Nicht-Sieger in PlayBoard.tsx (ereignisbasiert, kein Polling/setInterval)
+- AGENT_RULES: keine Dauerprozesse, nach Änderungen [Server]/[Mac]-Befehle, keine Commits ohne ausdrückliches GO
+- docs/milestones_active.md nur bei Bedarf
+
+Offen aus Nutzer-Diskussion (nicht Teil M24): Web-Zugang nach App-Store-Release deaktivieren — späterer Milestone.
+```
 
 ---
 
 ## M24 — UX-Blocker & Deploy-Verifikation
 
-**Ziel:** Bekannte UX-Lücken schließen und Backend-Features live verifizieren.
+**Status:** **abgenommen** 2026-06-11 · ereignisbasiertes Pool-Endspiel-Refresh, a11y-Basis, `verify-prod-api.sh`
+
+### Abnahme M24
+
+- [x] Multi Pool-Endspiel: Nicht-Sieger sieht Stats-Toggle **ohne** manuelles Aktualisieren (oder nach max. 1 Focus-Event)
+- [x] `GET .../match-analysis` enthält `scoreProgression` und `coaching` (Backend deployed — Verifikation via Skript)
+- [x] Zoom in Settings/Datenschutz funktioniert
+- [x] Safari Hard-Reload zeigt aktuelle UI nach Frontend-Build (nginx no-cache konfiguriert)
+- [ ] Nutzer: nginx reload falls noch nicht (`sudo nginx -t && sudo systemctl reload nginx`)
+- [ ] TestFlight-Regression Pool-Endspiel auf Gerät
+
+**Neuer Agent:** nach Abnahme M24 (Nutzer-Tests) → **M25**.
 
 ### Sprint 24.1 — Pool-Endspiel Auto-Refresh (Nicht-Sieger)
 
@@ -137,17 +181,6 @@ Nummerierte `[Server]`/`[Mac]`-Befehle gemäß `AGENT_RULES.md` Sektion 9 ausgeb
 | 2 | Migration `extra_yatzy_die_values` auf Prod verifiziert | `prisma migrate status` |
 | 3 | Dokumentation nginx reload für Cache-Header | `HANDOVER.md`, ggf. `infra/scripts/` Hinweis |
 | 4 | Verifikations-Skript **einmalig** (kein Loop): `infra/scripts/verify-prod-api.sh` | neu, optional |
-
-### Abnahme M24
-
-- [ ] Multi Pool-Endspiel: Nicht-Sieger sieht Stats-Toggle **ohne** manuelles Aktualisieren (oder nach max. 1 Focus-Event)
-- [ ] `GET .../match-analysis` enthält `scoreProgression` und `coaching` (Backend deployed)
-- [ ] Zoom in Settings/Datenschutz funktioniert
-- [ ] Safari Hard-Reload zeigt aktuelle UI nach Frontend-Build
-- [ ] Nutzer: nginx reload falls noch nicht (`sudo nginx -t && sudo systemctl reload nginx`)
-- [ ] TestFlight-Regression Pool-Endspiel auf Gerät
-
-**Neuer Agent:** nach Abnahme M24 (oder nach Sprint 24.1 wenn 24.2+24.3 vom Nutzer separat getestet werden).
 
 ---
 

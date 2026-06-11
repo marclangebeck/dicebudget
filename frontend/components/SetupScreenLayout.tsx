@@ -13,9 +13,14 @@ type Props = {
 export function SetupScreenLayout({ children, scrollable = true }: Props) {
   return (
     <FixedScreenShell routeClass="setup-route">
+      <a href="#main-content" className="skip-link">
+        Zum Inhalt
+      </a>
       <main className="setup-screen-main pt-safe mx-auto flex h-full min-h-0 w-full max-w-lg flex-1 flex-col gap-3 overflow-hidden px-4 py-4">
         <div
-          className={`setup-screen-body flex min-h-0 flex-1 flex-col gap-4 overscroll-none ${
+          id="main-content"
+          tabIndex={-1}
+          className={`setup-screen-body flex min-h-0 flex-1 flex-col gap-4 overscroll-none outline-none ${
             scrollable ? "overflow-y-auto" : "overflow-hidden"
           }`}
         >

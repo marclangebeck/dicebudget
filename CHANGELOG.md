@@ -5,6 +5,14 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **M24 Pool-Endspiel:** Ereignisbasiertes Session-Reload für Nicht-Sieger (Focus/Visibility, Abschluss-Übergang) — kein Polling; Loading-Hinweis „Session wird aktualisiert…"
+- **M24 a11y:** Skip-Link „Zum Inhalt" auf Home und Settings; Fokus-Falle in `PoolEndgamePanel` und `AchievementOverlay`; Zoom in Settings/Statistik/Legal (Pinch-Zoom nur noch auf Spiel-Routen)
+- **M24 Betrieb:** Einmal-Skript `infra/scripts/verify-prod-api.sh` (Health, Migration, match-analysis, Cache-Header)
+
+### Docs
+- **HANDOVER/Roadmap:** M24 umgesetzt; Prod-Verifikation und nginx-Reload dokumentiert
+
+### Added
 - **M23 Sicherheit:** Admin-Auth (`X-Admin-Key`) für `POST /stats/pairings/reset` und `/baseline`; Env `ADMIN_API_KEY` / `NEXT_PUBLIC_ADMIN_API_KEY`
 - **M23 Rate-Limiting:** max. 30 req/min/IP auf Run-/Session-Erstellung und Join
 - **M23 Solo-Secret:** `POST /runs` liefert `soloSecretToken`; API-Runs schützen Schreibzugriffe per `X-Player-Secret` (Legacy-Runs ohne Token bleiben offen)

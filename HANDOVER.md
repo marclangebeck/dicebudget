@@ -3,10 +3,10 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `d8b5952` (Stand 2026-06-11)  
+**Produktcode-HEAD:** `cce4996` → M24 nach Commit  
 **Sprache:** Deutsch
 
-Kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milestones_active.md`. iOS/TestFlight: `docs/ios_current.md`. Architektur/Betrieb: `docs/decisions.md` nur bei Bedarf.
+Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (M24 UX-Blocker & Deploy-Verifikation). Aktiver Milestone-Stand: `docs/milestones_active.md`. iOS/TestFlight: `docs/ios_current.md`. Architektur/Betrieb: `docs/decisions.md` nur bei Bedarf.
 
 ## Verbindliche Regeln
 
@@ -25,10 +25,11 @@ Kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milestones_active.md`. iOS/
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
 | Branch | `milestone-22-prep` |
-| Produktcode-HEAD | `d8b5952` — Cinematic Editorial Startscreen; Web `out/` gebaut |
+| Produktcode-HEAD | M24 — Pool-Endspiel Auto-Refresh, a11y-Basis, Prod-Verifikation |
+| Roadmap | M24 umgesetzt; **M25** Backend-Performance als Nächstes |
 | Startscreen (Standard) | **Cinematic Editorial** — gestapelte Poster-Kacheln Multi/Solo; Bilanz-Chip oben; integrierte Glas-CTA; Rollback: `HomeBentoGridClassic` |
 | Layout-Umschaltung | `NEXT_PUBLIC_HOME_LAYOUT=cinematic\|classic` in `frontend/.env.production`; `bash infra/scripts/set-home-layout.sh …`; Browser: `localStorage dicebudget.homeLayout` |
-| Backend | Coaching, `scoreProgression`, Migration `extra_yatzy_die_values` — Deploy-Status durch Nutzer prüfen |
+| Backend | M23 deployed; Admin-Key gesetzt; Coaching/`scoreProgression`/Migration `extra_yatzy_die_values` — in M24 verifizieren |
 | Branding | Nutzer-sichtbar **DiceBudget** und **Alle Fünfe** |
 | Footer | `Home · Statistik · Einstellungen · Menü` — Glas-Morph-Menü, Screenshot, Support, Legal |
 | Multi-Raum | **Code teilen** nur Code (kein Einladungstext/Link) |
@@ -49,10 +50,31 @@ Kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milestones_active.md`. iOS/
 
 ## Bekanntes UX-Thema (offen)
 
-- **Pool-Endspiel + Statistik-Toggle:** Nicht-Sieger ggf. **Aktualisieren** vor Abschluss-Screen.
-- **Punkte-Duell live:** Multi-Analyse-Graph nach Backend-Deploy (`scoreProgression`).
-- **Safari-/WebView-Cache:** Hard-Reload nach Deploy/TestFlight-Update.
+- **Punkte-Duell live:** Multi-Analyse-Graph nach Backend-Deploy (`scoreProgression`) — Prod-Verifikation: `bash infra/scripts/verify-prod-api.sh`
+- **Safari-/WebView-Cache:** Hard-Reload nach Deploy/TestFlight-Update; nginx reload falls Cache-Header fehlen (siehe unten)
 - **Mac `git pull`:** `git restore frontend/package-lock.json` vor Pull.
+
+## Prod-Verifikation & nginx (M24)
+
+Einmalig nach Deploy (kein Loop):
+
+```bash
+bash /home/bottleadmin/projects/kniffel/infra/scripts/verify-prod-api.sh
+```
+
+Optional mit abgeschlossener Multi-Session:
+
+```bash
+VERIFY_INVITE=CODE VERIFY_PLAYER=PLAYERID bash infra/scripts/verify-prod-api.sh
+```
+
+**nginx Cache-Header** (HTML `no-cache`, `_next/static/` `immutable`) — reload durch Nutzer:
+
+```bash
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+Prisma-Migration auf Prod: `cd backend && npx prisma migrate status` (u. a. `extra_yatzy_die_values`, `solo_secret_token`).
 
 ## Wichtige Dateien
 
@@ -65,10 +87,11 @@ Kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milestones_active.md`. iOS/
 
 ## Offene Prioritäten
 
-1. TestFlight-Regression: Cinematic-Startscreen, Footer/Menü, `/play`, Pool-Endspiel, Fortschritt, Code teilen.
-2. Backend deployen (falls offen): Coaching + `scoreProgression` + Migration.
-3. nginx reload (Cache-Header), falls noch nicht aktiv.
+1. **M25** (Roadmap): Backend-Performance — `GO M25` vom Nutzer.
+2. TestFlight-Regression: Cinematic-Startscreen, Footer/Menü, `/play`, Pool-Endspiel (Auto-Refresh Nicht-Sieger), Fortschritt, Code teilen.
+3. nginx reload (Cache-Header), falls `verify-prod-api.sh` no-cache meldet.
 4. App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`.
+5. Später: Web-Zugang nach App-Store-Release deaktivieren (nur App + API).
 
 ## Pflicht-Lesereihenfolge
 

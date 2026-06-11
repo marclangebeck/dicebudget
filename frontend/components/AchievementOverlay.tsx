@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { DiceFace } from "@/components/DiceFace";
 import { APP_NAME } from "@/lib/branding";
 import {
@@ -8,6 +8,7 @@ import {
   achievementVisual,
   type AchievementType,
 } from "@/lib/achievementTypes";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 
 type Props = {
   type: AchievementType;
@@ -25,6 +26,17 @@ const ORBIT_COUNT = 14;
 const COIN_COUNT = 22;
 
 export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: Props) {
+  const overlayRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(overlayRef, true);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
+
   const visual = achievementVisual(type, gameIndex);
   const confettiCount = ACHIEVEMENT_CONFETTI_COUNT[type];
 
@@ -89,8 +101,11 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
 
   return (
     <div
+      ref={overlayRef}
       className={`achievement-overlay achievement-overlay--${type} achievement-overlay--celebrate fixed inset-0 z-50 flex items-center justify-center`}
-      role="status"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="achievement-overlay-title"
       aria-live="polite"
       onClick={onClose}
     >
@@ -315,7 +330,7 @@ export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: 
           <div className="achievement-overlay-badge tabular-nums">{visual.badge}</div>
         )}
 
-        <p className="achievement-overlay-title">{visual.title}</p>
+        <p id="achievement-overlay-title" className="achievement-overlay-title">{visual.title}</p>
         <p className="achievement-overlay-sub">{visual.subtitle}</p>
 
         <p className="achievement-overlay-hint">Außerhalb tippen zum Schließen</p>

@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { FieldScoreChoiceGrid } from "@/components/FieldScoreChoiceGrid";
 import { FIELD_LABELS, fieldScoreChoices } from "@/lib/labels";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 import type { FieldDto } from "@/lib/types";
 
 type Props = {
@@ -24,6 +26,17 @@ export function PoolEndgamePanel({
   onSubmit,
   onCancel,
 }: Props) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(dialogRef, true);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onCancel();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onCancel]);
+
   const scoreChoices = fieldScoreChoices(field.fieldType);
   const parsedScore = scoreInput === "" ? null : Number(scoreInput);
   const scoreOk =
@@ -35,6 +48,7 @@ export function PoolEndgamePanel({
 
   return (
     <div
+      ref={dialogRef}
       className="field-entry-overlay fixed inset-0 z-50 flex justify-center"
       role="dialog"
       aria-modal="true"

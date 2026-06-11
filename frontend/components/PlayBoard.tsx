@@ -91,6 +91,8 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     MatchAnalysisDto | SessionMatchAnalysisDto | null
   >(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [lobbyRefreshing, setLobbyRefreshing] = useState(false);
+  const poolEndgamePendingRef = useRef(false);
 
   const resetEntry = useCallback(() => {
     setScoreInput("");
@@ -123,6 +125,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   // Lobby nur gezielt nachladen (Start + nach eigener Eintragung + Abschluss), kein Polling.
   const refreshLobby = useCallback(async () => {
     if (!inviteCode) return;
+    setLobbyRefreshing(true);
     try {
       const { session } = await getSessionLobby(inviteCode);
       setLobby(session);
@@ -137,6 +140,8 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       }
     } catch {
       // Anzeige ist optional – Fehler hier nicht ins Spiel durchreichen.
+    } finally {
+      setLobbyRefreshing(false);
     }
   }, [inviteCode]);
 
@@ -144,20 +149,10 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     void refreshLobby();
   }, [refreshLobby]);
 
-  // Gegner-Pool ohne Polling aktualisieren: einzelner Lobby-Request, wenn die App
-  // wieder in den Vordergrund kommt (Geräte-/App-Wechsel). Kein Dauerprozess.
-  useEffect(() => {
-    if (!inviteCode) return;
-    const onActive = () => {
-      if (document.visibilityState === "visible") void refreshLobby();
-    };
-    document.addEventListener("visibilitychange", onActive);
-    window.addEventListener("focus", onActive);
-    return () => {
-      document.removeEventListener("visibilitychange", onActive);
-      window.removeEventListener("focus", onActive);
-    };
-  }, [inviteCode, refreshLobby]);
+  const poolEndgamePending =
+    run?.status === "FINISHED" &&
+    !!lobby?.poolEndgameEnabled &&
+    !lobby.poolEndgameResolved;
 
   // Bin ich der Pool-Sieger und darf (noch) ein Feld verbessern? (M33)
   const amPoolEndgameImprover =
@@ -168,6 +163,53 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     !!inviteCode &&
     normalizePublicPlayerId(lobby.poolEndgameImproverPlayerId) ===
       normalizePublicPlayerId(getOrCreatePlayerId());
+
+  const waitingPoolEndgame =
+    poolEndgamePending && !amPoolEndgameImprover && !!inviteCode;
+
+  // Pool-Endspiel (Nicht-Sieger): Session beim Eintritt + Focus/Visibility gezielt
+  // nachladen — kein setInterval/Polling (M24 / AGENT_RULES).
+  useEffect(() => {
+    if (!waitingPoolEndgame) return;
+    void refreshLobby();
+  }, [waitingPoolEndgame, refreshLobby]);
+
+  useEffect(() => {
+    if (!inviteCode) return;
+    const onActive = () => {
+      if (document.visibilityState !== "visible") return;
+      if (run?.status === "FINISHED" && lobby?.poolEndgameEnabled && !lobby.poolEndgameResolved) {
+        void refreshLobby();
+        return;
+      }
+      void refreshLobby();
+    };
+    document.addEventListener("visibilitychange", onActive);
+    window.addEventListener("focus", onActive);
+    return () => {
+      document.removeEventListener("visibilitychange", onActive);
+      window.removeEventListener("focus", onActive);
+    };
+  }, [inviteCode, refreshLobby, run?.status, lobby?.poolEndgameEnabled, lobby?.poolEndgameResolved]);
+
+  // Abschluss-Screen: einmal nachladen, wenn Pool-Endspiel gerade aufgelöst wurde.
+  useEffect(() => {
+    if (run?.status !== "FINISHED") {
+      poolEndgamePendingRef.current = false;
+      return;
+    }
+    const pending = !!lobby?.poolEndgameEnabled && !lobby.poolEndgameResolved;
+    if (poolEndgamePendingRef.current && !pending && inviteCode) {
+      void refreshLobby();
+    }
+    poolEndgamePendingRef.current = pending;
+  }, [
+    run?.status,
+    lobby?.poolEndgameEnabled,
+    lobby?.poolEndgameResolved,
+    inviteCode,
+    refreshLobby,
+  ]);
 
   useEffect(() => {
     if (!run) return;
@@ -493,8 +535,6 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       : run.rollsInPool;
 
   if (run.status === "FINISHED") {
-    const poolEndgamePending =
-      !!lobby?.poolEndgameEnabled && !lobby?.poolEndgameResolved;
     const analysisAvailable =
       !poolEndgamePending &&
       (isLocalSolo || !inviteCode || lobby == null || lobby.playerCount >= 2);
@@ -653,16 +693,21 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
             <p className="play-endgame-banner-title">Pool-Endspiel läuft</p>
             <p className="play-endgame-banner-text">
               Sobald alle Mitspieler fertig sind, darf der Spieler mit dem größten
-              Wurf-Pool ein Feld verbessern. Tippe auf „Aktualisieren“, sobald die
-              anderen fertig sind.
+              Wurf-Pool ein Feld verbessern. Die Session aktualisiert sich beim
+              Wechsel zurück in die App — oder tippe auf „Aktualisieren“.
             </p>
+            {lobbyRefreshing && (
+              <p className="play-endgame-refresh-hint" aria-live="polite">
+                Session wird aktualisiert…
+              </p>
+            )}
             <button
               type="button"
-              disabled={busy}
+              disabled={lobbyRefreshing}
               onClick={() => void refreshLobby()}
               className="play-endgame-keep-btn disabled:opacity-50"
             >
-              {busy ? "…" : "Aktualisieren"}
+              {lobbyRefreshing ? "…" : "Aktualisieren"}
             </button>
           </div>
           {error && (
