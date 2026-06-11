@@ -1,5 +1,6 @@
 import type { Viewport } from "next";
 import type { ReactNode } from "react";
+import { AppErrorBoundary } from "@/components/AppErrorBoundary";
 import { HomeScreenShell } from "@/components/HomeScreenShell";
 
 export const viewport: Viewport = {
@@ -12,5 +13,9 @@ export const viewport: Viewport = {
 };
 
 export default function AppHomeLayout({ children }: { children: ReactNode }) {
-  return <HomeScreenShell>{children}</HomeScreenShell>;
+  return (
+    <AppErrorBoundary>
+      <HomeScreenShell>{children}</HomeScreenShell>
+    </AppErrorBoundary>
+  );
 }

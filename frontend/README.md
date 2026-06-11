@@ -24,6 +24,25 @@ npm run dev    # Port 3021
 
 Backend parallel in `../backend` starten (`npm run dev`, Port 3020).
 
+## Tests (M27)
+
+**Unit-Tests** (Node test runner, kein Dauerprozess):
+
+```bash
+npm run test
+```
+
+**E2E Smoke-Tests** (Playwright, nur manuell lokal — startet kurzzeitig `npm run dev`, danach mit Ctrl+C bzw. automatisch beenden):
+
+```bash
+npx playwright install chromium   # einmalig pro Maschine
+npm run test:e2e
+```
+
+Kein CI-Watcher auf dem Produktionsserver (`AGENT_RULES.md`). E2E typischerweise auf dem Mac nach `git pull`.
+
+Abgedeckte Smoke-Szenarien: `/app` (Cinematic/Classic), Solo → Feld → Eintrag-Overlay, `/multi/join` Code-Eingabe.
+
 ## Icons (PWA)
 
 ```bash

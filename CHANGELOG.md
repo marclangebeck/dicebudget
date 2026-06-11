@@ -5,6 +5,11 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **M27 Frontend-Tests:** Playwright Smoke-Tests (`e2e/`, `npm run test:e2e`) — Solo, Multi-Join, Home `/app`
+- **M27 Stabilität:** `AppErrorBoundary` für `/app`, `/play`, `/stats` mit Fallback zur Startseite
+- **M27 Unit-Tests:** Node test runner für `gameScoring`, `pairingMerge`, `localSoloRun` (`npm run test`)
+
+### Added
 - **M26 Backend-Qualität:** Zentrales `sortFields`/`isRunTerminal`; Run-Status `ABANDONED`; `InvalidYatzyDieValueError`; API `/player-names/aliases`
 - **M26 Tests:** Supertest-Setup (`httpSetup.ts`), Route-Tests runs/sessions/stats
 - **M26 Doku:** `backend/openapi.yaml`, `backend/README.md`, ESLint-Config

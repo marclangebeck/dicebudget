@@ -1,5 +1,6 @@
 import type { Viewport } from "next";
 import type { ReactNode } from "react";
+import { AppErrorBoundary } from "@/components/AppErrorBoundary";
 import { PlayScreenShell } from "@/components/PlayScreenShell";
 
 /** Spielseite: kein Pinch-Zoom, feste Skalierung. */
@@ -13,5 +14,9 @@ export const viewport: Viewport = {
 };
 
 export default function PlayLayout({ children }: { children: ReactNode }) {
-  return <PlayScreenShell>{children}</PlayScreenShell>;
+  return (
+    <AppErrorBoundary>
+      <PlayScreenShell>{children}</PlayScreenShell>
+    </AppErrorBoundary>
+  );
 }
