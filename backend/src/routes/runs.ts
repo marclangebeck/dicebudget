@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { createRunLimiter } from "../middleware/rateLimits.js";
 import { assertRunPlayerAccess } from "../services/runPlayerAuth.js";
 import { createRun } from "../services/createRun.js";
 import { getRunById } from "../services/getRun.js";
@@ -9,7 +10,7 @@ import { fieldsRouter } from "./fields.js";
 
 export const runsRouter = Router();
 
-runsRouter.post("/", async (req, res, next) => {
+runsRouter.post("/", createRunLimiter, async (req, res, next) => {
   try {
     const gameCount = Number(req.body?.gameCount);
     const useStrategyRules =
@@ -18,7 +19,7 @@ runsRouter.post("/", async (req, res, next) => {
         : Boolean(req.body.useStrategyRules);
     const result = await createRun(gameCount, useStrategyRules);
     const run = await getRunById(result.runId);
-    res.status(201).json({ run });
+    res.status(201).json({ run, soloSecretToken: result.soloSecretToken });
   } catch (error) {
     next(error);
   }

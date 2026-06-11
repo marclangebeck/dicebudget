@@ -1,4 +1,7 @@
 export const PORT = Number(process.env.PORT ?? 3020);
+
+/** Pflicht für destruktive Stats-Endpunkte (`X-Admin-Key`). */
+export const ADMIN_API_KEY = process.env.ADMIN_API_KEY?.trim() || "";
 export const MIN_GAME_COUNT = 1;
 export const MAX_GAME_COUNT = 6;
 export const FIELDS_PER_GAME = 13;

@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { requireAdminKey } from "../middleware/adminAuth.js";
 import { getStats } from "../services/getStats.js";
 import {
   getPairingDetail,
@@ -28,7 +29,7 @@ statsRouter.get("/pairings", async (_req, res, next) => {
   }
 });
 
-statsRouter.post("/pairings/reset", async (req, res, next) => {
+statsRouter.post("/pairings/reset", requireAdminKey, async (req, res, next) => {
   try {
     const raw = (req.body as { keys?: unknown })?.keys;
     const keys = Array.isArray(raw)
@@ -45,7 +46,7 @@ statsRouter.post("/pairings/reset", async (req, res, next) => {
   }
 });
 
-statsRouter.post("/pairings/baseline", async (req, res, next) => {
+statsRouter.post("/pairings/baseline", requireAdminKey, async (req, res, next) => {
   try {
     const raw = (req.body as { entries?: unknown })?.entries;
     if (!Array.isArray(raw)) {

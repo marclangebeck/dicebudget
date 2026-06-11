@@ -8,6 +8,7 @@ import {
 } from "../config.js";
 import { FIELD_TYPES_PER_GAME } from "../domain/fieldTypes.js";
 import { prisma } from "../db/prisma.js";
+import { generateSecretToken } from "../lib/secretToken.js";
 
 export class InvalidGameCountError extends Error {
   constructor(gameCount: number) {
@@ -29,6 +30,7 @@ export function parseUseStrategyRules(value: unknown): boolean {
 
 export type CreateRunResult = {
   runId: string;
+  soloSecretToken: string;
   gameCount: number;
   useStrategyRules: boolean;
   fieldCount: number;
@@ -42,11 +44,16 @@ export async function instantiateRun(
   tx: Prisma.TransactionClient,
   gameCount: number,
   useStrategyRules = true,
-): Promise<{ id: string }> {
+): Promise<{ id: string; soloSecretToken: string }> {
   assertValidGameCount(gameCount);
 
+  const soloSecretToken = generateSecretToken();
   const created = await tx.run.create({
-    data: { gameCount, useStrategyRules },
+    data: {
+      gameCount,
+      useStrategyRules,
+      soloSecretToken,
+    },
   });
 
   for (let gameIndex = 1; gameIndex <= gameCount; gameIndex += 1) {
@@ -67,7 +74,7 @@ export async function instantiateRun(
     }
   }
 
-  return created;
+  return { id: created.id, soloSecretToken };
 }
 
 /**
@@ -85,6 +92,7 @@ export async function createRun(
 
   return {
     runId: run.id,
+    soloSecretToken: run.soloSecretToken,
     gameCount,
     useStrategyRules,
     fieldCount: fieldCountForGameCount(gameCount),

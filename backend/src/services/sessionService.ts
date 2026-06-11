@@ -1,4 +1,5 @@
 import { randomBytes } from "crypto";
+import { generateSecretToken } from "../lib/secretToken.js";
 import type { Prisma } from "@prisma/client";
 import {
   MAX_SESSION_PLAYERS,
@@ -28,10 +29,6 @@ export const SESSION_STATUS = {
 } as const;
 
 const INVITE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // ohne I,O,0,1
-
-function generateSecretToken(): string {
-  return randomBytes(24).toString("hex");
-}
 
 async function generateUniqueInviteCode(
   tx: Prisma.TransactionClient,
@@ -94,6 +91,13 @@ export class SessionFullError extends Error {
   constructor() {
     super("Session is full");
     this.name = "SessionFullError";
+  }
+}
+
+export class PlayerAlreadyInSessionError extends Error {
+  constructor() {
+    super("Dieser Spieler ist der Session bereits beigetreten");
+    this.name = "PlayerAlreadyInSessionError";
   }
 }
 
@@ -340,6 +344,10 @@ export async function joinSession(inviteCode: string, playerId: string) {
     if (!session) throw new SessionNotFoundError();
     if (session.status === SESSION_STATUS.FINISHED) throw new SessionFinishedError();
     if (session.players.length >= session.maxPlayers) throw new SessionFullError();
+
+    if (session.players.some((p) => p.name === playerToken)) {
+      throw new PlayerAlreadyInSessionError();
+    }
 
     const orderIndex = session.players.length + 1;
     const secretToken = generateSecretToken();

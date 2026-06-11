@@ -1,4 +1,8 @@
 import { Router } from "express";
+import {
+  createSessionLimiter,
+  joinSessionLimiter,
+} from "../middleware/rateLimits.js";
 import { getSessionMatchAnalysis } from "../services/matchAnalysisService.js";
 import {
   createGameSession,
@@ -12,7 +16,11 @@ import { readPlayerSecret } from "./readPlayerSecret.js";
 
 export const sessionsRouter = Router();
 
-sessionsRouter.post("/", async (req, res, next) => {
+function routeParam(value: string | string[]): string {
+  return typeof value === "string" ? value : (value[0] ?? "");
+}
+
+sessionsRouter.post("/", createSessionLimiter, async (req, res, next) => {
   try {
     const gameCount = Number(req.body?.gameCount);
     const maxPlayers = Number(req.body?.maxPlayers);
@@ -57,14 +65,14 @@ sessionsRouter.get("/invite/:inviteCode", async (req, res, next) => {
   }
 });
 
-sessionsRouter.post("/invite/:inviteCode/join", async (req, res, next) => {
+sessionsRouter.post("/invite/:inviteCode/join", joinSessionLimiter, async (req, res, next) => {
   try {
     const playerId = req.body?.playerId;
     if (typeof playerId !== "string") {
       res.status(400).json({ error: "playerId required" });
       return;
     }
-    const result = await joinSession(req.params.inviteCode, playerId);
+    const result = await joinSession(routeParam(req.params.inviteCode), playerId);
     res.status(201).json(result);
   } catch (error) {
     next(error);

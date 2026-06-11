@@ -33,11 +33,12 @@ describe("completeField (integration)", () => {
   });
 
   it("rejects scores that are not allowed for the field type", async () => {
-    const { runId } = await createRun(1, false);
+    const { runId, soloSecretToken } = await createRun(1, false);
     try {
       const fieldId = await fieldIdByType(runId, "ONES");
       await assert.rejects(
-        () => completeField(runId, fieldId, { score: 7, rollsUsed: 1 }),
+        () =>
+          completeField(runId, fieldId, { score: 7, rollsUsed: 1 }, soloSecretToken),
         (err: unknown) => err instanceof InvalidFieldScoreError,
       );
     } finally {
@@ -46,11 +47,12 @@ describe("completeField (integration)", () => {
   });
 
   it("rejects more than three rolls in classic mode", async () => {
-    const { runId } = await createRun(1, false);
+    const { runId, soloSecretToken } = await createRun(1, false);
     try {
       const fieldId = await fieldIdByType(runId, "ONES");
       await assert.rejects(
-        () => completeField(runId, fieldId, { score: 3, rollsUsed: 4 }),
+        () =>
+          completeField(runId, fieldId, { score: 3, rollsUsed: 4 }, soloSecretToken),
         (err: unknown) => err instanceof InvalidInputError,
       );
     } finally {
@@ -59,10 +61,10 @@ describe("completeField (integration)", () => {
   });
 
   it("stores rollsUsed 1 for a valid classic entry", async () => {
-    const { runId } = await createRun(1, false);
+    const { runId, soloSecretToken } = await createRun(1, false);
     try {
       const fieldId = await fieldIdByType(runId, "ONES");
-      await completeField(runId, fieldId, { score: 4, rollsUsed: 1 });
+      await completeField(runId, fieldId, { score: 4, rollsUsed: 1 }, soloSecretToken);
       const field = await prisma.field.findUniqueOrThrow({ where: { id: fieldId } });
       assert.equal(field.score, 4);
       assert.equal(field.rollsUsed, 1);
@@ -72,11 +74,12 @@ describe("completeField (integration)", () => {
   });
 
   it("rejects pool use when not enough rolls are in the pool", async () => {
-    const { runId } = await createRun(1, true);
+    const { runId, soloSecretToken } = await createRun(1, true);
     try {
       const fieldId = await fieldIdByType(runId, "ONES");
       await assert.rejects(
-        () => completeField(runId, fieldId, { score: 5, rollsUsed: 5 }),
+        () =>
+          completeField(runId, fieldId, { score: 5, rollsUsed: 5 }, soloSecretToken),
         (err: unknown) => err instanceof RollLimitError,
       );
     } finally {
@@ -85,10 +88,10 @@ describe("completeField (integration)", () => {
   });
 
   it("applies pool spare and cost in strategy mode", async () => {
-    const { runId } = await createRun(1, true);
+    const { runId, soloSecretToken } = await createRun(1, true);
     try {
       const fieldId = await fieldIdByType(runId, "ONES");
-      await completeField(runId, fieldId, { score: 2, rollsUsed: 1 });
+      await completeField(runId, fieldId, { score: 2, rollsUsed: 1 }, soloSecretToken);
       const run = await prisma.run.findUniqueOrThrow({ where: { id: runId } });
       assert.equal(run.rollsInPool, 2);
       assert.equal(run.totalRollsUsed, 1);
@@ -98,11 +101,11 @@ describe("completeField (integration)", () => {
   });
 
   it("updates an already scored field and adjusts roll pool", async () => {
-    const { runId } = await createRun(1, true);
+    const { runId, soloSecretToken } = await createRun(1, true);
     try {
       const fieldId = await fieldIdByType(runId, "ONES");
-      await completeField(runId, fieldId, { score: 2, rollsUsed: 1 });
-      await completeField(runId, fieldId, { score: 5, rollsUsed: 2 });
+      await completeField(runId, fieldId, { score: 2, rollsUsed: 1 }, soloSecretToken);
+      await completeField(runId, fieldId, { score: 5, rollsUsed: 2 }, soloSecretToken);
       const field = await prisma.field.findUniqueOrThrow({ where: { id: fieldId } });
       const run = await prisma.run.findUniqueOrThrow({ where: { id: runId } });
       assert.equal(field.score, 5);
@@ -115,19 +118,19 @@ describe("completeField (integration)", () => {
   });
 
   it("clears only the last scored field and restores pool rolls", async () => {
-    const { runId } = await createRun(1, true);
+    const { runId, soloSecretToken } = await createRun(1, true);
     try {
       const onesId = await fieldIdByType(runId, "ONES");
       const twosId = await fieldIdByType(runId, "TWOS");
-      await completeField(runId, onesId, { score: 2, rollsUsed: 1 });
-      await completeField(runId, twosId, { score: 4, rollsUsed: 2 });
+      await completeField(runId, onesId, { score: 2, rollsUsed: 1 }, soloSecretToken);
+      await completeField(runId, twosId, { score: 4, rollsUsed: 2 }, soloSecretToken);
 
       await assert.rejects(
-        () => clearLastField(runId, onesId),
+        () => clearLastField(runId, onesId, soloSecretToken),
         (err: unknown) => err instanceof NotLastScoredFieldError,
       );
 
-      const cleared = await clearLastField(runId, twosId);
+      const cleared = await clearLastField(runId, twosId, soloSecretToken);
       assert.equal(cleared?.lastScoredFieldId, onesId);
       const twos = await prisma.field.findUniqueOrThrow({ where: { id: twosId } });
       const run = await prisma.run.findUniqueOrThrow({ where: { id: runId } });
@@ -141,7 +144,7 @@ describe("completeField (integration)", () => {
   });
 
   it("backfills legacy scored fields so the last entry can be cleared", async () => {
-    const { runId } = await createRun(1, false);
+    const { runId, soloSecretToken } = await createRun(1, false);
     try {
       const fieldId = await fieldIdByType(runId, "ONES");
       await prisma.field.update({
@@ -156,7 +159,7 @@ describe("completeField (integration)", () => {
       const run = await getRunById(runId);
       assert.equal(run?.lastScoredFieldId, fieldId);
 
-      const cleared = await clearLastField(runId, fieldId);
+      const cleared = await clearLastField(runId, fieldId, soloSecretToken);
       assert.equal(cleared?.games[0]?.fields[0]?.score, null);
     } finally {
       await deleteRun(runId);

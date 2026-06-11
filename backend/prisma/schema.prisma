@@ -89,6 +89,7 @@ model Player {
 
 model Run {
   id                String   @id @default(cuid())
+  soloSecretToken   String?  @unique @map("solo_secret_token")
   gameCount         Int      @map("game_count")
   useStrategyRules  Boolean  @default(true) @map("use_strategy_rules")
   totalScore        Int      @default(0) @map("total_score")

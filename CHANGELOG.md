@@ -4,6 +4,14 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
+### Added
+- **M23 Sicherheit:** Admin-Auth (`X-Admin-Key`) für `POST /stats/pairings/reset` und `/baseline`; Env `ADMIN_API_KEY` / `NEXT_PUBLIC_ADMIN_API_KEY`
+- **M23 Rate-Limiting:** max. 30 req/min/IP auf Run-/Session-Erstellung und Join
+- **M23 Solo-Secret:** `POST /runs` liefert `soloSecretToken`; API-Runs schützen Schreibzugriffe per `X-Player-Secret` (Legacy-Runs ohne Token bleiben offen)
+- **M23 Join-Duplikat:** gleiche `playerId` kann Session nicht zweimal belegen (409)
+- **M23 Betrieb:** Graceful Shutdown (`SIGTERM`/`SIGINT`), `helmet`, JSON-Body-Limit 100 KB
+- Migration `20260611120000_solo_secret_token`
+
 ### Changed
 - **Doku:** HANDOVER (kurzer Agent-Start-Prompt), `docs/milestones_active.md`, `docs/ios_current.md`, `milestones.md`, `GOiOS.md` — Stand `d8b5952`, TestFlight `2.0 (28)`, Cinematic Editorial Startscreen
 - **Startscreen Cinematic Doors:** Multi und Solo als gestapelte Einstiegstore (Vorschlag 3) — Bilanz/Stats per Glas-Chip aufklappbar; Entrance-Animation; klassisches Arena-Layout bleibt als `HomeBentoGridClassic` per `NEXT_PUBLIC_HOME_LAYOUT=classic` oder `bash infra/scripts/set-home-layout.sh classic` wiederherstellbar; Browser-Override: `localStorage dicebudget.homeLayout`

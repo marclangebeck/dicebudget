@@ -14,22 +14,22 @@ describe("incrementExtraYatzy (integration)", () => {
   });
 
   it("adds 100 to rotating game columns", async () => {
-    const { runId } = await createRun(3, false);
+    const { runId, soloSecretToken } = await createRun(3, false);
     try {
-      const r1 = await incrementExtraYatzy(runId, 3);
+      const r1 = await incrementExtraYatzy(runId, 3, soloSecretToken);
       assert.equal(r1.extraYatzyCount, 1);
       assert.equal(r1.games[0]!.summary.extraYatzyBonus, 100);
       assert.equal(r1.games[0]!.summary.gameTotal, 100);
       assert.deepEqual(r1.games[0]!.summary.extraYatzyDieValues, [3]);
 
-      const r2 = await incrementExtraYatzy(runId, 5);
+      const r2 = await incrementExtraYatzy(runId, 5, soloSecretToken);
       assert.equal(r2.extraYatzyCount, 2);
       assert.equal(r2.games[1]!.summary.extraYatzyBonus, 100);
       assert.deepEqual(r2.games[1]!.summary.extraYatzyDieValues, [5]);
 
-      await incrementExtraYatzy(runId, 1);
-      await incrementExtraYatzy(runId, 2);
-      const r5 = await incrementExtraYatzy(runId, 4);
+      await incrementExtraYatzy(runId, 1, soloSecretToken);
+      await incrementExtraYatzy(runId, 2, soloSecretToken);
+      const r5 = await incrementExtraYatzy(runId, 4, soloSecretToken);
       assert.equal(r5.extraYatzyCount, 5);
       assert.equal(r5.games[0]!.summary.extraYatzyBonus, 200);
       assert.equal(r5.games[1]!.summary.extraYatzyBonus, 200);

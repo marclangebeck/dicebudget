@@ -1,5 +1,6 @@
 import cors from "cors";
 import express from "express";
+import helmet from "helmet";
 import {
   FIELDS_PER_GAME,
   MAX_GAME_COUNT,
@@ -7,6 +8,7 @@ import {
   PORT,
   ROLLS_PER_FIELD,
 } from "./config.js";
+import { prisma } from "./db/prisma.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { runsRouter } from "./routes/runs.js";
 import { sessionsRouter } from "./routes/sessions.js";
@@ -14,6 +16,7 @@ import { statsRouter } from "./routes/stats.js";
 
 const app = express();
 
+app.use(helmet());
 app.use(
   cors({
     origin: [
@@ -25,7 +28,7 @@ app.use(
     ],
   }),
 );
-app.use(express.json());
+app.use(express.json({ limit: "100kb" }));
 
 app.get("/health", (_req, res) => {
   res.json({
@@ -45,6 +48,19 @@ app.use("/stats", statsRouter);
 
 app.use(errorHandler);
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`dicebudget-backend listening on http://127.0.0.1:${PORT}`);
 });
+
+function shutdown(signal: string): void {
+  console.log(`${signal} received, shutting down`);
+  server.close(() => {
+    void prisma.$disconnect().finally(() => {
+      process.exit(0);
+    });
+  });
+  setTimeout(() => process.exit(1), 10_000).unref();
+}
+
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));

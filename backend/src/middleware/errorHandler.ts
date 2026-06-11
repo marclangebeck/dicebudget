@@ -25,6 +25,7 @@ import {
   PoolEndgameInputError,
   PoolEndgameNotAvailableError,
   SessionFinishedError,
+  PlayerAlreadyInSessionError,
   SessionFullError,
   SessionNotFoundError,
   SessionNotReadyError,
@@ -95,6 +96,7 @@ export function errorHandler(
     return;
   }
   if (
+    err instanceof PlayerAlreadyInSessionError ||
     err instanceof SessionFullError ||
     err instanceof SessionFinishedError ||
     err instanceof SessionNotReadyError ||

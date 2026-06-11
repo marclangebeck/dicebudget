@@ -12,16 +12,26 @@ import { getApiBase } from "@/lib/apiBase";
 type ApiRequestInit = Omit<RequestInit, "headers"> & {
   headers?: HeadersInit;
   playerSecret?: string;
+  adminKey?: string;
 };
 
+function getAdminApiKey(): string | undefined {
+  const key = process.env.NEXT_PUBLIC_ADMIN_API_KEY?.trim();
+  return key || undefined;
+}
+
 async function request<T>(path: string, init?: ApiRequestInit): Promise<T> {
-  const { playerSecret, ...fetchRest } = init ?? {};
+  const { playerSecret, adminKey, ...fetchRest } = init ?? {};
   const headers = new Headers({ "Content-Type": "application/json" });
   if (init?.headers) {
     new Headers(init.headers).forEach((v, k) => headers.set(k, v));
   }
   if (playerSecret) {
     headers.set("X-Player-Secret", playerSecret);
+  }
+  const resolvedAdminKey = adminKey ?? getAdminApiKey();
+  if (resolvedAdminKey) {
+    headers.set("X-Admin-Key", resolvedAdminKey);
   }
 
   const res = await fetch(`${getApiBase()}${path}`, {
@@ -46,7 +56,7 @@ async function request<T>(path: string, init?: ApiRequestInit): Promise<T> {
 }
 
 export function createRun(gameCount: number, useStrategyRules = true) {
-  return request<{ run: RunDto }>("/runs", {
+  return request<{ run: RunDto; soloSecretToken: string }>("/runs", {
     method: "POST",
     body: JSON.stringify({ gameCount, useStrategyRules }),
   });

@@ -79,8 +79,9 @@ npm run build
 
 ## Bekannte Risikoentscheidungen
 
-- `POST /stats/pairings/reset` ist aktuell ohne Auth, destruktiv und global wirksam.
-- `POST /stats/pairings/baseline` ist aktuell ohne Auth und global wirksam.
+- `POST /stats/pairings/reset` und `POST /stats/pairings/baseline` erfordern seit M23 den Header `X-Admin-Key` (Backend `ADMIN_API_KEY`, Frontend `NEXT_PUBLIC_ADMIN_API_KEY`). Ohne konfigurierten Key antworten die Endpunkte mit **503**.
+- API-erstellte Singleplayer-Runs (`POST /runs`) erhalten `soloSecretToken`; Schreibzugriffe brauchen `X-Player-Secret`. Legacy-Runs ohne Token bleiben offen.
+- Rate-Limit: max. 30 Requests/min/IP auf `POST /runs`, `POST /sessions`, `POST .../join`.
 - `LeagueStanding` wird nach Stats-Reset nicht rueckwirkend neu berechnet.
 - Server validiert erlaubte Score-Werte je Feldtyp, aber nicht die physische Wuerfelrealitaet.
 - `playerSecret` liegt im Client-Kontext; Geraetewechsel erfordert erneuten Join.
