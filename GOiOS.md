@@ -13,8 +13,8 @@ Diese Datei ist ein Kompatibilitaets-Index. Fuer aktuellen iOS-/TestFlight-/App-
 
 - Bundle ID: `de.bottletrade.dicebudget`
 - Version in App Store Connect: `2.0`
-- Aktueller TestFlight-Build: `2.0 (25)` (verlässlich); `2.0 (26)` ohne `git pull` = noch `f29cf7d`
-- Naechster Upload: `2.0 (27)` (Stand `66e8487`: Arena ohne Mittel-Logo, Footer Glas-Morph, Card-Dashboards, …)
+- Aktueller TestFlight-Build: `2.0 (27)` (Stand `66e8487`: Arena ohne Mittel-Logo, Footer Glas-Morph, Card-Dashboards, …)
+- Historisch: `2.0 (26)` ohne `git pull`/`build:ios` wirkungslos
 - Details und Checkliste: `docs/ios_current.md`
 
 ## Wichtig

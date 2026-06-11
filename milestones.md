@@ -25,14 +25,13 @@ Nur bei Bedarf:
 - Branch: `milestone-22-prep`
 - Produktcode-HEAD: `66e8487` (2026-06-10)
 - Web/API live: https://dicebudget.bottle-trade.de
-- iOS: TestFlight `2.0 (25)`; Upload `2.0 (26)` ohne Pull wirkungslos; naechster Upload `2.0 (27)` ab `66e8487`
+- iOS: TestFlight `2.0 (27)` aktuell (Stand `66e8487`); `2.0 (26)` historisch wirkungslos
 - Letzte Features: Arena ohne Mittel-Logo, Footer Glas-Morph, Card-Dashboards, Code nur teilen, Vollbild-Erfolge, DiceBudget-Branding, nginx Cache.
 
 ## Offene Prioritaeten
 
-1. iOS-Build `2.0 (27)` auf dem Mac (`git pull`, `npm run build:ios`, Archive) — `HANDOVER.md`, `docs/ios_current.md`.
-2. TestFlight-Regression (Arena-Startscreen, Footer/Menü/Glas).
-3. Backend deployen; nginx reload (Cache-Header).
-4. App Store Connect: Paid Agreement, Bank/Steuer, Preis `1,19 EUR`.
-5. Optional: Stats-Reset-/Baseline-Endpunkte absichern.
-6. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main`.
+1. TestFlight-Regression (Arena-Startscreen, Footer/Menü/Glas).
+2. Backend deployen; nginx reload (Cache-Header).
+3. App Store Connect: Paid Agreement, Bank/Steuer, Preis `1,19 EUR`.
+4. Optional: Stats-Reset-/Baseline-Endpunkte absichern.
+5. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main`.

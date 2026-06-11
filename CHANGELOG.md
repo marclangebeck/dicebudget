@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
+- **Doku:** TestFlight `2.0 (27)` als aktueller Stand (Upload erledigt); offene Prioritäten ohne erneuten iOS-Build; Referenz-Workflow für künftige Uploads
 - **Doku:** HANDOVER, `docs/milestones_active.md`, `docs/ios_current.md`, `milestones.md`, `GOiOS.md` — Stand `66e8487`, iOS-Workflow mit `build:ios`-Pflicht, TestFlight `2.0 (27)`, Hinweis zu wirkungslosem Upload `2.0 (26)`
 - **Footer-Menü:** Dezenterer Hamburger-Trigger; Menü-Panel mit stärkerem Glas-Look (Blur, halbtransparent, weichere Typo)
 - **Startscreen Arena:** Zwei gleichwertige Kacheln ohne Mittel-Logo; zentrierte Texte, dominante 3D-Würfel-Icons (Multi/Solo) im Kachelzentrum

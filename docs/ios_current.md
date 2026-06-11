@@ -10,9 +10,9 @@ Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-
 ## Aktueller Stand
 
 - App Store Connect: **Version 2.0**.
-- TestFlight **`2.0 (25)`**: letzter Build mit verifiziertem älterem Stand.
-- TestFlight **`2.0 (26)`**: Build-Nummer erhöht, aber **ohne `git pull` auf `66e8487`** — UI entsprach noch `f29cf7d` (keine sichtbaren Arena-/Menü-Änderungen).
-- **Nächster Upload: `2.0 (27)`** — Pflicht-Stand **`66e8487`** (Arena ohne Mittel-Logo, Footer Glas-Morph, Card-Dashboards, Code nur teilen, …).
+- **TestFlight `2.0 (27)` (aktuell):** enthält Produktcode **`66e8487`** (Arena ohne Mittel-Logo, Footer Glas-Morph, Card-Dashboards, Code nur teilen, …).
+- Historisch: **`2.0 (26)`** wirkungslos (Build-Nummer erhöht, aber ohne `git pull`/`build:ios` — UI noch `f29cf7d`).
+- **`2.0 (25)`:** letzter älterer verifizierter Stand vor Arena-Redesign.
 - Web/API live: https://dicebudget.bottle-trade.de (nur Web; iOS-UI kommt aus lokalem Bundle).
 
 ## iOS-Bundle (kritisch)
@@ -26,7 +26,7 @@ Dieses Dokument enthaelt ausschliesslich den aktuell relevanten iOS-/TestFlight-
 
 `frontend/ios/App/App/public/` ist in `.gitignore` — wird **nicht** mit `git pull` aktualisiert.
 
-## Mac-Workflow Für Upload 2.0 (27)
+## Mac-Referenz-Workflow (künftiger Build)
 
 ```bash
 cd /Users/marclangebeck/projects/kniffel
@@ -62,11 +62,11 @@ env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworks
 In Xcode:
 
 1. **Product → Clean Build Folder** (⇧⌘K)
-2. Build-Nummer **27**
+2. Build-Nummer erhöhen (aktuell in TestFlight: **27**)
 3. **Any iOS Device** → **Product → Archive** → Upload
-4. Auf dem iPhone TestFlight **Build 27** installieren (nicht 26)
+4. Auf dem iPhone neuesten TestFlight-Build installieren
 
-## Was In 2.0 (27) Enthalten Sein Soll
+## Inhalt Von TestFlight 2.0 (27)
 
 - **Startscreen:** Zwei Arena-Kacheln Multi/Solo, **kein** Mittel-Logo; zentrierte Überschriften/Taglines/Badges; dominante 3D-Würfel-Icons.
 - **Footer:** `Home · Statistik · Einstellungen · Menü`; Hamburger dezent; Menü-Overlay mit Glas-Morph; Screenshot teilen.
@@ -76,7 +76,7 @@ In Xcode:
 - Zettel: Ergebnis 1/2/Spiel-Farben; Fortschritt 25/50/75 %; granulares Spiel-Feedback.
 - Backend (API, nicht iOS-Bundle): Coaching, `scoreProgression`, Migration `extra_yatzy_die_values` — Deploy-Status prüfen.
 
-## TestFlight-Checkliste 2.0 (27)
+## TestFlight-Checkliste (Build 27)
 
 - Startscreen: Multi/Solo-Kacheln, große Würfel-Icons, kein Logo in der Mitte.
 - Footer-Menü: dezenter Trigger, Glas-Panel, Screenshot/Support/Legal.

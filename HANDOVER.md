@@ -4,6 +4,7 @@
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
 **Produktcode-HEAD:** `66e8487` (Stand 2026-06-10)  
+**Doku-HEAD:** `06405a4`  
 **Sprache:** Deutsch
 
 Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milestones_active.md`. iOS/TestFlight/App Store: `docs/ios_current.md`. Dauerhafte Projektentscheidungen nur bei Bedarf: `docs/decisions.md`.
@@ -38,7 +39,7 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 | Spiel-Feedback | Granular unter `/settings/feedback`: Animationen, Sounds, Fortschritt 25/50/75 % |
 | Fortschritt | Overlay + Sound bei 25/50/75 %; **Warteschlange** hinter Erfolgs-Overlays |
 | Nginx | HTML `no-cache`, `_next/static/` `immutable` — reload durch Nutzer nach Config-Deploy |
-| iOS/TestFlight | Version `2.0`; letzter sinnvoller Stand in TF: **`2.0 (25)`**; Upload **`2.0 (26)`** hatte noch Code `f29cf7d` (ohne `git pull`); nächster Upload **`2.0 (27)`** ab `66e8487` |
+| iOS/TestFlight | Version `2.0`; **aktueller Build `2.0 (27)`** mit Produktcode `66e8487` (Arena, Footer Glas-Morph); historisch: `2.0 (26)` wirkungslos (ohne `git pull`/`build:ios`) |
 
 ## Wichtig: iOS-Bundle ≠ Web-Deploy
 
@@ -81,14 +82,13 @@ Diese Datei ist die kompakte Startübergabe. Aktiver Arbeitsstand: `docs/milesto
 
 ## Offene Prioritäten
 
-1. **iOS TestFlight `2.0 (27)`** auf dem Mac (nach `git pull` auf `66e8487`, `npm run build:ios`, Archive).
-2. TestFlight-Regression: Startscreen-Arena, Footer/Menü/Glas, `/play`, Pool-Endspiel, Fortschritt, Code teilen.
-3. **Backend deployen** (falls noch offen): Coaching + `scoreProgression` + Migration `extra_yatzy_die_values`.
-4. **nginx reload** (Nutzer sudo), falls Cache-Header noch nicht aktiv.
-5. App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
-6. Optional: Pool-Endspiel Auto-Refresh.
+1. TestFlight-Regression: Startscreen-Arena, Footer/Menü/Glas, `/play`, Pool-Endspiel, Fortschritt, Code teilen.
+2. **Backend deployen** (falls noch offen): Coaching + `scoreProgression` + Migration `extra_yatzy_die_values`.
+3. **nginx reload** (Nutzer sudo), falls Cache-Header noch nicht aktiv.
+4. App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
+5. Optional: Pool-Endspiel Auto-Refresh.
 
-## Mac: iOS-Build 2.0 (27)
+## Mac: iOS-Referenz-Workflow (künftiger Build)
 
 ```bash
 cd /Users/marclangebeck/projects/kniffel
@@ -118,7 +118,7 @@ Bundle prüfen:
 grep -c home-arena-pane /Users/marclangebeck/projects/kniffel/frontend/ios/App/App/public/_next/static/css/*.css
 ```
 
-In Xcode: **⇧⌘K** (Clean), Build-Nummer **27**, **Any iOS Device** → **Product → Archive** → Upload.
+In Xcode: **⇧⌘K** (Clean), Build-Nummer **28** (oder höher — `27` ist bereits in TestFlight), **Any iOS Device** → **Product → Archive** → Upload.
 
 ## Pflicht-Lesereihenfolge
 
@@ -159,7 +159,7 @@ Aktueller Kurzstand:
 - Branch: milestone-22-prep
 - Produktcode-HEAD: 66e8487 (Stand 2026-06-10)
 - Web/API live: https://dicebudget.bottle-trade.de
-- iOS: Version 2.0; TestFlight 2.0 (25) letzter verlässlicher Stand; 2.0 (26) ohne git pull = alter Code; nächster Upload 2.0 (27) ab 66e8487
+- iOS: Version 2.0; aktueller TestFlight-Build 2.0 (27) mit Produktcode 66e8487; 2.0 (26) historisch wirkungslos (ohne git pull/build:ios)
 - iOS-Bundle: frontend/ios/App/App/public/ ist gitignored — UI nur via npm run build:ios auf dem Mac im TestFlight-Bundle
 - Branding: DiceBudget; UI „Alle Fünfe“ statt Yatzy; technische IDs unverändert
 - Startscreen: Zwei Arena-Kacheln Multi/Solo, kein Mittel-Logo, zentrierte Texte/Badges, dominante 3D-Würfel-Icons; Hero mit Bilanz; Statistik/Einstellungen nur im Footer
@@ -177,22 +177,21 @@ Aktueller Kurzstand:
 - nginx reload (nach infra/nginx-Änderung): Nutzer per SSH:
   sudo nginx -t && sudo systemctl reload nginx
 
-Mac iOS-Build 2.0 (27):
+Mac iOS-Referenz (nur bei neuem UI-Stand nötig):
 cd /Users/marclangebeck/projects/kniffel
 git restore frontend/package-lock.json
 git pull origin milestone-22-prep
 cd frontend && npm ci && npm run build:ios && brew unlink rsync
 grep -c home-arena-pane ios/App/App/public/_next/static/css/*.css
 env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
-(Xcode: Clean Build Folder, Build-Nummer 27, Archive, Upload)
+(Xcode: Clean Build Folder, Build-Nummer erhöhen, Archive, Upload)
 
 Offene Prioritäten:
-1. iOS TestFlight 2.0 (27) mit 66e8487 bauen und hochladen
-2. TestFlight-Regression (Startscreen-Arena, Footer/Menü, /play, Pool-Endspiel, Fortschritt, Code teilen)
-3. Backend deployen (falls offen: Coaching + scoreProgression + Migration extra_yatzy_die_values)
-4. nginx reload falls Cache-Header noch nicht aktiv
-5. App Store Connect (Agreement, Bank/Steuer, Preis 1,19 EUR)
-6. Optional: Pool-Endspiel Auto-Refresh
+1. TestFlight-Regression (Startscreen-Arena, Footer/Menü, /play, Pool-Endspiel, Fortschritt, Code teilen)
+2. Backend deployen (falls offen: Coaching + scoreProgression + Migration extra_yatzy_die_values)
+3. nginx reload falls Cache-Header noch nicht aktiv
+4. App Store Connect (Agreement, Bank/Steuer, Preis 1,19 EUR)
+5. Optional: Pool-Endspiel Auto-Refresh
 
 Auftrag:
 <hier konkrete Aufgabe einfügen>
