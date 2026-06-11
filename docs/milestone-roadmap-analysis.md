@@ -5,7 +5,7 @@
 **Basis:** Vollständige Projektanalyse (Backend, Frontend, Release)  
 **Branch:** `milestone-22-prep`  
 **Produktcode-HEAD:** `cce4996` (M23)  
-**Nächster Milestone:** **M25** (GO vom Nutzer ausstehend)  
+**Nächster Milestone:** **M26** (GO vom Nutzer ausstehend)  
 **Arbeitsweise:** Pro Milestone ein **GO** vom Nutzer, danach Umsetzung in Sprints, dann Abnahme.
 
 Dieses Dokument ergänzt `docs/milestones_active.md`. Nach Abschluss eines Milestones: Eintrag in `CHANGELOG.md`, Update `HANDOVER.md`, optional Archivierung hier.
@@ -18,8 +18,8 @@ Dieses Dokument ergänzt `docs/milestones_active.md`. Nach Abschluss eines Miles
 |-----------|-------|---------|------------------|------------------|
 | **M23** | Sicherheit & API-Härtung | 3 | 1–2 Agent-Sessions | **Blocker App Store** — **abgenommen 2026-06-11** |
 | **M24** | UX-Blocker & Deploy-Verifikation | 3 | 1–2 Agent-Sessions | **Blocker App Store** — **abgenommen 2026-06-11** |
-| **M25** | Backend-Performance | 3 | 1–2 Agent-Sessions | Empfohlen vor Release — **als Nächstes** |
-| **M26** | Backend-Qualität & Tests | 3 | 2 Agent-Sessions | Empfohlen vor Release |
+| **M25** | Backend-Performance | 3 | 1–2 Agent-Sessions | Empfohlen vor Release — **abgenommen 2026-06-11** |
+| **M26** | Backend-Qualität & Tests | 3 | 2 Agent-Sessions | Empfohlen vor Release — **als Nächstes** |
 | **M27** | Frontend-Tests & Stabilität | 3 | 2 Agent-Sessions | Empfohlen vor Release |
 | **M28** | Frontend-Architektur & Bundle | 3 | 2–3 Agent-Sessions | Nach Release möglich |
 | **M29** | Technische Schulden & Security-Patch | 3 | 1–2 Agent-Sessions | Empfohlen vor Release |

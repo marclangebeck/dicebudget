@@ -10,17 +10,29 @@ export type StatsDto = {
 };
 
 export async function getStats(): Promise<StatsDto> {
-  const finished = await prisma.run.findMany({
-    where: { status: RUN_STATUS.FINISHED },
-    select: {
-      gameCount: true,
-      totalScore: true,
-      games: { select: { score: true } },
-    },
-    orderBy: { finishedAt: "desc" },
-  });
+  const finishedWhere = { status: RUN_STATUS.FINISHED };
 
-  if (finished.length === 0) {
+  const [runAgg, bestGameAgg, bestByGameCountRaw] = await Promise.all([
+    prisma.run.aggregate({
+      where: finishedWhere,
+      _count: { _all: true },
+      _max: { totalScore: true },
+      _avg: { totalScore: true },
+    }),
+    prisma.game.aggregate({
+      where: { run: finishedWhere },
+      _max: { score: true },
+    }),
+    prisma.run.groupBy({
+      by: ["gameCount"],
+      where: finishedWhere,
+      _max: { totalScore: true },
+      orderBy: { gameCount: "asc" },
+    }),
+  ]);
+
+  const finishedRuns = runAgg._count._all;
+  if (finishedRuns === 0) {
     return {
       finishedRuns: 0,
       bestTotalScore: null,
@@ -30,28 +42,19 @@ export async function getStats(): Promise<StatsDto> {
     };
   }
 
-  const totalScores = finished.map((r) => r.totalScore);
-  const gameScores = finished.flatMap((r) => r.games.map((g) => g.score));
-
-  const bestByMap = new Map<number, number>();
-  for (const run of finished) {
-    const prev = bestByMap.get(run.gameCount);
-    if (prev === undefined || run.totalScore > prev) {
-      bestByMap.set(run.gameCount, run.totalScore);
-    }
-  }
-
-  const bestByGameCount = [...bestByMap.entries()]
-    .map(([gameCount, bestTotalScore]) => ({ gameCount, bestTotalScore }))
-    .sort((a, b) => a.gameCount - b.gameCount);
-
-  const sum = totalScores.reduce((a, b) => a + b, 0);
+  const bestByGameCount = bestByGameCountRaw
+    .filter((row) => row._max.totalScore !== null)
+    .map((row) => ({
+      gameCount: row.gameCount,
+      bestTotalScore: row._max.totalScore!,
+    }));
 
   return {
-    finishedRuns: finished.length,
-    bestTotalScore: Math.max(...totalScores),
-    bestGameScore: gameScores.length > 0 ? Math.max(...gameScores) : null,
-    averageTotalScore: Math.round(sum / finished.length),
+    finishedRuns,
+    bestTotalScore: runAgg._max.totalScore,
+    bestGameScore: bestGameAgg._max.score,
+    averageTotalScore:
+      runAgg._avg.totalScore !== null ? Math.round(runAgg._avg.totalScore) : null,
     bestByGameCount,
   };
 }

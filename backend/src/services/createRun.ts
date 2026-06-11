@@ -64,14 +64,12 @@ export async function instantiateRun(
       },
     });
 
-    for (const fieldType of FIELD_TYPES_PER_GAME) {
-      await tx.field.create({
-        data: {
-          gameId: game.id,
-          fieldType,
-        },
-      });
-    }
+    await tx.field.createMany({
+      data: FIELD_TYPES_PER_GAME.map((fieldType) => ({
+        gameId: game.id,
+        fieldType,
+      })),
+    });
   }
 
   return { id: created.id, soloSecretToken };

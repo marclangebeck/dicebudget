@@ -12,6 +12,30 @@ function sortFields<T extends { fieldType: string }>(fields: T[]): T[] {
   );
 }
 
+type ScoredFieldRef = {
+  id: string;
+  score: number | null;
+  scoredSequence: number | null;
+};
+
+/** True, wenn mindestens ein bewertetes Feld ohne scoredSequence existiert. */
+export function runNeedsScoredSequenceBackfill(
+  games: Array<{ fields: ScoredFieldRef[] }>,
+): boolean {
+  return games
+    .flatMap((game) => game.fields)
+    .some((field) => field.score !== null && field.scoredSequence === null);
+}
+
+/** Run-IDs mit fehlenden scoredSequence-Werten (für einmaliges Backfill-Skript). */
+export async function listRunIdsNeedingScoredSequenceBackfill(): Promise<string[]> {
+  const fields = await prisma.field.findMany({
+    where: { score: { not: null }, scoredSequence: null },
+    select: { game: { select: { runId: true } } },
+  });
+  return [...new Set(fields.map((field) => field.game.runId))];
+}
+
 /** Vergibt fehlende scoredSequence-Werte für ältere oder fortgesetzte Läufe. */
 export async function backfillScoredSequences(runId: string): Promise<void> {
   const run = await prisma.run.findUnique({
@@ -24,12 +48,9 @@ export async function backfillScoredSequences(runId: string): Promise<void> {
     },
   });
 
-  if (!run) return;
+  if (!run || !runNeedsScoredSequenceBackfill(run.games)) return;
 
   const allFields = run.games.flatMap((game) => sortFields(game.fields));
-  const needsBackfill = allFields.some((f) => f.score !== null && f.scoredSequence === null);
-  if (!needsBackfill) return;
-
   let nextSeq =
     allFields.reduce(
       (max, field) =>
@@ -63,13 +84,41 @@ export async function backfillScoredSequences(runId: string): Promise<void> {
   });
 }
 
+/** Einmaliger Backfill aller betroffenen Runs (M25 — nicht bei normalem Read). */
+export async function backfillAllScoredSequences(): Promise<{ runsUpdated: number }> {
+  const runIds = await listRunIdsNeedingScoredSequenceBackfill();
+  for (const runId of runIds) {
+    await backfillScoredSequences(runId);
+  }
+  return { runsUpdated: runIds.length };
+}
+
+type LastScoredFieldRef = {
+  id: string;
+  score: number | null;
+  scoredSequence: number | null;
+  fieldType: string;
+};
+
 export function findLastScoredFieldId(
-  games: Array<{ fields: Array<{ id: string; score: number | null; scoredSequence: number | null }> }>,
+  games: Array<{ index?: number; fields: LastScoredFieldRef[] }>,
 ): string | null {
-  const lastScoredField = games
+  const withSequence = games
     .flatMap((game) => game.fields)
     .filter((field) => field.score !== null && field.scoredSequence !== null)
     .sort((a, b) => (b.scoredSequence ?? 0) - (a.scoredSequence ?? 0))[0];
 
-  return lastScoredField?.id ?? null;
+  if (withSequence) return withSequence.id;
+
+  const legacyScored = games.flatMap((game, gameIdx) =>
+    sortFields(game.fields)
+      .filter((field) => field.score !== null && field.scoredSequence === null)
+      .map((field) => ({ field, gameOrder: game.index ?? gameIdx + 1 })),
+  );
+
+  if (legacyScored.length === 0) return null;
+  if (legacyScored.length === 1) return legacyScored[0]!.field.id;
+
+  const lastLegacy = legacyScored[legacyScored.length - 1]!;
+  return lastLegacy.field.id;
 }

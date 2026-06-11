@@ -70,6 +70,7 @@ model GameSession {
   createdAt         DateTime @default(now()) @map("created_at")
   players           Player[]
 
+  @@index([pointsAwarded])
   @@map("game_sessions")
 }
 
@@ -103,6 +104,7 @@ model Run {
   games          Game[]
   player         Player?
 
+  @@index([status])
   @@map("runs")
 }
 

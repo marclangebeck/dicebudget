@@ -3,9 +3,12 @@ import { describe, it } from "node:test";
 import {
   emptyAccumulator,
   foldManualBaselines,
+  invalidatePairingStatsCache,
   normalizePairingKeys,
   pairingKey,
+  pairingStatsCacheStateForTests,
   parsePairingKey,
+  primePairingStatsCacheForTests,
   sessionResetAction,
   type PairingAccumulator,
 } from "./pairingStats.js";
@@ -52,6 +55,25 @@ describe("sessionResetAction", () => {
 
   it("ignoriert Mehr-Spieler-Sessions ohne das Paar", () => {
     assert.equal(sessionResetAction(["Marc", "Tom", "Ann"], targets), "ignore");
+  });
+});
+
+describe("pairingStats cache", () => {
+  it("invalidatePairingStatsCache leert einen aktiven Cache", () => {
+    const map = new Map<string, PairingAccumulator>();
+    map.set("A::B", emptyAccumulator("A::B", "A", "B"));
+    primePairingStatsCacheForTests(map);
+    assert.equal(pairingStatsCacheStateForTests().active, true);
+
+    invalidatePairingStatsCache();
+    assert.equal(pairingStatsCacheStateForTests().active, false);
+    assert.equal(pairingStatsCacheStateForTests().expiresAt, null);
+  });
+
+  it("abgelaufener Cache gilt als inaktiv", () => {
+    const map = new Map<string, PairingAccumulator>();
+    primePairingStatsCacheForTests(map, Date.now() - 1);
+    assert.equal(pairingStatsCacheStateForTests().active, false);
   });
 });
 

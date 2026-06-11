@@ -25,8 +25,8 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (M24 
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
 | Branch | `milestone-22-prep` |
-| Produktcode-HEAD | M24 — Pool-Endspiel Auto-Refresh, a11y-Basis, Prod-Verifikation |
-| Roadmap | M24 umgesetzt; **M25** Backend-Performance als Nächstes |
+| Produktcode-HEAD | M25 — Backend-Performance (getRun, createMany, Stats-Aggregation, Pairing-Cache) |
+| Roadmap | M25 umgesetzt; **M26** Backend-Qualität & Tests als Nächstes |
 | Startscreen (Standard) | **Cinematic Editorial** — gestapelte Poster-Kacheln Multi/Solo; Bilanz-Chip oben; integrierte Glas-CTA; Rollback: `HomeBentoGridClassic` |
 | Layout-Umschaltung | `NEXT_PUBLIC_HOME_LAYOUT=cinematic\|classic` in `frontend/.env.production`; `bash infra/scripts/set-home-layout.sh …`; Browser: `localStorage dicebudget.homeLayout` |
 | Backend | M23 deployed; Admin-Key gesetzt; Coaching/`scoreProgression`/Migration `extra_yatzy_die_values` — in M24 verifizieren |
@@ -87,7 +87,7 @@ Prisma-Migration auf Prod: `cd backend && npx prisma migrate status` (u. a. `ext
 
 ## Offene Prioritäten
 
-1. **M25** (Roadmap): Backend-Performance — `GO M25` vom Nutzer.
+1. **M26** (Roadmap): Backend-Qualität & Tests — `GO M26` vom Nutzer.
 2. TestFlight-Regression: Cinematic-Startscreen, Footer/Menü, `/play`, Pool-Endspiel (Auto-Refresh Nicht-Sieger), Fortschritt, Code teilen.
 3. nginx reload (Cache-Header), falls `verify-prod-api.sh` no-cache meldet.
 4. App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`.

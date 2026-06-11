@@ -174,6 +174,47 @@ export function foldManualBaselines(
   }
 }
 
+const PAIRING_CACHE_TTL_MS = 60_000;
+
+let pairingCache: {
+  map: Map<string, PairingAccumulator>;
+  expiresAt: number;
+} | null = null;
+
+/** Cache leeren (reset/baseline oder Tests). */
+export function invalidatePairingStatsCache(): void {
+  pairingCache = null;
+}
+
+/** Nur für Tests: Cache-Zustand prüfen. */
+export function pairingStatsCacheStateForTests(): {
+  active: boolean;
+  expiresAt: number | null;
+} {
+  if (!pairingCache) return { active: false, expiresAt: null };
+  return {
+    active: Date.now() < pairingCache.expiresAt,
+    expiresAt: pairingCache.expiresAt,
+  };
+}
+
+/** Nur für Tests: Cache ohne DB befüllen. */
+export function primePairingStatsCacheForTests(
+  map: Map<string, PairingAccumulator>,
+  expiresAt = Date.now() + PAIRING_CACHE_TTL_MS,
+): void {
+  pairingCache = { map, expiresAt };
+}
+
+async function getCachedAccumulatedPairings(): Promise<Map<string, PairingAccumulator>> {
+  if (pairingCache && Date.now() < pairingCache.expiresAt) {
+    return pairingCache.map;
+  }
+  const map = await accumulatePairings();
+  pairingCache = { map, expiresAt: Date.now() + PAIRING_CACHE_TTL_MS };
+  return map;
+}
+
 async function accumulatePairings(): Promise<Map<string, PairingAccumulator>> {
   const [sessions, baselines] = await Promise.all([
     loadFinishedSessions(),
@@ -281,7 +322,7 @@ function toSummary(acc: PairingAccumulator): PairingSummaryDto {
 }
 
 export async function listPairingSummaries(): Promise<PairingSummaryDto[]> {
-  const map = await accumulatePairings();
+  const map = await getCachedAccumulatedPairings();
   return [...map.values()]
     .map(toSummary)
     .sort((a, b) => {
@@ -334,6 +375,8 @@ export async function resetPairings(
 ): Promise<{ deletedSessions: number; skippedMultiPlayer: number }> {
   const targetKeys = normalizePairingKeys(keys);
   if (targetKeys.size === 0) return { deletedSessions: 0, skippedMultiPlayer: 0 };
+
+  invalidatePairingStatsCache();
 
   // Manuell nachgetragene Werte der betroffenen Paarungen ebenfalls entfernen.
   await prisma.pairingManualBaseline.deleteMany({
@@ -397,6 +440,8 @@ function clampInt(value: unknown): number {
 export async function upsertPairingBaselines(
   inputs: PairingBaselineInput[],
 ): Promise<{ written: number; deleted: number }> {
+  invalidatePairingStatsCache();
+
   let written = 0;
   let deleted = 0;
 
@@ -442,7 +487,7 @@ export async function getPairingDetail(key: string): Promise<PairingDetailDto | 
   if (!names) return null;
 
   const normalizedKey = pairingKey(names[0], names[1]);
-  const map = await accumulatePairings();
+  const map = await getCachedAccumulatedPairings();
   const acc = map.get(normalizedKey);
   if (!acc) return null;
 

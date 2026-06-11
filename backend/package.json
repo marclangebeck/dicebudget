@@ -11,6 +11,7 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:create-run": "tsx scripts/create-run.ts",
+    "db:backfill-scored-sequences": "tsx scripts/backfill-scored-sequences.ts",
     "pretest": "DATABASE_URL=file:./prisma/test.db npx prisma migrate deploy && npx prisma generate",
     "test": "DATABASE_URL=file:./prisma/test.db node --import tsx --test src/**/*.test.ts"
   },
