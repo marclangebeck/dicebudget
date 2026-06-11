@@ -9,15 +9,21 @@ type RouteClass = "home-route" | "setup-route" | "play-route";
 type Props = {
   routeClass: RouteClass;
   children: ReactNode;
+  /** false = Browser-Zoom erlauben (Settings, Statistik). */
+  blockPinchZoom?: boolean;
 };
 
 function screenClass(routeClass: RouteClass): string {
   return routeClass.replace("-route", "-screen");
 }
 
-/** Vollbild ohne Dokument-Scroll und ohne Pinch-Zoom. */
-export function FixedScreenShell({ routeClass, children }: Props) {
-  useFixedViewport(routeClass);
+/** Vollbild ohne Dokument-Scroll; Pinch-Zoom optional blockiert. */
+export function FixedScreenShell({
+  routeClass,
+  children,
+  blockPinchZoom = true,
+}: Props) {
+  useFixedViewport(routeClass, { blockPinchZoom });
   const showFooter = routeClass !== "play-route";
 
   return (

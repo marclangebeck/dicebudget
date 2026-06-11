@@ -505,8 +505,7 @@ html.legal-route body {
 
 .home-screen,
 .setup-screen,
-.play-screen,
-.legal-screen {
+.play-screen {
   position: fixed;
   inset: 0;
   display: grid;
@@ -516,6 +515,30 @@ html.legal-route body {
   max-height: none;
   min-height: 0;
   touch-action: manipulation;
+}
+
+.legal-screen {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  min-height: 0;
+  touch-action: auto;
+}
+
+html.zoomable-route.setup-route,
+html.zoomable-route.setup-route body,
+html.zoomable-route.setup-route .setup-screen,
+html.zoomable-route.setup-route .setup-screen-main,
+html.zoomable-route.setup-route .setup-screen-body,
+html.zoomable-route.legal-route,
+html.zoomable-route.legal-route body,
+html.zoomable-route.legal-route .legal-screen,
+html.zoomable-route.legal-route .legal-page-scroll {
+  touch-action: auto;
 }
 
 .play-screen {

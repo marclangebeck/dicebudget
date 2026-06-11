@@ -4,6 +4,9 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
+### Fixed
+- **M24 Zoom:** Settings, Statistik und Legal — `useFixedViewport` blockierte Pinch/Trackpad-Zoom per JS und `touch-action`; jetzt `allowPinchZoom` / `zoomable-route`
+
 ### Added
 - **M24 Pool-Endspiel:** Ereignisbasiertes Session-Reload für Nicht-Sieger (Focus/Visibility, Abschluss-Übergang) — kein Polling; Loading-Hinweis „Session wird aktualisiert…"
 - **M24 a11y:** Skip-Link „Zum Inhalt" auf Home und Settings; Fokus-Falle in `PoolEndgamePanel` und `AchievementOverlay`; Zoom in Settings/Statistik/Legal (Pinch-Zoom nur noch auf Spiel-Routen)

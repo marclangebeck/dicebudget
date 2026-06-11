@@ -19,12 +19,12 @@ export function LegalScrollShell({ children }: Props) {
       html.classList.remove(cls);
       body.classList.remove(cls);
     }
-    html.classList.add("legal-route");
-    body.classList.add("legal-route");
+    html.classList.add("legal-route", "zoomable-route");
+    body.classList.add("legal-route", "zoomable-route");
 
     return () => {
-      html.classList.remove("legal-route");
-      body.classList.remove("legal-route");
+      html.classList.remove("legal-route", "zoomable-route");
+      body.classList.remove("legal-route", "zoomable-route");
     };
   }, []);
 
