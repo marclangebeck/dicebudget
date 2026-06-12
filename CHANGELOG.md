@@ -7,6 +7,9 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ### Fixed
 - **Multi Eintrag Alle Fünfe:** Kein fixes Wurf-Limit pro Feld mehr (Strategy); Chips bis Pool + Restbudget; Hinweis wenn Würfel bei 50 Punkten fehlt
 
+### Changed
+- **Doku:** `HANDOVER.md`, `docs/milestones_active.md`, `docs/milestone-roadmap-analysis.md` — Stand `e198293`, M27/M29 abgenommen, M30 als Nächstes
+
 ### Added
 - **M29 Stats-Reset:** Nach `resetPairings` werden Ligapunkte betroffener Serien via `rebuildLeagueStandings` neu berechnet; UI-Hinweis in Statistik
 - **M29 Match-Analyse:** `GET .../match-analysis` erfordert `X-Player-Secret` des Viewers oder Session-Status `FINISHED`; Frontend sendet Secret aus aktivem Spiel

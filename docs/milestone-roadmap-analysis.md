@@ -1,11 +1,11 @@
 # Milestone-Roadmap — Umsetzung Projektanalyse
 
 **Erstellt:** 2026-06-11  
-**Aktualisiert:** 2026-06-11 (M23 abgenommen)  
+**Aktualisiert:** 2026-06-11 (M27, M29, Bugfix abgenommen)  
 **Basis:** Vollständige Projektanalyse (Backend, Frontend, Release)  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `cce4996` (M23)  
-**Nächster Milestone:** **M27** (GO vom Nutzer ausstehend)  
+**Produktcode-HEAD:** `e198293`  
+**Nächster Milestone:** **M30** App Store Release  
 **Arbeitsweise:** Pro Milestone ein **GO** vom Nutzer, danach Umsetzung in Sprints, dann Abnahme.
 
 Dieses Dokument ergänzt `docs/milestones_active.md`. Nach Abschluss eines Milestones: Eintrag in `CHANGELOG.md`, Update `HANDOVER.md`, optional Archivierung hier.
@@ -20,10 +20,10 @@ Dieses Dokument ergänzt `docs/milestones_active.md`. Nach Abschluss eines Miles
 | **M24** | UX-Blocker & Deploy-Verifikation | 3 | 1–2 Agent-Sessions | **Blocker App Store** — **abgenommen 2026-06-11** |
 | **M25** | Backend-Performance | 3 | 1–2 Agent-Sessions | Empfohlen vor Release — **abgenommen 2026-06-11** |
 | **M26** | Backend-Qualität & Tests | 3 | 2 Agent-Sessions | Empfohlen vor Release — **abgenommen 2026-06-11** |
-| **M27** | Frontend-Tests & Stabilität | 3 | 2 Agent-Sessions | Empfohlen vor Release — **als Nächstes** |
+| **M27** | Frontend-Tests & Stabilität | 3 | 2 Agent-Sessions | Empfohlen vor Release — **abgenommen 2026-06-11** |
 | **M28** | Frontend-Architektur & Bundle | 3 | 2–3 Agent-Sessions | Nach Release möglich |
-| **M29** | Technische Schulden & Security-Patch | 3 | 1–2 Agent-Sessions | Empfohlen vor Release |
-| **M30** | App Store Release (organisatorisch) | 3 | 1–2 Wochen (Nutzer + Apple) | **Release** |
+| **M29** | Technische Schulden & Security-Patch | 3 | 1–2 Agent-Sessions | Empfohlen vor Release — **abgenommen 2026-06-11** |
+| **M30** | App Store Release (organisatorisch) | 3 | 1–2 Wochen (Nutzer + Apple) | **Release — als Nächstes** |
 | **M31** | Post-Release v1.1 — Plattform | 3 | 2–3 Agent-Sessions | v1.1 |
 | **M32** | DevOps & Betrieb | 3 | 1–2 Agent-Sessions | v1.1 |
 | **M33** | Produkt v1.2 — Komfort | 3 | 2–3 Agent-Sessions | v1.2 |
@@ -47,7 +47,7 @@ Der Kontext eines Agent-Chats nähert sich bei **~80–90 %** der Kapazität an 
 
 ### Start-Prompt für Folge-Agent (kopieren)
 
-**Aktuell (M24):** siehe Abschnitt „Agent-Start M24“ unten.
+**Aktuell (M30):** siehe `HANDOVER.md` Agent-Start und Abschnitt M30 unten.
 
 **Allgemeine Vorlage:**
 

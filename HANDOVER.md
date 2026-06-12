@@ -3,10 +3,10 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `cce4996` → M24 nach Commit  
+**Produktcode-HEAD:** `e198293`  
 **Sprache:** Deutsch
 
-Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (M24 UX-Blocker & Deploy-Verifikation). Aktiver Milestone-Stand: `docs/milestones_active.md`. iOS/TestFlight: `docs/ios_current.md`. Architektur/Betrieb: `docs/decisions.md` nur bei Bedarf.
+Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M30** App Store Release). Aktiver Milestone-Stand: `docs/milestones_active.md`. iOS/TestFlight: `docs/ios_current.md`. Architektur/Betrieb: `docs/decisions.md` nur bei Bedarf.
 
 ## Verbindliche Regeln
 
@@ -25,36 +25,53 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (M24 
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
 | Branch | `milestone-22-prep` |
-| Produktcode-HEAD | M26 — Backend-Qualität (OpenAPI, Route-Tests, ABANDONED, player-names API) |
-| Roadmap | M26 umgesetzt; **M27** Frontend-Tests als Nächstes |
+| Produktcode-HEAD | `e198293` — Bugfix Strategy-Würfe / Alle-Fünfe-Eintrag |
+| Roadmap | **M27**, **M29** abgenommen; **M30** App Store Release als Nächstes |
 | Startscreen (Standard) | **Cinematic Editorial** — gestapelte Poster-Kacheln Multi/Solo; Bilanz-Chip oben; integrierte Glas-CTA; Rollback: `HomeBentoGridClassic` |
 | Layout-Umschaltung | `NEXT_PUBLIC_HOME_LAYOUT=cinematic\|classic` in `frontend/.env.production`; `bash infra/scripts/set-home-layout.sh …`; Browser: `localStorage dicebudget.homeLayout` |
-| Backend | M23 deployed; Admin-Key gesetzt; Coaching/`scoreProgression`/Migration `extra_yatzy_die_values` — in M24 verifizieren |
+| Backend | M23–M26 deployed; M29 (`rebuildLeagueStandings`, Match-Analyse-Auth); Bugfix `e198293` — **Prod-Deploy durch Nutzer bestätigen** |
+| Frontend-Tests | 22 Unit-Tests (`npm run test`); Playwright E2E (`npm run test:e2e`, 3 Smoke-Tests) |
 | Branding | Nutzer-sichtbar **DiceBudget** und **Alle Fünfe** |
 | Footer | `Home · Statistik · Einstellungen · Menü` — Glas-Morph-Menü, Screenshot, Support, Legal |
 | Multi-Raum | **Code teilen** nur Code (kein Einladungstext/Link) |
-| iOS/TestFlight | Version `2.0`; **Build `2.0 (28)`** mit `d8b5952` (Upload/Verarbeitung 2026-06-11); zuvor `2.0 (27)` mit `66e8487` |
+| iOS/TestFlight | Version `2.0`; **Build `2.0 (28)`** mit `d8b5952` (älter als HEAD); nächster Upload nach M30-Regression auf aktuellem HEAD |
 
 ## Wichtig: iOS-Bundle ≠ Web-Deploy
 
 - UI in der App aus `frontend/ios/App/App/public/` (gitignored).
 - Nur **`npm run build:ios`** auf dem Mac befüllt das Bundle.
-- Vor Archive: `git log -1` → `d8b5952`; Bundle-Check: `grep -c home-cinematic-door` in `ios/App/App/public/_next/static/css/*.css` > 0.
+- Vor Archive: `git log -1` → aktueller HEAD; Bundle-Check: `grep -c home-cinematic-door` in `ios/App/App/public/_next/static/css/*.css` > 0.
 
-## Letzte Produktänderungen (`d8b5952`)
+## Letzte Produktänderungen
+
+### `e198293` — Bugfix Multi Alle Fünfe / Strategy-Würfe
 
 | Feature | Backend nötig |
 |---------|---------------|
-| Cinematic Editorial Startscreen (gestapelte Poster, Bilanz-Chip, Würfel-Bühne + integrierte CTA) | Nein |
-| Classic-Startscreen als `HomeBentoGridClassic` + Layout-Switch (`homeLayout.ts`, `set-home-layout.sh`) | Nein |
+| Kein fixes 20-Würfe-Limit pro Feld; Grenzen nur Pool + Gesamtbudget | **Ja** |
+| Wurf-Chips bis `rollsRemaining`; Hinweis wenn bei 50 Punkten kein Würfel 1–6 gewählt | Nein (Frontend) |
+| `strategyRollChipOptions()` + Tests in `frontend/lib/gameRules.test.ts` | Nein |
+
+Dateien: `backend/src/domain/gameRules.ts`, `backend/src/services/playField.ts`, `frontend/lib/gameRules.ts`, `frontend/components/ScoreEntryPanel.tsx`, `PlayBoard.tsx`, `TableModePlayBoard.tsx`, `frontend/lib/localSoloRun.ts`
+
+### `706d509` — M29 Technische Schulden & Security
+
+- `rebuildLeagueStandings` nach Stats-Reset; Match-Analyse erfordert `X-Player-Secret` oder Session `FINISHED`
+- Next.js 15.5.19; Backend `npm audit fix`
+
+### `4d81f50` — M27 Frontend-Tests & Stabilität
+
+- Playwright E2E (`e2e/`), `AppErrorBoundary` für `/app`, `/play`, `/stats`
+- Unit-Tests: `gameScoring`, `pairingMerge`, `localSoloRun`, `gameRules`
 
 ## Bekanntes UX-Thema (offen)
 
-- **Punkte-Duell live:** Multi-Analyse-Graph nach Backend-Deploy (`scoreProgression`) — Prod-Verifikation: `bash infra/scripts/verify-prod-api.sh`
-- **Safari-/WebView-Cache:** Hard-Reload nach Deploy/TestFlight-Update; nginx reload falls Cache-Header fehlen (siehe unten)
-- **Mac `git pull`:** `git restore frontend/package-lock.json` vor Pull.
+- **Prod-Backend Bugfix:** Deploy-Skript nur vom **Projektroot**: `sudo bash infra/scripts/deploy-backend-prod.sh`
+- **Manueller Test:** Multi — Alle Fünfe (50) im 23.+ Wurf mit Würfelwahl 1–6
+- **Safari-/WebView-Cache:** Hard-Reload nach Deploy/TestFlight-Update; nginx reload falls Cache-Header fehlen
+- **Mac `git pull`:** vom Projektroot `git restore frontend/package-lock.json`; bereits in `frontend/`: `git restore package-lock.json` oder Schritt weglassen
 
-## Prod-Verifikation & nginx (M24)
+## Prod-Verifikation & nginx
 
 Einmalig nach Deploy (kein Loop):
 
@@ -68,30 +85,38 @@ Optional mit abgeschlossener Multi-Session:
 VERIFY_INVITE=CODE VERIFY_PLAYER=PLAYERID bash infra/scripts/verify-prod-api.sh
 ```
 
+**Backend-Deploy** (vom Projektroot):
+
+```bash
+cd ~/projects/kniffel
+sudo bash infra/scripts/deploy-backend-prod.sh
+```
+
 **nginx Cache-Header** (HTML `no-cache`, `_next/static/` `immutable`) — reload durch Nutzer:
 
 ```bash
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-Prisma-Migration auf Prod: `cd backend && npx prisma migrate status` (u. a. `extra_yatzy_die_values`, `solo_secret_token`).
+Prisma-Migration auf Prod: `cd backend && npx prisma migrate status`.
 
 ## Wichtige Dateien
 
-- Startscreen: `HomeBentoGrid.tsx`, `HomeBentoGridCinematic.tsx`, `HomeBentoGridClassic.tsx`, `HomeHeroBanner.tsx`, `lib/homeLayout.ts`, `lib/useHomeHeroData.ts`, `globals.css` (`.home-cinematic*`)
-- Layout-Script: `infra/scripts/set-home-layout.sh`
-- Footer/Menü: `AppLegalFooter.tsx`, `AppFooterMenu.tsx`
-- Multi-Teilen: `multi/page.tsx`, `shareSocial.ts`
-- Abschluss/Analyse: `RunFinishScreen.tsx`, `MatchAnalysisView.tsx`
+- Strategy-Würfe / Alle Fünfe: `frontend/lib/gameRules.ts`, `ScoreEntryPanel.tsx`, `backend/src/domain/gameRules.ts`, `backend/src/services/playField.ts`
+- Tests: `frontend/lib/gameRules.test.ts`, `frontend/e2e/`, `frontend/lib/gameScoring.test.ts`
+- Startscreen: `HomeBentoGridCinematic.tsx`, `HomeBentoGridClassic.tsx`, `lib/homeLayout.ts`
+- Match-Analyse: `MatchAnalysisView.tsx`, `backend/src/services/matchAnalysisService.ts`
+- Stats-Reset: `backend/src/services/pairingStats.ts`, `rebuildLeagueStandings`
 - Nginx: `infra/nginx/dicebudget.bottle-trade.de.conf`
+- Deploy: `infra/scripts/deploy-backend-prod.sh`, `infra/scripts/verify-prod-api.sh`
 
 ## Offene Prioritäten
 
-1. **M27** (Roadmap): Frontend-Tests & Stabilität — `GO M27` vom Nutzer.
-2. TestFlight-Regression: Cinematic-Startscreen, Footer/Menü, `/play`, Pool-Endspiel (Auto-Refresh Nicht-Sieger), Fortschritt, Code teilen.
-3. nginx reload (Cache-Header), falls `verify-prod-api.sh` no-cache meldet.
-4. App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`.
-5. Später: Web-Zugang nach App-Store-Release deaktivieren (nur App + API).
+1. **Prod-Backend-Deploy** für `e198293` + manueller Multi-Regressionstest (Alle Fünfe Wurf 23+)
+2. **M30 Sprint 30.1** — TestFlight-Regression final (`GO M30`)
+3. **M30 Sprint 30.2** — App Store Connect (Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten)
+4. iOS-Build auf aktuellem HEAD: `npm run build:ios` → Archive → Upload nächste Build-Nummer
+5. `milestone-22-prep` → `main` Merge nach Nutzer-Freigabe post-Release
 
 ## Pflicht-Lesereihenfolge
 
@@ -99,10 +124,13 @@ Prisma-Migration auf Prod: `cd backend && npx prisma migrate status` (u. a. `ext
 2. `HANDOVER.md`
 3. `docs/milestones_active.md` (nur bei Bedarf)
 
-Optional: `docs/ios_current.md`, `docs/decisions.md`, `docs/milestones_archive.md`, `docs/ios_archive.md`
+Optional: `docs/ios_current.md`, `docs/milestone-roadmap-analysis.md`, `docs/decisions.md`
 
 ## Agent-Start
 
 ```text
-Du arbeitest an dice.budget (kniffel). Lies AGENT_RULES.md und HANDOVER.md — Aufträge folgen danach; milestones_active.md nur bei Bedarf.
+Du arbeitest an dice.budget (kniffel). Lies AGENT_RULES.md und HANDOVER.md.
+Branch milestone-22-prep, HEAD e198293. M27 und M29 abgenommen; Bugfix Strategy-Würfe committed.
+Prüfe Prod-Backend-Deploy für e198293, dann M30 App Store Release (Sprint 30.1 Regression).
+Keine Commits ohne GO. Antworte auf Deutsch.
 ```

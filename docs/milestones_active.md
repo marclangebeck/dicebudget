@@ -2,7 +2,7 @@
 
 **Stand:** 2026-06-11  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `d8b5952`  
+**Produktcode-HEAD:** `e198293`  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -22,16 +22,47 @@ Technische Basis ist erledigt:
 - Zuvor: **`2.0 (27)`** mit `66e8487` (Arena Classic); **`2.0 (26)`** historisch wirkungslos.
 - iOS-UI kommt nur aus `npm run build:ios` auf dem Mac (`ios/App/App/public/` ist gitignored).
 
-Offen:
+Offen (M30):
 
-- TestFlight-Regression: Cinematic-Startscreen, Footer/Menü/Glas, `/play`, Pool-Endspiel, Fortschritt, Code teilen.
-- nginx Cache-Header reloaden (Safari-Cache-Thema).
-- Backend deployen (Coaching, `scoreProgression`, Migration `extra_yatzy_die_values`) — falls noch offen.
-- App Store Connect fuer kostenpflichtigen Release fertigstellen.
+- Prod-Backend-Deploy fuer Bugfix `e198293` (Strategy-Wuerfe ohne Feld-Limit) — Nutzer bestaetigen.
+- TestFlight-Regression auf aktuellem HEAD: Cinematic-Startscreen, Footer/Menü/Glas, `/play`, Pool-Endspiel, Fortschritt, Code teilen, Alle-Fuenfe-Eintrag Wurf 23+.
+- iOS-Upload naechste Build-Nummer nach `npm run build:ios` auf HEAD.
+- App Store Connect fuer kostenpflichtigen Release fertigstellen (Agreement, 1,19 EUR, Metadaten).
 
 Details: `docs/ios_current.md`.
 
 ## Letzte Abgeschlossene Milestones
+
+### Bugfix Multi Alle Fünfe / Strategy-Würfe 2026-06-11
+
+**Status:** erledigt im Produktcode (`e198293`); Server Frontend-Tests 22/22; Frontend-Build ok; **Prod-Backend-Deploy offen**.
+
+- Kein fixes 20-Wuerfe-Limit pro Feld mehr (Backend + Frontend + Solo lokal).
+- Grenzen nur noch: Pool + Gesamtbudget (`Spielanzahl × 39`).
+- Wurf-Chips bis `rollsRemaining`; Hinweis wenn bei Alle Fünfe (50) kein Wuerfel 1–6 gewaehlt.
+- Fehler statt stillem `return` bei ungueltigem Eintrag.
+
+Dateien: `backend/src/domain/gameRules.ts`, `backend/src/services/playField.ts`, `frontend/lib/gameRules.ts`, `frontend/lib/gameRules.test.ts`, `frontend/lib/localSoloRun.ts`, `ScoreEntryPanel.tsx`, `PlayBoard.tsx`, `TableModePlayBoard.tsx`
+
+### M29 Technische Schulden & Security 2026-06-11
+
+**Status:** abgenommen (`706d509`); Server- und Mac-Tests gruen.
+
+- `rebuildLeagueStandings` nach Stats-Reset (`resetPairings`).
+- Match-Analyse: `GET .../match-analysis` erfordert `X-Player-Secret` oder Session `FINISHED`.
+- Next.js 15.5.19; Backend `npm audit fix` (0 Findings); postcss moderate transitiv dokumentiert.
+
+Dateien: `backend/src/services/pairingStats.ts`, `backend/src/routes/sessions.ts`, `frontend/lib/api.ts`, `frontend/package.json`, `CHANGELOG.md`
+
+### M27 Frontend-Tests & Stabilität 2026-06-11
+
+**Status:** abgenommen (`4d81f50`); Mac E2E 3/3 nach `npm install`.
+
+- Playwright Smoke-Tests (`e2e/`, `npm run test:e2e`): Solo, Multi-Join, Home `/app`.
+- `AppErrorBoundary` fuer `/app`, `/play`, `/stats`.
+- Unit-Tests: `gameScoring`, `pairingMerge`, `localSoloRun` (`npm run test`).
+
+Dateien: `frontend/e2e/`, `frontend/components/AppErrorBoundary.tsx`, `frontend/lib/gameScoring.test.ts`, `frontend/lib/pairingMerge.test.ts`, `frontend/lib/localSoloRun.test.ts`
 
 ### UX Startscreen Cinematic Editorial 2026-06-11
 
@@ -308,28 +339,25 @@ Dateien:
 
 ## Offene Aufgaben
 
-1. TestFlight-Regression: Startscreen-Arena, Footer/Menü/Glas, Fortschritt, Code teilen, Footer/`/play`, Pool-Endspiel.
-2. **Backend deployen** (falls noch offen): Coaching-API + `scoreProgression` + Migration `extra_yatzy_die_values`.
-3. nginx reload nach Cache-Header-Deploy (Nutzer sudo).
+1. **Prod-Backend-Deploy** Bugfix `e198293`: `sudo bash infra/scripts/deploy-backend-prod.sh` (vom Projektroot).
+2. Manueller Multi-Test: Alle Fünfe (50) ab Wurf 23 mit Wuerfelwahl.
+3. **M30** TestFlight-Regression auf HEAD; iOS-Upload naechste Build-Nummer.
 4. App Store Connect: Paid Applications Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
 5. Optional: Auto-Refresh nach Pool-Endspiel fuer Statistik-Toggle.
-6. Optional: Stats-Reset-/Baseline-Endpunkte auf eigene Paarungen einschraenken.
-7. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
+6. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
 
 ## Bekannte Technische Schulden
 
-- `POST /stats/pairings/reset` ist destruktiv, ohne Auth und global wirksam.
-- `POST /stats/pairings/baseline` ist ohne Auth und global wirksam.
-- `LeagueStanding` wird nach Statistik-Reset nicht rueckwirkend neu berechnet.
-- Next.js Security-Upgrade ist als spaeteres Thema notiert.
-- Frontend-/E2E-Tests fehlen, insbesondere fuer iPad-Tischmodus, neue Game-Dashboard-Optik und iOS-Startscreen-Scroll.
+- Stats-Endpunkte sind durch `X-Admin-Key` geschuetzt (M23); Key nur in Env, kein UI-Prompt.
+- Frontend transitive `postcss` moderate (via Next.js) — kein sicherer Fix ohne Next-Major.
+- E2E-Abdeckung noch duenn (3 Smoke-Tests); iPad-Tischmodus und iOS-Scroll nicht abgedeckt.
 - Admin-UI fuer manuelle Paarungs-Baselines fehlt.
 
 ## Aktuelle Prioritaeten
 
-1. TestFlight-Regression inkl. Startscreen-Arena, Footer/Menü/Glas, Fortschritt, Code teilen.
-2. Backend deployen (falls noch offen); nginx reload (Cache-Header).
-3. Store-Connect-Freigaben und Metadaten abschliessen.
+1. Prod-Backend-Deploy + Multi-Regression Bugfix `e198293`.
+2. **M30** TestFlight-Regression und App Store Connect.
+3. iOS-Build auf HEAD; Release-Submit.
 
 ## Wichtige Dateien Fuer Aktuelle Arbeit
 
@@ -337,7 +365,8 @@ Dateien:
 - `HANDOVER.md`
 - `docs/ios_current.md`
 - `docs/decisions.md`
-- `frontend/lib/shareSocial.ts`, `frontend/lib/gameFeedbackPrefs.ts`, `frontend/lib/feedbackOverlayQueue.ts`, `frontend/lib/runProgressFeedback.ts`
+- `frontend/lib/gameRules.ts`, `frontend/lib/gameRules.test.ts`
+- `frontend/e2e/`, `frontend/components/AppErrorBoundary.tsx`
 - `frontend/lib/shareCanvasUtils.ts`, `frontend/lib/achievementShare.ts`, `frontend/lib/matchResultShare.ts`
 - `frontend/components/RunProgressOverlay.tsx`, `frontend/app/settings/feedback/page.tsx`
 - `frontend/components/ShareActionBar.tsx`, `frontend/components/AchievementShareBar.tsx`
