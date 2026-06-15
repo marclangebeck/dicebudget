@@ -4,6 +4,9 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
+### Changed
+- **Screenshot:** Button „Bild“ in der Fußleiste; Kamera-Blitz, Vorschau vor dem Teilen, Toast statt Menü-Reopen; Hamburger nur noch Support/Rechtliches
+
 ### Fixed
 - **iPad-Tisch Namen:** Leere Eingabe bleibt leer (kein Zurücksetzen auf „Links“/„Rechts“); Fallback nur beim Spielstart
 

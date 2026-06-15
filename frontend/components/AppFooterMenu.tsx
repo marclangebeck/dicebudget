@@ -11,20 +11,8 @@ import {
 
 type Props = {
   open: boolean;
-  screenshotBusy: boolean;
-  statusMessage: string | null;
   onClose: () => void;
-  onScreenshot: () => void;
 };
-
-function ScreenshotIcon() {
-  return (
-    <svg className="app-footer-menu-icon" viewBox="0 0 24 24" aria-hidden fill="none">
-      <path d="M5 8.5h2.2l1.2-1.6a1.2 1.2 0 0 1 .96-.5h5.24a1.2 1.2 0 0 1 .96.5L16.8 8.5H19a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2Z" />
-      <circle cx="12" cy="13" r="3.2" />
-    </svg>
-  );
-}
 
 function SupportIcon() {
   return (
@@ -66,13 +54,7 @@ function ExternalIcon() {
   );
 }
 
-export function AppFooterMenu({
-  open,
-  screenshotBusy,
-  statusMessage,
-  onClose,
-  onScreenshot,
-}: Props) {
+export function AppFooterMenu({ open, onClose }: Props) {
   if (!open) return null;
 
   const supportHref = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`${APP_NAME} Support`)}`;
@@ -89,17 +71,6 @@ export function AppFooterMenu({
         </header>
 
         <ul className="app-footer-menu-list">
-          <li>
-            <button
-              type="button"
-              className="app-footer-menu-item"
-              disabled={screenshotBusy}
-              onClick={() => void onScreenshot()}
-            >
-              <ScreenshotIcon />
-              <span>{screenshotBusy ? "Erstelle Screenshot …" : "Screenshot"}</span>
-            </button>
-          </li>
           <li>
             <a href={supportHref} className="app-footer-menu-item" onClick={onClose}>
               <SupportIcon />
@@ -131,8 +102,6 @@ export function AppFooterMenu({
             </a>
           </li>
         </ul>
-
-        {statusMessage && <p className="app-footer-menu-status">{statusMessage}</p>}
       </nav>
     </div>
   );
