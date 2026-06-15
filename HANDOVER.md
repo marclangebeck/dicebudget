@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:**  `188d31d` (UX-Politur II: Hamburger, Einstellungen Slate/Accordion, Statistik-Accordion, Spielabschluss)
+**Produktcode-HEAD:**  `23f24e6` (UX-Politur II: Hamburger, Einstellungen Slate/Accordion, Statistik-Accordion, Spielabschluss)
 **Sprache:** Deutsch
 
 Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M30** App Store Release). Aktiver Milestone-Stand: `docs/milestones_active.md`. iOS/TestFlight: `docs/ios_current.md`. Architektur/Betrieb: `docs/decisions.md` nur bei Bedarf.

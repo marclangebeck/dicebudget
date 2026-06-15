@@ -23,7 +23,7 @@ Nur bei Bedarf:
 ## Aktueller Kurzstand
 
 - Branch: `milestone-22-prep`
-- Produktcode-HEAD: `188d31d`
+- Produktcode-HEAD: `23f24e6`
 - Web/API live: https://dicebudget.bottle-trade.de
 - iOS: TestFlight `2.0 (28)`; nächster Upload **`2.0 (29)`** auf Web-HEAD
 - Letzte Features: UX-Politur II (Hamburger, Einstellungen Slate/Accordion, Statistik-Accordion, Spielabschluss); davor Statistik-Hero, Spielanalyse-Kern, Hausregeln (Labor)
