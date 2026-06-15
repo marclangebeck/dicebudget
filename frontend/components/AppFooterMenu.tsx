@@ -1,17 +1,29 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import {
   APP_NAME,
+  APP_SHORT,
   BOTTLE_TRADE_URL,
   CONTACT_EMAIL,
   IMPRESSUM_PATH,
   PRIVACY_PATH,
 } from "@/lib/branding";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 
 type Props = {
   open: boolean;
   onClose: () => void;
+};
+
+type MenuEntry = {
+  key: string;
+  label: string;
+  hint: string;
+  href: string;
+  external?: boolean;
+  icon: ReactNode;
 };
 
 function SupportIcon() {
@@ -54,54 +66,157 @@ function ExternalIcon() {
   );
 }
 
-export function AppFooterMenu({ open, onClose }: Props) {
-  if (!open) return null;
+function MenuDiceDecor() {
+  return (
+    <div className="app-footer-menu-dice" aria-hidden>
+      <span className="app-footer-menu-die app-footer-menu-die--a">
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+      </span>
+      <span className="app-footer-menu-die app-footer-menu-die--b">
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+      </span>
+    </div>
+  );
+}
 
-  const supportHref = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`${APP_NAME} Support`)}`;
+const MENU_ENTRIES: MenuEntry[] = [
+  {
+    key: "support",
+    label: "Support",
+    hint: "Fragen & Feedback",
+    href: `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`${APP_NAME} Support`)}`,
+    icon: <SupportIcon />,
+  },
+  {
+    key: "privacy",
+    label: "Datenschutz",
+    hint: "Deine Daten",
+    href: PRIVACY_PATH,
+    icon: <PrivacyIcon />,
+  },
+  {
+    key: "impressum",
+    label: "Impressum",
+    hint: "Anbieter & Kontakt",
+    href: IMPRESSUM_PATH,
+    icon: <InfoIcon />,
+  },
+  {
+    key: "bottle-trade",
+    label: "bottle-trade.de",
+    hint: "Mutterprojekt",
+    href: BOTTLE_TRADE_URL,
+    external: true,
+    icon: <ExternalIcon />,
+  },
+];
+
+export function AppFooterMenu({ open, onClose }: Props) {
+  const panelRef = useRef<HTMLElement>(null);
+  useFocusTrap(panelRef, open);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open, onClose]);
 
   return (
-    <div className="app-footer-menu" data-capture-exclude="true" role="dialog" aria-modal="true" aria-label="Menü">
-      <button type="button" className="app-footer-menu-backdrop" aria-label="Menü schließen" onClick={onClose} />
-      <nav className="app-footer-menu-panel">
-        <header className="app-footer-menu-head">
-          <p className="app-footer-menu-kicker">Menü</p>
-          <button type="button" className="app-footer-menu-close" onClick={onClose} aria-label="Schließen">
-            ✕
+    <div
+      className={`app-footer-menu ${open ? "is-open" : ""}`}
+      data-capture-exclude="true"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Menü"
+      aria-hidden={!open}
+      inert={open ? undefined : true}
+    >
+      <button
+        type="button"
+        className="app-footer-menu-backdrop"
+        aria-label="Menü schließen"
+        tabIndex={open ? 0 : -1}
+        onClick={onClose}
+      />
+      <nav ref={panelRef} className="app-footer-menu-sheet" aria-label="Rechtliches und Support">
+        <div className="app-footer-menu-sheet-glow" aria-hidden />
+        <header className="app-footer-menu-brand">
+          <MenuDiceDecor />
+          <div className="app-footer-menu-brand-copy">
+            <p className="app-footer-menu-brand-name">{APP_SHORT}</p>
+            <p className="app-footer-menu-brand-tag">Strategy Edition</p>
+          </div>
+          <button
+            type="button"
+            className="app-footer-menu-close"
+            onClick={onClose}
+            aria-label="Schließen"
+            tabIndex={open ? 0 : -1}
+          >
+            <span aria-hidden />
+            <span aria-hidden />
           </button>
         </header>
 
         <ul className="app-footer-menu-list">
-          <li>
-            <a href={supportHref} className="app-footer-menu-item" onClick={onClose}>
-              <SupportIcon />
-              <span>Support</span>
-            </a>
-          </li>
-          <li>
-            <Link href={PRIVACY_PATH} className="app-footer-menu-item" onClick={onClose}>
-              <PrivacyIcon />
-              <span>Datenschutz</span>
-            </Link>
-          </li>
-          <li>
-            <Link href={IMPRESSUM_PATH} className="app-footer-menu-item" onClick={onClose}>
-              <InfoIcon />
-              <span>Impressum</span>
-            </Link>
-          </li>
-          <li>
-            <a
-              href={BOTTLE_TRADE_URL}
-              className="app-footer-menu-item"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={onClose}
-            >
-              <ExternalIcon />
-              <span>bottle-trade.de</span>
-            </a>
-          </li>
+          {MENU_ENTRIES.map((entry, index) => {
+            const className = "app-footer-menu-item";
+            const style = { "--menu-item-index": index } as CSSProperties;
+            const content = (
+              <>
+                <span className="app-footer-menu-item-icon">{entry.icon}</span>
+                <span className="app-footer-menu-item-copy">
+                  <span className="app-footer-menu-item-label">{entry.label}</span>
+                  <span className="app-footer-menu-item-hint">{entry.hint}</span>
+                </span>
+                <span className="app-footer-menu-item-chevron" aria-hidden />
+              </>
+            );
+
+            return (
+              <li key={entry.key} className="app-footer-menu-row">
+                {entry.external || entry.href.startsWith("mailto:") ? (
+                  <a
+                    href={entry.href}
+                    className={className}
+                    style={style}
+                    tabIndex={open ? 0 : -1}
+                    {...(entry.external
+                      ? { target: "_blank", rel: "noopener noreferrer" }
+                      : {})}
+                    onClick={onClose}
+                  >
+                    {content}
+                  </a>
+                ) : (
+                  <Link
+                    href={entry.href}
+                    className={className}
+                    style={style}
+                    tabIndex={open ? 0 : -1}
+                    onClick={onClose}
+                  >
+                    {content}
+                  </Link>
+                )}
+              </li>
+            );
+          })}
         </ul>
+
+        <p className="app-footer-menu-foot">Würfel. Strategie. Bilanz.</p>
       </nav>
     </div>
   );

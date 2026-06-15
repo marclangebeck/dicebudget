@@ -2,7 +2,7 @@
 
 **Stand:** 2026-06-15  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `d6bd92b` (Zusatzregeln-UI)  
+**Produktcode-HEAD:** `04ab018` (Spielanalyse, Statistik, Einstellungen, Screenshot, Startscreen)  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -19,27 +19,40 @@ Technische Basis ist erledigt:
 - Native App startet direkt auf `/app`.
 - Native API-Basis zeigt auf `https://dicebudget.bottle-trade.de/api`.
 - TestFlight ist aktiv; **aktueller Build `2.0 (28)`** mit Produktcode **`d8b5952`** (Cinematic Editorial Startscreen).
-- Zuvor: **`2.0 (27)`** mit `66e8487` (Arena Classic); **`2.0 (26)`** historisch wirkungslos.
+- **Web-HEAD `04ab018`** enthält Einstellungen Ein-Screen, Statistik-Hero, Spielanalyse-Kern, Screenshot-Footer, Startscreen-Würfel — **noch nicht in iOS** (Build 29 ausstehend).
 - iOS-UI kommt nur aus `npm run build:ios` auf dem Mac (`ios/App/App/public/` ist gitignored).
 
 Offen (M30):
 
-- TestFlight-Regression auf HEAD: Feature-Labor, Hausregeln (Strategy), Cinematic-Startscreen, Footer, `/play`, Pool-Endspiel.
-- iOS-Upload **Build `2.0 (29)`** nach `npm run build:ios` auf Mac.
+- iOS-Upload **Build `2.0 (29)`** nach `npm run build:ios` auf Mac (HEAD `04ab018`).
+- TestFlight-Regression: Einstellungen Ein-Screen, Statistik-Hero, Spielanalyse (Kern + 10%-Graph), Screenshot-Footer, Fortschritt vorn/zurück, Hausregeln, Cinematic-Startscreen.
 - App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
 
 Details: `docs/ios_current.md`.
 
 ## Letzte Abgeschlossene Milestones
 
+### UX Politur Einstellungen / Statistik / Analyse 2026-06-15
+
+**Status:** implementiert; Web/Server-Frontend gebaut (HEAD `04ab018`); iOS noch auf Build 28.
+
+- **Einstellungen Ein-Screen:** Alle Toggles + Solo/Multi-Start; Labs/Feedback leiten um; iPad-Namen leer lassen.
+- **Statistik Stufe A+B:** `StatsHeroPanel`, Badges, Duellbalken, Sortierung.
+- **Spielanalyse:** Kern „Warum verloren?“; Details eingeklappt; Graph alle 10 %.
+- **Fortschritt 25/50/75 %:** vorn/zurück/gleichauf; manuell wegklickbar.
+- **Screenshot:** Footer-Button „Bild“, Vorschau, Toast.
+- **Startscreen:** Würfel größer, ohne Puls-Ring.
+
+Dateien: `app/settings/page.tsx`, `StatsHeroPanel.tsx`, `MatchAnalysisView.tsx`, `ScoreProgressionChart.tsx`, `RunProgressOverlay.tsx`, `AppLegalFooter.tsx`, `HomeBentoGridCinematic.tsx`, `lib/statsOverview.ts`, `lib/scoreProgressionChart.ts`, `lib/runProgressFeedback.ts`
+
 ### Hausregeln Strategy (Feature-Labor) 2026-06-15
 
-**Status:** implementiert; Backend Prod deployed; Web-Frontend gebaut (HEAD `d6bd92b`); iOS noch auf Build 28.
+**Status:** implementiert; Backend Prod deployed; Web-Frontend gebaut; iOS noch auf Build 28.
 
 - **Brennt:** −5 Pool vor Eintrag (leeres Feld); Button im Wurf-Overlay (`ScoreEntryPanel`).
 - **Wurf verkaufen / 2× Alle Fünfe:** **Zusatzregeln** — Popover rechts am Zettel oder eingeklappt im Overlay (`HouseRulesTableActions`).
 - **iPad-Tischmodus:** Hausregeln in `TableModePlayBoard` (seit `1457a2f`).
-- Aktivierung: Entwickler-Vorschau (`NEXT_PUBLIC_LABS_PIN`, `/settings/labs`); Labor pro Gerät.
+- Aktivierung: Entwickler-Vorschau (`NEXT_PUBLIC_LABS_PIN`, Code auf `/settings` → Hausregeln-Toggles); Labor pro Gerät.
 
 Dateien: `backend/src/domain/houseRules.ts`, `houseRulesService.ts`, `frontend/lib/houseRules.ts`, `HouseRulesTableActions.tsx`, `HouseRulesPanel.tsx`, `ScoreEntryPanel.tsx`, `TableModePlayBoard.tsx`, `RollSaleOverlay.tsx`
 
@@ -47,7 +60,7 @@ Dateien: `backend/src/domain/houseRules.ts`, `houseRulesService.ts`, `frontend/l
 
 **Status:** abgenommen (`5e621ac`).
 
-- Code-Freischaltung, `/settings/labs`, `featureFlags.ts` für schrittweisen Feature-Rollout.
+- Code-Freischaltung auf `/settings` (Route `/settings/labs` leitet um), `featureFlags.ts` für schrittweisen Feature-Rollout.
 
 Dateien: `labsAccess.ts`, `LabsUnlockDialog.tsx`, `app/settings/labs/page.tsx`
 

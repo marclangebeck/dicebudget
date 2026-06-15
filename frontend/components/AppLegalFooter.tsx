@@ -49,12 +49,17 @@ function ScreenshotIcon() {
   );
 }
 
-function MenuIcon() {
+function MenuIcon({ open }: { open: boolean }) {
   return (
-    <svg className="app-legal-icon" viewBox="0 0 24 24" aria-hidden fill="none">
-      <path d="M5 7h14" />
-      <path d="M5 12h14" />
-      <path d="M5 17h14" />
+    <svg
+      className={`app-legal-icon app-legal-menu-icon ${open ? "app-legal-menu-icon--open" : ""}`}
+      viewBox="0 0 24 24"
+      aria-hidden
+      fill="none"
+    >
+      <path className="app-legal-menu-bar app-legal-menu-bar--top" d="M5 7h14" />
+      <path className="app-legal-menu-bar app-legal-menu-bar--mid" d="M5 12h14" />
+      <path className="app-legal-menu-bar app-legal-menu-bar--bot" d="M5 17h14" />
     </svg>
   );
 }
@@ -165,7 +170,7 @@ export function AppLegalFooter() {
           aria-label="Menü öffnen"
           onClick={() => setMenuOpen((open) => !open)}
         >
-          <MenuIcon />
+          <MenuIcon open={menuOpen} />
           <span>Menü</span>
         </button>
       </footer>

@@ -5,6 +5,9 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
+- **Hamburger-Menü:** Seiten-Sheet von rechts mit Würfel-Branding, gestaffelten Karten-Einträgen und animiertem Icon (Burger → X)
+- **Startscreen Bilanz-Dropdown:** 3D-Würfel skalieren beim Ausklappen dynamisch kleiner und kehren beim Zuklappen zur Originalgröße zurück
+- **Doku:** `HANDOVER.md`, `docs/milestones_active.md`, `docs/ios_current.md`, `milestones.md` — HEAD `04ab018`, UX-Politur 2026-06-15
 - **Spielanalyse:** Kompakter Kern („Warum verloren/gewonnen?“), Details eingeklappt; Duell-Graph alle 10 % statt pro Wurf
 - **Fortschritt 25/50/75 %:** Hinweis vorn/zurück (ohne Abstand), Overlay per „Weiter“ wegklickbar
 - **Statistik (A+B):** Kompakter Hero mit Bilanz, Siegquote und KPIs; Sortierung; Paarungs-Badges und Duellbalken

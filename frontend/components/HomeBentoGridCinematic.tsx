@@ -42,7 +42,9 @@ function CinematicDoor({
         </div>
         <div className="home-cinematic-door-stage" aria-hidden>
           <div className="home-cinematic-door-hero">
-            <img src={iconSrc} alt="" className="home-bento-motif" loading="eager" decoding="async" />
+            <div className="home-cinematic-door-motif-wrap">
+              <img src={iconSrc} alt="" className="home-bento-motif" loading="eager" decoding="async" />
+            </div>
           </div>
         </div>
         <span className="home-cinematic-door-cta">{cta}</span>
@@ -64,7 +66,7 @@ export function HomeBentoGridCinematic() {
 
   return (
     <div
-      className={`home-cinematic flex min-h-0 flex-1 flex-col overflow-hidden ${entered ? "home-cinematic--entered" : ""}`}
+      className={`home-cinematic flex min-h-0 flex-1 flex-col overflow-hidden ${entered ? "home-cinematic--entered" : ""} ${statsOpen ? "home-cinematic--stats-open" : ""}`}
     >
       <div className="home-cinematic-top shrink-0">
         <p className="home-cinematic-kicker">{APP_SHORT} · Strategy Edition</p>

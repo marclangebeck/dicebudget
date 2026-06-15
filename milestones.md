@@ -23,14 +23,14 @@ Nur bei Bedarf:
 ## Aktueller Kurzstand
 
 - Branch: `milestone-22-prep`
-- Produktcode-HEAD: siehe `git log -1` (Hausregeln + Feature-Labor)
+- Produktcode-HEAD: `04ab018` (siehe `git log -1`)
 - Web/API live: https://dicebudget.bottle-trade.de
-- iOS: TestFlight `2.0 (28)`; nächster Upload **`2.0 (29)`**
-- Letzte Features: Hausregeln (Labor), Feature-Labor, Strategy-Bugfix, M27/M29
+- iOS: TestFlight `2.0 (28)`; nächster Upload **`2.0 (29)`** auf HEAD `04ab018`
+- Letzte Features: Einstellungen Ein-Screen, Statistik-Hero, Spielanalyse-Kern, Screenshot-Footer, Hausregeln (Labor)
 
 ## Offene Prioritaeten
 
-1. TestFlight Build 29 (Xcode Archive + Upload).
-2. M30 Regression inkl. Hausregeln und Labor.
+1. iOS Build 29 (`npm run build:ios` + Archive + Upload).
+2. M30 TestFlight-Regression (neue UX + Hausregeln/Labor).
 3. App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`.
 4. `milestone-22-prep` → `main` nach Release-Freigabe.

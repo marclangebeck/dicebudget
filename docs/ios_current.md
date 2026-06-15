@@ -2,7 +2,7 @@
 
 **Stand:** 2026-06-15  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `d6bd92b` (Mac nach `git pull`)  
+**Produktcode-HEAD (Web):** `04ab018` (Mac nach `git pull`)  
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
@@ -11,8 +11,8 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 
 - App Store Connect: **Version 2.0**.
 - **TestFlight `2.0 (28)` (aktuell in Connect):** Produktcode **`d8b5952`** — Cinematic Editorial Startscreen.
-- **Nächster geplanter Upload: `2.0 (29)`** — HEAD `d6bd92b`: Feature-Labor, Zusatzregeln-UI, iPad-Tisch, Strategy-Fixes.
-- Web/API live: https://dicebudget.bottle-trade.de
+- **Nächster geplanter Upload: `2.0 (29)`** — HEAD **`04ab018`**: Einstellungen Ein-Screen, Statistik-Hero, Spielanalyse-Kern, Screenshot-Footer, Startscreen-Würfel, Hausregeln/Zusatzregeln, Feature-Labor.
+- Web/API live: https://dicebudget.bottle-trade.de (bereits auf `04ab018` gebaut)
 
 ## iOS-Bundle (kritisch)
 
@@ -84,13 +84,17 @@ env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworks
 
 Ausführliche Connect-Schritte: `docs/testflight-app-store.md`, Einsteiger: `docs/ios-xcode-anleitung.md`.
 
-## TestFlight-Checkliste (Build 29+, HEAD `d6bd92b`)
+## TestFlight-Checkliste (Build 29+, HEAD `04ab018`)
 
-- Entwickler-Vorschau: Code auf **jedem Testgerät** → `/settings/labs` → Toggles
-- **Brennt** im Wurf-Overlay; **Zusatzregeln** rechts am Zettel / eingeklappt im Overlay (Verkauf, 2× Alle Fünfe)
-- iPad-Tischmodus: Zusatzregeln + Brennt wie Online-Multi
-- Cinematic Startscreen, Footer/Menü, Multi Code teilen, Pool-Endspiel
-- Alle Fünfe Eintrag Wurf 23+; Match-Analyse
+- **Einstellungen:** Ein-Screen, Solo/Multi-Start, Hausregeln nach Code, iPad-Namen leer tippbar
+- **Statistik:** Hero-Bilanz, Badges, Duellbalken, Sortierung
+- **Spielanalyse:** Kern „Warum verloren?“; Graph alle 10 %; Details eingeklappt
+- **Screenshot:** Footer „Bild“, Blitz, Vorschau, Toast
+- **Fortschritt 25/50/75 %:** vorn/zurück-Hinweis; Overlay per „Weiter“ schließen
+- **Startscreen:** Würfel ohne Puls-Ring, größer/zentriert
+- **Hausregeln:** Brennt im Overlay; Zusatzregeln am Zettel (Verkauf, 2× Alle Fünfe); iPad-Tisch
+- Entwickler-Vorschau: Code pro Gerät auf `/settings`
+- Cinematic Startscreen, Multi Code teilen, Pool-Endspiel, Alle Fünfe Eintrag
 
 ## Typische Fehler
 
