@@ -25,7 +25,8 @@ import {
 } from "@/lib/api";
 import { APP_HOME_PATH } from "@/lib/branding";
 import { poolDeltaForComplete } from "@/lib/gameRules";
-import { BURN_POOL_COST } from "@/lib/houseRules";
+import { BURN_POOL_COST, canBurnHouseRule } from "@/lib/houseRules";
+import { isFeatureEnabled } from "@/lib/featureFlags";
 import { buildAchievementAfterField } from "@/lib/achievementFeedback";
 import { useQueuedFeedbackOverlays } from "@/lib/feedbackOverlayQueue";
 import { buildProgressMilestoneAfterField } from "@/lib/runProgressFeedback";
@@ -560,17 +561,14 @@ export function TableModePlayBoard({ inviteCode }: Props) {
 
       {error && <p className="glass-alert-error shrink-0 px-3 py-2 text-sm">{error}</p>}
 
-      {houseRulesRun && (
+      {houseRulesRun && !showEntryPanel && (
         <HouseRulesPanel
           run={houseRulesRun}
           inviteCode={inviteCode}
           lobby={lobby}
-          activeFieldId={activeFieldId}
-          rollsUsed={rollsUsed}
           isLocalSolo={false}
           ownPlayerDbId={houseRulesPlayerDbId}
           busy={busy}
-          onBurn={(fieldId) => void handleBurn(fieldId)}
           onRollSale={(seller, buyer, pools) => void handleRollSale(seller, buyer, pools)}
           onYatzyStreak={(victimId) => void handleYatzyStreak(victimId)}
         />
@@ -748,6 +746,14 @@ export function TableModePlayBoard({ inviteCode }: Props) {
           canClearLast={canClearLast}
           rollsInPoolOverride={rollsInPoolForEntry}
           rollSaleMode={!!activeRun.rollSaleFreeFillActive && !isCorrection}
+          burnEnabled={
+            isFeatureEnabled("houseRulesBurn") &&
+            activeRun.useStrategyRules &&
+            !isCorrection &&
+            !activeRun.rollSaleFreeFillActive
+          }
+          canBurn={canBurnHouseRule(activeRun, activeFieldId, isCorrection)}
+          onBurn={() => activeFieldId && void handleBurn(activeFieldId)}
           onPickScoreValue={(v) => {
             setScoreInput(String(v));
             if (v !== 50) setYatzyDieValue(null);

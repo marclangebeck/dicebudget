@@ -1,6 +1,20 @@
-import type { FieldTypeId } from "@/lib/types";
+import type { FieldTypeId, RunDto } from "@/lib/types";
 
 export const BURN_POOL_COST = 5;
+
+/** Brennt: leeres Feld gewählt, Eintrag noch nicht gebucht (nicht Korrektur). */
+export function canBurnHouseRule(
+  run: RunDto,
+  activeFieldId: string | null,
+  isCorrection: boolean,
+): boolean {
+  if (!activeFieldId || run.status !== "ACTIVE" || !run.useStrategyRules) return false;
+  if (isCorrection) return false;
+  if (run.rollsInPool < BURN_POOL_COST) return false;
+  const field = run.games.flatMap((g) => g.fields).find((f) => f.id === activeFieldId);
+  if (!field || field.score !== null) return false;
+  return field.rollsUsed === 0;
+}
 
 const UPPER_FACE: Record<string, 1 | 2 | 3 | 4 | 5 | 6> = {
   ONES: 1,

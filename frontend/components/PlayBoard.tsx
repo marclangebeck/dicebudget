@@ -33,7 +33,8 @@ import {
 } from "@/lib/api";
 import type { SessionLobbyDto } from "@/lib/sessionTypes";
 import { poolDeltaForComplete } from "@/lib/gameRules";
-import { BURN_POOL_COST } from "@/lib/houseRules";
+import { BURN_POOL_COST, canBurnHouseRule } from "@/lib/houseRules";
+import { isFeatureEnabled } from "@/lib/featureFlags";
 import { buildAchievementAfterField } from "@/lib/achievementFeedback";
 import { useQueuedFeedbackOverlays } from "@/lib/feedbackOverlayQueue";
 import { buildProgressMilestoneAfterField } from "@/lib/runProgressFeedback";
@@ -865,19 +866,18 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         <p className="glass-alert-error shrink-0 px-3 py-2 text-sm">{error}</p>
       )}
 
-      <HouseRulesPanel
-        run={run}
-        inviteCode={inviteCode ?? undefined}
-        lobby={lobby}
-        activeFieldId={activeFieldId}
-        rollsUsed={rollsUsed}
-        isLocalSolo={isLocalSolo}
-        ownPlayerDbId={ownPlayerDbId}
-        busy={busy}
-        onBurn={(fieldId) => void handleBurn(fieldId)}
-        onRollSale={(seller, buyer, pools) => void handleRollSale(seller, buyer, pools)}
-        onYatzyStreak={(victimId) => void handleYatzyStreak(victimId)}
-      />
+      {!showEntryPanel && (
+        <HouseRulesPanel
+          run={run}
+          inviteCode={inviteCode ?? undefined}
+          lobby={lobby}
+          isLocalSolo={isLocalSolo}
+          ownPlayerDbId={ownPlayerDbId}
+          busy={busy}
+          onRollSale={(seller, buyer, pools) => void handleRollSale(seller, buyer, pools)}
+          onYatzyStreak={(victimId) => void handleYatzyStreak(victimId)}
+        />
+      )}
 
       {sheetReviewAfterComplete && allScored && !showCompleteOverlay && (
         <div className="play-review-banner shrink-0">
@@ -959,6 +959,14 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
           canClearLast={canClearLast}
           rollsInPoolOverride={rollsInPoolForEntry}
           rollSaleMode={!!run.rollSaleFreeFillActive && !isCorrection}
+          burnEnabled={
+            isFeatureEnabled("houseRulesBurn") &&
+            run.useStrategyRules &&
+            !isCorrection &&
+            !run.rollSaleFreeFillActive
+          }
+          canBurn={canBurnHouseRule(run, activeFieldId, isCorrection)}
+          onBurn={() => activeFieldId && void handleBurn(activeFieldId)}
           onPickScoreValue={(v) => {
             setScoreInput(String(v));
             if (v !== 50) setYatzyDieValue(null);

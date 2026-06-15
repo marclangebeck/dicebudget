@@ -3,7 +3,7 @@
 import { FieldScoreChoiceGrid } from "@/components/FieldScoreChoiceGrid";
 import { YatzyDiePicker } from "@/components/YatzyDiePicker";
 import { strategyRollChipOptions } from "@/lib/gameRules";
-import { rollSaleAllowedScores } from "@/lib/houseRules";
+import { rollSaleAllowedScores, BURN_POOL_COST, canBurnHouseRule } from "@/lib/houseRules";
 import { FIELD_LABELS, fieldScoreChoices } from "@/lib/labels";
 import type { FieldDto, RunDto } from "@/lib/types";
 
@@ -20,6 +20,9 @@ type Props = {
   canClearLast?: boolean;
   rollsInPoolOverride?: number;
   rollSaleMode?: boolean;
+  burnEnabled?: boolean;
+  canBurn?: boolean;
+  onBurn?: () => void;
   onPickScoreValue: (value: number) => void;
   onYatzyDieValue?: (value: number) => void;
   onRollsUsed: (n: number) => void;
@@ -41,6 +44,9 @@ export function ScoreEntryPanel({
   canClearLast,
   rollsInPoolOverride,
   rollSaleMode,
+  burnEnabled,
+  canBurn,
+  onBurn,
   onPickScoreValue,
   onYatzyDieValue,
   onRollsUsed,
@@ -159,7 +165,7 @@ export function ScoreEntryPanel({
           )}
 
           {rollSaleMode && (
-            <p className="play-entry-section-label text-[11px] text-slate-300">
+            <p className="play-entry-hint text-[11px]">
               Ohne Würfeln · nur erlaubte Verkaufs-Werte
             </p>
           )}
@@ -193,6 +199,34 @@ export function ScoreEntryPanel({
                 Anzahl Würfe auf diesem Feld (nicht die Gesamtwurfsnummer) · 1–3 → Pool · ab 4. aus
                 Pool
               </p>
+            </div>
+          )}
+
+          {burnEnabled && onBurn && !rollSaleMode && (
+            <div className="play-entry-section play-entry-house-rules">
+              <p className="play-entry-section-label mb-1.5">Hausregel</p>
+              <button
+                type="button"
+                disabled={run.status !== "ACTIVE" || busy || !canBurn}
+                onClick={onBurn}
+                className="play-entry-burn-btn disabled:opacity-45"
+              >
+                Brennt (−{BURN_POOL_COST} Pool)
+              </button>
+              {!canBurn && (
+                <p className="play-entry-hint mt-1">
+                  {run.rollsInPool < BURN_POOL_COST
+                    ? `Nicht genug Pool (benötigt ${BURN_POOL_COST}).`
+                    : isCorrection
+                      ? "Nicht bei Korrekturen."
+                      : "Nur bevor der Eintrag gebucht ist."}
+                </p>
+              )}
+              {canBurn && (
+                <p className="play-entry-hint mt-1">
+                  Physisch neu würfeln, bevor du Punkte einträgst.
+                </p>
+              )}
             </div>
           )}
 

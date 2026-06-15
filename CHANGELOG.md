@@ -9,6 +9,9 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Entwickler-Vorschau:** Code-Freischaltung (`NEXT_PUBLIC_LABS_PIN`), Labor unter `/settings/labs`, Feature-Register `featureFlags.ts`
 
 ### Fixed
+- **Brennt:** Im Wurf-Overlay statt oberem Panel; Wurfbeginn = leeres Feld vor Eintrag (UI-Bug `rollsUsed === null` behoben)
+- **Hausregeln am Zettel:** Eigene helle Panel-Styles mit dunkler Schrift (Zettel-Felder unverändert); oberes Panel nur noch Tischregeln (Verkauf, 2× Alle Fünfe)
+- **Eingabefelder:** `glass-input` nutzt feste dunkle Schrift auf hellem Grund (Code, Namen, Hausregeln) — zuvor helle Schrift auf weißem BG in dunklen Screens
 - **iPad-Tischmodus:** Hausregeln (Brennt, Verkauf, 2× Alle Fünfe) im `TableModePlayBoard` — zuvor nur im normalen Spielscreen
 - **Multi Eintrag Alle Fünfe:** Kein fixes Wurf-Limit pro Feld mehr (Strategy); Chips bis Pool + Restbudget; Hinweis wenn Würfel bei 50 Punkten fehlt
 
