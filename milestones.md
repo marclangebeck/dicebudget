@@ -26,7 +26,7 @@ Nur bei Bedarf:
 - Produktcode-HEAD: `23f24e6`
 - Web/API live: https://dicebudget.bottle-trade.de
 - iOS: TestFlight `2.0 (28)`; nächster Upload **`2.0 (29)`** auf Web-HEAD
-- Letzte Features: UX-Politur II (Hamburger, Einstellungen Slate/Accordion, Statistik-Accordion, Spielabschluss); davor Statistik-Hero, Spielanalyse-Kern, Hausregeln (Labor)
+- Letzte Features: UX-Politur II; geplant **M36** Hausregeln Session-Toggles (nach M30)
 
 ## Offene Prioritaeten
 

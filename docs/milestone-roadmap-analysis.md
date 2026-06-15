@@ -1,14 +1,16 @@
 # Milestone-Roadmap — Umsetzung Projektanalyse
 
 **Erstellt:** 2026-06-11  
-**Aktualisiert:** 2026-06-15 (Hausregeln vor M30)  
+**Aktualisiert:** 2026-06-15 (M36 Hausregeln Session geplant)  
 **Basis:** Vollständige Projektanalyse (Backend, Frontend, Release)  
 **Branch:** `milestone-22-prep`  
 **Produktcode-HEAD:** siehe `git log -1`  
 **Nächster Milestone:** **M30** App Store Release  
 **Arbeitsweise:** Pro Milestone ein **GO** vom Nutzer, danach Umsetzung in Sprints, dann Abnahme.
 
-**Vor M30 umgesetzt (nicht nummeriert):** Feature-Labor (`5e621ac`), Hausregeln Strategy (Brennt / Verkauf / 2× Alle Fünfe) hinter Labor-Toggles.
+**Vor M30 umgesetzt (nicht nummeriert):** Feature-Labor (`5e621ac`), Hausregeln Strategy (Brennt / Verkauf / 2× Alle Fünfe) hinter Labor-Toggles — **bis M36:** jeder Spieler schaltet lokal per Code frei (Labor-Zwischenstand, bewusst OK).
+
+**Geplant nach M30:** **M36** Hausregeln öffentlich + Session-Toggles (Host legt Regeln für alle fest).
 
 Dieses Dokument ergänzt `docs/milestones_active.md`. Nach Abschluss eines Milestones: Eintrag in `CHANGELOG.md`, Update `HANDOVER.md`, optional Archivierung hier.
 
@@ -26,12 +28,13 @@ Dieses Dokument ergänzt `docs/milestones_active.md`. Nach Abschluss eines Miles
 | **M28** | Frontend-Architektur & Bundle | 3 | 2–3 Agent-Sessions | Nach Release möglich |
 | **M29** | Technische Schulden & Security-Patch | 3 | 1–2 Agent-Sessions | Empfohlen vor Release — **abgenommen 2026-06-11** |
 | **M30** | App Store Release (organisatorisch) | 3 | 1–2 Wochen (Nutzer + Apple) | **Release — als Nächstes** |
+| **M36** | Hausregeln öffentlich & Session-Toggles | 3 | 1–2 Agent-Sessions | **v1.1 Produkt** — nach M30 |
 | **M31** | Post-Release v1.1 — Plattform | 3 | 2–3 Agent-Sessions | v1.1 |
 | **M32** | DevOps & Betrieb | 3 | 1–2 Agent-Sessions | v1.1 |
 | **M33** | Produkt v1.2 — Komfort | 3 | 2–3 Agent-Sessions | v1.2 |
 | **M34** | Skalierung (nur bei Bedarf) | 2 | Planung + GO | v2.x |
 
-**Empfohlene Release-Reihenfolge:** M23 → M24 → (M25–M27 parallel möglich) → M29 → M30 → M28/M31+
+**Empfohlene Release-Reihenfolge:** M23 → M24 → (M25–M27 parallel möglich) → M29 → M30 → **M36** → M28/M31+
 
 ---
 
@@ -580,6 +583,78 @@ Offen aus Nutzer-Diskussion (nicht Teil M24): Web-Zugang nach App-Store-Release 
 
 ---
 
+## M36 — Hausregeln öffentlich & Session-Toggles
+
+**Status:** geplant (GO nach M30).  
+**Ziel:** Hausregeln werden ein **frei zugänglicher Einstellungsbereich** — wie Gegner-Pool sichtbar oder Pool-Endspiel. Der **Host legt die Regeln beim Multi-Start** fest; **alle Spieler** sehen dieselbe UI, **ohne Labor-Code pro Gerät**.
+
+**Ausgangslage (Labor, bis M36):**
+
+- Freischaltung über `NEXT_PUBLIC_LABS_PIN` + `localStorage` (`labsAccess.ts`, `featureFlags.ts`).
+- UI prüft `isFeatureEnabled("houseRules*")` **nur lokal** — Gegner ohne Code sieht nichts.
+- Backend (`houseRulesService`, Brennt / Verkauf / 2× Alle Fünfe) ist **session-unabhängig** und erlaubt API-Calls ohne Labs-Check.
+
+**Zielmodell:**
+
+| Modus | Wer entscheidet | Speicherort |
+|-------|-----------------|-------------|
+| **Multi** | Host beim Raum erstellen | `game_sessions` (Session-Flags) |
+| **Solo** | Spieler in Einstellungen | `uiPrefs` / `AppSettings` (lokal) |
+| **iPad-Tisch** | wie Multi (Session des Hosts) | Lobby-DTO |
+
+**Vorbild im Code:** `show_opponent_pool`, `pool_endgame_enabled` — Session-Felder in Prisma, Host-Toggle in Multi-Setup, Anzeige über Lobby-DTO.
+
+### Sprint 36.1 — Backend: Session-Flags & API-Härtung
+
+| # | Aufgabe | Dateien (voraussichtlich) |
+|---|---------|---------------------------|
+| 1 | Prisma-Migration: drei Booleans auf `GameSession`, z. B. `house_rules_burn_enabled`, `house_rules_roll_sale_enabled`, `house_rules_yatzy_streak_enabled` (Default `false`) | `backend/prisma/schema.prisma`, Migration |
+| 2 | Session-Erstellung: Flags aus Request übernehmen (nur Host) | `backend/src/services/sessionService.ts`, `backend/src/routes/sessions.ts` |
+| 3 | Lobby-DTO um Hausregeln erweitern | Session-Mapper, `frontend/lib/sessionTypes.ts` |
+| 4 | `houseRulesService`: Brennt / Verkauf / 2× Alle Fünfe nur wenn Session-Flag gesetzt **und** `useStrategyRules` | `backend/src/services/houseRulesService.ts` |
+| 5 | Tests: API 403/400 wenn Flag aus | `backend/src/domain/houseRules.test.ts`, Service-Tests |
+
+### Sprint 36.2 — Einstellungen & Multi-Setup (öffentlich)
+
+| # | Aufgabe | Dateien |
+|---|---------|---------|
+| 1 | Hausregeln aus Labor-Sektion in **normalen Einstellungs-Accordion** (Multi + optional Solo-Defaults) | `frontend/app/settings/page.tsx`, `SettingsSection.tsx` |
+| 2 | `AppSettings` / `uiPrefs`: Solo-Defaults für die drei Regeln (analog `showOpponentPool`) | `frontend/lib/uiPrefs.ts` |
+| 3 | Multi-Raum erstellen: Host-Toggles → `POST /sessions` Body | `frontend/components/GameSetup.tsx`, `frontend/app/multi/page.tsx`, `frontend/lib/api.ts` |
+| 4 | Labor-Code für Hausregeln entfernen oder nur noch für andere Labs-Features behalten | `featureFlags.ts`, `LabsUnlockDialog.tsx` |
+| 5 | Feature-Registry: Hausregeln `stage: "released"` **oder** Labs-Pfad für diese IDs abschaffen | `frontend/lib/featureFlags.ts` |
+
+### Sprint 36.3 — Spiel-UI an Session koppeln
+
+| # | Aufgabe | Dateien |
+|---|---------|---------|
+| 1 | Hilfsfunktion `isHouseRuleEnabled(rule, { session, soloSettings })` — Multi: Lobby-Flags; Solo: `uiPrefs` | `frontend/lib/houseRules.ts` (neu/erweitern) |
+| 2 | `PlayBoard`, `TableModePlayBoard`, `ScoreEntryPanel`, `HouseRulesPanel`, `HouseRulesTableActions`: `isFeatureEnabled` durch Session/Solo-Logik ersetzen | genannte Komponenten |
+| 3 | Joiner: nach Lobby-Load sofort korrekte Zusatzregeln / Brennt-Button | Lobby-Refresh unverändert ereignisbasiert |
+| 4 | Unit-Tests Frontend; CHANGELOG + `HANDOVER.md` + `milestones_active.md` | Tests, Doku |
+| 5 | iOS-Regression: Multi mit Host-Toggles, Joiner ohne Code | `docs/ios_current.md` Checkliste |
+
+### Nicht im Scope M36
+
+- Neue Hausregeln (nur Freigabe bestehender drei Regeln).
+- Push/Sync/Polling für Lobby (weiter ereignisbasiert wie heute).
+- Statistik-/Liga-Auswirkungen ändern sich nicht.
+
+### Abnahme M36
+
+- [ ] Host aktiviert Brennt + Verkauf in Multi-Setup → **Joiner sieht UI ohne eigenen Code**.
+- [ ] Host lässt Regeln aus → **keine** Zusatzregeln-UI bei beiden; API lehnt Hausregeln-Aktionen ab.
+- [ ] Solo: Toggles in Einstellungen steuern Brennt/Zusatzregeln lokal.
+- [ ] iPad-Tisch: Session-Flags des Hosts gelten für beide Zettel.
+- [ ] Labor-Code für Hausregeln nicht mehr nötig (oder dokumentiert deprecated).
+- [ ] Backend Prod deploy + Frontend build.
+
+**Neuer Agent:** ein Agent pro Sprint 36.x; GO vom Nutzer vor Sprint 36.1.
+
+**Referenz (Ist-Implementierung Labor):** `backend/src/domain/houseRules.ts`, `houseRulesService.ts`, `HouseRulesPanel.tsx`, `HouseRulesTableActions.tsx`, `ScoreEntryPanel.tsx`, `labsAccess.ts`, `featureFlags.ts`.
+
+---
+
 ## Mapping: Analyse-Anmerkung → Milestone
 
 | Analyse-Punkt | Milestone |
@@ -627,6 +702,8 @@ Offen aus Nutzer-Diskussion (nicht Teil M24): Web-Zugang nach App-Store-Release 
 | Push (ohne Polling) | M33.1 |
 | Lichtmodus | M33.2 |
 | i18n | M33.3 |
+| Hausregeln nur lokal (Labor-Code pro Gerät) | **M36** (geplant) |
+| Hausregeln Session-Toggles Host → alle Spieler | M36.1–36.3 |
 | PostgreSQL | M34.1 |
 | WebSockets/SSE | M34.2 |
 | Match-Analyse ohne Token (Risiko) | M29.2 |
@@ -648,6 +725,7 @@ Woche 2 (Jun 18–24):  M25 → M26 → M27     [Agent, parallel M25/M26 möglic
 Woche 3 (Jun 25–Jul 1): M29 → M30.1–30.2 [Nutzer ASC + Agent Doku]
 Woche 4 (Jul 2–8):    M30.3 Apple Review  [Nutzer]
 Ab Jul 2026:          M28, M31–M34 nach Priorität
+Post M30 (v1.1):      M36 Hausregeln Session (empfohlen vor breitem Multi-Rollout)
 ```
 
 ---

@@ -30,6 +30,20 @@ Offen (M30):
 
 Details: `docs/ios_current.md`.
 
+## Geplante Milestones
+
+### M36 — Hausregeln öffentlich & Session-Toggles
+
+**Status:** geplant; **GO nach M30** (App Store Release).
+
+**Problem heute:** Hausregeln hängen am Labor (`NEXT_PUBLIC_LABS_PIN` + `localStorage` pro Gerät). Im Multi sieht nur wer den Code eingegeben hat die UI — Backend unterstützt die Regeln bereits session-übergreifend.
+
+**Ziel:** Freier Einstellungsbereich; **Host wählt Regeln für die Session** (wie Gegner-Pool / Pool-Endspiel); alle Spieler sehen dieselben Toggles im Spiel. Solo weiter über `uiPrefs`.
+
+**Sprints:** 36.1 Backend Session-Flags · 36.2 Einstellungen + Multi-Setup · 36.3 Spiel-UI koppeln.
+
+Details: `docs/milestone-roadmap-analysis.md` → Abschnitt **M36**.
+
 ## Letzte Abgeschlossene Milestones
 
 ### UX Politur II — Navigation, Einstellungen, Statistik, Abschluss 2026-06-15
