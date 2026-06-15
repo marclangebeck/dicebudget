@@ -150,6 +150,52 @@ export function abandonRun(runId: string, playerSecret?: string) {
   });
 }
 
+export function applyBurnRoll(runId: string, fieldId: string, playerSecret?: string) {
+  return request<{ run: RunDto }>(`/runs/${runId}/house-rules/burn`, {
+    method: "POST",
+    body: JSON.stringify({ fieldId }),
+    playerSecret,
+  });
+}
+
+export function applyYatzyStreakPenalty(
+  runId: string,
+  victimPlayerId: string,
+  playerSecret?: string,
+) {
+  return request<{
+    beneficiaryRun: RunDto;
+    victimRun: RunDto;
+    victimPlayerId: string;
+    victimPlayerName: string;
+    poolsLost: number;
+  }>(`/runs/${runId}/house-rules/yatzy-streak-penalty`, {
+    method: "POST",
+    body: JSON.stringify({ victimPlayerId }),
+    playerSecret,
+  });
+}
+
+export function applyRollSale(
+  inviteCode: string,
+  sellerPlayerId: string,
+  buyerPlayerId: string,
+  pools: number,
+  playerSecret: string,
+) {
+  return request<{
+    sellerRun: RunDto;
+    buyerRun: RunDto;
+    sellerPlayerId: string;
+    buyerPlayerId: string;
+    pools: number;
+  }>(`/sessions/invite/${encodeURIComponent(inviteCode)}/roll-sale`, {
+    method: "POST",
+    body: JSON.stringify({ sellerPlayerId, buyerPlayerId, pools }),
+    playerSecret,
+  });
+}
+
 export function getStats() {
   return request<{ stats: StatsDto }>("/stats");
 }

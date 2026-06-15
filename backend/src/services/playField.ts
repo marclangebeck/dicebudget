@@ -1,13 +1,15 @@
 import { ROLLS_PER_FIELD, maxRollsForGameCount } from "../config.js";
 import { poolDeltaForComplete } from "../domain/gameRules.js";
+import { isValidRollSaleScore } from "../domain/houseRules.js";
 import { assertExtraYatzyDieValue, appendExtraYatzyDieValue } from "../domain/extraYatzyDieValues.js";
 import {
   EXTRA_YATZY_BONUS_POINTS,
   computeGameBreakdown,
   gameIndexForExtraYatzyClick,
 } from "../domain/gameScoring.js";
-import { assertValidScoreForField } from "../domain/fieldScores.js";
+import { assertValidScoreForField, InvalidFieldScoreError } from "../domain/fieldScores.js";
 import { RUN_STATUS } from "../domain/fieldTypes.js";
+import type { FieldTypeId } from "../domain/fieldTypes.js";
 import { prisma } from "../db/prisma.js";
 import { getRunById } from "./getRun.js";
 import { assertRunPlayerAccess } from "./runPlayerAuth.js";
@@ -302,12 +304,49 @@ export async function completeField(
   const field = await loadFieldForRun(runId, fieldId);
   if (!field) throw new FieldNotFoundError();
   const run = field.game.run;
+  const isCorrection = field.score !== null;
+  const isRollSaleEntry = run.rollSaleFreeFillActive && !isCorrection;
+
+  if (isRollSaleEntry) {
+    if (!run.useStrategyRules) {
+      throw new InvalidInputError("Verkaufs-Freifeld nur im Strategy-Modus");
+    }
+    if (rollsUsed !== 0) {
+      throw new InvalidInputError("Verkaufs-Freifeld: 0 Würfe (ohne Würfeln)");
+    }
+    if (!isValidRollSaleScore(field.fieldType as FieldTypeId, score)) {
+      throw new InvalidFieldScoreError(field.fieldType as FieldTypeId, score);
+    }
+    if (yatzyDieValue !== undefined && yatzyDieValue !== null) {
+      throw new InvalidYatzyDieValueError("yatzyDieValue nicht erlaubt beim Verkaufs-Freifeld");
+    }
+    if (run.status !== RUN_STATUS.ACTIVE) throw new RunNotActiveError();
+
+    await prisma.$transaction(async (tx) => {
+      const runRow = await tx.run.findUniqueOrThrow({ where: { id: runId } });
+      const scoredSequence = runRow.nextScoredSequence;
+      await tx.run.update({
+        where: { id: runId },
+        data: {
+          nextScoredSequence: { increment: 1 },
+          rollSaleFreeFillActive: false,
+        },
+      });
+      await tx.field.update({
+        where: { id: fieldId },
+        data: { score, rollsUsed: 0, scoredSequence, yatzyDieValue: null },
+      });
+      await recalculateRunTotals(runId, tx);
+    });
+
+    return getRunById(runId);
+  }
+
   assertManualEntry(score, rollsUsed, run.useStrategyRules);
   assertValidScoreForField(field.fieldType, score);
   const resolvedYatzyDie = assertYatzyDieValue(field.fieldType, score, yatzyDieValue);
   if (run.status !== RUN_STATUS.ACTIVE) throw new RunNotActiveError();
 
-  const isCorrection = field.score !== null;
   const oldRollsUsed = isCorrection ? field.rollsUsed : 0;
   const oldDelta = isCorrection
     ? poolDeltaForComplete(oldRollsUsed, run.useStrategyRules)

@@ -1,12 +1,14 @@
 # Milestone-Roadmap — Umsetzung Projektanalyse
 
 **Erstellt:** 2026-06-11  
-**Aktualisiert:** 2026-06-11 (M27, M29, Bugfix abgenommen)  
+**Aktualisiert:** 2026-06-15 (Hausregeln vor M30)  
 **Basis:** Vollständige Projektanalyse (Backend, Frontend, Release)  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `e198293`  
+**Produktcode-HEAD:** siehe `git log -1`  
 **Nächster Milestone:** **M30** App Store Release  
 **Arbeitsweise:** Pro Milestone ein **GO** vom Nutzer, danach Umsetzung in Sprints, dann Abnahme.
+
+**Vor M30 umgesetzt (nicht nummeriert):** Feature-Labor (`5e621ac`), Hausregeln Strategy (Brennt / Verkauf / 2× Alle Fünfe) hinter Labor-Toggles.
 
 Dieses Dokument ergänzt `docs/milestones_active.md`. Nach Abschluss eines Milestones: Eintrag in `CHANGELOG.md`, Update `HANDOVER.md`, optional Archivierung hier.
 

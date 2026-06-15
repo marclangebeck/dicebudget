@@ -13,10 +13,14 @@ import { FitScoreSheet } from "@/components/FitScoreSheet";
 import { PlayTopBar } from "@/components/PlayTopBar";
 import { PoolEndgamePanel } from "@/components/PoolEndgamePanel";
 import { ScoreEntryPanel } from "@/components/ScoreEntryPanel";
+import { HouseRulesPanel } from "@/components/HouseRulesPanel";
 import { ScoreSheetTable } from "@/components/ScoreSheetTable";
 import { clearActiveGame, saveActiveGame } from "@/lib/activeGame";
 import {
   abandonRun,
+  applyBurnRoll,
+  applyRollSale,
+  applyYatzyStreakPenalty,
   clearLastField,
   completeField,
   finalizeSessionStats,
@@ -29,6 +33,7 @@ import {
 } from "@/lib/api";
 import type { SessionLobbyDto } from "@/lib/sessionTypes";
 import { poolDeltaForComplete } from "@/lib/gameRules";
+import { BURN_POOL_COST } from "@/lib/houseRules";
 import { buildAchievementAfterField } from "@/lib/achievementFeedback";
 import { useQueuedFeedbackOverlays } from "@/lib/feedbackOverlayQueue";
 import { buildProgressMilestoneAfterField } from "@/lib/runProgressFeedback";
@@ -36,6 +41,7 @@ import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdenti
 import { APP_HOME_PATH } from "@/lib/branding";
 import {
   abandonLocalSoloRun,
+  burnLocalSoloRoll,
   clearLocalSoloField,
   completeLocalSoloField,
   finishLocalSoloRun,
@@ -169,6 +175,10 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     normalizePublicPlayerId(lobby.poolEndgameImproverPlayerId) ===
       normalizePublicPlayerId(getOrCreatePlayerId());
 
+  const ownPlayerDbId = lobby?.players.find(
+    (p) => normalizePublicPlayerId(p.playerId) === normalizePublicPlayerId(getOrCreatePlayerId()),
+  )?.id;
+
   const waitingPoolEndgame =
     poolEndgamePending && !amPoolEndgameImprover && !!inviteCode;
 
@@ -273,7 +283,11 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     }
 
     resetEntry();
-    setRollsUsed(defaultRollsUsed(run));
+    if (run.rollSaleFreeFillActive) {
+      setRollsUsed(0);
+    } else {
+      setRollsUsed(defaultRollsUsed(run));
+    }
   }
 
   async function handleExtraYatzy(yatzyDieValue: number) {
@@ -329,17 +343,22 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
 
   async function handleSubmit() {
     if (!activeFieldId || !run || scoreInput === "") return;
-    const effectiveRolls: number = run.useStrategyRules ? (rollsUsed ?? 0) : (rollsUsed ?? 1);
-    if (run.useStrategyRules && rollsUsed === null) {
+    const rollSaleEntry = !!run.rollSaleFreeFillActive && !isCorrection;
+    const effectiveRolls: number = rollSaleEntry
+      ? 0
+      : run.useStrategyRules
+        ? (rollsUsed ?? 0)
+        : (rollsUsed ?? 1);
+    if (run.useStrategyRules && !rollSaleEntry && rollsUsed === null) {
       setError("Bitte die Anzahl Würfe für dieses Feld wählen.");
       return;
     }
-    if (effectiveRolls < 1) return;
+    if (!rollSaleEntry && effectiveRolls < 1) return;
     const score = Number(scoreInput);
     const activeFieldType = run.games
       .flatMap((g) => g.fields)
       .find((f) => f.id === activeFieldId)?.fieldType;
-    const needsYatzyDie = activeFieldType === "KNIFFEL" && score === 50;
+    const needsYatzyDie = !rollSaleEntry && activeFieldType === "KNIFFEL" && score === 50;
     if (needsYatzyDie && yatzyDieValue === null) {
       setError("Bitte den Würfel für Alle Fünfe (50 Punkte) wählen.");
       return;
@@ -505,6 +524,78 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       await refreshLobby();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Aktion fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleBurn(fieldId: string) {
+    if (!run) return;
+    if (!window.confirm(`Brennt: ${BURN_POOL_COST} Pool abziehen und physisch neu würfeln?`)) {
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const updated = isLocalSolo
+        ? burnLocalSoloRoll(runId, fieldId)
+        : (await applyBurnRoll(runId, fieldId, playerSecret)).run;
+      setRun(updated);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Brennt fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleRollSale(
+    sellerPlayerId: string,
+    buyerPlayerId: string,
+    pools: number,
+  ) {
+    if (!inviteCode || !playerSecret) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const result = await applyRollSale(
+        inviteCode,
+        sellerPlayerId,
+        buyerPlayerId,
+        pools,
+        playerSecret,
+      );
+      if (result.sellerRun.id === runId) {
+        setRun(result.sellerRun);
+      } else if (result.buyerRun.id === runId) {
+        setRun(result.buyerRun);
+      } else {
+        await load();
+      }
+      await refreshLobby();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Verkauf fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleYatzyStreak(victimPlayerId: string) {
+    if (!playerSecret || !run) return;
+    if (
+      !window.confirm(
+        "Gegner verliert die Hälfte des Pools (abrunden). Strafe jetzt anwenden?",
+      )
+    ) {
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      await applyYatzyStreakPenalty(runId, victimPlayerId, playerSecret);
+      await load();
+      await refreshLobby();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Strafe fehlgeschlagen");
     } finally {
       setBusy(false);
     }
@@ -774,6 +865,20 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         <p className="glass-alert-error shrink-0 px-3 py-2 text-sm">{error}</p>
       )}
 
+      <HouseRulesPanel
+        run={run}
+        inviteCode={inviteCode ?? undefined}
+        lobby={lobby}
+        activeFieldId={activeFieldId}
+        rollsUsed={rollsUsed}
+        isLocalSolo={isLocalSolo}
+        ownPlayerDbId={ownPlayerDbId}
+        busy={busy}
+        onBurn={(fieldId) => void handleBurn(fieldId)}
+        onRollSale={(seller, buyer, pools) => void handleRollSale(seller, buyer, pools)}
+        onYatzyStreak={(victimId) => void handleYatzyStreak(victimId)}
+      />
+
       {sheetReviewAfterComplete && allScored && !showCompleteOverlay && (
         <div className="play-review-banner shrink-0">
           <p className="play-review-score tabular-nums">{run.totalScore} Punkte</p>
@@ -853,6 +958,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
           isCorrection={isCorrection}
           canClearLast={canClearLast}
           rollsInPoolOverride={rollsInPoolForEntry}
+          rollSaleMode={!!run.rollSaleFreeFillActive && !isCorrection}
           onPickScoreValue={(v) => {
             setScoreInput(String(v));
             if (v !== 50) setYatzyDieValue(null);

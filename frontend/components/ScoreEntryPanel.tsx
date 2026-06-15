@@ -3,6 +3,7 @@
 import { FieldScoreChoiceGrid } from "@/components/FieldScoreChoiceGrid";
 import { YatzyDiePicker } from "@/components/YatzyDiePicker";
 import { strategyRollChipOptions } from "@/lib/gameRules";
+import { rollSaleAllowedScores } from "@/lib/houseRules";
 import { FIELD_LABELS, fieldScoreChoices } from "@/lib/labels";
 import type { FieldDto, RunDto } from "@/lib/types";
 
@@ -18,6 +19,7 @@ type Props = {
   isCorrection?: boolean;
   canClearLast?: boolean;
   rollsInPoolOverride?: number;
+  rollSaleMode?: boolean;
   onPickScoreValue: (value: number) => void;
   onYatzyDieValue?: (value: number) => void;
   onRollsUsed: (n: number) => void;
@@ -38,6 +40,7 @@ export function ScoreEntryPanel({
   isCorrection,
   canClearLast,
   rollsInPoolOverride,
+  rollSaleMode,
   onPickScoreValue,
   onYatzyDieValue,
   onRollsUsed,
@@ -45,9 +48,11 @@ export function ScoreEntryPanel({
   onClearLast,
   onCancel,
 }: Props) {
-  const scoreChoices = fieldScoreChoices(field.fieldType);
+  const scoreChoices = rollSaleMode
+    ? [...rollSaleAllowedScores(field.fieldType)]
+    : fieldScoreChoices(field.fieldType);
 
-  const strategy = run.useStrategyRules;
+  const strategy = run.useStrategyRules && !rollSaleMode;
   const maxExtraRolls = rollsInPoolOverride ?? run.rollsInPool;
   const maxRollsAllowed =
     strategy && run.rollsRemaining != null
@@ -67,17 +72,20 @@ export function ScoreEntryPanel({
   const needsYatzyDie = field.fieldType === "KNIFFEL" && parsedScore === 50;
   const yatzyDieOk = !needsYatzyDie || (yatzyDieValue !== null && yatzyDieValue !== undefined);
 
-  const canSubmit =
-    run.status === "ACTIVE" &&
-    scoreOk &&
-    yatzyDieOk &&
-    (strategy ? rollsUsed !== null : true) &&
-    !busy;
+  const canSubmit = rollSaleMode
+    ? run.status === "ACTIVE" && scoreOk && !busy
+    : run.status === "ACTIVE" &&
+      scoreOk &&
+      yatzyDieOk &&
+      (strategy ? rollsUsed !== null : true) &&
+      !busy;
 
   const entryBlockedHint =
     run.status === "ACTIVE" && !busy && !canSubmit
       ? !scoreOk
-        ? "Bitte einen gültigen Punktwert wählen."
+        ? rollSaleMode
+          ? "Bitte einen erlaubten Verkaufs-Wert wählen."
+          : "Bitte einen gültigen Punktwert wählen."
         : needsYatzyDie && !yatzyDieOk
           ? "Bitte den Würfel für Alle Fünfe (50 Punkte) wählen."
           : strategy && rollsUsed === null
@@ -105,7 +113,7 @@ export function ScoreEntryPanel({
           <div className="play-entry-header">
             <div className="min-w-0">
               <p className="play-entry-kicker">
-                {isCorrection ? "Korrektur" : "Eintrag"}
+                {rollSaleMode ? "Verkaufs-Freifeld" : isCorrection ? "Korrektur" : "Eintrag"}
               </p>
               {gameIndex !== null && (
                 <p id="field-entry-title" className="play-entry-title">
@@ -134,6 +142,7 @@ export function ScoreEntryPanel({
               fieldType={field.fieldType}
               selectedScore={parsedScore}
               disabled={run.status !== "ACTIVE" || busy}
+              scoreChoicesOverride={rollSaleMode ? scoreChoices : undefined}
               onPick={onPickScoreValue}
             />
           </div>
@@ -147,6 +156,12 @@ export function ScoreEntryPanel({
                 onPick={onYatzyDieValue}
               />
             </div>
+          )}
+
+          {rollSaleMode && (
+            <p className="play-entry-section-label text-[11px] text-slate-300">
+              Ohne Würfeln · nur erlaubte Verkaufs-Werte
+            </p>
           )}
 
           {strategy && (

@@ -7,6 +7,7 @@ type Props = {
   fieldType: FieldTypeId;
   selectedScore: number | null;
   disabled?: boolean;
+  scoreChoicesOverride?: readonly number[];
   onPick: (score: number) => void;
 };
 
@@ -14,9 +15,10 @@ export function FieldScoreChoiceGrid({
   fieldType,
   selectedScore,
   disabled,
+  scoreChoicesOverride,
   onPick,
 }: Props) {
-  const choices = fieldScoreChoices(fieldType);
+  const choices = scoreChoicesOverride ?? fieldScoreChoices(fieldType);
   const isSumDiceGrid = choices.length > 15;
 
   const gridClass = isSumDiceGrid

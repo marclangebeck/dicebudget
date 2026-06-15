@@ -1,5 +1,6 @@
 import { computeGameBreakdown, gameIndexForExtraYatzyClick } from "@/lib/gameScoring";
 import { poolDeltaForComplete } from "@/lib/gameRules";
+import { BURN_POOL_COST, isValidRollSaleScore } from "@/lib/houseRules";
 import { SHEET_ROWS } from "@/lib/labels";
 import type { FieldDto, FieldTypeId, GameDto, RunDto } from "@/lib/types";
 
@@ -145,6 +146,7 @@ export function createLocalSoloRun(gameCount: number, useStrategyRules: boolean)
     totalRollsUsed: 0,
     extraYatzyCount: 0,
     rollsInPool: 0,
+    rollSaleFreeFillActive: false,
     rollsRemaining: useStrategyRules ? maxRollsForGameCount(gameCount) : null,
     status: "ACTIVE",
     createdAt,
@@ -166,6 +168,23 @@ export function getLocalSoloRun(runId: string): RunDto {
   return deepClone(state.run);
 }
 
+export function burnLocalSoloRoll(runId: string, fieldId: string): RunDto {
+  const state = getState(runId);
+  const run = state.run;
+  if (run.status !== "ACTIVE") throw new Error("Run is not active");
+  if (!run.useStrategyRules) throw new Error("Brennt nur im Strategy-Modus");
+  const field = findField(state, fieldId);
+  if (!field || field.score !== null) {
+    throw new Error("Brennt nur am Anfang eines Wurfes");
+  }
+  if (field.rollsUsed > 0) throw new Error("Brennt nur am Anfang eines Wurfes");
+  if (run.rollsInPool < BURN_POOL_COST) {
+    throw new Error(`Nicht genug Pool für Brennt (benötigt ${BURN_POOL_COST})`);
+  }
+  run.rollsInPool -= BURN_POOL_COST;
+  return saveState(state);
+}
+
 export function completeLocalSoloField(
   runId: string,
   fieldId: string,
@@ -178,6 +197,22 @@ export function completeLocalSoloField(
   if (run.status !== "ACTIVE") throw new Error("Run is not active");
   const field = findField(state, fieldId);
   if (!field) throw new Error("Field not found");
+
+  if (run.rollSaleFreeFillActive && field.score === null) {
+    if (rollsUsed !== 0) throw new Error("Verkaufs-Freifeld: 0 Würfe");
+    if (!isValidRollSaleScore(field.fieldType, score)) {
+      throw new Error("Punktwert für Verkaufs-Freifeld nicht erlaubt");
+    }
+    state.scoredSequenceByFieldId[field.id] = state.nextScoredSequence;
+    state.nextScoredSequence += 1;
+    field.score = score;
+    field.rollsUsed = 0;
+    field.yatzyDieValue = null;
+    field.scoredSequence = state.scoredSequenceByFieldId[field.id];
+    run.rollSaleFreeFillActive = false;
+    recomputeRun(run);
+    return saveState(state);
+  }
 
   if (field.fieldType === "KNIFFEL" && score === 50) {
     if (
@@ -232,6 +267,7 @@ export function completeLocalSoloField(
 
   field.score = score;
   field.rollsUsed = rollsUsed;
+  field.scoredSequence = state.scoredSequenceByFieldId[field.id] ?? null;
   field.yatzyDieValue =
     field.fieldType === "KNIFFEL" && score === 50 ? yatzyDieValue ?? null : null;
   run.totalRollsUsed += rollsUsed;

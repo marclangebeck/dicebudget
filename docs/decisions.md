@@ -85,4 +85,5 @@ npm run build
 - `LeagueStanding` wird nach Stats-Reset aus verbleibenden Sessions neu berechnet (M29, `rebuildLeagueStandings`).
 - `GET /sessions/invite/:code/match-analysis`: ohne `X-Player-Secret` nur bei Session-Status `FINISHED`; mit gültigem Secret des Viewers jederzeit (sofern Analyse bereit). Historie unter `/stats/match-analysis` nutzt FINISHED-Fallback.
 - Server validiert erlaubte Score-Werte je Feldtyp, aber nicht die physische Wuerfelrealitaet.
+- **Hausregeln (Strategy, Feature-Labor):** Brennt (−5 Pool), Wurf verkaufen, 2× Alle-Fünfe-Strafe — buchen Pool/Flags serverseitig; Eintrag bleibt manuell mit Validierung (`houseRules.ts`). Nur sichtbar nach `NEXT_PUBLIC_LABS_PIN` + Toggle in `/settings/labs`.
 - `playerSecret` liegt im Client-Kontext; Geraetewechsel erfordert erneuten Join.

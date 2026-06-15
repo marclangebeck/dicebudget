@@ -1,8 +1,8 @@
 # Aktive Milestones - dice.budget
 
-**Stand:** 2026-06-11  
+**Stand:** 2026-06-15  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `e198293`  
+**Produktcode-HEAD:** siehe `git log -1` (Hausregeln + Feature-Labor)  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -24,18 +24,36 @@ Technische Basis ist erledigt:
 
 Offen (M30):
 
-- Prod-Backend-Deploy fuer Bugfix `e198293` (Strategy-Wuerfe ohne Feld-Limit) — Nutzer bestaetigen.
-- TestFlight-Regression auf aktuellem HEAD: Cinematic-Startscreen, Footer/Menü/Glas, `/play`, Pool-Endspiel, Fortschritt, Code teilen, Alle-Fuenfe-Eintrag Wurf 23+.
-- iOS-Upload naechste Build-Nummer nach `npm run build:ios` auf HEAD.
-- App Store Connect fuer kostenpflichtigen Release fertigstellen (Agreement, 1,19 EUR, Metadaten).
+- TestFlight-Regression auf HEAD: Feature-Labor, Hausregeln (Strategy), Cinematic-Startscreen, Footer, `/play`, Pool-Endspiel.
+- iOS-Upload **Build `2.0 (29)`** nach `npm run build:ios` auf Mac.
+- App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
 
 Details: `docs/ios_current.md`.
 
 ## Letzte Abgeschlossene Milestones
 
+### Hausregeln Strategy (Feature-Labor) 2026-06-15
+
+**Status:** implementiert; Backend Prod deployed; Web-Frontend gebaut; iOS noch auf Build 28.
+
+- **Brennt:** −5 Pool am Wurfbeginn (Feld gewählt, noch keine Würfe).
+- **Wurf verkaufen:** Volle Feldzeile (alle Spalten eines Typs); 2–6 Spieler; Pool-Transfer; Verkäufer-Freifeld (0 Würfe, eingeschränkte Scores).
+- **2× Alle Fünfe:** Letzte zwei Einträge KNIFFEL ≤3 → gewählter Gegner verliert ⌊Pool/2⌋.
+- Aktivierung nur über Entwickler-Vorschau (`NEXT_PUBLIC_LABS_PIN`, `/settings/labs`).
+
+Dateien: `backend/src/domain/houseRules.ts`, `houseRulesService.ts`, `frontend/lib/houseRules.ts`, `HouseRulesPanel.tsx`, `RollSaleOverlay.tsx`, Migration `roll_sale_free_fill_active`
+
+### Feature-Labor (Entwickler-Vorschau) 2026-06-14
+
+**Status:** abgenommen (`5e621ac`).
+
+- Code-Freischaltung, `/settings/labs`, `featureFlags.ts` für schrittweisen Feature-Rollout.
+
+Dateien: `labsAccess.ts`, `LabsUnlockDialog.tsx`, `app/settings/labs/page.tsx`
+
 ### Bugfix Multi Alle Fünfe / Strategy-Würfe 2026-06-11
 
-**Status:** erledigt im Produktcode (`e198293`); Server Frontend-Tests 22/22; Frontend-Build ok; **Prod-Backend-Deploy offen**.
+**Status:** abgenommen (`e198293`); Prod deployed.
 
 - Kein fixes 20-Wuerfe-Limit pro Feld mehr (Backend + Frontend + Solo lokal).
 - Grenzen nur noch: Pool + Gesamtbudget (`Spielanzahl × 39`).

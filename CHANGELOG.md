@@ -4,11 +4,15 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
+### Added
+- **Hausregeln (Feature-Labor):** Brennt (−5 Pool), Wurf verkaufen (volle Feldzeile, 2–6 Spieler), 2× Alle Fünfe-Strafe (Gegner halber Pool)
+- **Entwickler-Vorschau:** Code-Freischaltung (`NEXT_PUBLIC_LABS_PIN`), Labor unter `/settings/labs`, Feature-Register `featureFlags.ts`
+
 ### Fixed
 - **Multi Eintrag Alle Fünfe:** Kein fixes Wurf-Limit pro Feld mehr (Strategy); Chips bis Pool + Restbudget; Hinweis wenn Würfel bei 50 Punkten fehlt
 
 ### Changed
-- **Doku:** `HANDOVER.md`, `docs/milestones_active.md`, `docs/milestone-roadmap-analysis.md` — Stand `e198293`, M27/M29 abgenommen, M30 als Nächstes
+- **Doku:** `HANDOVER.md`, `docs/milestones_active.md`, `docs/ios_current.md`, `GOiOS.md`, `milestones.md`, `docs/decisions.md` — Hausregeln, Feature-Labor, iOS Build 29
 
 ### Added
 - **M29 Stats-Reset:** Nach `resetPairings` werden Ligapunkte betroffener Serien via `rebuildLeagueStandings` neu berechnet; UI-Hinweis in Statistik

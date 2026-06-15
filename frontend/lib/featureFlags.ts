@@ -25,14 +25,27 @@ export type FeatureDefinition = {
  * Marktreif → stage auf "released" setzen und ggf. in normale Einstellungen verschieben.
  */
 export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
-  // Beispiel:
-  // soundPackV2: {
-  //   id: "soundPackV2",
-  //   title: "Sound-Pack V2",
-  //   description: "Neue Erfolgs-Sounds (Test).",
-  //   stage: "labs",
-  //   defaultLabsOn: true,
-  // },
+  houseRulesBurn: {
+    id: "houseRulesBurn",
+    title: "Hausregel: Brennt",
+    description: "Ungültiger Wurf am Tisch: −5 Pool, physisch neu würfeln.",
+    stage: "labs",
+    defaultLabsOn: true,
+  },
+  houseRulesRollSale: {
+    id: "houseRulesRollSale",
+    title: "Hausregel: Wurf verkaufen",
+    description: "Bei voller Feldzeile Wurf verkaufen, Freifeld ohne Würfeln.",
+    stage: "labs",
+    defaultLabsOn: true,
+  },
+  houseRulesYatzyStreak: {
+    id: "houseRulesYatzyStreak",
+    title: "Hausregel: 2× Alle Fünfe",
+    description: "Zwei Alle Fünfe (≤3 Würfe) hintereinander: Gegner verliert halben Pool.",
+    stage: "labs",
+    defaultLabsOn: true,
+  },
 };
 
 export type FeatureId = keyof typeof FEATURE_REGISTRY;

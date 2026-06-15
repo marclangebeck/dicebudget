@@ -7,6 +7,7 @@ import { getRunMatchAnalysisSolo } from "../services/matchAnalysisService.js";
 import { abandonRun, finishRun, incrementExtraYatzy } from "../services/playField.js";
 import { readPlayerSecret } from "./readPlayerSecret.js";
 import { fieldsRouter } from "./fields.js";
+import { houseRulesRouter } from "./houseRules.js";
 
 export const runsRouter = Router();
 
@@ -26,6 +27,7 @@ runsRouter.post("/", createRunLimiter, async (req, res, next) => {
 });
 
 runsRouter.use("/:runId/fields", fieldsRouter);
+runsRouter.use("/:runId/house-rules", houseRulesRouter);
 
 runsRouter.post("/:runId/finish", async (req, res, next) => {
   try {

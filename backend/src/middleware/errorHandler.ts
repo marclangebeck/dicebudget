@@ -36,6 +36,10 @@ import {
   InvalidPlayerNameMergeError,
   PlayerNameAliasNotFoundError,
 } from "../services/playerNames.js";
+import {
+  HouseRuleError,
+  RollSaleNotAvailableError,
+} from "../services/houseRulesService.js";
 
 export function errorHandler(
   err: unknown,
@@ -88,9 +92,14 @@ export function errorHandler(
     err instanceof InvalidInputError ||
     err instanceof InvalidFieldScoreError ||
     err instanceof InvalidYatzyDieValueError ||
-    err instanceof RollLimitError
+    err instanceof RollLimitError ||
+    err instanceof HouseRuleError
   ) {
     res.status(400).json({ error: err.message });
+    return;
+  }
+  if (err instanceof RollSaleNotAvailableError) {
+    res.status(409).json({ error: err.message });
     return;
   }
   if (

@@ -24,6 +24,7 @@ export type FieldDto = {
   fieldType: FieldTypeId;
   score: number | null;
   rollsUsed: number;
+  scoredSequence?: number | null;
   /** Würfel-Augenzahl bei Alle Fünfe (50 Punkte), für Strichliste auf dem Zettel. */
   yatzyDieValue?: number | null;
   rolls: RollDto[];
@@ -56,6 +57,7 @@ export type RunDto = {
   totalRollsUsed: number;
   extraYatzyCount: number;
   rollsInPool: number;
+  rollSaleFreeFillActive?: boolean;
   rollsRemaining: number | null;
   status: string;
   createdAt: string;

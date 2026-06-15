@@ -1,8 +1,8 @@
 # iOS Aktuell - dice.budget
 
-**Stand:** 2026-06-11  
+**Stand:** 2026-06-15  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `d8b5952`  
+**Produktcode-HEAD:** `git log -1` auf Mac nach Pull  
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
@@ -10,9 +10,9 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 ## Aktueller Stand
 
 - App Store Connect: **Version 2.0**.
-- **TestFlight `2.0 (28)` (aktuell):** Produktcode **`d8b5952`** — Cinematic Editorial Startscreen (gestapelte Poster Multi/Solo, Bilanz-Chip, integrierte CTA).
-- Zuvor: **`2.0 (27)`** mit `66e8487` (Arena Classic); **`2.0 (26)`** historisch wirkungslos.
-- Web/API live: https://dicebudget.bottle-trade.de (nur Web; iOS-UI aus lokalem Bundle).
+- **TestFlight `2.0 (28)` (aktuell in Connect):** Produktcode **`d8b5952`** — Cinematic Editorial Startscreen.
+- **Nächster geplanter Upload: `2.0 (29)`** — enthält Feature-Labor, Hausregeln, Bugfix Strategy-Würfe, M27/M29 (nach Pull aktuellen HEAD).
+- Web/API live: https://dicebudget.bottle-trade.de
 
 ## iOS-Bundle (kritisch)
 
@@ -25,32 +25,37 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 
 `frontend/ios/App/App/public/` ist in `.gitignore`.
 
-## Mac-Referenz-Workflow
+## Mac-Workflow (TestFlight / App Store Connect)
 
 ```bash
-cd /Users/marclangebeck/projects/kniffel
+cd ~/projects/kniffel
 git restore frontend/package-lock.json
 git pull origin milestone-22-prep
 git log -1 --oneline
 ```
 
-Erwartung: `d8b5952 Startscreen: Cinematic Editorial mit integriertem CTA und Classic-Rollback.`
+```bash
+cd ~/projects/kniffel/frontend
+```
+
+`NEXT_PUBLIC_LABS_PIN` in `.env.production` setzen (Entwickler-Vorschau in der App):
 
 ```bash
-cd /Users/marclangebeck/projects/kniffel/frontend
-npm ci
+grep NEXT_PUBLIC_LABS_PIN .env.production
+```
+
+```bash
+npm install
 npm run build:ios
 brew unlink rsync
 ```
 
-Prüfung vor Xcode:
+Optional Bundle-Check:
 
 ```bash
 grep -c home-cinematic-door ios/App/App/public/_next/static/css/*.css
 ls -lt ios/App/App/public/_next/static/css/ | head -3
 ```
-
-`grep` muss **> 0** liefern.
 
 Xcode öffnen:
 
@@ -58,36 +63,26 @@ Xcode öffnen:
 env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
 ```
 
-In Xcode:
+### In Xcode (Archive → App Store Connect)
 
 1. **Product → Clean Build Folder** (⇧⌘K)
-2. Build-Nummer erhöhen (aktuell in TestFlight: **28**)
-3. **Any iOS Device** → **Product → Archive** → Upload
-4. Neuesten TestFlight-Build auf dem Gerät installieren
+2. Target **App** → **General** → **Build** erhöhen: **29** (aktuell in TestFlight: **28**)
+3. Scheme **App**, Ziel **Any iOS Device (arm64)**
+4. **Product → Archive**
+5. Organizer → **Distribute App** → **App Store Connect** → **Upload**
+6. In App Store Connect: Build unter **TestFlight** warten (Verarbeitung), dann auf Gerät testen
 
-## Inhalt Von TestFlight 2.0 (28)
+Ausführliche Connect-Schritte: `docs/testflight-app-store.md`, Einsteiger: `docs/ios-xcode-anleitung.md`.
 
-- **Startscreen:** Cinematic Editorial — gestapelte Poster Multi/Solo; Bilanz-Chip; Würfel-Bühne; integrierte Glas-CTA.
-- **Footer:** `Home · Statistik · Einstellungen · Menü`; Glas-Morph-Menü; Screenshot teilen.
-- DiceBudget-Branding; Multi Code nur teilen; Erfolgs-Animationen Vollbild; Card-Dashboards Abschluss/Analyse.
-- Classic-Startscreen weiter per Layout-Switch verfügbar (nur Web-Build-Env, nicht iOS-spezifisch).
+## TestFlight-Checkliste (Build 29+)
 
-## TestFlight-Checkliste (Build 28)
+- Entwickler-Vorschau: Code eingeben → `/settings/labs` → Hausregeln-Toggles
+- **Hausregeln** im Spiel (Strategy): Brennt, Verkauf, 2× Alle Fünfe (Multi)
+- Cinematic Startscreen, Footer/Menü, Multi Code teilen, Pool-Endspiel
+- Alle Fünfe Eintrag Wurf 23+; Match-Analyse nach Backend-Deploy
 
-- Startscreen: gestapelte Multi/Solo-Poster, Bilanz-Chip, CTA getrennt von Würfeln.
-- Footer-Menü: Glas-Panel, Screenshot/Support/Legal.
-- Multi: Raum anlegen → **Code teilen** (nur Code).
-- Fortschritt 25/50/75 %; nach Erfolgs-Overlays nacheinander.
-- Regression: `/play`, Pool-Endspiel, Teilen Spielende/Bilanz.
+## Typische Fehler
 
-## Bekannte Mac-Fallen
-
-- **`git pull` blockiert** durch `frontend/package-lock.json` → `git restore frontend/package-lock.json` vor Pull.
-- **Build-Nummer erhöht, UI unverändert** → `npm run build:ios` fehlte oder Pull nicht auf aktuellem HEAD.
-- **Classic statt Cinematic in Web** → `NEXT_PUBLIC_HOME_LAYOUT` in `.env.production` prüfen (Server, gitignored).
-
-## App Store Connect (offen)
-
-- Paid Applications Agreement, Bank/Steuer.
-- Preis **1,19 EUR**.
-- Screenshots, Beschreibung DE, Datenschutzfragebogen.
+- **UI alt trotz Pull** → `npm run build:ios` fehlte vor Archive
+- **Labor-Code ungültig** → `NEXT_PUBLIC_LABS_PIN` fehlt in `.env.production` oder Build nach PIN-Änderung nicht wiederholt
+- **Build-Nummer nicht erhöht** → Upload wird von Connect abgelehnt oder ersetzt nichts Sichtbares

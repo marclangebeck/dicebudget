@@ -96,6 +96,7 @@ model Run {
   totalScore        Int      @default(0) @map("total_score")
   totalRollsUsed    Int      @default(0) @map("total_rolls_used")
   rollsInPool       Int      @default(0) @map("rolls_in_pool")
+  rollSaleFreeFillActive Boolean @default(false) @map("roll_sale_free_fill_active")
   extraYatzyCount   Int      @default(0) @map("extra_yatzy_count")
   nextScoredSequence Int     @default(1) @map("next_scored_sequence")
   status            String   @default("ACTIVE")

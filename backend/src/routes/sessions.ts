@@ -13,6 +13,7 @@ import {
   joinSession,
   resolvePoolEndgame,
 } from "../services/sessionService.js";
+import { applyRollSale } from "../services/houseRulesService.js";
 
 export const sessionsRouter = Router();
 
@@ -74,6 +75,30 @@ sessionsRouter.post("/invite/:inviteCode/join", joinSessionLimiter, async (req, 
     }
     const result = await joinSession(routeParam(req.params.inviteCode), playerId);
     res.status(201).json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+sessionsRouter.post("/invite/:inviteCode/roll-sale", async (req, res, next) => {
+  try {
+    const sellerPlayerId = req.body?.sellerPlayerId;
+    const buyerPlayerId = req.body?.buyerPlayerId;
+    const pools = Number(req.body?.pools);
+    if (typeof sellerPlayerId !== "string" || typeof buyerPlayerId !== "string") {
+      res.status(400).json({ error: "sellerPlayerId and buyerPlayerId required" });
+      return;
+    }
+    if (!Number.isInteger(pools) || pools < 1) {
+      res.status(400).json({ error: "pools must be a positive integer" });
+      return;
+    }
+    const result = await applyRollSale(
+      routeParam(req.params.inviteCode),
+      { sellerPlayerId, buyerPlayerId, pools },
+      readPlayerSecret(req),
+    );
+    res.json(result);
   } catch (error) {
     next(error);
   }

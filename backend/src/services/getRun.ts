@@ -40,6 +40,7 @@ export async function getRunById(runId: string) {
     rollsInPool: run.useStrategyRules ? run.rollsInPool : 0,
     rollsRemaining:
       maxRolls !== null ? maxRolls - run.totalRollsUsed : null,
+    rollSaleFreeFillActive: run.rollSaleFreeFillActive,
     status: run.status,
     createdAt: run.createdAt.toISOString(),
     finishedAt: run.finishedAt?.toISOString() ?? null,
