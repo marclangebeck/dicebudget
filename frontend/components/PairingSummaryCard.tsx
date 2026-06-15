@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { PairingSummaryDto } from "@/lib/pairingTypes";
+import type { PairingHighlightTone } from "@/lib/statsPairingInsights";
 import { playerLabel } from "@/lib/playerIdentity";
 
 type Props = {
@@ -10,7 +11,19 @@ type Props = {
   selectable?: boolean;
   selected?: boolean;
   onToggleSelect?: () => void;
+  badge?: string | null;
+  badgeTone?: PairingHighlightTone | null;
+  featured?: boolean;
+  duelShareA?: number;
 };
+
+function badgeClass(tone: PairingHighlightTone | null | undefined): string {
+  if (tone === "lead") return "stats-pairing-badge--lead";
+  if (tone === "chase") return "stats-pairing-badge--chase";
+  if (tone === "tie") return "stats-pairing-badge--tie";
+  if (tone === "even") return "stats-pairing-badge--even";
+  return "";
+}
 
 export function PairingSummaryCard({
   pairing,
@@ -20,15 +33,23 @@ export function PairingSummaryCard({
   selectable,
   selected,
   onToggleSelect,
+  badge,
+  badgeTone,
+  featured,
+  duelShareA = 50,
 }: Props) {
   const href = `/stats/pairing?key=${encodeURIComponent(pairing.key)}`;
   const netDiff = pairing.playerABonusPoints - pairing.playerBBonusPoints;
+  const shareB = 100 - duelShareA;
 
   return (
     <li>
       <div
-        className={`stats-pairing-card${selected ? " stats-pairing-card--selected" : ""}`}
+        className={`stats-pairing-card${selected ? " stats-pairing-card--selected" : ""}${featured ? " stats-pairing-card--featured" : ""}`}
       >
+        {badge && (
+          <span className={`stats-pairing-badge ${badgeClass(badgeTone)}`}>{badge}</span>
+        )}
         {selectable && (
           <label className="stats-pairing-select">
             <input
@@ -53,6 +74,12 @@ export function PairingSummaryCard({
               {playerLabel(pairing.playerB, ownPlayerId, aliases)}
             </span>
           </p>
+
+          <div className="stats-pairing-duel-bar" aria-hidden>
+            <span className="stats-pairing-duel-bar-a" style={{ width: `${duelShareA}%` }} />
+            <span className="stats-pairing-duel-bar-b" style={{ width: `${shareB}%` }} />
+          </div>
+
           <div className="stats-pairing-card-scores">
             <div className="stats-pairing-card-player">
               <p className="stats-pairing-card-wins tabular-nums">{pairing.playerAWins}</p>

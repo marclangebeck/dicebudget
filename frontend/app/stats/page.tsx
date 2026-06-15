@@ -1,18 +1,36 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { getPairingSummaries, resetPairings } from "@/lib/api";
+import { getPairingSummaries, getStats, resetPairings } from "@/lib/api";
 import type { PairingSummaryDto } from "@/lib/pairingTypes";
 import { mergePairingSummaries } from "@/lib/pairingMerge";
 import { playerLabel } from "@/lib/playerIdentity";
 import { PairingSummaryCard } from "@/components/PairingSummaryCard";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
+import { StatsHeroPanel } from "@/components/StatsHeroPanel";
 import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
 import { loadPlayerAliases, setPlayerAlias, type PlayerAliasMap } from "@/lib/playerAliases";
 import { PlayerAliasOverlay } from "@/components/PlayerAliasOverlay";
+import { buildStatsOverview } from "@/lib/statsOverview";
+import {
+  duelWinShare,
+  getPairingHighlight,
+  pickFeaturedPairingKey,
+  sortPairings,
+  type PairingSortMode,
+} from "@/lib/statsPairingInsights";
+import type { StatsDto } from "@/lib/statsTypes";
+
+const SORT_OPTIONS: { id: PairingSortMode; label: string }[] = [
+  { id: "recent", label: "Zuletzt" },
+  { id: "closest", label: "Engste" },
+  { id: "mostRounds", label: "Meiste Runden" },
+];
 
 export default function StatsPage() {
   const [pairings, setPairings] = useState<PairingSummaryDto[]>([]);
+  const [stats, setStats] = useState<StatsDto | null>(null);
   const [ownPlayerId, setOwnPlayerId] = useState("");
   const [aliases, setAliases] = useState<PlayerAliasMap>({});
   const [editingPlayerId, setEditingPlayerId] = useState<string | null>(null);
@@ -22,13 +40,18 @@ export default function StatsPage() {
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [resetting, setResetting] = useState(false);
   const [resetNotice, setResetNotice] = useState<string | null>(null);
+  const [sortMode, setSortMode] = useState<PairingSortMode>("recent");
 
   const refreshPairings = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const { pairings: data } = await getPairingSummaries();
+      const [{ pairings: data }, { stats: statsData }] = await Promise.all([
+        getPairingSummaries(),
+        getStats(),
+      ]);
       setPairings(data);
+      setStats(statsData);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Statistik nicht geladen");
     } finally {
@@ -45,10 +68,24 @@ export default function StatsPage() {
     void refreshPairings();
   }, [refreshPairings]);
 
-  // Gleicher Alias = dieselbe Person → Paarungen lokal zusammenführen.
   const mergedPairings = useMemo(
     () => mergePairingSummaries(pairings, aliases, ownPlayerId),
     [pairings, aliases, ownPlayerId],
+  );
+
+  const overview = useMemo(
+    () => buildStatsOverview(mergedPairings, stats, ownPlayerId, aliases),
+    [mergedPairings, stats, ownPlayerId, aliases],
+  );
+
+  const featuredKey = useMemo(
+    () => pickFeaturedPairingKey(mergedPairings),
+    [mergedPairings],
+  );
+
+  const sortedPairings = useMemo(
+    () => sortPairings(mergedPairings, sortMode),
+    [mergedPairings, sortMode],
   );
 
   const exitSelectMode = useCallback(() => {
@@ -110,12 +147,16 @@ export default function StatsPage() {
   }, [mergedPairings, selectedKeys, ownPlayerId, aliases, exitSelectMode, refreshPairings]);
 
   return (
-    <div className="stats-screen flex flex-col gap-3 pb-2">
+    <div className="stats-screen flex flex-col gap-2.5 pb-2">
       <AppScreenHeader
         section="Statistik"
         title="Paarungen"
-        subtitle="Direkter Vergleich aus abgeschlossenen Multiplayer-Runden"
+        subtitle="Bilanz, Rivalen und direkte Duelle"
       />
+
+      {!loading && !error && mergedPairings.length > 0 && (
+        <StatsHeroPanel overview={overview} />
+      )}
 
       {error && <p className="glass-alert-error px-3 py-2 text-sm">{error}</p>}
 
@@ -124,41 +165,57 @@ export default function StatsPage() {
       )}
 
       {!loading && !error && mergedPairings.length > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          {!selectMode ? (
-            <button
-              type="button"
-              className="btn-chip px-3 py-1 text-xs"
-              onClick={() => {
-                setResetNotice(null);
-                setSelectMode(true);
-              }}
-            >
-              Statistik zurücksetzen
-            </button>
-          ) : (
-            <>
+        <>
+          <div className="stats-sort-row" role="toolbar" aria-label="Paarungen sortieren">
+            {SORT_OPTIONS.map((option) => (
               <button
+                key={option.id}
                 type="button"
-                className="btn-danger px-3 py-1 text-xs"
-                disabled={selectedKeys.size === 0 || resetting}
-                onClick={() => void handleReset()}
+                className={`stats-sort-chip${sortMode === option.id ? " stats-sort-chip--active" : ""}`}
+                aria-pressed={sortMode === option.id}
+                onClick={() => setSortMode(option.id)}
               >
-                {resetting
-                  ? "Wird zurückgesetzt …"
-                  : `Ausgewählte zurücksetzen (${selectedKeys.size})`}
+                {option.label}
               </button>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            {!selectMode ? (
               <button
                 type="button"
                 className="btn-chip px-3 py-1 text-xs"
-                disabled={resetting}
-                onClick={exitSelectMode}
+                onClick={() => {
+                  setResetNotice(null);
+                  setSelectMode(true);
+                }}
               >
-                Abbrechen
+                Statistik zurücksetzen
               </button>
-            </>
-          )}
-        </div>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className="btn-danger px-3 py-1 text-xs"
+                  disabled={selectedKeys.size === 0 || resetting}
+                  onClick={() => void handleReset()}
+                >
+                  {resetting
+                    ? "Wird zurückgesetzt …"
+                    : `Ausgewählte zurücksetzen (${selectedKeys.size})`}
+                </button>
+                <button
+                  type="button"
+                  className="btn-chip px-3 py-1 text-xs"
+                  disabled={resetting}
+                  onClick={exitSelectMode}
+                >
+                  Abbrechen
+                </button>
+              </>
+            )}
+          </div>
+        </>
       )}
 
       {loading && !error && (
@@ -166,26 +223,35 @@ export default function StatsPage() {
       )}
 
       {!loading && !error && mergedPairings.length === 0 && (
-        <p className="stats-empty-state">
-          Noch keine Paarungen. Spiele mindestens eine Multiplayer-Runde mit zwei oder
-          mehr Spielern zu Ende.
-        </p>
+        <div className="stats-empty-state stats-empty-state--cta">
+          <p>Noch keine Paarungen. Spiele mindestens eine Multiplayer-Runde zu Ende.</p>
+          <Link href="/multi" className="setup-host-submit mt-3 inline-flex min-h-10 items-center px-4 no-underline">
+            Multi starten
+          </Link>
+        </div>
       )}
 
       {!loading && mergedPairings.length > 0 && (
         <ul className="stats-pairing-list">
-          {mergedPairings.map((pairing) => (
-            <PairingSummaryCard
-              key={pairing.key}
-              pairing={pairing}
-              ownPlayerId={ownPlayerId}
-              aliases={aliases}
-              onEditPlayerAlias={selectMode ? undefined : setEditingPlayerId}
-              selectable={selectMode}
-              selected={selectedKeys.has(pairing.key)}
-              onToggleSelect={() => toggleSelected(pairing.key)}
-            />
-          ))}
+          {sortedPairings.map((pairing) => {
+            const highlight = getPairingHighlight(pairing, ownPlayerId, featuredKey);
+            return (
+              <PairingSummaryCard
+                key={pairing.key}
+                pairing={pairing}
+                ownPlayerId={ownPlayerId}
+                aliases={aliases}
+                onEditPlayerAlias={selectMode ? undefined : setEditingPlayerId}
+                selectable={selectMode}
+                selected={selectedKeys.has(pairing.key)}
+                onToggleSelect={() => toggleSelected(pairing.key)}
+                badge={highlight.badge}
+                badgeTone={highlight.tone}
+                featured={highlight.featured}
+                duelShareA={duelWinShare(pairing)}
+              />
+            );
+          })}
         </ul>
       )}
 
