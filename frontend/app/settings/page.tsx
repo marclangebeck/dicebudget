@@ -1,11 +1,14 @@
 "use client";
 
 import { Suspense, useEffect, useState, type ReactNode } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
+import { LabsUnlockDialog } from "@/components/LabsUnlockDialog";
 import { parseSettingsReturn } from "@/lib/settingsReturn";
 import { BonusCelebrationToggle } from "@/components/BonusCelebrationToggle";
 import { StrategyModeToggle } from "@/components/StrategyModeToggle";
+import { isLabsUnlocked, subscribeLabsAccess } from "@/lib/labsAccess";
 import {
   DEFAULT_APP_SETTINGS,
   getAppSettings,
@@ -108,10 +111,22 @@ function SettingsPageInner() {
   const fromParam = searchParams.get("from");
   const returnTarget = parseSettingsReturn(fromParam);
   const [settings, setSettingsState] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
+  const [labsUnlocked, setLabsUnlocked] = useState(false);
+  const [showLabsUnlock, setShowLabsUnlock] = useState(false);
 
   useEffect(() => {
     setSettingsState(getAppSettings());
   }, []);
+
+  useEffect(() => {
+    setLabsUnlocked(isLabsUnlocked());
+    return subscribeLabsAccess(() => setLabsUnlocked(isLabsUnlocked()));
+  }, []);
+
+  const labsHref =
+    fromParam === "solo" || fromParam === "multi"
+      ? `/settings/labs?from=${fromParam}`
+      : "/settings/labs";
 
   function update(update: Partial<AppSettings>) {
     setSettingsState((current) => {
@@ -260,6 +275,43 @@ function SettingsPageInner() {
           </p>
         </div>
       </SettingsSection>
+
+      <section className="settings-group mt-2 border-t border-white/5 pt-4">
+        <h2 className="settings-group-title text-slate-500">Entwickler</h2>
+        <div className="settings-card-grid">
+          {labsUnlocked ? (
+            <Link
+              href={labsHref}
+              className="settings-compact-card settings-compact-card--wide transition hover:border-emerald-400/30"
+            >
+              <p className="settings-compact-title">Entwickler-Vorschau</p>
+              <p className="settings-compact-text mt-2">
+                Experimentelle Features ein- und ausschalten.
+              </p>
+            </Link>
+          ) : (
+            <div className="settings-compact-card settings-compact-card--wide">
+              <p className="settings-compact-title">Entwickler-Vorschau</p>
+              <p className="settings-compact-text mt-2">
+                Mit persönlichem Code neue Features vor dem Rollout testen.
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowLabsUnlock(true)}
+                className="glass-button mt-4 min-h-11 w-full px-4 text-sm font-semibold"
+              >
+                Code eingeben
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <LabsUnlockDialog
+        open={showLabsUnlock}
+        onClose={() => setShowLabsUnlock(false)}
+        onUnlocked={() => setLabsUnlocked(true)}
+      />
     </div>
   );
 }
