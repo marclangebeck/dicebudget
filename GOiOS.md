@@ -20,6 +20,6 @@ Diese Datei ist ein Kompatibilitaets-Index. Fuer aktuellen iOS-/TestFlight-/App-
 ## Wichtig
 
 - Web-Deploy und iOS-Release sind getrennt; `ios/App/App/public/` ist gitignored.
-- Nach UI-Aenderungen: Mac `git pull`, `NEXT_PUBLIC_LABS_PIN` in `.env.production`, `npm run build:ios`, Xcode Archive/Upload.
+- Nach UI-Aenderungen: Mac `git pull`, `NEXT_PUBLIC_LABS_PIN` in `.env.production`, `npm run build:ios` (öffnet Xcode), Archive/Upload.
 - Bei `git pull`-Fehler: `git restore frontend/package-lock.json` vor Pull (vom Projektroot).
 - Der verbindliche Sync-Workflow steht in `AGENT_RULES.md` Sektion 9.

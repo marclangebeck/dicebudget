@@ -213,6 +213,19 @@ git pull origin milestone-22-prep
 cd /Users/marclangebeck/projects/kniffel/frontend
 npm run build:ios
 brew unlink rsync
+```
+
+`build:ios` öffnet auf dem Mac danach automatisch Xcode (`npm run open:ios`).
+
+Xcode manuell öffnen (aus `frontend/`):
+
+```bash
+npm run open:ios
+```
+
+Entspricht:
+
+```bash
 env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
 ```
 

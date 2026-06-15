@@ -13,6 +13,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Multi Eintrag Alle Fünfe:** Kein fixes Wurf-Limit pro Feld mehr (Strategy); Chips bis Pool + Restbudget; Hinweis wenn Würfel bei 50 Punkten fehlt
 
 ### Changed
+- **iOS-Build:** `npm run build:ios` öffnet auf dem Mac nach `cap sync` automatisch `App.xcworkspace` in Xcode
 - **Doku:** `HANDOVER.md`, `docs/milestones_active.md`, `docs/ios_current.md`, `GOiOS.md`, `milestones.md`, `docs/decisions.md` — Hausregeln, Feature-Labor, iOS Build 29
 
 ### Added

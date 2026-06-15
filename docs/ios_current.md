@@ -50,6 +50,16 @@ npm run build:ios
 brew unlink rsync
 ```
 
+`build:ios` öffnet danach automatisch Xcode (`npm run open:ios`).
+
+Xcode manuell:
+
+```bash
+npm run open:ios
+```
+
+Entspricht `env PATH="…" open ios/App/App.xcworkspace` (aus `frontend/`).
+
 Optional Bundle-Check:
 
 ```bash
@@ -58,6 +68,14 @@ ls -lt ios/App/App/public/_next/static/css/ | head -3
 ```
 
 Xcode öffnen:
+
+```bash
+npm run open:ios
+```
+
+(`build:ios` ruft das am Ende automatisch auf.)
+
+Manuell mit vollem Befehl:
 
 ```bash
 env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace

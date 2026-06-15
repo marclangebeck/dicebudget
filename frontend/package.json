@@ -5,9 +5,10 @@
   "scripts": {
     "dev": "next dev -p 3021",
     "build": "next build",
-    "build:ios": "npm run build && npx cap sync ios",
+    "build:ios": "npm run build && npx cap sync ios && bash scripts/open-xcode.sh",
+    "open:ios": "bash scripts/open-xcode.sh",
     "cap:sync": "npx cap sync ios",
-    "cap:open:ios": "npx cap open ios",
+    "cap:open:ios": "npm run open:ios",
     "icons": "node --input-type=module -e \"import sharp from 'sharp'; await sharp('public/logo-source.png').resize(512,512,{fit:'cover',position:'centre'}).png().toFile('public/icon-512.png'); await sharp('public/icon-512.png').resize(180,180).toFile('public/apple-touch-icon.png'); await sharp('public/icon-512.png').resize(32,32).toFile('app/icon.png');\"",
     "start": "next start -p 3021",
     "lint": "eslint",
