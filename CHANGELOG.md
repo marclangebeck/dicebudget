@@ -11,7 +11,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ### Fixed
 - **Zusatzregeln:** Umbenennung von „Tischregeln“, dezenter Trigger rechts am Zettel statt voller Breite
 - **Brennt:** Im Wurf-Overlay statt oberem Panel; Wurfbeginn = leeres Feld vor Eintrag (UI-Bug `rollsUsed === null` behoben)
-- **Hausregeln am Zettel:** Eigene helle Panel-Styles mit dunkler Schrift (Zettel-Felder unverändert); oberes Panel nur noch Tischregeln (Verkauf, 2× Alle Fünfe)
+- **Hausregeln am Zettel:** Helle Panel-Styles; oberer Bereich nur noch Zusatzregeln (Verkauf, 2× Alle Fünfe)
 - **Eingabefelder:** `glass-input` nutzt feste dunkle Schrift auf hellem Grund (Code, Namen, Hausregeln) — zuvor helle Schrift auf weißem BG in dunklen Screens
 - **iPad-Tischmodus:** Hausregeln (Brennt, Verkauf, 2× Alle Fünfe) im `TableModePlayBoard` — zuvor nur im normalen Spielscreen
 - **Multi Eintrag Alle Fünfe:** Kein fixes Wurf-Limit pro Feld mehr (Strategy); Chips bis Pool + Restbudget; Hinweis wenn Würfel bei 50 Punkten fehlt

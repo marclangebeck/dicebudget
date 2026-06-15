@@ -2,7 +2,7 @@
 
 **Stand:** 2026-06-15  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `git log -1` auf Mac nach Pull  
+**Produktcode-HEAD:** `d6bd92b` (Mac nach `git pull`)  
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
@@ -11,7 +11,7 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 
 - App Store Connect: **Version 2.0**.
 - **TestFlight `2.0 (28)` (aktuell in Connect):** Produktcode **`d8b5952`** — Cinematic Editorial Startscreen.
-- **Nächster geplanter Upload: `2.0 (29)`** — enthält Feature-Labor, Hausregeln, Bugfix Strategy-Würfe, M27/M29 (nach Pull aktuellen HEAD).
+- **Nächster geplanter Upload: `2.0 (29)`** — HEAD `d6bd92b`: Feature-Labor, Zusatzregeln-UI, iPad-Tisch, Strategy-Fixes.
 - Web/API live: https://dicebudget.bottle-trade.de
 
 ## iOS-Bundle (kritisch)
@@ -52,14 +52,6 @@ brew unlink rsync
 
 `build:ios` öffnet danach automatisch Xcode (`npm run open:ios`).
 
-Xcode manuell:
-
-```bash
-npm run open:ios
-```
-
-Entspricht `env PATH="…" open ios/App/App.xcworkspace` (aus `frontend/`).
-
 Optional Bundle-Check:
 
 ```bash
@@ -92,12 +84,13 @@ env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworks
 
 Ausführliche Connect-Schritte: `docs/testflight-app-store.md`, Einsteiger: `docs/ios-xcode-anleitung.md`.
 
-## TestFlight-Checkliste (Build 29+)
+## TestFlight-Checkliste (Build 29+, HEAD `d6bd92b`)
 
-- Entwickler-Vorschau: Code eingeben → `/settings/labs` → Hausregeln-Toggles
-- **Hausregeln** im Spiel (Strategy): Brennt, Verkauf, 2× Alle Fünfe (Multi)
+- Entwickler-Vorschau: Code auf **jedem Testgerät** → `/settings/labs` → Toggles
+- **Brennt** im Wurf-Overlay; **Zusatzregeln** rechts am Zettel / eingeklappt im Overlay (Verkauf, 2× Alle Fünfe)
+- iPad-Tischmodus: Zusatzregeln + Brennt wie Online-Multi
 - Cinematic Startscreen, Footer/Menü, Multi Code teilen, Pool-Endspiel
-- Alle Fünfe Eintrag Wurf 23+; Match-Analyse nach Backend-Deploy
+- Alle Fünfe Eintrag Wurf 23+; Match-Analyse
 
 ## Typische Fehler
 

@@ -14,7 +14,7 @@ Diese Datei ist ein Kompatibilitaets-Index. Fuer aktuellen iOS-/TestFlight-/App-
 - Bundle ID: `de.bottletrade.dicebudget`
 - Version in App Store Connect: `2.0`
 - Aktueller TestFlight-Build: `2.0 (28)` (Produktcode `d8b5952`)
-- **Nächster Upload:** `2.0 (29)` nach `git pull` + `npm run build:ios` auf aktuellem HEAD
+- **Nächster Upload:** `2.0 (29)` auf HEAD `d6bd92b` (`git pull` + `npm run build:ios`)
 - Details und Checkliste: `docs/ios_current.md`
 
 ## Wichtig

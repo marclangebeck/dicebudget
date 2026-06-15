@@ -2,7 +2,7 @@
 
 **Stand:** 2026-06-15  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** siehe `git log -1` (Hausregeln + Feature-Labor)  
+**Produktcode-HEAD:** `d6bd92b` (Zusatzregeln-UI)  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -34,14 +34,14 @@ Details: `docs/ios_current.md`.
 
 ### Hausregeln Strategy (Feature-Labor) 2026-06-15
 
-**Status:** implementiert; Backend Prod deployed; Web-Frontend gebaut; iOS noch auf Build 28.
+**Status:** implementiert; Backend Prod deployed; Web-Frontend gebaut (HEAD `d6bd92b`); iOS noch auf Build 28.
 
-- **Brennt:** −5 Pool am Wurfbeginn (Feld gewählt, noch keine Würfe).
-- **Wurf verkaufen:** Volle Feldzeile (alle Spalten eines Typs); 2–6 Spieler; Pool-Transfer; Verkäufer-Freifeld (0 Würfe, eingeschränkte Scores).
-- **2× Alle Fünfe:** Letzte zwei Einträge KNIFFEL ≤3 → gewählter Gegner verliert ⌊Pool/2⌋.
-- Aktivierung nur über Entwickler-Vorschau (`NEXT_PUBLIC_LABS_PIN`, `/settings/labs`).
+- **Brennt:** −5 Pool vor Eintrag (leeres Feld); Button im Wurf-Overlay (`ScoreEntryPanel`).
+- **Wurf verkaufen / 2× Alle Fünfe:** **Zusatzregeln** — Popover rechts am Zettel oder eingeklappt im Overlay (`HouseRulesTableActions`).
+- **iPad-Tischmodus:** Hausregeln in `TableModePlayBoard` (seit `1457a2f`).
+- Aktivierung: Entwickler-Vorschau (`NEXT_PUBLIC_LABS_PIN`, `/settings/labs`); Labor pro Gerät.
 
-Dateien: `backend/src/domain/houseRules.ts`, `houseRulesService.ts`, `frontend/lib/houseRules.ts`, `HouseRulesPanel.tsx`, `RollSaleOverlay.tsx`, Migration `roll_sale_free_fill_active`
+Dateien: `backend/src/domain/houseRules.ts`, `houseRulesService.ts`, `frontend/lib/houseRules.ts`, `HouseRulesTableActions.tsx`, `HouseRulesPanel.tsx`, `ScoreEntryPanel.tsx`, `TableModePlayBoard.tsx`, `RollSaleOverlay.tsx`
 
 ### Feature-Labor (Entwickler-Vorschau) 2026-06-14
 

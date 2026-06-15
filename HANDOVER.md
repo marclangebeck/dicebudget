@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** siehe `git log -1` (Hausregeln + Feature-Labor)  
+**Produktcode-HEAD:** `d6bd92b` (Zusatzregeln UI: Brennt im Overlay, Verkauf/Strafe dezent + eingeklappt)  
 **Sprache:** Deutsch
 
 Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M30** App Store Release). Aktiver Milestone-Stand: `docs/milestones_active.md`. iOS/TestFlight: `docs/ios_current.md`. Architektur/Betrieb: `docs/decisions.md` nur bei Bedarf.
@@ -25,10 +25,10 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M3
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
 | Branch | `milestone-22-prep` |
-| Letzte Features | Feature-Labor (`5e621ac`); Hausregeln Strategy (Brennt, Verkauf, 2× Alle Fünfe) |
+| Letzte Features | Zusatzregeln-UI (`d6bd92b`); Feature-Labor; Hausregeln Strategy |
 | Roadmap | **M30** App Store Release als Nächstes |
 | Backend Prod | Hausregeln-API deployed (Nutzer bestätigt) |
-| Frontend-Tests | 32 Unit-Tests; Backend 86 Tests |
+| Frontend-Tests | 33 Unit-Tests; Backend 86 Tests |
 | Entwickler-Vorschau | `/settings/labs`; Code via `NEXT_PUBLIC_LABS_PIN` (Build-Zeit, Web + iOS) |
 | iOS/TestFlight | Version `2.0`; **Build `2.0 (28)`** mit `d8b5952`; **nächster Upload `2.0 (29)`** auf aktuellem HEAD |
 
@@ -44,13 +44,13 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M3
 
 | Regel | Kurz | Backend |
 |-------|------|---------|
-| **Brennt** | −5 Pool am Wurfbeginn, physisch neu würfeln | `POST .../house-rules/burn` |
-| **Wurf verkaufen** | Volle Feldzeile (z. B. alle Gr. Straßen); Pool-Transfer; Freifeld 0 Würfe | `POST .../roll-sale` |
-| **2× Alle Fünfe** | Letzte 2 Einträge KNIFFEL ≤3 Würfe → Gegner halber Pool | `POST .../yatzy-streak-penalty` |
+| **Brennt** | −5 Pool vor Eintrag (Feld leer), physisch neu würfeln — Button im **Wurf-Overlay** | `POST .../house-rules/burn` |
+| **Wurf verkaufen** | Volle Feldzeile; Pool-Transfer; Freifeld 0 Würfe | `POST .../roll-sale` |
+| **2× Alle Fünfe** | Letzte 2 KNIFFEL ≤3 Würfe → Gegner halber Pool | `POST .../yatzy-streak-penalty` |
 
-Aktivierung: Entwickler-Vorschau freischalten → Toggles in `/settings/labs` → im Spiel **Hausregeln**.
+Aktivierung: Entwickler-Vorschau → `/settings/labs` → Toggles. Im Spiel: **Zusatzregeln** (dezent rechts am Zettel oder eingeklappt im Wurf-Overlay); **Brennt** nur im Overlay. Labor-Code pro Gerät (`localStorage`).
 
-Dateien: `backend/src/domain/houseRules.ts`, `houseRulesService.ts`, `frontend/lib/houseRules.ts`, `HouseRulesPanel.tsx`, `RollSaleOverlay.tsx`
+Dateien: `houseRules.ts`, `houseRulesTableActions.tsx`, `HouseRulesPanel.tsx`, `ScoreEntryPanel.tsx`, `TableModePlayBoard.tsx`, `RollSaleOverlay.tsx`
 
 ### Feature-Labor (`5e621ac`)
 
@@ -77,7 +77,7 @@ Prisma-Migration `20260615120000_house_rules_roll_sale` (`roll_sale_free_fill_ac
 
 ## Wichtige Dateien
 
-- Hausregeln: `houseRules.ts` (Backend/Frontend), `HouseRulesPanel.tsx`, `playField.ts` (Freifeld-Eintrag)
+- Hausregeln: `houseRules.ts`, `HouseRulesTableActions.tsx`, `HouseRulesPanel.tsx`, `ScoreEntryPanel.tsx`
 - Feature-Labor: `featureFlags.ts`, `labsAccess.ts`, `app/settings/labs/page.tsx`
 - Deploy: `infra/scripts/deploy-backend-prod.sh`
 - iOS-Workflow: `docs/ios_current.md`, `GOiOS.md`
