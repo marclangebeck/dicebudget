@@ -5,7 +5,9 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
-- **Statistik (A+B):** Kompakter Hero mit Bilanz, Siegquote und KPIs; Sortierung (Zuletzt/Engste/Meiste Runden); Paarungs-Badges, Duellbalken und Top-Rivalität
+- **Spielanalyse:** Kompakter Kern („Warum verloren/gewonnen?“), Details eingeklappt; Duell-Graph alle 10 % statt pro Wurf
+- **Fortschritt 25/50/75 %:** Hinweis vorn/zurück (ohne Abstand), Overlay per „Weiter“ wegklickbar
+- **Statistik (A+B):** Kompakter Hero mit Bilanz, Siegquote und KPIs; Sortierung; Paarungs-Badges und Duellbalken
 - **Startscreen Solo/Multi:** 3D-Würfel ohne Puls-Ring und Glow, ~30 % größer und zentrierter; nur noch der Card-Hintergrund
 - **Screenshot:** Button „Bild“ in der Fußleiste; Kamera-Blitz, Vorschau vor dem Teilen, Toast statt Menü-Reopen; Hamburger nur noch Support/Rechtliches
 

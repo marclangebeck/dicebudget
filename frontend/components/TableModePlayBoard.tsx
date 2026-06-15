@@ -271,7 +271,18 @@ export function TableModePlayBoard({ inviteCode }: Props) {
       if (!shownProgressByRunRef.current[activeRun.id]) {
         shownProgressByRunRef.current[activeRun.id] = shownSet;
       }
-      const progress = buildProgressMilestoneAfterField(activeRun, updated, shownSet);
+      const progress = buildProgressMilestoneAfterField(
+        activeRun,
+        updated,
+        shownSet,
+        activeSide
+          ? {
+              kind: "table",
+              ownSide: activeSide,
+              runs: { ...runs, [activeSide]: updated },
+            }
+          : null,
+      );
       await refreshAfterChange(activeSide, updated);
       if (progress) {
         shownSet.add(progress.percent);
@@ -729,6 +740,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
       {progressOverlay && (
         <RunProgressOverlay
           percent={progressOverlay.percent}
+          positionHint={progressOverlay.positionHint}
           onClose={closeProgressOverlay}
         />
       )}

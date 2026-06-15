@@ -6666,6 +6666,44 @@ html.zoomable-route.legal-route .legal-page-scroll {
   color: #e2e8f0;
 }
 
+.match-analysis-narrative--compact {
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.match-analysis-hero--compact {
+  padding: 0.72rem 0.8rem;
+}
+
+.match-analysis-focus-card {
+  margin-top: 0;
+}
+
+.match-analysis-focus-block + .match-analysis-focus-block {
+  margin-top: 0.55rem;
+}
+
+.match-analysis-focus-label {
+  margin: 0 0 0.28rem;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(214, 168, 90, 0.88);
+}
+
+.match-analysis-focus-list {
+  margin: 0;
+  padding-left: 1rem;
+  font-size: 0.72rem;
+  line-height: 1.38;
+  color: rgba(226, 232, 240, 0.88);
+}
+
+.match-analysis-focus-list li + li {
+  margin-top: 0.22rem;
+}
+
 .match-analysis-trait {
   border-radius: 0.65rem;
   padding: 0.55rem 0.65rem;
@@ -8287,8 +8325,16 @@ html.zoomable-route.legal-route .legal-page-scroll {
 }
 
 .run-progress-overlay {
-  background: rgba(2, 6, 23, 0.55);
-  backdrop-filter: blur(4px);
+  position: relative;
+}
+
+.run-progress-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgba(2, 6, 23, 0.42);
+  backdrop-filter: blur(3px);
+  cursor: pointer;
 }
 
 .run-progress-scene {
@@ -8366,6 +8412,13 @@ html.zoomable-route.legal-route .legal-page-scroll {
   margin-top: 0.45rem;
   font-size: 0.75rem;
   color: #a7f3d0;
+}
+
+.run-progress-position {
+  margin-top: 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 750;
+  color: #fde68a;
 }
 
 @keyframes run-progress-pulse {

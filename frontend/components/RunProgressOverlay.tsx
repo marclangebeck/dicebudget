@@ -1,37 +1,43 @@
 "use client";
 
-import type { ProgressMilestonePercent } from "@/lib/runProgressFeedback";
+import { progressPositionLabel, type ProgressMilestonePercent } from "@/lib/runProgressFeedback";
 
 type Props = {
   percent: ProgressMilestonePercent;
+  positionHint?: "ahead" | "behind" | "even" | null;
   onClose: () => void;
 };
 
-export function RunProgressOverlay({ percent, onClose }: Props) {
+export function RunProgressOverlay({ percent, positionHint, onClose }: Props) {
+  const positionLabel = progressPositionLabel(positionHint);
+
   return (
     <div
       className="run-progress-overlay fixed inset-0 z-50 flex items-center justify-center p-4"
-      role="status"
-      aria-live="polite"
-      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="run-progress-title"
     >
-      <div className="run-progress-scene" aria-hidden>
-        <div className="run-progress-scene-glow" />
-        <div className="run-progress-ring run-progress-ring--outer" />
-        <div
-          className="run-progress-ring run-progress-ring--inner"
-          style={{ "--progress-pct": percent } as React.CSSProperties}
-        />
-      </div>
-
-      <div
-        className="run-progress-card relative z-10 text-center"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <button
+        type="button"
+        className="run-progress-overlay-backdrop"
+        aria-label="Hinweis schließen"
+        onClick={onClose}
+      />
+      <div className="run-progress-card relative z-10 text-center">
         <p className="run-progress-kicker">Fortschritt</p>
-        <p className="run-progress-value tabular-nums">{percent}%</p>
+        <p id="run-progress-title" className="run-progress-value tabular-nums">
+          {percent}%
+        </p>
         <p className="run-progress-title">absolviert</p>
-        <p className="run-progress-sub">Weiter so — du bist auf Kurs.</p>
+        {positionLabel ? (
+          <p className="run-progress-position">{positionLabel}</p>
+        ) : (
+          <p className="run-progress-sub">Weiter so — du bist auf Kurs.</p>
+        )}
+        <button type="button" className="glass-button mt-4 min-h-10 px-5 text-sm font-semibold" onClick={onClose}>
+          Weiter
+        </button>
       </div>
     </div>
   );

@@ -401,6 +401,9 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         run,
         updated,
         shownProgressRef.current,
+        inviteCode && lobby && lobby.playerCount >= 2
+          ? { kind: "lobby", lobby, ownPlayerId: getOrCreatePlayerId() }
+          : null,
       );
       setRun(updated);
       resetEntry();
@@ -929,6 +932,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       {progressOverlay && !showCompleteOverlay && (
         <RunProgressOverlay
           percent={progressOverlay.percent}
+          positionHint={progressOverlay.positionHint}
           onClose={closeProgressOverlay}
         />
       )}

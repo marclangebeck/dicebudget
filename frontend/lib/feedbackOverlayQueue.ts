@@ -5,10 +5,7 @@ import {
   type AchievementOverlayState,
 } from "@/lib/achievementFeedback";
 import { playProgressMilestoneSound } from "@/lib/achievementSound";
-import {
-  RUN_PROGRESS_DURATION_MS,
-  type RunProgressOverlayState,
-} from "@/lib/runProgressFeedback";
+import type { RunProgressOverlayState } from "@/lib/runProgressFeedback";
 
 /** Erfolgs- und Fortschritts-Overlays nacheinander (Fortschritt wartet hinter Erfolg). */
 export function useQueuedFeedbackOverlays() {
@@ -39,12 +36,6 @@ export function useQueuedFeedbackOverlays() {
     );
     return () => window.clearTimeout(timer);
   }, [achievementOverlay, closeAchievementOverlay]);
-
-  useEffect(() => {
-    if (!progressOverlay) return;
-    const timer = window.setTimeout(() => setProgressOverlay(null), RUN_PROGRESS_DURATION_MS);
-    return () => window.clearTimeout(timer);
-  }, [progressOverlay]);
 
   const presentFeedbackAfterField = useCallback(
     (achievement: AchievementOverlayState | null, progress: RunProgressOverlayState | null) => {
