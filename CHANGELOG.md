@@ -9,6 +9,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Entwickler-Vorschau:** Code-Freischaltung (`NEXT_PUBLIC_LABS_PIN`), Labor unter `/settings/labs`, Feature-Register `featureFlags.ts`
 
 ### Fixed
+- **Zusatzregeln:** Umbenennung von „Tischregeln“, dezenter Trigger rechts am Zettel statt voller Breite
 - **Brennt:** Im Wurf-Overlay statt oberem Panel; Wurfbeginn = leeres Feld vor Eintrag (UI-Bug `rollsUsed === null` behoben)
 - **Hausregeln am Zettel:** Eigene helle Panel-Styles mit dunkler Schrift (Zettel-Felder unverändert); oberes Panel nur noch Tischregeln (Verkauf, 2× Alle Fünfe)
 - **Eingabefelder:** `glass-input` nutzt feste dunkle Schrift auf hellem Grund (Code, Namen, Hausregeln) — zuvor helle Schrift auf weißem BG in dunklen Screens
@@ -16,6 +17,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Multi Eintrag Alle Fünfe:** Kein fixes Wurf-Limit pro Feld mehr (Strategy); Chips bis Pool + Restbudget; Hinweis wenn Würfel bei 50 Punkten fehlt
 
 ### Changed
+- **Zusatzregeln (Stufe B):** Verkauf und 2× Alle Fünfe im Wurf-Overlay (eingeklappt) und dezent rechts am Zettel; gemeinsame `HouseRulesTableActions`
 - **iOS-Build:** `npm run build:ios` öffnet auf dem Mac nach `cap sync` automatisch `App.xcworkspace` in Xcode
 - **Doku:** `HANDOVER.md`, `docs/milestones_active.md`, `docs/ios_current.md`, `GOiOS.md`, `milestones.md`, `docs/decisions.md` — Hausregeln, Feature-Labor, iOS Build 29
 

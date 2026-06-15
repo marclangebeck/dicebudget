@@ -2,10 +2,15 @@
 
 import { FieldScoreChoiceGrid } from "@/components/FieldScoreChoiceGrid";
 import { YatzyDiePicker } from "@/components/YatzyDiePicker";
+import {
+  HouseRulesTableActions,
+  isExtraHouseRulesUiAvailable,
+} from "@/components/HouseRulesTableActions";
 import { strategyRollChipOptions } from "@/lib/gameRules";
-import { rollSaleAllowedScores, BURN_POOL_COST, canBurnHouseRule } from "@/lib/houseRules";
+import { rollSaleAllowedScores, BURN_POOL_COST } from "@/lib/houseRules";
 import { FIELD_LABELS, fieldScoreChoices } from "@/lib/labels";
 import type { FieldDto, RunDto } from "@/lib/types";
+import type { SessionLobbyDto } from "@/lib/sessionTypes";
 
 type Props = {
   id?: string;
@@ -23,6 +28,12 @@ type Props = {
   burnEnabled?: boolean;
   canBurn?: boolean;
   onBurn?: () => void;
+  inviteCode?: string;
+  lobby?: SessionLobbyDto | null;
+  isLocalSolo?: boolean;
+  ownPlayerDbId?: string;
+  onRollSale?: (sellerPlayerId: string, buyerPlayerId: string, pools: number) => void;
+  onYatzyStreak?: (victimPlayerId: string) => void;
   onPickScoreValue: (value: number) => void;
   onYatzyDieValue?: (value: number) => void;
   onRollsUsed: (n: number) => void;
@@ -47,6 +58,12 @@ export function ScoreEntryPanel({
   burnEnabled,
   canBurn,
   onBurn,
+  inviteCode,
+  lobby,
+  isLocalSolo = false,
+  ownPlayerDbId,
+  onRollSale,
+  onYatzyStreak,
   onPickScoreValue,
   onYatzyDieValue,
   onRollsUsed,
@@ -98,6 +115,12 @@ export function ScoreEntryPanel({
             ? "Bitte die Anzahl Würfe für dieses Feld wählen."
             : null
       : null;
+
+  const showExtraRules =
+    !rollSaleMode &&
+    isExtraHouseRulesUiAvailable(isLocalSolo, run.useStrategyRules) &&
+    onRollSale &&
+    onYatzyStreak;
 
   return (
     <div
@@ -228,6 +251,23 @@ export function ScoreEntryPanel({
                 </p>
               )}
             </div>
+          )}
+
+          {showExtraRules && (
+            <details className="play-entry-extra-rules">
+              <summary className="play-entry-extra-rules-summary">Zusatzregeln</summary>
+              <HouseRulesTableActions
+                run={run}
+                inviteCode={inviteCode}
+                lobby={lobby ?? null}
+                isLocalSolo={isLocalSolo}
+                ownPlayerDbId={ownPlayerDbId}
+                busy={busy}
+                onRollSale={onRollSale}
+                onYatzyStreak={onYatzyStreak}
+                variant="entry"
+              />
+            </details>
           )}
 
           <div className={`play-entry-actions ${canClearLast ? "play-entry-actions--split" : ""}`}>

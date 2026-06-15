@@ -754,6 +754,12 @@ export function TableModePlayBoard({ inviteCode }: Props) {
           }
           canBurn={canBurnHouseRule(activeRun, activeFieldId, isCorrection)}
           onBurn={() => activeFieldId && void handleBurn(activeFieldId)}
+          inviteCode={inviteCode}
+          lobby={lobby}
+          isLocalSolo={false}
+          ownPlayerDbId={houseRulesPlayerDbId}
+          onRollSale={(seller, buyer, pools) => void handleRollSale(seller, buyer, pools)}
+          onYatzyStreak={(victimId) => void handleYatzyStreak(victimId)}
           onPickScoreValue={(v) => {
             setScoreInput(String(v));
             if (v !== 50) setYatzyDieValue(null);

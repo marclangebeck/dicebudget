@@ -2726,22 +2726,83 @@ html.zoomable-route.legal-route .legal-page-scroll {
     inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
-/* Hausregeln am Spielzettel — helle Karte, dunkle Schrift (Zettel-Felder unverändert) */
+/* Hausregeln am Spielzettel — Zusatzregeln dezent rechts; Zettel-Felder unverändert */
+.house-rules-slot {
+  position: relative;
+  z-index: 15;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 0.35rem 0.15rem;
+}
+
+.house-rules-trigger {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(15, 23, 42, 0.42);
+  color: #e2e8f0;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 0.28rem 0.62rem;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px -4px rgba(0, 0, 0, 0.45);
+}
+
+.house-rules-trigger:hover {
+  border-color: rgba(214, 168, 90, 0.45);
+  color: #ffffff;
+}
+
+.house-rules-slot-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 14;
+  border: none;
+  background: transparent;
+  cursor: default;
+}
+
+.house-rules-popover {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  right: 0;
+  z-index: 16;
+  width: min(18.5rem, calc(100vw - 1.25rem));
+  border-radius: 0.85rem;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  color: #0f172a;
+  padding: 0.65rem;
+  box-shadow: 0 10px 28px -8px rgba(15, 23, 42, 0.28);
+}
+
+.house-rules-popover-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.house-rules-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.house-rules-actions--entry {
+  margin-top: 0.35rem;
+}
+
 .house-rules-toggle,
 .house-rules-panel,
-.house-rules-panel .glass-input {
+.house-rules-panel .glass-input,
+.house-rules-popover .glass-input,
+.house-rules-actions .glass-input {
   --input-bg: #ffffff;
   --input-text: #0f172a;
   --input-placeholder: #64748b;
   color: #0f172a;
-}
-
-.house-rules-toggle {
-  border-radius: 0.65rem;
-  border: 1px solid rgba(15, 23, 42, 0.16);
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  color: #0f172a;
-  box-shadow: 0 1px 4px -2px rgba(15, 23, 42, 0.12);
 }
 
 .house-rules-panel {
@@ -3325,6 +3386,34 @@ html.zoomable-route.legal-route .legal-page-scroll {
   border-color: rgba(15, 23, 42, 0.12);
   background: #f1f5f9;
   color: #94a3b8;
+}
+
+.play-entry-extra-rules {
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  padding-top: 0.35rem;
+}
+
+.play-entry-extra-rules-summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #0369a1;
+  user-select: none;
+}
+
+.play-entry-extra-rules-summary::-webkit-details-marker {
+  display: none;
+}
+
+.play-entry-extra-rules-summary::before {
+  content: "▸ ";
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+.play-entry-extra-rules[open] .play-entry-extra-rules-summary::before {
+  transform: rotate(90deg);
 }
 
 .field-entry-overlay {
