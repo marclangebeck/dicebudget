@@ -17,6 +17,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Multi Eintrag Alle Fünfe:** Kein fixes Wurf-Limit pro Feld mehr (Strategy); Chips bis Pool + Restbudget; Hinweis wenn Würfel bei 50 Punkten fehlt
 
 ### Changed
+- **Einstellungen (Ein-Screen):** Alle Toggles (Modus, Feedback, Multi, iPad, Hausregeln nach Code) in einer scrollbaren Liste; Solo- und Multi-Start direkt aus den Einstellungen; `/settings/feedback` und `/settings/labs` leiten auf die Hauptseite um
 - **Zusatzregeln (Stufe B):** Verkauf und 2× Alle Fünfe im Wurf-Overlay (eingeklappt) und dezent rechts am Zettel; gemeinsame `HouseRulesTableActions`
 - **iOS-Build:** `npm run build:ios` öffnet auf dem Mac nach `cap sync` automatisch `App.xcworkspace` in Xcode
 - **Doku:** `HANDOVER.md`, `docs/milestones_active.md`, `docs/ios_current.md`, `GOiOS.md`, `milestones.md`, `docs/decisions.md` — Hausregeln, Feature-Labor, iOS Build 29

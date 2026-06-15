@@ -6882,13 +6882,90 @@ html.zoomable-route.legal-route .legal-page-scroll {
 .settings-screen {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.5rem;
+}
+
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem;
+}
+
+.settings-section-label {
+  margin: 0.45rem 0 0;
+  padding: 0 0.1rem;
+  color: #d6a85a;
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.settings-section-label:first-child {
+  margin-top: 0;
 }
 
 .settings-card-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.65rem;
+}
+
+.settings-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.settings-group--actions {
+  margin-top: 0.35rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.settings-range-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.settings-compact-value-inline {
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 850;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 12px rgba(214, 168, 90, 0.18);
+}
+
+.settings-compact-card--slim {
+  min-height: auto;
+  padding: 0.52rem 0.68rem;
+  gap: 0.32rem;
+}
+
+.settings-compact-card--toggle.settings-compact-card--slim {
+  min-height: 3.35rem;
+}
+
+.settings-compact-title--sm {
+  font-size: 0.8rem;
+  line-height: 1.15;
+}
+
+.settings-compact-text--sm {
+  font-size: 0.62rem;
+  line-height: 1.28;
+}
+
+.settings-compact-card--range.settings-compact-card--slim {
+  text-align: left;
+}
+
+.settings-compact-card--range.settings-compact-card--slim .settings-compact-value {
+  display: none;
 }
 
 .settings-compact-card {
