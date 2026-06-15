@@ -1,17 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { getPairingSummaries, getStats, resetPairings } from "@/lib/api";
 import type { PairingSummaryDto } from "@/lib/pairingTypes";
-import { mergePairingSummaries } from "@/lib/pairingMerge";
+import { mergePairingSummaries, type MergedPairingSummary } from "@/lib/pairingMerge";
 import { playerLabel } from "@/lib/playerIdentity";
-import { PairingSummaryCard } from "@/components/PairingSummaryCard";
+import { PairingAccordionItem } from "@/components/PairingAccordionItem";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { StatsHeroPanel } from "@/components/StatsHeroPanel";
 import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
 import { loadPlayerAliases, setPlayerAlias, type PlayerAliasMap } from "@/lib/playerAliases";
 import { PlayerAliasOverlay } from "@/components/PlayerAliasOverlay";
+import { PairingEditOverlay } from "@/components/PairingEditOverlay";
 import { buildStatsOverview } from "@/lib/statsOverview";
 import {
   duelWinShare,
@@ -28,19 +30,28 @@ const SORT_OPTIONS: { id: PairingSortMode; label: string }[] = [
   { id: "mostRounds", label: "Meiste Runden" },
 ];
 
-export default function StatsPage() {
+function StatsPageInner() {
+  const searchParams = useSearchParams();
+  const deepLinkKey = (searchParams.get("pairing") ?? "").trim();
+
   const [pairings, setPairings] = useState<PairingSummaryDto[]>([]);
   const [stats, setStats] = useState<StatsDto | null>(null);
   const [ownPlayerId, setOwnPlayerId] = useState("");
   const [aliases, setAliases] = useState<PlayerAliasMap>({});
   const [editingPlayerId, setEditingPlayerId] = useState<string | null>(null);
+  const [editingPairing, setEditingPairing] = useState<{
+    group: MergedPairingSummary;
+    sources: PairingSummaryDto[];
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectMode, setSelectMode] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [openKeys, setOpenKeys] = useState<Set<string>>(new Set());
   const [resetting, setResetting] = useState(false);
   const [resetNotice, setResetNotice] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<PairingSortMode>("recent");
+  const [detailReloadToken, setDetailReloadToken] = useState(0);
 
   const refreshPairings = useCallback(async () => {
     setLoading(true);
@@ -68,6 +79,11 @@ export default function StatsPage() {
     void refreshPairings();
   }, [refreshPairings]);
 
+  useEffect(() => {
+    if (!deepLinkKey) return;
+    setOpenKeys(new Set([deepLinkKey]));
+  }, [deepLinkKey]);
+
   const mergedPairings = useMemo(
     () => mergePairingSummaries(pairings, aliases, ownPlayerId),
     [pairings, aliases, ownPlayerId],
@@ -91,6 +107,15 @@ export default function StatsPage() {
   const exitSelectMode = useCallback(() => {
     setSelectMode(false);
     setSelectedKeys(new Set());
+  }, []);
+
+  const toggleOpen = useCallback((key: string) => {
+    setOpenKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
   }, []);
 
   const toggleSelected = useCallback((key: string) => {
@@ -138,7 +163,9 @@ export default function StatsPage() {
       }
       setResetNotice(notice);
       exitSelectMode();
+      setOpenKeys(new Set());
       await refreshPairings();
+      setDetailReloadToken((value) => value + 1);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Zurücksetzen fehlgeschlagen");
     } finally {
@@ -151,7 +178,7 @@ export default function StatsPage() {
       <AppScreenHeader
         section="Statistik"
         title="Paarungen"
-        subtitle="Bilanz, Rivalen und direkte Duelle"
+        subtitle="Bilanz, Rivalen und direkte Duelle — Paarung antippen zum Aufklappen"
       />
 
       {!loading && !error && mergedPairings.length > 0 && (
@@ -236,12 +263,15 @@ export default function StatsPage() {
           {sortedPairings.map((pairing) => {
             const highlight = getPairingHighlight(pairing, ownPlayerId, featuredKey);
             return (
-              <PairingSummaryCard
+              <PairingAccordionItem
                 key={pairing.key}
                 pairing={pairing}
                 ownPlayerId={ownPlayerId}
                 aliases={aliases}
+                open={openKeys.has(pairing.key)}
+                onToggle={() => toggleOpen(pairing.key)}
                 onEditPlayerAlias={selectMode ? undefined : setEditingPlayerId}
+                onEditPairing={selectMode ? undefined : setEditingPairing}
                 selectable={selectMode}
                 selected={selectedKeys.has(pairing.key)}
                 onToggleSelect={() => toggleSelected(pairing.key)}
@@ -249,6 +279,7 @@ export default function StatsPage() {
                 badgeTone={highlight.tone}
                 featured={highlight.featured}
                 duelShareA={duelWinShare(pairing)}
+                reloadToken={detailReloadToken}
               />
             );
           })}
@@ -265,9 +296,33 @@ export default function StatsPage() {
           onSave={(alias) => {
             setAliases(setPlayerAlias(editingPlayerId, alias));
             setEditingPlayerId(null);
+            setDetailReloadToken((value) => value + 1);
+          }}
+        />
+      )}
+
+      {editingPairing && (
+        <PairingEditOverlay
+          merged={editingPairing.group}
+          sourceSummaries={editingPairing.sources}
+          ownPlayerId={ownPlayerId}
+          aliases={aliases}
+          onClose={() => setEditingPairing(null)}
+          onSaved={() => {
+            setEditingPairing(null);
+            void refreshPairings();
+            setDetailReloadToken((value) => value + 1);
           }}
         />
       )}
     </div>
+  );
+}
+
+export default function StatsPage() {
+  return (
+    <Suspense fallback={<p className="stats-empty-state">Lade Paarungen …</p>}>
+      <StatsPageInner />
+    </Suspense>
   );
 }

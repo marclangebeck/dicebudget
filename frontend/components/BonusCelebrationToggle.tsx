@@ -12,7 +12,7 @@ type Props = {
   feedbackHref?: string;
 };
 
-/** Verlinkt zu den detaillierten Spiel-Feedback-Einstellungen. */
+/** Verlinkt zu den Einstellungen „Visuelle Einblendungen“. */
 export function BonusCelebrationToggle({ disabled, feedbackHref = "/settings/feedback" }: Props) {
   const [summary, setSummary] = useState("Animationen · Sounds · Fortschritt");
 
@@ -24,11 +24,11 @@ export function BonusCelebrationToggle({ disabled, feedbackHref = "/settings/fee
     <Link
       href={feedbackHref}
       className={`setup-mode-toggle block no-underline${disabled ? " pointer-events-none opacity-50" : ""}`}
-      aria-label="Spiel-Feedback-Einstellungen öffnen"
+      aria-label="Einstellungen Visuelle Einblendungen öffnen"
     >
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-strong text-sm font-semibold">Spiel-Feedback</p>
+          <p className="text-strong text-sm font-semibold">Visuelle Einblendungen</p>
           <p className="text-muted mt-0.5 text-xs leading-snug">
             Erfolgsanimationen, Sounds und Fortschrittshinweise einzeln steuern
           </p>

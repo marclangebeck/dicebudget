@@ -5,7 +5,9 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
-- **Einstellungen:** Violett-Indigo „Schaltzentrale“ — Header, Labels, Karten, Toggles und Slider; Hausregeln-Labor mit dezentem Amber-Akzent; App-Hintergrund unverändert
+- **Statistik:** Paarungen als einklappbare Dropdowns auf `/stats` — Details, Runden und Bearbeiten inline; alte `/stats/pairing?key=…`-Links leiten um
+- **Einstellungen:** Dezentes Perlgrau/Slate statt kräftigem Violett — zurückhaltende Karten, neutrale Akzente; Hausregeln nur leicht warm
+- **Einstellungen:** Bereiche als einklappbare Dropdowns (Spielmodus, Visuelle Einblendungen, Solo, Multi, iPad-Tisch, Hausregeln) mit Kurz-Zusammenfassung im eingeklappten Zustand
 - **Hamburger-Menü:** Seiten-Sheet von rechts mit Würfel-Branding, gestaffelten Karten-Einträgen und animiertem Icon (Burger → X)
 - **Startscreen Bilanz-Dropdown:** 3D-Würfel skalieren beim Ausklappen dynamisch kleiner und kehren beim Zuklappen zur Originalgröße zurück
 - **Doku:** `HANDOVER.md`, `docs/milestones_active.md`, `docs/ios_current.md`, `milestones.md` — HEAD `04ab018`, UX-Politur 2026-06-15

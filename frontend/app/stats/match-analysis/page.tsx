@@ -53,7 +53,7 @@ function MatchAnalysisInner() {
   }, [invite, perspectiveParam]);
 
   const backHref = pairingKey
-    ? `/stats/pairing?key=${encodeURIComponent(pairingKey)}`
+    ? `/stats?pairing=${encodeURIComponent(pairingKey)}`
     : "/stats";
 
   return (
