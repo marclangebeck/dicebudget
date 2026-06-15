@@ -1031,14 +1031,6 @@ html.zoomable-route.legal-route .legal-page-scroll {
     linear-gradient(155deg, #071f22 0%, #0f3438 44%, #111827 100%);
 }
 
-.home-cinematic-door-veil {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: linear-gradient(118deg, rgba(2, 6, 23, 0.62) 0%, rgba(2, 6, 23, 0.18) 42%, transparent 68%);
-}
-
 .home-cinematic-door-poster {
   position: relative;
   z-index: 2;
@@ -1133,44 +1125,35 @@ html.zoomable-route.legal-route .legal-page-scroll {
 .home-cinematic-door-stage {
   position: relative;
   z-index: 1;
-  min-height: 4.25rem;
+  display: flex;
+  min-height: 5.5rem;
   flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   margin-bottom: 0.15rem;
 }
 
 .home-cinematic-door-hero {
-  position: absolute;
-  top: 0;
-  right: -8%;
-  bottom: 0;
+  position: relative;
   display: flex;
-  width: min(74%, 12.5rem);
+  width: 100%;
+  height: 100%;
   align-items: center;
   justify-content: center;
   pointer-events: none;
-}
-
-.home-cinematic-door-hero .home-bento-icon-glow {
-  width: 88%;
-  height: 72%;
-  opacity: 0.9;
-}
-
-.home-cinematic-door-hero .home-bento-icon-ring {
-  width: min(92%, 10.5rem);
 }
 
 .home-cinematic-door-hero .home-bento-motif {
   position: relative;
   z-index: 2;
   display: block;
-  width: 118%;
+  width: 154%;
   height: auto;
   max-height: 100%;
   object-fit: contain;
   object-position: center;
-  transform: rotate(-7deg);
+  transform: rotate(-5deg);
   animation: home-motif-float 4.5s ease-in-out infinite;
   filter: drop-shadow(0 28px 36px rgba(0, 0, 0, 0.52));
 }
@@ -1374,26 +1357,18 @@ html.zoomable-route.legal-route .legal-page-scroll {
   flex: 1 1 0;
   align-items: center;
   justify-content: center;
-  padding: 0.15rem 0.25rem 0.3rem;
-}
-
-.home-arena-pane-hero .home-bento-icon-glow {
-  width: 88%;
-  height: 74%;
-}
-
-.home-arena-pane-hero .home-bento-icon-ring {
-  width: min(92%, 12.5rem);
+  padding: 0.1rem 0.15rem 0.25rem;
 }
 
 .home-arena-pane-hero .home-bento-motif {
   position: relative;
   z-index: 2;
   display: block;
-  width: min(130%, 17.5rem);
+  width: min(169%, 22.75rem);
   height: auto;
-  max-height: min(44vh, 17.5rem);
+  max-height: min(44vh, 22.75rem);
   object-fit: contain;
+  object-position: center;
   animation: home-motif-float 4.5s ease-in-out infinite;
   filter: drop-shadow(0 24px 32px rgba(0, 0, 0, 0.48));
 }
@@ -1453,18 +1428,6 @@ html.zoomable-route.legal-route .legal-page-scroll {
   overflow: hidden;
   border-radius: inherit;
   pointer-events: none;
-}
-
-.home-bento-tile--arena .home-bento-scene::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  opacity: 0.35;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-  background-size: 1.35rem 1.35rem;
-  mask-image: radial-gradient(circle at 50% 42%, #000 0%, transparent 72%);
 }
 
 .home-bento-tile--multi.home-bento-tile--arena .home-bento-scene {
@@ -1613,8 +1576,8 @@ html.zoomable-route.legal-route .legal-page-scroll {
 .home-bento-tile--arena .home-bento-motif {
   position: relative;
   z-index: 2;
-  width: min(118%, 19rem);
-  max-height: 13rem;
+  width: min(153%, 24.7rem);
+  max-height: 16.9rem;
   animation: home-motif-float 4.5s ease-in-out infinite;
   filter: drop-shadow(0 22px 28px rgba(0, 0, 0, 0.42));
 }
@@ -1633,14 +1596,6 @@ html.zoomable-route.legal-route .legal-page-scroll {
 
 .home-bento-tile--solo.home-bento-tile--arena .home-bento-motif {
   animation-delay: 0.75s;
-}
-
-.home-bento-tile--multi.home-bento-tile--arena .home-bento-icon-ring {
-  animation-delay: 0.3s;
-}
-
-.home-bento-tile--solo.home-bento-tile--arena .home-bento-icon-ring {
-  animation-delay: 0.95s;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -2616,13 +2571,9 @@ html.zoomable-route.legal-route .legal-page-scroll {
     min-height: 5.5rem;
   }
 
-  .home-arena-pane-hero .home-bento-icon-ring {
-    width: min(90%, 10rem);
-  }
-
   .home-arena-pane-hero .home-bento-motif {
-    width: min(125%, 13.5rem);
-    max-height: min(38vh, 13.5rem);
+    width: min(162%, 17.55rem);
+    max-height: min(38vh, 17.55rem);
   }
 
   .home-arena-pane.home-bento-tile--arena {
@@ -2738,11 +2689,6 @@ html.zoomable-route.legal-route .legal-page-scroll {
 
   .home-cinematic-door-stage {
     min-height: 3.85rem;
-  }
-
-  .home-cinematic-door-hero {
-    right: -10%;
-    width: min(76%, 10rem);
   }
 
   .home-cinematic-door-cta {
@@ -4233,7 +4179,6 @@ html.zoomable-route.legal-route .legal-page-scroll {
 
   .home-bento-tile--arena .home-bento-scene,
   .home-bento-tile--arena .home-bento-motif,
-  .home-bento-tile--arena .home-bento-icon-ring,
   .home-arena-pane-hero .home-bento-motif,
   .home-cinematic-door-hero .home-bento-motif {
     animation: none;

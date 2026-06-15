@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
+- **Startscreen Solo/Multi:** 3D-Würfel ohne Puls-Ring und Glow, ~30 % größer und zentrierter; nur noch der Card-Hintergrund
 - **Screenshot:** Button „Bild“ in der Fußleiste; Kamera-Blitz, Vorschau vor dem Teilen, Toast statt Menü-Reopen; Hamburger nur noch Support/Rechtliches
 
 ### Fixed

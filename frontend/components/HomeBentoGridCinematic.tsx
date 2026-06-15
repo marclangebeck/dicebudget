@@ -34,7 +34,6 @@ function CinematicDoor({
       style={{ "--home-cinematic-enter-delay": `${enterDelayMs}ms` } as CSSProperties}
     >
       <div className="home-bento-scene home-cinematic-door-scene" aria-hidden />
-      <div className="home-cinematic-door-veil" aria-hidden />
       <div className="home-cinematic-door-poster">
         <div className="home-cinematic-door-copy">
           <span className="home-cinematic-door-chip">{chip}</span>
@@ -43,8 +42,6 @@ function CinematicDoor({
         </div>
         <div className="home-cinematic-door-stage" aria-hidden>
           <div className="home-cinematic-door-hero">
-            <span className="home-bento-icon-glow" />
-            <span className="home-bento-icon-ring" />
             <img src={iconSrc} alt="" className="home-bento-motif" loading="eager" decoding="async" />
           </div>
         </div>

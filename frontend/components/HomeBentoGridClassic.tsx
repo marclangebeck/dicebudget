@@ -22,11 +22,6 @@ function ArenaPane({ href, tone, label, tagline, badges, cta, iconSrc }: ArenaPa
     >
       <div className="home-bento-scene" aria-hidden />
       <div className="home-arena-pane-head">
-        <div className="home-arena-pane-head-gfx" aria-hidden>
-          <span className="home-arena-pane-orb home-arena-pane-orb--a" />
-          <span className="home-arena-pane-orb home-arena-pane-orb--b" />
-          <span className="home-arena-pane-head-line" />
-        </div>
         <span className="home-arena-pane-label">{label}</span>
         <p className="home-arena-pane-tagline">{tagline}</p>
         <div className="home-arena-pane-badges">
@@ -38,8 +33,6 @@ function ArenaPane({ href, tone, label, tagline, badges, cta, iconSrc }: ArenaPa
         </div>
       </div>
       <div className="home-arena-pane-hero">
-        <span className="home-bento-icon-glow" aria-hidden />
-        <span className="home-bento-icon-ring" aria-hidden />
         <img src={iconSrc} alt="" className="home-bento-motif" loading="eager" decoding="async" />
       </div>
       <span className="home-arena-pane-cta home-bento-play-btn">{cta}</span>
