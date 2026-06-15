@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
+- **Einstellungen:** Violett-Indigo „Schaltzentrale“ — Header, Labels, Karten, Toggles und Slider; Hausregeln-Labor mit dezentem Amber-Akzent; App-Hintergrund unverändert
 - **Hamburger-Menü:** Seiten-Sheet von rechts mit Würfel-Branding, gestaffelten Karten-Einträgen und animiertem Icon (Burger → X)
 - **Startscreen Bilanz-Dropdown:** 3D-Würfel skalieren beim Ausklappen dynamisch kleiner und kehren beim Zuklappen zur Originalgröße zurück
 - **Doku:** `HANDOVER.md`, `docs/milestones_active.md`, `docs/ios_current.md`, `milestones.md` — HEAD `04ab018`, UX-Politur 2026-06-15

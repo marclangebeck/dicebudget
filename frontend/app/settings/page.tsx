@@ -218,8 +218,8 @@ function SettingsPageInner() {
 
         {!labsUnlocked ? (
           <>
-            <p className="settings-section-label">Hausregeln</p>
-            <div className="settings-compact-card settings-compact-card--wide settings-compact-card--slim">
+            <p className="settings-section-label settings-section-label--labs">Hausregeln</p>
+            <div className="settings-compact-card settings-compact-card--wide settings-compact-card--slim settings-compact-card--labs">
               <p className="settings-compact-title settings-compact-title--sm">
                 Entwickler-Vorschau
               </p>
@@ -237,7 +237,7 @@ function SettingsPageInner() {
           </>
         ) : (
           <>
-            <p className="settings-section-label">Hausregeln</p>
+            <p className="settings-section-label settings-section-label--labs">Hausregeln</p>
             {labsFeatures.map((feature) => (
               <SettingsToggleCard
                 key={feature.id}
@@ -247,7 +247,7 @@ function SettingsPageInner() {
                 onChange={(value) => setLabsFeaturePref(feature.id, value)}
               />
             ))}
-            <div className="settings-compact-card settings-compact-card--wide settings-compact-card--slim">
+            <div className="settings-compact-card settings-compact-card--wide settings-compact-card--slim settings-compact-card--labs">
               <p className="settings-compact-text settings-compact-text--sm">
                 Vorschau sperren entfernt den Zugang auf diesem Gerät.
               </p>
