@@ -5,10 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { StatsRatingToggle } from "@/components/StatsRatingToggle";
 import { FitScoreSheet } from "@/components/FitScoreSheet";
+import { HouseRulesPanel } from "@/components/HouseRulesPanel";
 import { PoolEndgamePanel } from "@/components/PoolEndgamePanel";
 import { ScoreEntryPanel } from "@/components/ScoreEntryPanel";
 import { ScoreSheetTable } from "@/components/ScoreSheetTable";
 import {
+  applyBurnRoll,
+  applyRollSale,
+  applyYatzyStreakPenalty,
   clearLastField,
   completeField,
   finalizeSessionStats,
@@ -21,6 +25,7 @@ import {
 } from "@/lib/api";
 import { APP_HOME_PATH } from "@/lib/branding";
 import { poolDeltaForComplete } from "@/lib/gameRules";
+import { BURN_POOL_COST } from "@/lib/houseRules";
 import { buildAchievementAfterField } from "@/lib/achievementFeedback";
 import { useQueuedFeedbackOverlays } from "@/lib/feedbackOverlayQueue";
 import { buildProgressMilestoneAfterField } from "@/lib/runProgressFeedback";
@@ -110,6 +115,20 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     () => players?.find((p) => p.side === activeSide) ?? null,
     [players, activeSide],
   );
+  const houseRulesRun = useMemo(() => {
+    if (activeRun) return activeRun;
+    const withFreeFill = [runs.left, runs.right].find((run) => run?.rollSaleFreeFillActive);
+    if (withFreeFill) return withFreeFill;
+    return runs.left ?? runs.right;
+  }, [activeRun, runs.left, runs.right]);
+  const houseRulesActor = activePlayer ?? players?.[0] ?? null;
+  const houseRulesPlayerDbId = useMemo(() => {
+    const publicId = houseRulesActor?.playerId;
+    if (!publicId || !lobby) return undefined;
+    return lobby.players.find(
+      (p) => normalizePublicPlayerId(p.playerId) === normalizePublicPlayerId(publicId),
+    )?.id;
+  }, [houseRulesActor, lobby]);
   const activeField: FieldDto | undefined = activeRun?.games
     .flatMap((g) => g.fields)
     .find((f) => f.id === activeFieldId);
@@ -172,7 +191,11 @@ export function TableModePlayBoard({ inviteCode }: Props) {
       return;
     }
     setScoreInput("");
-    setRollsUsed(defaultRollsUsed(run));
+    if (run.rollSaleFreeFillActive) {
+      setRollsUsed(0);
+    } else {
+      setRollsUsed(defaultRollsUsed(run));
+    }
   }
 
   function selectEndgameField(side: TableModeSide, fieldId: string) {
@@ -192,18 +215,23 @@ export function TableModePlayBoard({ inviteCode }: Props) {
 
   async function handleSubmit() {
     if (!activeSide || !activePlayer || !activeRun || !activeFieldId || scoreInput === "") return;
-    const effectiveRolls = activeRun.useStrategyRules ? (rollsUsed ?? 0) : (rollsUsed ?? 1);
-    if (activeRun.useStrategyRules && rollsUsed === null) {
+    const rollSaleEntry = !!activeRun.rollSaleFreeFillActive && !isCorrection;
+    const effectiveRolls: number = rollSaleEntry
+      ? 0
+      : activeRun.useStrategyRules
+        ? (rollsUsed ?? 0)
+        : (rollsUsed ?? 1);
+    if (activeRun.useStrategyRules && !rollSaleEntry && rollsUsed === null) {
       setError("Bitte die Anzahl Würfe für dieses Feld wählen.");
       return;
     }
-    if (effectiveRolls < 1) return;
+    if (!rollSaleEntry && effectiveRolls < 1) return;
     const score = Number(scoreInput);
     if (Number.isNaN(score)) return;
     const activeFieldType = activeRun.games
       .flatMap((g) => g.fields)
       .find((f) => f.id === activeFieldId)?.fieldType;
-    const needsYatzyDie = activeFieldType === "KNIFFEL" && score === 50;
+    const needsYatzyDie = !rollSaleEntry && activeFieldType === "KNIFFEL" && score === 50;
     if (needsYatzyDie && yatzyDieValue === null) {
       setError("Bitte den Würfel für Alle Fünfe (50 Punkte) wählen.");
       return;
@@ -362,6 +390,90 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     }
   }
 
+  async function handleBurn(fieldId: string) {
+    if (!activeSide || !activePlayer || !activeRun) return;
+    if (!window.confirm(`Brennt: ${BURN_POOL_COST} Pool abziehen und physisch neu würfeln?`)) {
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const { run: updated } = await applyBurnRoll(
+        activeRun.id,
+        fieldId,
+        activePlayer.playerSecret,
+      );
+      await refreshAfterChange(activeSide, updated);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Brennt fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleRollSale(
+    sellerPlayerId: string,
+    buyerPlayerId: string,
+    pools: number,
+  ) {
+    const actor = houseRulesActor;
+    if (!actor) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const result = await applyRollSale(
+        inviteCode,
+        sellerPlayerId,
+        buyerPlayerId,
+        pools,
+        actor.playerSecret,
+      );
+      setRuns((current) => ({
+        left:
+          current.left?.id === result.sellerRun.id
+            ? result.sellerRun
+            : current.left?.id === result.buyerRun.id
+              ? result.buyerRun
+              : current.left,
+        right:
+          current.right?.id === result.sellerRun.id
+            ? result.sellerRun
+            : current.right?.id === result.buyerRun.id
+              ? result.buyerRun
+              : current.right,
+      }));
+      const { session } = await getSessionLobby(inviteCode);
+      setLobby(session);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Verkauf fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleYatzyStreak(victimPlayerId: string) {
+    const actor = houseRulesActor;
+    const run = activeRun ?? houseRulesRun;
+    if (!actor || !run) return;
+    if (
+      !window.confirm(
+        "Gegner verliert die Hälfte des Pools (abrunden). Strafe jetzt anwenden?",
+      )
+    ) {
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      await applyYatzyStreakPenalty(run.id, victimPlayerId, actor.playerSecret);
+      await refreshAllRuns();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Strafe fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleViewAnalysis() {
     if (!players) return;
     setAnalysisLoading(true);
@@ -447,6 +559,22 @@ export function TableModePlayBoard({ inviteCode }: Props) {
       </div>
 
       {error && <p className="glass-alert-error shrink-0 px-3 py-2 text-sm">{error}</p>}
+
+      {houseRulesRun && (
+        <HouseRulesPanel
+          run={houseRulesRun}
+          inviteCode={inviteCode}
+          lobby={lobby}
+          activeFieldId={activeFieldId}
+          rollsUsed={rollsUsed}
+          isLocalSolo={false}
+          ownPlayerDbId={houseRulesPlayerDbId}
+          busy={busy}
+          onBurn={(fieldId) => void handleBurn(fieldId)}
+          onRollSale={(seller, buyer, pools) => void handleRollSale(seller, buyer, pools)}
+          onYatzyStreak={(victimId) => void handleYatzyStreak(victimId)}
+        />
+      )}
 
       {poolEndgamePending && endgamePlayer && (
         <div className="play-endgame-banner shrink-0">
@@ -619,6 +747,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
           isCorrection={isCorrection}
           canClearLast={canClearLast}
           rollsInPoolOverride={rollsInPoolForEntry}
+          rollSaleMode={!!activeRun.rollSaleFreeFillActive && !isCorrection}
           onPickScoreValue={(v) => {
             setScoreInput(String(v));
             if (v !== 50) setYatzyDieValue(null);

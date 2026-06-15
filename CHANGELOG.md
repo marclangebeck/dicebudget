@@ -9,6 +9,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Entwickler-Vorschau:** Code-Freischaltung (`NEXT_PUBLIC_LABS_PIN`), Labor unter `/settings/labs`, Feature-Register `featureFlags.ts`
 
 ### Fixed
+- **iPad-Tischmodus:** Hausregeln (Brennt, Verkauf, 2× Alle Fünfe) im `TableModePlayBoard` — zuvor nur im normalen Spielscreen
 - **Multi Eintrag Alle Fünfe:** Kein fixes Wurf-Limit pro Feld mehr (Strategy); Chips bis Pool + Restbudget; Hinweis wenn Würfel bei 50 Punkten fehlt
 
 ### Changed
