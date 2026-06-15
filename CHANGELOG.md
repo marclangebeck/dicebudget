@@ -5,12 +5,14 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
+- **Spielabschluss:** „Zettel ansehen“ und „Spielanalyse“ als dunkle Karten mit heller Schrift — passend zu Einstellungen/Statistik statt weißer `btn-secondary`
 - **Statistik:** Paarungen als einklappbare Dropdowns auf `/stats` — Details, Runden und Bearbeiten inline; alte `/stats/pairing?key=…`-Links leiten um
 - **Einstellungen:** Dezentes Perlgrau/Slate statt kräftigem Violett — zurückhaltende Karten, neutrale Akzente; Hausregeln nur leicht warm
 - **Einstellungen:** Bereiche als einklappbare Dropdowns (Spielmodus, Visuelle Einblendungen, Solo, Multi, iPad-Tisch, Hausregeln) mit Kurz-Zusammenfassung im eingeklappten Zustand
+- **Einstellungen:** Toggles global Grün (an) / Rot (aus) — auch in Settings-Karten ohne Slate-Override
 - **Hamburger-Menü:** Seiten-Sheet von rechts mit Würfel-Branding, gestaffelten Karten-Einträgen und animiertem Icon (Burger → X)
 - **Startscreen Bilanz-Dropdown:** 3D-Würfel skalieren beim Ausklappen dynamisch kleiner und kehren beim Zuklappen zur Originalgröße zurück
-- **Doku:** `HANDOVER.md`, `docs/milestones_active.md`, `docs/ios_current.md`, `milestones.md` — HEAD `04ab018`, UX-Politur 2026-06-15
+- **Doku:** `HANDOVER.md`, `docs/milestones_active.md`, `docs/ios_current.md`, `milestones.md` — UX-Politur II 2026-06-15
 - **Spielanalyse:** Kompakter Kern („Warum verloren/gewonnen?“), Details eingeklappt; Duell-Graph alle 10 % statt pro Wurf
 - **Fortschritt 25/50/75 %:** Hinweis vorn/zurück (ohne Abstand), Overlay per „Weiter“ wegklickbar
 - **Statistik (A+B):** Kompakter Hero mit Bilanz, Siegquote und KPIs; Sortierung; Paarungs-Badges und Duellbalken
@@ -18,6 +20,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Screenshot:** Button „Bild“ in der Fußleiste; Kamera-Blitz, Vorschau vor dem Teilen, Toast statt Menü-Reopen; Hamburger nur noch Support/Rechtliches
 
 ### Fixed
+- **Statistik:** Badge „Top-Rivalität“ auf Paarungs-Accordions oben mittig statt links im Trigger
 - **iPad-Tisch Namen:** Leere Eingabe bleibt leer (kein Zurücksetzen auf „Links“/„Rechts“); Fallback nur beim Spielstart
 
 ### Added

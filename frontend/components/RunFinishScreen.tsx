@@ -265,7 +265,7 @@ export function RunFinishScreen({
             <button
               type="button"
               onClick={onViewSheet}
-              className="btn-secondary inline-flex min-h-10 w-full items-center justify-center px-6 text-sm"
+              className="run-finish-action-btn inline-flex min-h-10 w-full items-center justify-center px-6 text-sm"
             >
               Zettel ansehen
             </button>
@@ -275,7 +275,7 @@ export function RunFinishScreen({
               type="button"
               disabled={analysisLoading}
               onClick={onViewAnalysis}
-              className="btn-secondary inline-flex min-h-10 w-full items-center justify-center px-6 text-sm disabled:opacity-50"
+              className="run-finish-action-btn inline-flex min-h-10 w-full items-center justify-center px-6 text-sm disabled:opacity-50"
             >
               {analysisLoading ? "Lade Analyse …" : "Spielanalyse"}
             </button>

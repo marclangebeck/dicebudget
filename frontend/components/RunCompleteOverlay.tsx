@@ -38,7 +38,7 @@ export function RunCompleteOverlay({
             type="button"
             disabled={busy}
             onClick={onViewSheet}
-            className="play-review-btn play-review-btn--secondary w-full disabled:opacity-50"
+            className="run-finish-action-btn w-full min-h-10 px-6 text-sm disabled:opacity-50"
           >
             Zettel ansehen
           </button>

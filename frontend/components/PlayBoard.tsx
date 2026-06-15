@@ -696,7 +696,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
               type="button"
               disabled={analysisLoading}
               onClick={() => void handleViewAnalysis()}
-              className="btn-secondary flex min-h-10 shrink-0 items-center justify-center px-6 text-sm disabled:opacity-50"
+              className="run-finish-action-btn flex min-h-10 shrink-0 items-center justify-center px-6 text-sm disabled:opacity-50"
             >
               {analysisLoading ? "Lade Analyse …" : "Spielanalyse"}
             </button>

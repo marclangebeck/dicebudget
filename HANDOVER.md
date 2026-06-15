@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `04ab018` (Spielanalyse straffen, Statistik-Hero, Einstellungen Ein-Screen, Screenshot-Footer)  
+**Produktcode-HEAD:**  `8cb4274` (UX-Politur II: Hamburger, Einstellungen Slate/Accordion, Statistik-Accordion, Spielabschluss)
 **Sprache:** Deutsch
 
 Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M30** App Store Release). Aktiver Milestone-Stand: `docs/milestones_active.md`. iOS/TestFlight: `docs/ios_current.md`. Architektur/Betrieb: `docs/decisions.md` nur bei Bedarf.
@@ -25,12 +25,12 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M3
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
 | Branch | `milestone-22-prep` |
-| Letzte Features | Einstellungen Ein-Screen; Statistik-Hero; Spielanalyse-Kern; Screenshot-Footer; Startscreen-Würfel |
+| Letzte Features | UX-Politur II: Hamburger-Sheet, Einstellungen Slate/Accordion, Statistik-Paarungen inline, Spielabschluss-Buttons |
 | Roadmap | **M30** App Store Release als Nächstes |
 | Backend Prod | Hausregeln-API deployed (Nutzer bestätigt) |
 | Frontend-Tests | **37** Unit-Tests (`npm run test`); Backend 86 Tests |
 | Entwickler-Vorschau | Hausregeln-Toggles auf `/settings` nach Code-Eingabe (`NEXT_PUBLIC_LABS_PIN`) |
-| iOS/TestFlight | Version `2.0`; **Build `2.0 (28)`** in Connect; **nächster Upload `2.0 (29)`** auf HEAD `04ab018` (noch offen) |
+| iOS/TestFlight | Version `2.0`; **Build `2.0 (28)`** in Connect; **nächster Upload `2.0 (29)`** auf Web-HEAD (noch offen) |
 
 ## Wichtig: iOS-Bundle ≠ Web-Deploy
 
@@ -39,6 +39,16 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M3
 - Vor Archive: `git log -1`; `NEXT_PUBLIC_LABS_PIN` in `frontend/.env.production` setzen.
 
 ## Letzte Produktänderungen (2026-06-15, Web deployed)
+
+### UX Politur II — Hamburger, Einstellungen, Statistik, Abschluss
+
+- **Hamburger-Menü:** Seiten-Sheet von rechts (`AppFooterMenu`), Würfel-Branding, gestaffelte Karten, Burger→X-Animation.
+- **Startscreen:** 3D-Würfel skalieren kleiner, wenn Bilanz-Dropdown offen (`home-cinematic--stats-open`).
+- **Einstellungen:** Perlgrau/Slate statt Violett; Bereiche als Accordion (Spielmodus, Visuelle Einblendungen, Solo, Multi, iPad-Tisch, Hausregeln); Toggles Grün/Rot.
+- **Statistik:** Paarungen als Accordion auf `/stats` — Details lazy via `loadMergedPairingDetail`; `/stats/pairing?key=…` leitet um; Badge „Top-Rivalität“ oben mittig.
+- **Spielabschluss:** „Zettel ansehen“ und „Spielanalyse“ als dunkle Karten (`.run-finish-action-btn`).
+
+Dateien: `AppFooterMenu.tsx`, `HomeBentoGridCinematic.tsx`, `app/settings/page.tsx`, `SettingsSection.tsx`, `PairingAccordionItem.tsx`, `PairingDetailPanel.tsx`, `RunFinishScreen.tsx`, `globals.css`
 
 ### Einstellungen Ein-Screen (`561151d`, `9057e93`)
 
@@ -105,7 +115,8 @@ Reine Frontend-Änderungen seit 2026-06-15: **kein** Backend-Neustart nötig.
 ## Wichtige Dateien
 
 - Einstellungen: `app/settings/page.tsx`, `components/settings/`
-- Statistik: `StatsHeroPanel.tsx`, `PairingSummaryCard.tsx`, `lib/statsOverview.ts`
+- Statistik: `StatsHeroPanel.tsx`, `PairingAccordionItem.tsx`, `PairingDetailPanel.tsx`, `lib/loadMergedPairingDetail.ts`
+- Spielabschluss: `RunFinishScreen.tsx`, `RunCompleteOverlay.tsx`
 - Spielanalyse: `MatchAnalysisView.tsx`, `ScoreProgressionChart.tsx`
 - Screenshot: `AppLegalFooter.tsx`, `lib/screenshotFlow.ts`
 - Hausregeln: `houseRules.ts`, `HouseRulesTableActions.tsx`, `HouseRulesPanel.tsx`
@@ -114,8 +125,8 @@ Reine Frontend-Änderungen seit 2026-06-15: **kein** Backend-Neustart nötig.
 
 ## Offene Prioritäten
 
-1. **iOS Build `2.0 (29)`** — `git pull` → `npm run build:ios` → Xcode Archive → TestFlight (HEAD `04ab018`)
-2. **M30 Sprint 30.1** — TestFlight-Regression (Einstellungen, Statistik, Spielanalyse, Screenshot, Hausregeln)
+1. **iOS Build `2.0 (29)`** — `git pull` → `npm run build:ios` → Xcode Archive → TestFlight (Web-HEAD nach Pull)
+2. **M30 Sprint 30.1** — TestFlight-Regression (Einstellungen Accordion/Slate, Statistik-Accordion, Spielabschluss, Hamburger, Hausregeln)
 3. **M30 Sprint 30.2** — App Store Connect (Agreement, 1,19 EUR, Metadaten)
 4. `milestone-22-prep` → `main` nach Release-Freigabe
 
@@ -123,6 +134,6 @@ Reine Frontend-Änderungen seit 2026-06-15: **kein** Backend-Neustart nötig.
 
 ```text
 Du arbeitest an dice.budget (kniffel). Lies AGENT_RULES.md und HANDOVER.md.
-Branch milestone-22-prep. Web-HEAD 04ab018; iOS Build 29 noch offen. M30 App Store als Nächstes.
+Branch milestone-22-prep. Web-HEAD nach git pull; iOS Build 29 noch offen. M30 App Store als Nächstes.
 Keine Commits ohne GO. Antworte auf Deutsch.
 ```

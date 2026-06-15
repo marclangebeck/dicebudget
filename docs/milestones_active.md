@@ -2,7 +2,7 @@
 
 **Stand:** 2026-06-15  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `04ab018` (Spielanalyse, Statistik, Einstellungen, Screenshot, Startscreen)  
+**Produktcode-HEAD:** `8cb4274` (UX-Politur II auf `04ab018`)  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -19,18 +19,30 @@ Technische Basis ist erledigt:
 - Native App startet direkt auf `/app`.
 - Native API-Basis zeigt auf `https://dicebudget.bottle-trade.de/api`.
 - TestFlight ist aktiv; **aktueller Build `2.0 (28)`** mit Produktcode **`d8b5952`** (Cinematic Editorial Startscreen).
-- **Web-HEAD `04ab018`** enthält Einstellungen Ein-Screen, Statistik-Hero, Spielanalyse-Kern, Screenshot-Footer, Startscreen-Würfel — **noch nicht in iOS** (Build 29 ausstehend).
+- **Web-HEAD** (nach Pull): UX-Politur II — Hamburger-Sheet, Einstellungen Slate/Accordion, Statistik-Paarungen inline, Spielabschluss-Buttons — **noch nicht in iOS** (Build 29 ausstehend).
 - iOS-UI kommt nur aus `npm run build:ios` auf dem Mac (`ios/App/App/public/` ist gitignored).
 
 Offen (M30):
 
-- iOS-Upload **Build `2.0 (29)`** nach `npm run build:ios` auf Mac (HEAD `04ab018`).
-- TestFlight-Regression: Einstellungen Ein-Screen, Statistik-Hero, Spielanalyse (Kern + 10%-Graph), Screenshot-Footer, Fortschritt vorn/zurück, Hausregeln, Cinematic-Startscreen.
+- iOS-Upload **Build `2.0 (29)`** nach `npm run build:ios` auf Mac (Web-HEAD nach Pull).
+- TestFlight-Regression: Einstellungen Accordion/Slate, Statistik-Accordion, Spielabschluss-Buttons, Hamburger-Sheet, Spielanalyse (Kern + 10%-Graph), Screenshot-Footer, Fortschritt vorn/zurück, Hausregeln, Cinematic-Startscreen.
 - App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
 
 Details: `docs/ios_current.md`.
 
 ## Letzte Abgeschlossene Milestones
+
+### UX Politur II — Navigation, Einstellungen, Statistik, Abschluss 2026-06-15
+
+**Status:** implementiert; Web/Server-Frontend gebaut; iOS noch auf Build 28.
+
+- **Hamburger-Menü:** Seiten-Sheet von rechts, Würfel-Branding, gestaffelte Karten, animiertes Icon.
+- **Startscreen:** Würfel skalieren bei offener Bilanz (`home-cinematic--stats-open`).
+- **Einstellungen:** Perlgrau/Slate, Accordion-Bereiche, Toggles Grün/Rot.
+- **Statistik:** Paarungen als Accordion auf `/stats`; lazy Detail-Load; Redirect von `/stats/pairing`; Badge „Top-Rivalität“ zentriert.
+- **Spielabschluss:** „Zettel ansehen“ / „Spielanalyse“ als dunkle Karten (`.run-finish-action-btn`).
+
+Dateien: `AppFooterMenu.tsx`, `HomeBentoGridCinematic.tsx`, `app/settings/page.tsx`, `SettingsSection.tsx`, `PairingAccordionItem.tsx`, `PairingDetailPanel.tsx`, `app/stats/page.tsx`, `RunFinishScreen.tsx`, `globals.css`
 
 ### UX Politur Einstellungen / Statistik / Analyse 2026-06-15
 

@@ -107,8 +107,13 @@ export function PairingAccordionItem({
   return (
     <li>
       <section
-        className={`stats-section ${open ? "is-open" : ""}${featured ? " stats-section--featured" : ""}${selected ? " stats-section--selected" : ""}`}
+        className={`stats-section ${open ? "is-open" : ""}${featured ? " stats-section--featured" : ""}${selected ? " stats-section--selected" : ""}${badge ? " stats-section--badged" : ""}`}
       >
+        {badge && (
+          <span className={`stats-pairing-badge stats-section-badge ${badgeClass(badgeTone)}`}>
+            {badge}
+          </span>
+        )}
         <button
           type="button"
           className="stats-section-trigger"
@@ -116,11 +121,6 @@ export function PairingAccordionItem({
           aria-controls={panelId}
           onClick={onToggle}
         >
-          {badge && (
-            <span className={`stats-pairing-badge stats-section-badge ${badgeClass(badgeTone)}`}>
-              {badge}
-            </span>
-          )}
           {selectable && (
             <label
               className="stats-pairing-select stats-section-select"

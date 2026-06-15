@@ -23,10 +23,10 @@ Nur bei Bedarf:
 ## Aktueller Kurzstand
 
 - Branch: `milestone-22-prep`
-- Produktcode-HEAD: `04ab018` (siehe `git log -1`)
+- Produktcode-HEAD: `8cb4274`
 - Web/API live: https://dicebudget.bottle-trade.de
-- iOS: TestFlight `2.0 (28)`; nächster Upload **`2.0 (29)`** auf HEAD `04ab018`
-- Letzte Features: Einstellungen Ein-Screen, Statistik-Hero, Spielanalyse-Kern, Screenshot-Footer, Hausregeln (Labor)
+- iOS: TestFlight `2.0 (28)`; nächster Upload **`2.0 (29)`** auf Web-HEAD
+- Letzte Features: UX-Politur II (Hamburger, Einstellungen Slate/Accordion, Statistik-Accordion, Spielabschluss); davor Statistik-Hero, Spielanalyse-Kern, Hausregeln (Labor)
 
 ## Offene Prioritaeten
 

@@ -2,7 +2,7 @@
 
 **Stand:** 2026-06-15  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD (Web):** `04ab018` (Mac nach `git pull`)  
+**Produktcode-HEAD (Web):** `8cb4274`  
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
@@ -11,8 +11,8 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 
 - App Store Connect: **Version 2.0**.
 - **TestFlight `2.0 (28)` (aktuell in Connect):** Produktcode **`d8b5952`** — Cinematic Editorial Startscreen.
-- **Nächster geplanter Upload: `2.0 (29)`** — HEAD **`04ab018`**: Einstellungen Ein-Screen, Statistik-Hero, Spielanalyse-Kern, Screenshot-Footer, Startscreen-Würfel, Hausregeln/Zusatzregeln, Feature-Labor.
-- Web/API live: https://dicebudget.bottle-trade.de (bereits auf `04ab018` gebaut)
+- **Nächster geplanter Upload: `2.0 (29)`** — Web-HEAD nach Pull: UX-Politur II (Hamburger, Einstellungen Slate/Accordion, Statistik-Accordion, Spielabschluss) plus `04ab018`-Features (Einstellungen Ein-Screen, Statistik-Hero, Spielanalyse, Screenshot, Startscreen-Würfel, Hausregeln/Zusatzregeln, Feature-Labor).
+- Web/API live: https://dicebudget.bottle-trade.de (nach Server-Build auf aktuellem HEAD)
 
 ## iOS-Bundle (kritisch)
 
