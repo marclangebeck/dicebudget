@@ -194,6 +194,8 @@ function SettingsPageInner() {
                 value={settings.tableLeftName}
                 maxLength={24}
                 disabled={!tableModeActive}
+                placeholder="Spielername"
+                onFocus={(e) => e.target.select()}
                 onChange={(e) => updateSettings({ tableLeftName: e.target.value })}
                 className="glass-input min-h-9 px-3 text-sm font-semibold disabled:opacity-45"
               />
@@ -205,6 +207,8 @@ function SettingsPageInner() {
                 value={settings.tableRightName}
                 maxLength={24}
                 disabled={!tableModeActive}
+                placeholder="Spielername"
+                onFocus={(e) => e.target.select()}
                 onChange={(e) => updateSettings({ tableRightName: e.target.value })}
                 className="glass-input min-h-9 px-3 text-sm font-semibold disabled:opacity-45"
               />

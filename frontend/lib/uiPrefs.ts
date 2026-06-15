@@ -30,8 +30,8 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   showOpponentPool: false,
   poolEndgameEnabled: false,
   tableModeEnabled: false,
-  tableLeftName: "Links",
-  tableRightName: "Rechts",
+  tableLeftName: "",
+  tableRightName: "",
 };
 
 function clampInt(value: unknown, min: number, max: number, fallback: number): number {
@@ -67,12 +67,12 @@ function normalizeSettings(value: unknown): AppSettings {
     poolEndgameEnabled: Boolean(source.poolEndgameEnabled),
     tableModeEnabled,
     tableLeftName:
-      typeof source.tableLeftName === "string" && source.tableLeftName.trim()
-        ? source.tableLeftName.trim().slice(0, 24)
+      typeof source.tableLeftName === "string"
+        ? source.tableLeftName.slice(0, 24)
         : DEFAULT_APP_SETTINGS.tableLeftName,
     tableRightName:
-      typeof source.tableRightName === "string" && source.tableRightName.trim()
-        ? source.tableRightName.trim().slice(0, 24)
+      typeof source.tableRightName === "string"
+        ? source.tableRightName.slice(0, 24)
         : DEFAULT_APP_SETTINGS.tableRightName,
   };
 }

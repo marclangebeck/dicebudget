@@ -4,6 +4,9 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
+### Fixed
+- **iPad-Tisch Namen:** Leere Eingabe bleibt leer (kein Zurücksetzen auf „Links“/„Rechts“); Fallback nur beim Spielstart
+
 ### Added
 - **Hausregeln (Feature-Labor):** Brennt (−5 Pool), Wurf verkaufen (volle Feldzeile, 2–6 Spieler), 2× Alle Fünfe-Strafe (Gegner halber Pool)
 - **Entwickler-Vorschau:** Code-Freischaltung (`NEXT_PUBLIC_LABS_PIN`), Labor unter `/settings/labs`, Feature-Register `featureFlags.ts`

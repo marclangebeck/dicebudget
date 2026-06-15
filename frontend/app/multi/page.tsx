@@ -138,8 +138,8 @@ export default function MultiHostPage() {
           )}
           {settings.tableModeEnabled && (
             <p className="setup-host-success-hint">
-              Tischmodus: {settings.tableLeftName || "Links"} gegen{" "}
-              {settings.tableRightName || "Rechts"}
+              Tischmodus: {settings.tableLeftName.trim() || "…"} gegen{" "}
+              {settings.tableRightName.trim() || "…"}
             </p>
           )}
           <Link href={settingsHrefWithReturn("multi")} className="settings-inline-link">
