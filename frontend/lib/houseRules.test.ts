@@ -21,7 +21,7 @@ describe("houseRules (frontend)", () => {
   });
 
   it("BURN_POOL_COST", () => {
-    assert.equal(BURN_POOL_COST, 5);
+    assert.equal(BURN_POOL_COST, 2);
   });
 
   it("canBurnHouseRule bei leerem Feld vor Eintrag", () => {

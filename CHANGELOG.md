@@ -5,7 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
-- **Spielabschluss:** „Zettel ansehen“ und „Spielanalyse“ als dunkle Karten mit heller Schrift — passend zu Einstellungen/Statistik statt weißer `btn-secondary`
+- **Hausregel Brennt:** Pool-Kosten pro Anwendung von 5 auf 2 reduziert (`BURN_POOL_COST`)
 - **Statistik:** Paarungen als einklappbare Dropdowns auf `/stats` — Details, Runden und Bearbeiten inline; alte `/stats/pairing?key=…`-Links leiten um
 - **Einstellungen:** Dezentes Perlgrau/Slate statt kräftigem Violett — zurückhaltende Karten, neutrale Akzente; Hausregeln nur leicht warm
 - **Einstellungen:** Bereiche als einklappbare Dropdowns (Spielmodus, Visuelle Einblendungen, Solo, Multi, iPad-Tisch, Hausregeln) mit Kurz-Zusammenfassung im eingeklappten Zustand

@@ -28,7 +28,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
   houseRulesBurn: {
     id: "houseRulesBurn",
     title: "Hausregel: Brennt",
-    description: "Ungültiger Wurf am Tisch: −5 Pool, physisch neu würfeln.",
+    description: "Ungültiger Wurf am Tisch: −2 Pool, physisch neu würfeln.",
     stage: "labs",
     defaultLabsOn: true,
   },

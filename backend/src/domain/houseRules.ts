@@ -1,7 +1,7 @@
 import type { FieldTypeId } from "./fieldTypes.js";
 import { FIELD_TYPES_PER_GAME } from "./fieldTypes.js";
 
-export const BURN_POOL_COST = 5;
+export const BURN_POOL_COST = 2;
 
 const UPPER_FACE: Record<string, 1 | 2 | 3 | 4 | 5 | 6> = {
   ONES: 1,
