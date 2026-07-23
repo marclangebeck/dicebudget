@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **Rivalen verwalten:** Eigener Bereich in den Einstellungen (anlegen, umbenennen, löschen, zusammenführen); Link von der Statistik (`/settings?open=rivals`)
 - **App-Tour:** Geführte Kurz-Tour (inkl. Wurf-Pool) beim ersten Start; Häkchen „nicht erneut anzeigen“; in Einstellungen starten/steuern (`/app?tour=1`)
 - **Rivalen-Profile:** Lokale Namen statt nur Alias; Statistik „Meine Rivalen“; unbekannt klar markiert; Migration bestehender Aliase
 

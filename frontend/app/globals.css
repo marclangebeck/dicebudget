@@ -9408,3 +9408,120 @@ html.zoomable-route.legal-route .legal-page-scroll {
   background: linear-gradient(135deg, #102033 0%, #173f43 52%, #5b3a24 100%);
   color: #fff;
 }
+
+/* —— Rivalen verwalten —— */
+.rival-manage {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.rival-manage-hint,
+.rival-manage-empty {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--text-muted, #94a3b8);
+}
+
+.rival-manage-create,
+.rival-manage-edit {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.rival-manage-input {
+  flex: 1 1 8rem;
+  min-width: 0;
+  min-height: 2.2rem;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8125rem;
+}
+
+.rival-manage-btn {
+  min-height: 2.1rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(15, 23, 42, 0.45);
+  color: #e2e8f0;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.rival-manage-btn.is-active {
+  border-color: rgba(214, 168, 90, 0.45);
+  color: #fde68a;
+}
+
+.rival-manage-btn--primary {
+  border-color: rgba(214, 168, 90, 0.42);
+  background: linear-gradient(135deg, #102033 0%, #173f43 52%, #5b3a24 100%);
+  color: #fff;
+}
+
+.rival-manage-error {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fecaca;
+}
+
+.rival-manage-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.rival-manage-item {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.35);
+  padding: 0.55rem 0.65rem;
+}
+
+.rival-manage-item-main {
+  margin-bottom: 0.4rem;
+}
+
+.rival-manage-name {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.rival-manage-meta {
+  margin: 0.15rem 0 0;
+  font-size: 0.65rem;
+  color: #94a3b8;
+}
+
+.rival-manage-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.stats-rivals-manage-link {
+  display: inline-flex;
+  align-self: flex-start;
+  margin: -0.15rem 0 0.15rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(214, 168, 90, 0.28);
+  background: rgba(15, 23, 42, 0.45);
+  color: #fde68a;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.stats-rivals-manage-link:hover {
+  border-color: rgba(214, 168, 90, 0.45);
+}

@@ -4,7 +4,7 @@
  */
 
 import { loadPlayerAliases, setPlayerAlias } from "@/lib/playerAliases";
-import { normalizePublicPlayerId } from "@/lib/playerIdentity";
+import { normalizePublicPlayerId, shortPlayerId } from "@/lib/playerIdentity";
 
 const STORAGE_KEY = "dicebudget.rivalProfiles.v1";
 const MIGRATED_KEY = "dicebudget.rivalProfiles.migratedFromAliases.v1";
@@ -13,6 +13,7 @@ export const RIVAL_PROFILES_CHANGED_EVENT = "dicebudget:rival-profiles-changed";
 export type RivalProfile = {
   id: string;
   name: string;
+  /** Kann leer sein (manuell angelegt, noch nicht verknüpft). */
   playerIds: string[];
 };
 
@@ -21,6 +22,14 @@ function createId(): string {
     return window.crypto.randomUUID();
   }
   return `rival-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function syncAliasesFromProfiles(profiles: RivalProfile[]): void {
+  for (const profile of profiles) {
+    for (const playerId of profile.playerIds) {
+      setPlayerAlias(playerId, profile.name);
+    }
+  }
 }
 
 function readProfiles(): RivalProfile[] {
@@ -46,10 +55,10 @@ function readProfiles(): RivalProfile[] {
             ),
           ]
         : [];
-      if (!name || playerIds.length === 0) continue;
+      if (!name) continue;
       out.push({ id, name, playerIds });
     }
-    return out;
+    return out.sort((a, b) => a.name.localeCompare(b.name, "de"));
   } catch {
     return [];
   }
@@ -57,7 +66,19 @@ function readProfiles(): RivalProfile[] {
 
 function writeProfiles(profiles: RivalProfile[]): void {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(profiles));
+  const cleaned = profiles
+    .map((profile) => ({
+      ...profile,
+      name: profile.name.trim(),
+      playerIds: [
+        ...new Set(
+          profile.playerIds.map((id) => normalizePublicPlayerId(id)).filter(Boolean),
+        ),
+      ],
+    }))
+    .filter((profile) => profile.name);
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(cleaned));
+  syncAliasesFromProfiles(cleaned);
   window.dispatchEvent(new Event(RIVAL_PROFILES_CHANGED_EVENT));
 }
 
@@ -132,14 +153,11 @@ export function upsertRivalName(playerId: string, name: string): Record<string, 
   const profiles = loadRivalProfiles();
 
   if (!trimmed) {
-    const next = profiles
-      .map((profile) => ({
-        ...profile,
-        playerIds: profile.playerIds.filter((id) => id !== normalizedId),
-      }))
-      .filter((profile) => profile.playerIds.length > 0);
+    const next = profiles.map((profile) => ({
+      ...profile,
+      playerIds: profile.playerIds.filter((id) => id !== normalizedId),
+    }));
     writeProfiles(next);
-    setPlayerAlias(normalizedId, "");
     return loadDisplayNames();
   }
 
@@ -152,7 +170,9 @@ export function upsertRivalName(playerId: string, name: string): Record<string, 
       (profile) => profile.name.toLowerCase() === trimmed.toLowerCase(),
     );
     if (sameName) {
-      sameName.playerIds.push(normalizedId);
+      if (!sameName.playerIds.includes(normalizedId)) {
+        sameName.playerIds.push(normalizedId);
+      }
       writeProfiles(profiles);
     } else {
       writeProfiles([
@@ -161,8 +181,71 @@ export function upsertRivalName(playerId: string, name: string): Record<string, 
       ]);
     }
   }
-  setPlayerAlias(normalizedId, trimmed);
   return loadDisplayNames();
+}
+
+/** Manuell Rival anlegen (ohne verknüpfte ID — Verknüpfung später beim Benennen). */
+export function createRival(name: string): RivalProfile | null {
+  const trimmed = name.trim();
+  if (!trimmed) return null;
+  const profiles = loadRivalProfiles();
+  const existing = profiles.find(
+    (profile) => profile.name.toLowerCase() === trimmed.toLowerCase(),
+  );
+  if (existing) return existing;
+  const profile: RivalProfile = { id: createId(), name: trimmed, playerIds: [] };
+  writeProfiles([...profiles, profile]);
+  return profile;
+}
+
+export function renameRival(rivalId: string, name: string): RivalProfile[] {
+  const trimmed = name.trim();
+  if (!trimmed) return loadRivalProfiles();
+  const profiles = loadRivalProfiles();
+  const next = profiles.map((profile) =>
+    profile.id === rivalId ? { ...profile, name: trimmed } : profile,
+  );
+  writeProfiles(next);
+  return loadRivalProfiles();
+}
+
+export function deleteRival(rivalId: string): RivalProfile[] {
+  const profiles = loadRivalProfiles();
+  const doomed = profiles.find((profile) => profile.id === rivalId);
+  if (doomed) {
+    for (const playerId of doomed.playerIds) {
+      setPlayerAlias(playerId, "");
+    }
+  }
+  const next = profiles.filter((profile) => profile.id !== rivalId);
+  writeProfiles(next);
+  return loadRivalProfiles();
+}
+
+/** Zwei Rivalen zusammenführen: Name von target, IDs aus beiden. */
+export function mergeRivals(targetId: string, sourceId: string): RivalProfile[] {
+  if (targetId === sourceId) return loadRivalProfiles();
+  const profiles = loadRivalProfiles();
+  const target = profiles.find((profile) => profile.id === targetId);
+  const source = profiles.find((profile) => profile.id === sourceId);
+  if (!target || !source) return profiles;
+  const merged: RivalProfile = {
+    ...target,
+    playerIds: [...new Set([...target.playerIds, ...source.playerIds])],
+  };
+  const next = profiles
+    .filter((profile) => profile.id !== sourceId)
+    .map((profile) => (profile.id === targetId ? merged : profile));
+  writeProfiles(next);
+  return loadRivalProfiles();
+}
+
+export function rivalLinkedIdsLabel(profile: RivalProfile): string {
+  if (profile.playerIds.length === 0) return "Noch nicht verknüpft";
+  if (profile.playerIds.length === 1) {
+    return `ID ${shortPlayerId(profile.playerIds[0]!)}`;
+  }
+  return `${profile.playerIds.length} verknüpfte IDs`;
 }
 
 export function isNamedRival(playerId: string, displayNames: Record<string, string>): boolean {

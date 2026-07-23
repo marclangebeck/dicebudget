@@ -182,6 +182,10 @@ function StatsPageInner() {
         subtitle="Bilanz und Duelle — Rivalen tippen zum Benennen, Paarung zum Aufklappen"
       />
 
+      <Link href="/settings?open=rivals" className="stats-rivals-manage-link">
+        Rivalen verwalten
+      </Link>
+
       {!loading && !error && mergedPairings.length > 0 && (
         <StatsHeroPanel overview={overview} />
       )}

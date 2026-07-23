@@ -29,6 +29,11 @@ import {
   setAppSettings,
   type AppSettings,
 } from "@/lib/uiPrefs";
+import { RivalManagePanel } from "@/components/RivalManagePanel";
+import {
+  loadRivalProfiles,
+  subscribeRivalProfiles,
+} from "@/lib/rivalProfiles";
 import {
   getAppTourPrefs,
   setAppTourPrefs,
@@ -38,6 +43,7 @@ import {
 
 type SettingsSectionId =
   | "tour"
+  | "rivals"
   | "mode"
   | "visuals"
   | "solo"
@@ -55,11 +61,13 @@ function SettingsPageInner() {
     DEFAULT_GAME_FEEDBACK_PREFS,
   );
   const [tourPrefs, setTourPrefsState] = useState<AppTourPrefs>({ dontShowAgain: false });
+  const [rivalCount, setRivalCount] = useState(0);
   const [labsUnlocked, setLabsUnlocked] = useState(false);
   const [showLabsUnlock, setShowLabsUnlock] = useState(false);
   const [featureRevision, setFeatureRevision] = useState(0);
   const [openSections, setOpenSections] = useState<Record<SettingsSectionId, boolean>>({
     tour: false,
+    rivals: false,
     mode: false,
     visuals: false,
     solo: false,
@@ -72,11 +80,26 @@ function SettingsPageInner() {
     setSettingsState(getAppSettings());
     setFeedbackPrefsState(getGameFeedbackPrefs());
     setTourPrefsState(getAppTourPrefs());
+    setRivalCount(loadRivalProfiles().length);
   }, []);
 
   useEffect(() => {
     return subscribeAppTourPrefs(() => setTourPrefsState(getAppTourPrefs()));
   }, []);
+
+  useEffect(() => {
+    return subscribeRivalProfiles(() => setRivalCount(loadRivalProfiles().length));
+  }, []);
+
+  useEffect(() => {
+    const open = searchParams.get("open");
+    if (open === "rivals") {
+      setOpenSections((current) => ({ ...current, rivals: true }));
+    }
+    if (open === "tour") {
+      setOpenSections((current) => ({ ...current, tour: true }));
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     setLabsUnlocked(isLabsUnlocked());
@@ -148,6 +171,20 @@ function SettingsPageInner() {
           >
             Tour jetzt starten
           </button>
+        </SettingsSection>
+
+        <SettingsSection
+          id="rivals"
+          title="Rivalen verwalten"
+          summary={
+            rivalCount === 0
+              ? "Noch keine"
+              : `${rivalCount} ${rivalCount === 1 ? "Rival" : "Rivalen"}`
+          }
+          open={openSections.rivals}
+          onToggle={() => toggleSection("rivals")}
+        >
+          <RivalManagePanel />
         </SettingsSection>
 
         <SettingsSection

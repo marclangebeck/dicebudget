@@ -1,13 +1,17 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it } from "node:test";
 import {
+  createRival,
   getRivalDisplayMap,
   loadDisplayNames,
+  loadRivalProfiles,
+  mergeRivals,
   upsertRivalName,
 } from "./rivalProfiles.js";
 
 function installBrowserMocks(): void {
   const storage: Record<string, string> = {};
+  let idSeq = 0;
   Object.defineProperty(globalThis, "window", {
     configurable: true,
     writable: true,
@@ -25,7 +29,7 @@ function installBrowserMocks(): void {
       addEventListener: () => {},
       removeEventListener: () => {},
       crypto: {
-        randomUUID: () => "rival-test-id",
+        randomUUID: () => `rival-test-id-${++idSeq}`,
       },
     },
   });
@@ -57,5 +61,19 @@ describe("rivalProfiles", () => {
     );
     const map = loadDisplayNames();
     assert.equal(map.xyz, "Marc");
+  });
+
+  it("legt manuelle Rivalen an und merged sie", () => {
+    createRival("Nicole");
+    createRival("Nic");
+    const before = loadRivalProfiles();
+    assert.equal(before.length, 2);
+    const nicole = before.find((profile) => profile.name === "Nicole");
+    const nic = before.find((profile) => profile.name === "Nic");
+    assert.ok(nicole && nic);
+    mergeRivals(nicole!.id, nic!.id);
+    const after = loadRivalProfiles();
+    assert.equal(after.length, 1);
+    assert.equal(after[0]?.name, "Nicole");
   });
 });
