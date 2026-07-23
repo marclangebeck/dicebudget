@@ -150,7 +150,7 @@ export function AppLegalFooter() {
         </Link>
         <Link href="/settings" className="app-legal-link">
           <SettingsIcon />
-          <span>Einstellungen</span>
+          <span>Spielregeln</span>
         </Link>
         <button
           type="button"
