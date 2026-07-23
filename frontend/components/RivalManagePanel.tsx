@@ -73,14 +73,14 @@ export function RivalManagePanel() {
 
   function handleMerge(targetId: string) {
     if (!mergeSourceId || mergeSourceId === targetId) {
-      setError("Zum Zusammenführen zuerst einen anderen Rivalen als Quelle wählen.");
+      setError("Zum Zusammenführen zuerst bei einem Rivalen „Zusammenführen“ tippen.");
       return;
     }
     const source = profiles.find((profile) => profile.id === mergeSourceId);
     const target = profiles.find((profile) => profile.id === targetId);
     if (!source || !target) return;
     const ok = window.confirm(
-      `„${source.name}“ in „${target.name}“ zusammenführen?\n\nAlle verknüpften IDs landen bei „${target.name}“. „${source.name}“ wird entfernt.`,
+      `„${source.name}“ mit „${target.name}“ zusammenführen?\n\nEs bleibt nur „${target.name}“. Alle Spiele von „${source.name}“ zählen dann dazu. „${source.name}“ verschwindet aus der Liste.`,
     );
     if (!ok) return;
     mergeRivals(targetId, mergeSourceId);
@@ -92,8 +92,9 @@ export function RivalManagePanel() {
   return (
     <div className="rival-manage">
       <p className="rival-manage-hint">
-        Namen gelten nur auf diesem Gerät. Manuell angelegte Rivalen verknüpfst du in der
-        Statistik: Unbekannten Gegner antippen → Rivalen aus der Liste wählen.
+        Namen gelten nur auf diesem Gerät. Doppelte Einträge derselben Person: bei einem
+        „Zusammenführen“ tippen, beim anderen „Hier zusammenführen“. Manuell angelegte Rivalen
+        verknüpfst du in der Statistik: Unbekannten Gegner antippen → Rivalen wählen.
       </p>
 
       <form onSubmit={handleCreate} className="rival-manage-create">
@@ -179,7 +180,7 @@ export function RivalManagePanel() {
                             )
                           }
                         >
-                          {mergeSourceId === profile.id ? "Quelle ✓" : "Als Quelle"}
+                          {mergeSourceId === profile.id ? "Gewählt ✓" : "Zusammenführen"}
                         </button>
                         {mergeSourceId && mergeSourceId !== profile.id && (
                           <button
@@ -187,7 +188,7 @@ export function RivalManagePanel() {
                             className="rival-manage-btn rival-manage-btn--primary"
                             onClick={() => handleMerge(profile.id)}
                           >
-                            Hierher mergen
+                            Hier zusammenführen
                           </button>
                         )}
                       </>

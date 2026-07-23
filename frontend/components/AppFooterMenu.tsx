@@ -177,7 +177,7 @@ export function AppFooterMenu({ open, onClose }: Props) {
     {
       key: "rivals",
       label: "Rivalen verwalten",
-      hint: "Anlegen, umbenennen, mergen",
+      hint: "Anlegen, umbenennen, zusammenführen",
       icon: <RivalsIcon />,
       onSelect: () => goApp(RIVALS_PATH),
     },
