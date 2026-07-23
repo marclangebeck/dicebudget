@@ -8,14 +8,17 @@ import {
   parseAppTourChapterParam,
 } from "./appTourSteps.js";
 import {
+  consumePendingAppTour,
   DEFAULT_APP_TOUR_PREFS,
   getAppTourPrefs,
+  requestAppTour,
   setAppTourPrefs,
   shouldAutoStartAppTour,
 } from "./appTourPrefs.js";
 
 function installBrowserMocks(): void {
   const storage: Record<string, string> = {};
+  const session: Record<string, string> = {};
   Object.defineProperty(globalThis, "window", {
     configurable: true,
     writable: true,
@@ -29,6 +32,15 @@ function installBrowserMocks(): void {
           delete storage[key];
         },
       },
+      sessionStorage: {
+        getItem: (key: string) => session[key] ?? null,
+        setItem: (key: string, value: string) => {
+          session[key] = value;
+        },
+        removeItem: (key: string) => {
+          delete session[key];
+        },
+      },
       dispatchEvent: () => true,
       addEventListener: () => {},
       removeEventListener: () => {},
@@ -40,6 +52,7 @@ describe("appTourPrefs", () => {
   beforeEach(() => {
     installBrowserMocks();
     window.localStorage.removeItem("dicebudget.appTour.v1");
+    window.sessionStorage.removeItem("dicebudget.appTour.pending");
   });
 
   afterEach(() => {
@@ -56,6 +69,12 @@ describe("appTourPrefs", () => {
     assert.equal(shouldAutoStartAppTour(), false);
     setAppTourPrefs({ dontShowAgain: false });
     assert.equal(shouldAutoStartAppTour(), true);
+  });
+
+  it("requestAppTour setzt Pending zum Konsumieren", () => {
+    requestAppTour("all");
+    assert.equal(consumePendingAppTour(), "all");
+    assert.equal(consumePendingAppTour(), null);
   });
 });
 

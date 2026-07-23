@@ -2808,8 +2808,12 @@ html.zoomable-route.legal-route .legal-page-scroll {
     linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
     rgba(15, 23, 42, 0.42);
   color: rgba(241, 245, 249, 0.92);
+  text-align: left;
   text-decoration: none;
   cursor: pointer;
+  font: inherit;
+  appearance: none;
+  -webkit-appearance: none;
   opacity: 0;
   transform: translateX(1.1rem);
   transition:

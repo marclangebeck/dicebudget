@@ -7,7 +7,7 @@ export default function RivalsSettingsPage() {
   return (
     <div className="settings-screen">
       <AppScreenHeader
-        section="Einstellungen"
+        section="Rivalen"
         title="Rivalen verwalten"
         subtitle="Anlegen, umbenennen, zusammenführen oder löschen — nur auf diesem Gerät."
         backHref="/stats"

@@ -5,6 +5,8 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Fixed
+- **Hamburger Rivalen/Tour:** Interne Menü-Ziele per `router.push` nach Menü-Schließen (nicht mehr Link+onClose) — verhindert Sprung auf den Startscreen in Capacitor
+- **App-Tour aus Menü:** Startet die Overlay-Tour zuverlässig (Event + Pending), statt nur auf den Startscreen zu wechseln
 - **Rivalen verknüpfen:** Beim Benennen unbekannter Gegner bestehende Rivalen auswählen (nicht nur neuer Name)
 
 ### Added

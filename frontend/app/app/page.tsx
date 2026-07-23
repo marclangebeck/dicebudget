@@ -1,11 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { AppIntroSplash } from "@/components/AppIntroSplash";
 import { AppTourOverlay } from "@/components/AppTourOverlay";
 import { HomeBentoGrid } from "@/components/HomeBentoGrid";
 import { ResumeActiveGame } from "@/components/ResumeActiveGame";
-import { shouldAutoStartAppTour } from "@/lib/appTourPrefs";
+import {
+  consumePendingAppTour,
+  shouldAutoStartAppTour,
+  subscribeAppTourRequest,
+} from "@/lib/appTourPrefs";
 import {
   parseAppTourChapterParam,
   type AppTourChapterId,
@@ -19,36 +24,73 @@ type TourLaunch = {
   chain: boolean;
 };
 
-export default function AppHomePage() {
+function launchFromRequest(chapter: AppTourChapterId | "all"): TourLaunch {
+  if (chapter === "all") return { chapter: "start", chain: true };
+  return { chapter, chain: false };
+}
+
+function AppHomePageInner() {
+  const searchParams = useSearchParams();
   const [showIntro, setShowIntro] = useState(false);
   const [introProgress, setIntroProgress] = useState(0);
   const [tourLaunch, setTourLaunch] = useState<TourLaunch | null>(null);
   const hideTimerRef = useRef<number | null>(null);
   const tourTimerRef = useRef<number | null>(null);
+  const skipAutoStartRef = useRef(false);
 
+  function clearTourTimers() {
+    if (hideTimerRef.current !== null) {
+      window.clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+    if (tourTimerRef.current !== null) {
+      window.clearTimeout(tourTimerRef.current);
+      tourTimerRef.current = null;
+    }
+  }
+
+  function openTour(chapter: AppTourChapterId | "all") {
+    skipAutoStartRef.current = true;
+    setShowIntro(false);
+    clearTourTimers();
+    setTourLaunch(launchFromRequest(chapter));
+  }
+
+  // Menü-Event: Tour öffnen, auch wenn /app schon gemountet ist
+  useEffect(() => {
+    return subscribeAppTourRequest((chapter) => openTour(chapter));
+  }, []);
+
+  // Pending (Navigation von anderer Seite) + Deep-Link ?tour=
+  useEffect(() => {
+    const pending = consumePendingAppTour();
+    const fromUrl = parseAppTourChapterParam(searchParams.get("tour"));
+    const request = pending ?? fromUrl;
+    if (!request) return;
+    openTour(request);
+  }, [searchParams]);
+
+  // Intro + Auto-Start nur ohne explizite Tour-Anforderung
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const params = new URLSearchParams(window.location.search);
-    const tourParam = parseAppTourChapterParam(params.get("tour"));
-    if (tourParam) {
-      if (tourParam === "all") {
-        setTourLaunch({ chapter: "start", chain: true });
-      } else {
-        setTourLaunch({ chapter: tourParam, chain: false });
-      }
+    if (
+      skipAutoStartRef.current ||
+      parseAppTourChapterParam(searchParams.get("tour")) ||
+      window.sessionStorage.getItem("dicebudget.appTour.pending")
+    ) {
       return;
     }
 
     const alreadyShown = window.sessionStorage.getItem(INTRO_SHOWN_KEY) === "1";
     if (alreadyShown) {
       if (shouldAutoStartAppTour()) {
-        tourTimerRef.current = window.setTimeout(
-          () => setTourLaunch({ chapter: "start", chain: true }),
-          450,
-        );
+        tourTimerRef.current = window.setTimeout(() => {
+          if (skipAutoStartRef.current) return;
+          setTourLaunch({ chapter: "start", chain: true });
+        }, 450);
       }
-      return;
+      return () => clearTourTimers();
     }
 
     setShowIntro(true);
@@ -65,11 +107,11 @@ export default function AppHomePage() {
         window.sessionStorage.setItem(INTRO_SHOWN_KEY, "1");
         hideTimerRef.current = window.setTimeout(() => {
           setShowIntro(false);
-          if (shouldAutoStartAppTour()) {
-            tourTimerRef.current = window.setTimeout(
-              () => setTourLaunch({ chapter: "start", chain: true }),
-              380,
-            );
+          if (shouldAutoStartAppTour() && !skipAutoStartRef.current) {
+            tourTimerRef.current = window.setTimeout(() => {
+              if (skipAutoStartRef.current) return;
+              setTourLaunch({ chapter: "start", chain: true });
+            }, 380);
           }
         }, 180);
       }
@@ -78,13 +120,10 @@ export default function AppHomePage() {
     raf = window.requestAnimationFrame(tick);
     return () => {
       window.cancelAnimationFrame(raf);
-      if (hideTimerRef.current !== null) {
-        window.clearTimeout(hideTimerRef.current);
-      }
-      if (tourTimerRef.current !== null) {
-        window.clearTimeout(tourTimerRef.current);
-      }
+      clearTourTimers();
     };
+    // Nur beim ersten Mount der Home-Seite
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -101,5 +140,13 @@ export default function AppHomePage() {
         onClose={() => setTourLaunch(null)}
       />
     </>
+  );
+}
+
+export default function AppHomePage() {
+  return (
+    <Suspense fallback={null}>
+      <AppHomePageInner />
+    </Suspense>
   );
 }

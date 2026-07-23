@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import {
+  APP_HOME_PATH,
   APP_NAME,
   APP_SHORT,
   BOTTLE_TRADE_URL,
@@ -10,6 +11,7 @@ import {
   IMPRESSUM_PATH,
   PRIVACY_PATH,
 } from "@/lib/branding";
+import { requestAppTour } from "@/lib/appTourPrefs";
 import { useFocusTrap } from "@/lib/useFocusTrap";
 
 type Props = {
@@ -21,10 +23,16 @@ type MenuEntry = {
   key: string;
   label: string;
   hint: string;
-  href: string;
-  external?: boolean;
   icon: ReactNode;
+  /** Interner App-Pfad (clientseitig via router.push). */
+  appPath?: string;
+  /** Externe URL oder mailto: */
+  href?: string;
+  external?: boolean;
+  onSelect?: () => void;
 };
+
+const RIVALS_PATH = "/settings/rivals";
 
 function TourIcon() {
   return (
@@ -115,54 +123,20 @@ function MenuDiceDecor() {
   );
 }
 
-const MENU_ENTRIES: MenuEntry[] = [
-  {
-    key: "tour",
-    label: "App-Tour",
-    hint: "Start, Strategy & Rivalen",
-    href: "/app?tour=all",
-    icon: <TourIcon />,
-  },
-  {
-    key: "rivals",
-    label: "Rivalen verwalten",
-    hint: "Anlegen, umbenennen, mergen",
-    href: "/settings/rivals",
-    icon: <RivalsIcon />,
-  },
-  {
-    key: "support",
-    label: "Support",
-    hint: "Fragen & Feedback",
-    href: `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`${APP_NAME} Support`)}`,
-    icon: <SupportIcon />,
-  },
-  {
-    key: "privacy",
-    label: "Datenschutz",
-    hint: "Deine Daten",
-    href: PRIVACY_PATH,
-    icon: <PrivacyIcon />,
-  },
-  {
-    key: "impressum",
-    label: "Impressum",
-    hint: "Anbieter & Kontakt",
-    href: IMPRESSUM_PATH,
-    icon: <InfoIcon />,
-  },
-  {
-    key: "bottle-trade",
-    label: "bottle-trade.de",
-    hint: "Mutterprojekt",
-    href: BOTTLE_TRADE_URL,
-    external: true,
-    icon: <ExternalIcon />,
-  },
-];
+function isAppHomePath(pathname: string | null): boolean {
+  if (!pathname) return false;
+  return (
+    pathname === APP_HOME_PATH ||
+    pathname === `${APP_HOME_PATH}/` ||
+    pathname.endsWith("/app") ||
+    pathname.endsWith("/app/")
+  );
+}
 
 export function AppFooterMenu({ open, onClose }: Props) {
   const panelRef = useRef<HTMLElement>(null);
+  const router = useRouter();
+  const pathname = usePathname();
   useFocusTrap(panelRef, open);
 
   useEffect(() => {
@@ -173,6 +147,70 @@ export function AppFooterMenu({ open, onClose }: Props) {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open, onClose]);
+
+  /** Menü zuerst schließen, dann clientseitig navigieren (Capacitor-sicher). */
+  function goApp(path: string) {
+    onClose();
+    window.setTimeout(() => {
+      router.push(path);
+    }, 0);
+  }
+
+  function startTourFromMenu() {
+    onClose();
+    requestAppTour("all");
+    if (!isAppHomePath(pathname)) {
+      window.setTimeout(() => {
+        router.push(APP_HOME_PATH);
+      }, 0);
+    }
+  }
+
+  const menuEntries: MenuEntry[] = [
+    {
+      key: "tour",
+      label: "App-Tour",
+      hint: "Start, Strategy & Rivalen",
+      icon: <TourIcon />,
+      onSelect: startTourFromMenu,
+    },
+    {
+      key: "rivals",
+      label: "Rivalen verwalten",
+      hint: "Anlegen, umbenennen, mergen",
+      icon: <RivalsIcon />,
+      onSelect: () => goApp(RIVALS_PATH),
+    },
+    {
+      key: "support",
+      label: "Support",
+      hint: "Fragen & Feedback",
+      href: `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`${APP_NAME} Support`)}`,
+      icon: <SupportIcon />,
+    },
+    {
+      key: "privacy",
+      label: "Datenschutz",
+      hint: "Deine Daten",
+      icon: <PrivacyIcon />,
+      onSelect: () => goApp(PRIVACY_PATH),
+    },
+    {
+      key: "impressum",
+      label: "Impressum",
+      hint: "Anbieter & Kontakt",
+      icon: <InfoIcon />,
+      onSelect: () => goApp(IMPRESSUM_PATH),
+    },
+    {
+      key: "bottle-trade",
+      label: "bottle-trade.de",
+      hint: "Mutterprojekt",
+      href: BOTTLE_TRADE_URL,
+      external: true,
+      icon: <ExternalIcon />,
+    },
+  ];
 
   return (
     <div
@@ -212,7 +250,7 @@ export function AppFooterMenu({ open, onClose }: Props) {
         </header>
 
         <ul className="app-footer-menu-list">
-          {MENU_ENTRIES.map((entry, index) => {
+          {menuEntries.map((entry, index) => {
             const className = "app-footer-menu-item";
             const style = { "--menu-item-index": index } as CSSProperties;
             const content = (
@@ -226,32 +264,37 @@ export function AppFooterMenu({ open, onClose }: Props) {
               </>
             );
 
+            if (entry.onSelect) {
+              return (
+                <li key={entry.key} className="app-footer-menu-row">
+                  <button
+                    type="button"
+                    className={className}
+                    style={style}
+                    tabIndex={open ? 0 : -1}
+                    onClick={entry.onSelect}
+                  >
+                    {content}
+                  </button>
+                </li>
+              );
+            }
+
+            const href = entry.href ?? "#";
             return (
               <li key={entry.key} className="app-footer-menu-row">
-                {entry.external || entry.href.startsWith("mailto:") ? (
-                  <a
-                    href={entry.href}
-                    className={className}
-                    style={style}
-                    tabIndex={open ? 0 : -1}
-                    {...(entry.external
-                      ? { target: "_blank", rel: "noopener noreferrer" }
-                      : {})}
-                    onClick={onClose}
-                  >
-                    {content}
-                  </a>
-                ) : (
-                  <Link
-                    href={entry.href}
-                    className={className}
-                    style={style}
-                    tabIndex={open ? 0 : -1}
-                    onClick={onClose}
-                  >
-                    {content}
-                  </Link>
-                )}
+                <a
+                  href={href}
+                  className={className}
+                  style={style}
+                  tabIndex={open ? 0 : -1}
+                  {...(entry.external
+                    ? { target: "_blank", rel: "noopener noreferrer" }
+                    : {})}
+                  onClick={onClose}
+                >
+                  {content}
+                </a>
               </li>
             );
           })}
