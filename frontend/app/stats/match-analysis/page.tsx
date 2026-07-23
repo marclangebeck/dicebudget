@@ -7,7 +7,7 @@ import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { MatchAnalysisView } from "@/components/MatchAnalysisView";
 import { getSessionMatchAnalysis } from "@/lib/api";
 import { loadActiveGame } from "@/lib/activeGame";
-import { loadPlayerAliases } from "@/lib/playerAliases";
+import { loadDisplayNames } from "@/lib/rivalProfiles";
 import type { SessionMatchAnalysisDto } from "@/lib/matchAnalysisTypes";
 import { getOrCreatePlayerId } from "@/lib/playerIdentity";
 
@@ -71,7 +71,7 @@ function MatchAnalysisInner() {
         <MatchAnalysisView
           analysis={analysis}
           ownPlayerId={perspectiveParam || getOrCreatePlayerId()}
-          aliases={loadPlayerAliases()}
+          aliases={loadDisplayNames()}
           subtitle={
             analysis.finishedAt
               ? `Gespielt am ${formatDateTime(analysis.finishedAt)}`

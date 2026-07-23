@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { LabsUnlockDialog } from "@/components/LabsUnlockDialog";
 import { SettingsGameActions } from "@/components/settings/SettingsGameActions";
@@ -29,8 +29,15 @@ import {
   setAppSettings,
   type AppSettings,
 } from "@/lib/uiPrefs";
+import {
+  getAppTourPrefs,
+  setAppTourPrefs,
+  subscribeAppTourPrefs,
+  type AppTourPrefs,
+} from "@/lib/appTourPrefs";
 
 type SettingsSectionId =
+  | "tour"
   | "mode"
   | "visuals"
   | "solo"
@@ -39,6 +46,7 @@ type SettingsSectionId =
   | "house-rules";
 
 function SettingsPageInner() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const fromParam = searchParams.get("from");
   const returnTarget = parseSettingsReturn(fromParam);
@@ -46,10 +54,12 @@ function SettingsPageInner() {
   const [feedbackPrefs, setFeedbackPrefsState] = useState<GameFeedbackPrefs>(
     DEFAULT_GAME_FEEDBACK_PREFS,
   );
+  const [tourPrefs, setTourPrefsState] = useState<AppTourPrefs>({ dontShowAgain: false });
   const [labsUnlocked, setLabsUnlocked] = useState(false);
   const [showLabsUnlock, setShowLabsUnlock] = useState(false);
   const [featureRevision, setFeatureRevision] = useState(0);
   const [openSections, setOpenSections] = useState<Record<SettingsSectionId, boolean>>({
+    tour: false,
     mode: false,
     visuals: false,
     solo: false,
@@ -61,6 +71,11 @@ function SettingsPageInner() {
   useEffect(() => {
     setSettingsState(getAppSettings());
     setFeedbackPrefsState(getGameFeedbackPrefs());
+    setTourPrefsState(getAppTourPrefs());
+  }, []);
+
+  useEffect(() => {
+    return subscribeAppTourPrefs(() => setTourPrefsState(getAppTourPrefs()));
   }, []);
 
   useEffect(() => {
@@ -113,6 +128,28 @@ function SettingsPageInner() {
       />
 
       <div className="settings-list">
+        <SettingsSection
+          id="tour"
+          title="App-Tour"
+          summary={tourPrefs.dontShowAgain ? "Nicht erneut anzeigen" : "Beim Start anbieten"}
+          open={openSections.tour}
+          onToggle={() => toggleSection("tour")}
+        >
+          <SettingsToggleCard
+            title="Tour nicht erneut anzeigen"
+            description="Aus = Tour erscheint wieder beim Öffnen der App. An = keine Auto-Tour."
+            checked={tourPrefs.dontShowAgain}
+            onChange={(value) => setTourPrefsState(setAppTourPrefs({ dontShowAgain: value }))}
+          />
+          <button
+            type="button"
+            className="setup-host-submit w-full"
+            onClick={() => router.push("/app?tour=1")}
+          >
+            Tour jetzt starten
+          </button>
+        </SettingsSection>
+
         <SettingsSection
           id="mode"
           title="Spielmodus"

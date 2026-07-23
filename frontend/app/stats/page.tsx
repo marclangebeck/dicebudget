@@ -11,7 +11,7 @@ import { PairingAccordionItem } from "@/components/PairingAccordionItem";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { StatsHeroPanel } from "@/components/StatsHeroPanel";
 import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
-import { loadPlayerAliases, setPlayerAlias, type PlayerAliasMap } from "@/lib/playerAliases";
+import { loadDisplayNames, upsertRivalName } from "@/lib/rivalProfiles";
 import { PlayerAliasOverlay } from "@/components/PlayerAliasOverlay";
 import { PairingEditOverlay } from "@/components/PairingEditOverlay";
 import { buildStatsOverview } from "@/lib/statsOverview";
@@ -23,6 +23,7 @@ import {
   type PairingSortMode,
 } from "@/lib/statsPairingInsights";
 import type { StatsDto } from "@/lib/statsTypes";
+import type { PlayerAliasMap } from "@/lib/playerAliases";
 
 const SORT_OPTIONS: { id: PairingSortMode; label: string }[] = [
   { id: "recent", label: "Zuletzt" },
@@ -72,7 +73,7 @@ function StatsPageInner() {
 
   useEffect(() => {
     setOwnPlayerId(getOrCreatePlayerId());
-    setAliases(loadPlayerAliases());
+    setAliases(loadDisplayNames());
   }, []);
 
   useEffect(() => {
@@ -177,8 +178,8 @@ function StatsPageInner() {
     <div className="stats-screen flex flex-col gap-2.5 pb-2">
       <AppScreenHeader
         section="Statistik"
-        title="Paarungen"
-        subtitle="Bilanz, Rivalen und direkte Duelle — Paarung antippen zum Aufklappen"
+        title="Meine Rivalen"
+        subtitle="Bilanz und Duelle — Rivalen tippen zum Benennen, Paarung zum Aufklappen"
       />
 
       {!loading && !error && mergedPairings.length > 0 && (
@@ -294,7 +295,7 @@ function StatsPageInner() {
           currentAlias={aliases[normalizePublicPlayerId(editingPlayerId)]}
           onClose={() => setEditingPlayerId(null)}
           onSave={(alias) => {
-            setAliases(setPlayerAlias(editingPlayerId, alias));
+            setAliases(upsertRivalName(editingPlayerId, alias));
             setEditingPlayerId(null);
             setDetailReloadToken((value) => value + 1);
           }}

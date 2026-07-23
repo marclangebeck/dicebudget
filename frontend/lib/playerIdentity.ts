@@ -41,6 +41,6 @@ export function playerLabel(
   if (ownPlayerId && normalized === ownPlayerId) return "Du";
   const alias = aliases?.[normalized]?.trim();
   if (alias) return alias;
-  return `Spieler ${shortPlayerId(playerId)}`;
+  return `Unbekannt (${shortPlayerId(playerId)})`;
 }
 

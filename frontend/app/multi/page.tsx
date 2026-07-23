@@ -7,7 +7,7 @@ import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { JoinByCodeForm } from "@/components/JoinByCodeForm";
 import { createGameSession, joinSession } from "@/lib/api";
 import { saveActiveGame } from "@/lib/activeGame";
-import { setPlayerAlias } from "@/lib/playerAliases";
+import { upsertRivalName } from "@/lib/rivalProfiles";
 import { shareInviteCode } from "@/lib/shareSocial";
 import { settingsHrefWithReturn } from "@/lib/settingsReturn";
 import { DEFAULT_APP_SETTINGS, getAppSettings, type AppSettings } from "@/lib/uiPrefs";
@@ -70,8 +70,8 @@ export default function MultiHostPage() {
         ];
         saveTableModeSession({ inviteCode: session.inviteCode, players });
         saveActiveGame({ type: "table", inviteCode: session.inviteCode });
-        setPlayerAlias(leftPlayerId, leftLabel);
-        setPlayerAlias(rightPlayerId, rightLabel);
+        upsertRivalName(leftPlayerId, leftLabel);
+        upsertRivalName(rightPlayerId, rightLabel);
         router.push(
           `/play?table=1&invite=${encodeURIComponent(session.inviteCode)}`,
         );

@@ -20,6 +20,7 @@ function ArenaPane({ href, tone, label, tagline, badges, cta, iconSrc }: ArenaPa
     <Link
       href={href}
       className={`home-arena-pane home-bento-tile home-bento-tile--arena home-bento-tile--${tone} home-arena-pane--${tone} flex min-h-0 flex-col no-underline`}
+      data-tour-anchor={tone === "multi" ? "host" : tone === "solo" ? "solo" : undefined}
     >
       <div className="home-bento-scene" aria-hidden />
       <div className="home-arena-pane-head">

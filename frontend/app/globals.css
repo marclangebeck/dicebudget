@@ -9275,3 +9275,136 @@ html.zoomable-route.legal-route .legal-page-scroll {
     opacity: 0.35;
   }
 }
+
+/* —— App-Tour —— */
+.app-tour {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 1rem 0.85rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  pointer-events: auto;
+}
+
+.app-tour-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(2px);
+}
+
+.app-tour-spotlight {
+  position: absolute;
+  z-index: 1;
+  border-radius: 1.15rem;
+  box-shadow:
+    0 0 0 9999px rgba(2, 6, 23, 0.72),
+    0 0 0 2px rgba(214, 168, 90, 0.55),
+    0 18px 40px -18px rgba(0, 0, 0, 0.75);
+  pointer-events: none;
+  transition: top 0.28s ease, left 0.28s ease, width 0.28s ease, height 0.28s ease;
+}
+
+.app-tour-backdrop:has(+ .app-tour-spotlight) {
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.app-tour-card {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 24rem);
+  border-radius: 1.15rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 0.95rem 0.95rem 0.85rem;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(214, 168, 90, 0.18), transparent 42%),
+    linear-gradient(160deg, rgba(17, 24, 39, 0.96), rgba(15, 23, 42, 0.94));
+  box-shadow:
+    0 22px 48px -24px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+}
+
+.app-tour-progress {
+  margin: 0;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #e5c07b;
+}
+
+.app-tour-title {
+  margin: 0.35rem 0 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #f8fafc;
+}
+
+.app-tour-body {
+  margin: 0.45rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #cbd5e1;
+}
+
+.app-tour-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin-top: 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  cursor: pointer;
+}
+
+.app-tour-check input {
+  margin-top: 0.12rem;
+  accent-color: #d6a85a;
+}
+
+.app-tour-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.55rem;
+  margin-top: 0.95rem;
+}
+
+.app-tour-actions-main {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.app-tour-btn {
+  min-height: 2.35rem;
+  border-radius: 0.75rem;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.app-tour-btn--ghost {
+  border: 0;
+  background: transparent;
+  color: #94a3b8;
+}
+
+.app-tour-btn--secondary {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(15, 23, 42, 0.55);
+  color: #e2e8f0;
+}
+
+.app-tour-btn--primary {
+  border: 1px solid rgba(214, 168, 90, 0.42);
+  background: linear-gradient(135deg, #102033 0%, #173f43 52%, #5b3a24 100%);
+  color: #fff;
+}

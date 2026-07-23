@@ -8,9 +8,10 @@ import { getSessionLobby, getSessionRanking, joinSession, createGameSession } fr
 import { saveActiveGame } from "@/lib/activeGame";
 import { ResumeLobbySheet } from "@/components/ResumeLobbySheet";
 import type { SessionLobbyDto, SessionRankingDto } from "@/lib/sessionTypes";
-import { getOrCreatePlayerId, normalizePublicPlayerId, playerLabel } from "@/lib/playerIdentity";
-import { loadPlayerAliases, setPlayerAlias, type PlayerAliasMap } from "@/lib/playerAliases";
+import { loadDisplayNames, upsertRivalName } from "@/lib/rivalProfiles";
+import type { PlayerAliasMap } from "@/lib/playerAliases";
 import { PlayerAliasOverlay } from "@/components/PlayerAliasOverlay";
+import { normalizePublicPlayerId, getOrCreatePlayerId, playerLabel } from "@/lib/playerIdentity";
 
 function MultiJoinInner() {
   const router = useRouter();
@@ -26,7 +27,7 @@ function MultiJoinInner() {
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     setPlayerId(getOrCreatePlayerId());
-    setAliases(loadPlayerAliases());
+    setAliases(loadDisplayNames());
   }, []);
 
   const [nextRoundLoading, setNextRoundLoading] = useState(false);
@@ -329,7 +330,7 @@ function MultiJoinInner() {
           currentAlias={aliases[normalizePublicPlayerId(editingPlayerId)]}
           onClose={() => setEditingPlayerId(null)}
           onSave={(alias) => {
-            setAliases(setPlayerAlias(editingPlayerId, alias));
+            setAliases(upsertRivalName(editingPlayerId, alias));
             setEditingPlayerId(null);
           }}
         />

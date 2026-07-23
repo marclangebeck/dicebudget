@@ -35,6 +35,7 @@ function CinematicDoor({
       href={href}
       className={`home-cinematic-door home-cinematic-door--${tone} home-cinematic-door--editorial home-bento-tile home-bento-tile--arena home-bento-tile--${tone} no-underline`}
       style={{ "--home-cinematic-enter-delay": `${enterDelayMs}ms` } as CSSProperties}
+      data-tour-anchor={tone === "multi" ? "host" : tone === "solo" ? "solo" : undefined}
     >
       <div className="home-bento-scene home-cinematic-door-scene" aria-hidden />
       <div className="home-cinematic-door-poster">

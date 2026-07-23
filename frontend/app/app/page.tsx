@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AppIntroSplash } from "@/components/AppIntroSplash";
+import { AppTourOverlay } from "@/components/AppTourOverlay";
 import { HomeBentoGrid } from "@/components/HomeBentoGrid";
 import { ResumeActiveGame } from "@/components/ResumeActiveGame";
+import { shouldAutoStartAppTour } from "@/lib/appTourPrefs";
 
 const INTRO_SHOWN_KEY = "dicebudget.introShown.v2";
 const INTRO_DURATION_MS = 1700;
@@ -11,12 +13,26 @@ const INTRO_DURATION_MS = 1700;
 export default function AppHomePage() {
   const [showIntro, setShowIntro] = useState(false);
   const [introProgress, setIntroProgress] = useState(0);
+  const [tourOpen, setTourOpen] = useState(false);
   const hideTimerRef = useRef<number | null>(null);
+  const tourTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("tour") === "1") {
+      setTourOpen(true);
+      return;
+    }
+
     const alreadyShown = window.sessionStorage.getItem(INTRO_SHOWN_KEY) === "1";
-    if (alreadyShown) return;
+    if (alreadyShown) {
+      if (shouldAutoStartAppTour()) {
+        tourTimerRef.current = window.setTimeout(() => setTourOpen(true), 450);
+      }
+      return;
+    }
 
     setShowIntro(true);
     const start = performance.now();
@@ -30,7 +46,12 @@ export default function AppHomePage() {
         raf = window.requestAnimationFrame(tick);
       } else {
         window.sessionStorage.setItem(INTRO_SHOWN_KEY, "1");
-        hideTimerRef.current = window.setTimeout(() => setShowIntro(false), 180);
+        hideTimerRef.current = window.setTimeout(() => {
+          setShowIntro(false);
+          if (shouldAutoStartAppTour()) {
+            tourTimerRef.current = window.setTimeout(() => setTourOpen(true), 380);
+          }
+        }, 180);
       }
     };
 
@@ -39,6 +60,9 @@ export default function AppHomePage() {
       window.cancelAnimationFrame(raf);
       if (hideTimerRef.current !== null) {
         window.clearTimeout(hideTimerRef.current);
+      }
+      if (tourTimerRef.current !== null) {
+        window.clearTimeout(tourTimerRef.current);
       }
     };
   }, []);
@@ -50,6 +74,7 @@ export default function AppHomePage() {
         <HomeBentoGrid />
       </main>
       {showIntro && <AppIntroSplash progress={introProgress} />}
+      <AppTourOverlay open={tourOpen} onClose={() => setTourOpen(false)} />
     </>
   );
 }

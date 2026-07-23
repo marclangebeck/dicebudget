@@ -26,7 +26,7 @@ export function JoinByCodeForm({ variant = "card" }: Props) {
 
   if (variant === "home") {
     return (
-      <section className="home-cinematic-join" aria-label="Multi-Spiel beitreten">
+      <section className="home-cinematic-join" aria-label="Multi-Spiel beitreten" data-tour-anchor="join">
         <div className="home-cinematic-join-copy">
           <p className="home-cinematic-join-kicker">Multi-Spiel</p>
           <p className="home-cinematic-join-title">Mit Code beitreten</p>

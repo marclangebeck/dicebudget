@@ -35,24 +35,25 @@ export function PlayerAliasOverlay({
     >
       <div className="play-complete-card w-full max-w-sm text-left">
         <p id="player-alias-title" className="play-complete-kicker">
-          Gegner lokal benennen
+          Rivalen lokal benennen
         </p>
         <p className="text-secondary mt-2 text-sm">
           Aktuell: <strong className="text-strong">{playerLabel(playerId, ownPlayerId, aliases)}</strong>
         </p>
         <p className="text-muted mt-1 text-xs">
-          Dieser Alias wird nur auf deinem Gerät gespeichert. Serverseitig bleibt es
-          bei der Pseudo-ID {shortPlayerId(playerId)}.
+          Der Name gilt nur auf diesem Gerät (Rivalen-Profil). Serverseitig bleibt die
+          Pseudo-ID {shortPlayerId(playerId)}.
         </p>
 
         <label className="mt-4 flex flex-col gap-1 text-sm">
-          <span className="text-secondary">Alias</span>
+          <span className="text-secondary">Name</span>
           <input
             value={aliasInput}
             onChange={(e) => setAliasInput(e.target.value)}
             maxLength={40}
             className="glass-input px-3 py-2"
             placeholder="z. B. Nicole"
+            autoFocus
           />
         </label>
 
@@ -72,4 +73,3 @@ export function PlayerAliasOverlay({
     </div>
   );
 }
-

@@ -9,7 +9,8 @@ import {
 import { mergePairingSummaries } from "@/lib/pairingMerge";
 import type { PairingSummaryDto } from "@/lib/pairingTypes";
 import { getOrCreatePlayerId } from "@/lib/playerIdentity";
-import { loadPlayerAliases, type PlayerAliasMap } from "@/lib/playerAliases";
+import { loadDisplayNames } from "@/lib/rivalProfiles";
+import type { PlayerAliasMap } from "@/lib/playerAliases";
 import { buildStatsOverview } from "@/lib/statsOverview";
 import type { StatsDto } from "@/lib/statsTypes";
 
@@ -22,7 +23,7 @@ export function useHomeHeroData() {
 
   useEffect(() => {
     setOwnPlayerId(getOrCreatePlayerId());
-    setAliases(loadPlayerAliases());
+    setAliases(loadDisplayNames());
   }, []);
 
   useEffect(() => {

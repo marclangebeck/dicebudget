@@ -32,7 +32,7 @@ import { useQueuedFeedbackOverlays } from "@/lib/feedbackOverlayQueue";
 import { buildProgressMilestoneAfterField } from "@/lib/runProgressFeedback";
 import type { SessionMatchAnalysisDto } from "@/lib/matchAnalysisTypes";
 import { allFieldsScored, getLastScoredFieldId, isRunEnded } from "@/lib/runUtils";
-import { loadPlayerAliases } from "@/lib/playerAliases";
+import { loadDisplayNames } from "@/lib/rivalProfiles";
 import {
   loadTableModeSession,
   type TableModePlayer,
@@ -542,7 +542,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
           <MatchAnalysisView
             analysis={matchAnalysis}
             ownPlayerId={players[0].playerId}
-            aliases={loadPlayerAliases()}
+            aliases={loadDisplayNames()}
             onBack={() => setShowMatchAnalysis(false)}
             backLabel="Zurück zum Duell"
           />

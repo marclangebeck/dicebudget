@@ -4,6 +4,10 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
+### Added
+- **App-Tour:** Geführte Kurz-Tour (inkl. Wurf-Pool) beim ersten Start; Häkchen „nicht erneut anzeigen“; in Einstellungen starten/steuern (`/app?tour=1`)
+- **Rivalen-Profile:** Lokale Namen statt nur Alias; Statistik „Meine Rivalen“; unbekannt klar markiert; Migration bestehender Aliase
+
 ### Changed
 - **Startscreen:** Multi-Kachel heißt „Multi-Spiel als Host starten“; kompaktes Code-Feld zum Beitreten zwischen Multi und Solo (ohne Scroll)
 - **Hausregel Brennt:** Pool-Kosten pro Anwendung auf 1 reduziert (`BURN_POOL_COST`; zuvor 2, davor 5)
