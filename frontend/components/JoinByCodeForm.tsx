@@ -30,6 +30,7 @@ export function JoinByCodeForm({ variant = "card" }: Props) {
         <div className="home-cinematic-join-copy">
           <p className="home-cinematic-join-kicker">Multi-Spiel</p>
           <p className="home-cinematic-join-title">Mit Code beitreten</p>
+          <p className="home-cinematic-join-hint">Code vom Host — direkt in die Lobby</p>
         </div>
         <form onSubmit={handleSubmit} className="home-cinematic-join-form">
           <input
