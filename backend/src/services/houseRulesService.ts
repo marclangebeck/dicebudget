@@ -39,7 +39,7 @@ async function loadActiveRun(runId: string) {
   return run;
 }
 
-/** Brennt: −2 Pool am Anfang eines Wurfes (Feld gewählt, noch nicht eingetragen). */
+/** Brennt: −1 Pool am Anfang eines Wurfes (Feld gewählt, noch nicht eingetragen). */
 export async function applyBurnRoll(
   runId: string,
   fieldId: string,

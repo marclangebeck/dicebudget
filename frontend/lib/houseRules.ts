@@ -1,6 +1,6 @@
 import type { FieldTypeId, RunDto } from "@/lib/types";
 
-export const BURN_POOL_COST = 2;
+export const BURN_POOL_COST = 1;
 
 /** Brennt: leeres Feld gewählt, Eintrag noch nicht gebucht (nicht Korrektur). */
 export function canBurnHouseRule(

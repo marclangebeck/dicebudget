@@ -55,7 +55,7 @@ describe("houseRules", () => {
     assert.equal(qualifiesYatzyStreakPenalty(fields), true);
   });
 
-  it("BURN_POOL_COST ist 2", () => {
-    assert.equal(BURN_POOL_COST, 2);
+  it("BURN_POOL_COST ist 1", () => {
+    assert.equal(BURN_POOL_COST, 1);
   });
 });
