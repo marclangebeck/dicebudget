@@ -997,6 +997,9 @@ html.zoomable-route.legal-route .legal-page-scroll {
 
 .home-cinematic-door-motif-wrap {
   display: flex;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
   align-items: center;
   justify-content: center;
   transform: scale(1);
@@ -1006,7 +1009,7 @@ html.zoomable-route.legal-route .legal-page-scroll {
 }
 
 .home-cinematic--stats-open .home-cinematic-door-motif-wrap {
-  transform: scale(0.74);
+  transform: scale(0.88);
 }
 
 .home-cinematic-stats-panel .home-hero-banner {
@@ -1081,8 +1084,8 @@ html.zoomable-route.legal-route .legal-page-scroll {
   height: 100%;
   min-height: 0;
   flex-direction: column;
-  gap: 0.28rem;
-  padding: 0.82rem 0.78rem 0.72rem;
+  gap: 0.22rem;
+  padding: 0.68rem 0.72rem 0.62rem;
 }
 
 .home-cinematic--entered .home-cinematic-door {
@@ -1176,12 +1179,13 @@ html.zoomable-route.legal-route .legal-page-scroll {
   position: relative;
   z-index: 1;
   display: flex;
-  min-height: 4.25rem;
+  min-height: 0;
   flex: 1 1 0;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.08rem;
+  padding: 0.15rem 0.35rem;
 }
 
 .home-cinematic-door-hero {
@@ -1189,6 +1193,7 @@ html.zoomable-route.legal-route .legal-page-scroll {
   display: flex;
   width: 100%;
   height: 100%;
+  max-height: 100%;
   align-items: center;
   justify-content: center;
   pointer-events: none;
@@ -1198,20 +1203,23 @@ html.zoomable-route.legal-route .legal-page-scroll {
   position: relative;
   z-index: 2;
   display: block;
-  width: 154%;
+  width: auto;
   height: auto;
+  max-width: min(78%, 11.5rem);
   max-height: 100%;
   object-fit: contain;
   object-position: center;
-  transform: rotate(-5deg);
-  animation: home-motif-float 4.5s ease-in-out infinite;
-  filter: drop-shadow(0 28px 36px rgba(0, 0, 0, 0.52));
-  transition: width 0.38s cubic-bezier(0.22, 1, 0.36, 1), filter 0.38s ease;
+  transform: rotate(-4deg);
+  animation: home-motif-float-tight 4.5s ease-in-out infinite;
+  filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.48));
+  transition:
+    max-width 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.38s ease;
 }
 
 .home-cinematic--stats-open .home-cinematic-door-hero .home-bento-motif {
-  width: 118%;
-  filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.42));
+  max-width: min(68%, 9.5rem);
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.4));
 }
 
 .home-cinematic-door--multi .home-cinematic-door-hero .home-bento-motif {
@@ -1546,24 +1554,26 @@ html.zoomable-route.legal-route .legal-page-scroll {
   position: relative;
   z-index: 1;
   display: flex;
-  min-height: 7rem;
+  min-height: 0;
   flex: 1 1 0;
   align-items: center;
   justify-content: center;
-  padding: 0.1rem 0.15rem 0.25rem;
+  overflow: hidden;
+  padding: 0.15rem 0.35rem 0.2rem;
 }
 
 .home-arena-pane-hero .home-bento-motif {
   position: relative;
   z-index: 2;
   display: block;
-  width: min(169%, 22.75rem);
+  width: auto;
   height: auto;
-  max-height: min(44vh, 22.75rem);
+  max-width: min(88%, 14rem);
+  max-height: 100%;
   object-fit: contain;
   object-position: center;
-  animation: home-motif-float 4.5s ease-in-out infinite;
-  filter: drop-shadow(0 24px 32px rgba(0, 0, 0, 0.48));
+  animation: home-motif-float-tight 4.5s ease-in-out infinite;
+  filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.45));
 }
 
 .home-arena-pane--multi .home-arena-pane-hero .home-bento-motif {
@@ -1846,6 +1856,16 @@ html.zoomable-route.legal-route .legal-page-scroll {
   }
   50% {
     transform: translateY(-0.35rem);
+  }
+}
+
+@keyframes home-motif-float-tight {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(-0.18rem) rotate(-4deg);
   }
 }
 
@@ -3139,7 +3159,12 @@ html.zoomable-route.legal-route .legal-page-scroll {
   }
 
   .home-cinematic-door-stage {
-    min-height: 3.1rem;
+    min-height: 0;
+    padding: 0.1rem 0.25rem;
+  }
+
+  .home-cinematic-door-hero .home-bento-motif {
+    max-width: min(72%, 10rem);
   }
 
   .home-cinematic-door-cta {

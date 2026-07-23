@@ -14,7 +14,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Rivalen-Profile:** Lokale Namen statt nur Alias; Statistik „Meine Rivalen“; unbekannt klar markiert; Migration bestehender Aliase
 
 ### Changed
-- **Startscreen Join-Code:** Höherer, cyan-abgesetzter Beitreten-Streifen (klarer Multi-Einstieg); Multi/Solo etwas niedriger
+- **Startscreen Join-Code:** Höherer, cyan-abgesetzter Beitreten-Streifen (klarer Multi-Einstieg); Multi/Solo etwas niedriger; Motive in Multi/Solo skaliert, damit sie nicht abgeschnitten werden
 - **Startscreen:** Multi-Kachel heißt „Multi-Spiel als Host starten“; kompaktes Code-Feld zum Beitreten zwischen Multi und Solo (ohne Scroll)
 - **Hausregel Brennt:** Pool-Kosten pro Anwendung auf 1 reduziert (`BURN_POOL_COST`; zuvor 2, davor 5)
 - **Statistik:** Paarungen als einklappbare Dropdowns auf `/stats` — Details, Runden und Bearbeiten inline; alte `/stats/pairing?key=…`-Links leiten um
