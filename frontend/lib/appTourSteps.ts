@@ -50,7 +50,7 @@ export const APP_TOUR_STEPS_START: AppTourStep[] = [
     id: "welcome",
     chapter: "start",
     title: "Willkommen bei dice.budget",
-    body: "Kurze Tour in drei Kapiteln: Start, Strategy (Pool) und Rivalen. Jederzeit überspringbar — unter Einstellungen erneut startbar.",
+    body: "Kurze Tour in drei Kapiteln: Start, Strategy (Pool) und Rivalen. Jederzeit überspringbar — über das Menü erneut startbar.",
   },
   {
     id: "host",

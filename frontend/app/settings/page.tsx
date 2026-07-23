@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { LabsUnlockDialog } from "@/components/LabsUnlockDialog";
 import { SettingsGameActions } from "@/components/settings/SettingsGameActions";
@@ -34,15 +34,8 @@ import {
   loadRivalProfiles,
   subscribeRivalProfiles,
 } from "@/lib/rivalProfiles";
-import {
-  getAppTourPrefs,
-  setAppTourPrefs,
-  subscribeAppTourPrefs,
-  type AppTourPrefs,
-} from "@/lib/appTourPrefs";
 
 type SettingsSectionId =
-  | "tour"
   | "rivals"
   | "mode"
   | "visuals"
@@ -52,7 +45,6 @@ type SettingsSectionId =
   | "house-rules";
 
 function SettingsPageInner() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const fromParam = searchParams.get("from");
   const returnTarget = parseSettingsReturn(fromParam);
@@ -60,13 +52,11 @@ function SettingsPageInner() {
   const [feedbackPrefs, setFeedbackPrefsState] = useState<GameFeedbackPrefs>(
     DEFAULT_GAME_FEEDBACK_PREFS,
   );
-  const [tourPrefs, setTourPrefsState] = useState<AppTourPrefs>({ dontShowAgain: false });
   const [rivalCount, setRivalCount] = useState(0);
   const [labsUnlocked, setLabsUnlocked] = useState(false);
   const [showLabsUnlock, setShowLabsUnlock] = useState(false);
   const [featureRevision, setFeatureRevision] = useState(0);
   const [openSections, setOpenSections] = useState<Record<SettingsSectionId, boolean>>({
-    tour: false,
     rivals: false,
     mode: false,
     visuals: false,
@@ -79,12 +69,7 @@ function SettingsPageInner() {
   useEffect(() => {
     setSettingsState(getAppSettings());
     setFeedbackPrefsState(getGameFeedbackPrefs());
-    setTourPrefsState(getAppTourPrefs());
     setRivalCount(loadRivalProfiles().length);
-  }, []);
-
-  useEffect(() => {
-    return subscribeAppTourPrefs(() => setTourPrefsState(getAppTourPrefs()));
   }, []);
 
   useEffect(() => {
@@ -95,9 +80,6 @@ function SettingsPageInner() {
     const open = searchParams.get("open");
     if (open === "rivals") {
       setOpenSections((current) => ({ ...current, rivals: true }));
-    }
-    if (open === "tour") {
-      setOpenSections((current) => ({ ...current, tour: true }));
     }
   }, [searchParams]);
 
@@ -151,54 +133,6 @@ function SettingsPageInner() {
       />
 
       <div className="settings-list">
-        <SettingsSection
-          id="tour"
-          title="App-Tour"
-          summary={tourPrefs.dontShowAgain ? "Nicht erneut anzeigen" : "Beim Start anbieten"}
-          open={openSections.tour}
-          onToggle={() => toggleSection("tour")}
-        >
-          <SettingsToggleCard
-            title="Tour nicht erneut anzeigen"
-            description="Aus = Kapitel-Tour erscheint wieder beim Öffnen der App. An = keine Auto-Tour."
-            checked={tourPrefs.dontShowAgain}
-            onChange={(value) => setTourPrefsState(setAppTourPrefs({ dontShowAgain: value }))}
-          />
-          <p className="settings-compact-text settings-compact-text--sm">
-            Drei Kapitel: Start, Strategy (Pool) und Rivalen. Auto-Start führt alle nacheinander.
-          </p>
-          <button
-            type="button"
-            className="setup-host-submit w-full"
-            onClick={() => router.push("/app?tour=all")}
-          >
-            Ganze Tour starten
-          </button>
-          <div className="app-tour-settings-row">
-            <button
-              type="button"
-              className="settings-tour-chapter-btn"
-              onClick={() => router.push("/app?tour=start")}
-            >
-              Nur Start
-            </button>
-            <button
-              type="button"
-              className="settings-tour-chapter-btn"
-              onClick={() => router.push("/app?tour=strategy")}
-            >
-              Nur Strategy
-            </button>
-            <button
-              type="button"
-              className="settings-tour-chapter-btn"
-              onClick={() => router.push("/app?tour=rivals")}
-            >
-              Nur Rivalen
-            </button>
-          </div>
-        </SettingsSection>
-
         <SettingsSection
           id="rivals"
           title="Rivalen verwalten"

@@ -26,6 +26,22 @@ type MenuEntry = {
   icon: ReactNode;
 };
 
+function TourIcon() {
+  return (
+    <svg className="app-footer-menu-icon" viewBox="0 0 24 24" aria-hidden fill="none">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 5v2.2" />
+      <path d="M12 16.8V19" />
+      <path d="M5 12h2.2" />
+      <path d="M16.8 12H19" />
+      <path d="m7.05 7.05 1.55 1.55" />
+      <path d="m15.4 15.4 1.55 1.55" />
+      <path d="m16.95 7.05-1.55 1.55" />
+      <path d="m8.6 15.4-1.55 1.55" />
+    </svg>
+  );
+}
+
 function SupportIcon() {
   return (
     <svg className="app-footer-menu-icon" viewBox="0 0 24 24" aria-hidden fill="none">
@@ -90,6 +106,13 @@ function MenuDiceDecor() {
 
 const MENU_ENTRIES: MenuEntry[] = [
   {
+    key: "tour",
+    label: "App-Tour",
+    hint: "Start, Strategy & Rivalen",
+    href: "/app?tour=all",
+    icon: <TourIcon />,
+  },
+  {
     key: "support",
     label: "Support",
     hint: "Fragen & Feedback",
@@ -150,7 +173,7 @@ export function AppFooterMenu({ open, onClose }: Props) {
         tabIndex={open ? 0 : -1}
         onClick={onClose}
       />
-      <nav ref={panelRef} className="app-footer-menu-sheet" aria-label="Rechtliches und Support">
+      <nav ref={panelRef} className="app-footer-menu-sheet" aria-label="Menü">
         <div className="app-footer-menu-sheet-glow" aria-hidden />
         <header className="app-footer-menu-brand">
           <MenuDiceDecor />
