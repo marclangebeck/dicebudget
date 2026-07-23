@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { normalizeInviteCode } from "@/lib/activeGame";
 
 type Props = {
-  variant?: "card" | "compact" | "inline";
+  variant?: "card" | "compact" | "inline" | "home";
 };
 
 export function JoinByCodeForm({ variant = "card" }: Props) {
@@ -22,6 +22,38 @@ export function JoinByCodeForm({ variant = "card" }: Props) {
     }
     setError(null);
     router.push(`/multi/join?code=${encodeURIComponent(normalized)}`);
+  }
+
+  if (variant === "home") {
+    return (
+      <section className="home-cinematic-join" aria-label="Multi-Spiel beitreten">
+        <div className="home-cinematic-join-copy">
+          <p className="home-cinematic-join-kicker">Multi-Spiel</p>
+          <p className="home-cinematic-join-title">Mit Code beitreten</p>
+        </div>
+        <form onSubmit={handleSubmit} className="home-cinematic-join-form">
+          <input
+            value={code}
+            onChange={(e) => {
+              setCode(e.target.value.toUpperCase());
+              setError(null);
+            }}
+            aria-label="Raum-Code vom Host"
+            autoCapitalize="characters"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
+            maxLength={12}
+            placeholder="Code"
+            className="home-bento-input home-cinematic-join-input"
+          />
+          <button type="submit" className="home-bento-submit home-cinematic-join-submit">
+            Beitreten
+          </button>
+        </form>
+        {error && <p className="home-cinematic-join-error">{error}</p>}
+      </section>
+    );
   }
 
   const form = (

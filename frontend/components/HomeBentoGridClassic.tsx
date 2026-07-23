@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { HomeHeroBanner } from "@/components/HomeHeroBanner";
+import { JoinByCodeForm } from "@/components/JoinByCodeForm";
 import { useHomeHeroData } from "@/lib/useHomeHeroData";
 
 type ArenaPaneProps = {
@@ -48,16 +49,17 @@ export function HomeBentoGridClassic() {
     <div className="flex min-h-0 flex-1 flex-col gap-2.5 overflow-hidden">
       <HomeHeroBanner {...hero} />
 
-      <div className="home-play-arena min-h-0 flex-1">
+      <div className="home-play-arena home-play-arena--with-join min-h-0 flex-1">
         <ArenaPane
           href="/multi"
           tone="multi"
-          label="Multi"
+          label="Multi-Spiel als Host starten"
           tagline="Raum erstellen, Code teilen, Rivalen schlagen."
           badges={["2–6 Spieler", "Duell"]}
-          cta="Lobby öffnen"
+          cta="Als Host starten"
           iconSrc="/home-icons/multiplayer.png"
         />
+        <JoinByCodeForm variant="home" />
         <ArenaPane
           href="/solo"
           tone="solo"

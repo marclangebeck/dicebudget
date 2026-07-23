@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
+- **Startscreen:** Multi-Kachel heißt „Multi-Spiel als Host starten“; kompaktes Code-Feld zum Beitreten zwischen Multi und Solo (ohne Scroll)
 - **Hausregel Brennt:** Pool-Kosten pro Anwendung auf 1 reduziert (`BURN_POOL_COST`; zuvor 2, davor 5)
 - **Statistik:** Paarungen als einklappbare Dropdowns auf `/stats` — Details, Runden und Bearbeiten inline; alte `/stats/pairing?key=…`-Links leiten um
 - **Einstellungen:** Dezentes Perlgrau/Slate statt kräftigem Violett — zurückhaltende Karten, neutrale Akzente; Hausregeln nur leicht warm

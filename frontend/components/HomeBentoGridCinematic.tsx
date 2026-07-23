@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState, type CSSProperties } from "react";
 import { APP_SHORT } from "@/lib/branding";
 import { HomeHeroBanner } from "@/components/HomeHeroBanner";
+import { JoinByCodeForm } from "@/components/JoinByCodeForm";
 import { useHomeHeroData } from "@/lib/useHomeHeroData";
 
 type CinematicDoorProps = {
@@ -15,6 +16,7 @@ type CinematicDoorProps = {
   cta: string;
   iconSrc: string;
   enterDelayMs: number;
+  labelClassName?: string;
 };
 
 function CinematicDoor({
@@ -26,6 +28,7 @@ function CinematicDoor({
   cta,
   iconSrc,
   enterDelayMs,
+  labelClassName,
 }: CinematicDoorProps) {
   return (
     <Link
@@ -37,7 +40,9 @@ function CinematicDoor({
       <div className="home-cinematic-door-poster">
         <div className="home-cinematic-door-copy">
           <span className="home-cinematic-door-chip">{chip}</span>
-          <span className="home-cinematic-door-label">{label}</span>
+          <span className={`home-cinematic-door-label${labelClassName ? ` ${labelClassName}` : ""}`}>
+            {label}
+          </span>
           <p className="home-cinematic-door-tagline">{tagline}</p>
         </div>
         <div className="home-cinematic-door-stage" aria-hidden>
@@ -94,13 +99,15 @@ export function HomeBentoGridCinematic() {
         <CinematicDoor
           href="/multi"
           tone="multi"
-          label="Multi"
+          label="Multi-Spiel als Host starten"
           tagline="Raum erstellen, Code teilen, Rivalen schlagen."
           chip="2–6 Spieler"
-          cta="Lobby öffnen"
+          cta="Als Host starten"
           iconSrc="/home-icons/multiplayer.png"
           enterDelayMs={80}
+          labelClassName="home-cinematic-door-label--host"
         />
+        <JoinByCodeForm variant="home" />
         <CinematicDoor
           href="/solo"
           tone="solo"
