@@ -6,14 +6,23 @@ import { AppTourOverlay } from "@/components/AppTourOverlay";
 import { HomeBentoGrid } from "@/components/HomeBentoGrid";
 import { ResumeActiveGame } from "@/components/ResumeActiveGame";
 import { shouldAutoStartAppTour } from "@/lib/appTourPrefs";
+import {
+  parseAppTourChapterParam,
+  type AppTourChapterId,
+} from "@/lib/appTourSteps";
 
 const INTRO_SHOWN_KEY = "dicebudget.introShown.v2";
 const INTRO_DURATION_MS = 1700;
 
+type TourLaunch = {
+  chapter: AppTourChapterId;
+  chain: boolean;
+};
+
 export default function AppHomePage() {
   const [showIntro, setShowIntro] = useState(false);
   const [introProgress, setIntroProgress] = useState(0);
-  const [tourOpen, setTourOpen] = useState(false);
+  const [tourLaunch, setTourLaunch] = useState<TourLaunch | null>(null);
   const hideTimerRef = useRef<number | null>(null);
   const tourTimerRef = useRef<number | null>(null);
 
@@ -21,15 +30,23 @@ export default function AppHomePage() {
     if (typeof window === "undefined") return;
 
     const params = new URLSearchParams(window.location.search);
-    if (params.get("tour") === "1") {
-      setTourOpen(true);
+    const tourParam = parseAppTourChapterParam(params.get("tour"));
+    if (tourParam) {
+      if (tourParam === "all") {
+        setTourLaunch({ chapter: "start", chain: true });
+      } else {
+        setTourLaunch({ chapter: tourParam, chain: false });
+      }
       return;
     }
 
     const alreadyShown = window.sessionStorage.getItem(INTRO_SHOWN_KEY) === "1";
     if (alreadyShown) {
       if (shouldAutoStartAppTour()) {
-        tourTimerRef.current = window.setTimeout(() => setTourOpen(true), 450);
+        tourTimerRef.current = window.setTimeout(
+          () => setTourLaunch({ chapter: "start", chain: true }),
+          450,
+        );
       }
       return;
     }
@@ -49,7 +66,10 @@ export default function AppHomePage() {
         hideTimerRef.current = window.setTimeout(() => {
           setShowIntro(false);
           if (shouldAutoStartAppTour()) {
-            tourTimerRef.current = window.setTimeout(() => setTourOpen(true), 380);
+            tourTimerRef.current = window.setTimeout(
+              () => setTourLaunch({ chapter: "start", chain: true }),
+              380,
+            );
           }
         }, 180);
       }
@@ -74,7 +94,12 @@ export default function AppHomePage() {
         <HomeBentoGrid />
       </main>
       {showIntro && <AppIntroSplash progress={introProgress} />}
-      <AppTourOverlay open={tourOpen} onClose={() => setTourOpen(false)} />
+      <AppTourOverlay
+        open={tourLaunch !== null}
+        chapter={tourLaunch?.chapter ?? "start"}
+        chainChapters={tourLaunch?.chain ?? false}
+        onClose={() => setTourLaunch(null)}
+      />
     </>
   );
 }

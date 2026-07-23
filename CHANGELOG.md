@@ -8,8 +8,9 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Rivalen verknüpfen:** Beim Benennen unbekannter Gegner bestehende Rivalen auswählen (nicht nur neuer Name)
 
 ### Added
+- **App-Tour Kapitel A/B/C:** Start & Navigation, Strategy/Pool (Abweichungen zum klassischen Würfeln) und Statistik/Rivalen; Auto-Start verkettet alle Kapitel; in Einstellungen einzeln oder ganz startbar (`/app?tour=all|start|strategy|rivals`)
 - **Rivalen verwalten:** Eigener Bereich in den Einstellungen (anlegen, umbenennen, löschen, zusammenführen); Link von der Statistik (`/settings?open=rivals`)
-- **App-Tour:** Geführte Kurz-Tour (inkl. Wurf-Pool) beim ersten Start; Häkchen „nicht erneut anzeigen“; in Einstellungen starten/steuern (`/app?tour=1`)
+- **App-Tour:** Geführte Tour beim ersten Start; Häkchen „nicht erneut anzeigen“; in Einstellungen starten/steuern
 - **Rivalen-Profile:** Lokale Namen statt nur Alias; Statistik „Meine Rivalen“; unbekannt klar markiert; Migration bestehender Aliase
 
 ### Changed

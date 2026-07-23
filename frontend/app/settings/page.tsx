@@ -160,17 +160,43 @@ function SettingsPageInner() {
         >
           <SettingsToggleCard
             title="Tour nicht erneut anzeigen"
-            description="Aus = Tour erscheint wieder beim Öffnen der App. An = keine Auto-Tour."
+            description="Aus = Kapitel-Tour erscheint wieder beim Öffnen der App. An = keine Auto-Tour."
             checked={tourPrefs.dontShowAgain}
             onChange={(value) => setTourPrefsState(setAppTourPrefs({ dontShowAgain: value }))}
           />
+          <p className="settings-compact-text settings-compact-text--sm">
+            Drei Kapitel: Start, Strategy (Pool) und Rivalen. Auto-Start führt alle nacheinander.
+          </p>
           <button
             type="button"
             className="setup-host-submit w-full"
-            onClick={() => router.push("/app?tour=1")}
+            onClick={() => router.push("/app?tour=all")}
           >
-            Tour jetzt starten
+            Ganze Tour starten
           </button>
+          <div className="app-tour-settings-row">
+            <button
+              type="button"
+              className="settings-tour-chapter-btn"
+              onClick={() => router.push("/app?tour=start")}
+            >
+              Nur Start
+            </button>
+            <button
+              type="button"
+              className="settings-tour-chapter-btn"
+              onClick={() => router.push("/app?tour=strategy")}
+            >
+              Nur Strategy
+            </button>
+            <button
+              type="button"
+              className="settings-tour-chapter-btn"
+              onClick={() => router.push("/app?tour=rivals")}
+            >
+              Nur Rivalen
+            </button>
+          </div>
         </SettingsSection>
 
         <SettingsSection

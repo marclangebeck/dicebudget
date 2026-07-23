@@ -1,12 +1,24 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useState } from "react";
-import { APP_TOUR_STEPS } from "@/lib/appTourSteps";
+import {
+  getAppTourChapterMeta,
+  getAppTourSteps,
+  nextAppTourChapter,
+  type AppTourChapterId,
+} from "@/lib/appTourSteps";
 import { setAppTourPrefs } from "@/lib/appTourPrefs";
 
 type Props = {
   open: boolean;
   onClose: () => void;
+  /** Startkapitel; Standard: Start */
+  chapter?: AppTourChapterId;
+  /**
+   * true = nach Kapitel-Ende zum nächsten Kapitel (Auto-Tour / „ganze Tour“).
+   * false = nur das gewählte Kapitel.
+   */
+  chainChapters?: boolean;
 };
 
 type SpotlightRect = {
@@ -16,21 +28,30 @@ type SpotlightRect = {
   height: number;
 };
 
-export function AppTourOverlay({ open, onClose }: Props) {
+export function AppTourOverlay({
+  open,
+  onClose,
+  chapter = "start",
+  chainChapters = false,
+}: Props) {
+  const [activeChapter, setActiveChapter] = useState<AppTourChapterId>(chapter);
   const [stepIndex, setStepIndex] = useState(0);
   const [dontShowAgain, setDontShowAgain] = useState(false);
   const [spotlight, setSpotlight] = useState<SpotlightRect | null>(null);
 
-  const steps = APP_TOUR_STEPS;
+  const steps = getAppTourSteps(activeChapter);
   const step = steps[stepIndex] ?? steps[0]!;
-  const isLast = stepIndex >= steps.length - 1;
-  const progressLabel = `${stepIndex + 1} / ${steps.length}`;
+  const isLastStep = stepIndex >= steps.length - 1;
+  const nextChapter = chainChapters ? nextAppTourChapter(activeChapter) : null;
+  const chapterMeta = getAppTourChapterMeta(activeChapter);
+  const progressLabel = `${chapterMeta.label} · ${stepIndex + 1} / ${steps.length}`;
 
   useEffect(() => {
     if (!open) return;
+    setActiveChapter(chapter);
     setStepIndex(0);
     setDontShowAgain(false);
-  }, [open]);
+  }, [open, chapter]);
 
   useLayoutEffect(() => {
     if (!open) {
@@ -66,7 +87,7 @@ export function AppTourOverlay({ open, onClose }: Props) {
       window.removeEventListener("resize", measure);
       window.removeEventListener("scroll", measure, true);
     };
-  }, [open, step.anchor, stepIndex]);
+  }, [open, step.anchor, stepIndex, activeChapter]);
 
   useEffect(() => {
     if (!open) return;
@@ -87,15 +108,42 @@ export function AppTourOverlay({ open, onClose }: Props) {
   }
 
   function goNext() {
-    if (isLast) {
-      finish();
+    if (!isLastStep) {
+      setStepIndex((value) => Math.min(steps.length - 1, value + 1));
       return;
     }
-    setStepIndex((value) => Math.min(steps.length - 1, value + 1));
+    if (nextChapter) {
+      setActiveChapter(nextChapter);
+      setStepIndex(0);
+      return;
+    }
+    finish();
   }
 
   function goBack() {
-    setStepIndex((value) => Math.max(0, value - 1));
+    if (stepIndex > 0) {
+      setStepIndex((value) => Math.max(0, value - 1));
+      return;
+    }
+    if (!chainChapters) return;
+    const order: AppTourChapterId[] = ["start", "strategy", "rivals"];
+    const idx = order.indexOf(activeChapter);
+    if (idx <= 0) return;
+    const prevChapter = order[idx - 1]!;
+    const prevSteps = getAppTourSteps(prevChapter);
+    setActiveChapter(prevChapter);
+    setStepIndex(prevSteps.length - 1);
+  }
+
+  const canGoBack = stepIndex > 0 || (chainChapters && activeChapter !== "start");
+
+  function primaryLabel(): string {
+    if (!isLastStep) return "Weiter";
+    if (nextChapter) {
+      const nextMeta = getAppTourChapterMeta(nextChapter);
+      return `Weiter: ${nextMeta.label}`;
+    }
+    return "Fertig";
   }
 
   return (
@@ -121,7 +169,7 @@ export function AppTourOverlay({ open, onClose }: Props) {
         </h2>
         <p className="app-tour-body">{step.body}</p>
 
-        {isLast && (
+        {isLastStep && (
           <label className="app-tour-check">
             <input
               type="checkbox"
@@ -132,18 +180,24 @@ export function AppTourOverlay({ open, onClose }: Props) {
           </label>
         )}
 
+        {isLastStep && nextChapter && (
+          <p className="app-tour-chapter-hint">
+            Als Nächstes: {getAppTourChapterMeta(nextChapter).title}. Mit „Später“ hier beenden.
+          </p>
+        )}
+
         <div className="app-tour-actions">
           <button type="button" className="app-tour-btn app-tour-btn--ghost" onClick={finish}>
-            Überspringen
+            {isLastStep && nextChapter ? "Später" : "Überspringen"}
           </button>
           <div className="app-tour-actions-main">
-            {stepIndex > 0 && (
+            {canGoBack && (
               <button type="button" className="app-tour-btn app-tour-btn--secondary" onClick={goBack}>
                 Zurück
               </button>
             )}
             <button type="button" className="app-tour-btn app-tour-btn--primary" onClick={goNext}>
-              {isLast ? "Fertig" : "Weiter"}
+              {primaryLabel()}
             </button>
           </div>
         </div>

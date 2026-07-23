@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it } from "node:test";
-import { APP_TOUR_STEPS } from "./appTourSteps.js";
+import {
+  APP_TOUR_STEPS,
+  APP_TOUR_STEPS_BY_CHAPTER,
+  getAppTourSteps,
+  nextAppTourChapter,
+  parseAppTourChapterParam,
+} from "./appTourSteps.js";
 import {
   DEFAULT_APP_TOUR_PREFS,
   getAppTourPrefs,
@@ -54,8 +60,27 @@ describe("appTourPrefs", () => {
 });
 
 describe("appTourSteps", () => {
-  it("enthält Pool-Schritt und mind. 5 Schritte", () => {
-    assert.ok(APP_TOUR_STEPS.length >= 5);
-    assert.ok(APP_TOUR_STEPS.some((step) => step.id === "pool"));
+  it("hat drei Kapitel mit Strategy- und Rivalen-Inhalt", () => {
+    assert.equal(Object.keys(APP_TOUR_STEPS_BY_CHAPTER).length, 3);
+    assert.ok(getAppTourSteps("start").length >= 4);
+    assert.ok(getAppTourSteps("strategy").length >= 6);
+    assert.ok(getAppTourSteps("rivals").length >= 4);
+    assert.ok(APP_TOUR_STEPS.some((step) => step.id === "pool-build"));
+    assert.ok(APP_TOUR_STEPS.some((step) => step.id === "pool-spend"));
+    assert.ok(APP_TOUR_STEPS.some((step) => step.id === "rivals-manage"));
+    assert.ok(APP_TOUR_STEPS.some((step) => step.id === "house-rules"));
+  });
+
+  it("verkettet Kapitel A → B → C", () => {
+    assert.equal(nextAppTourChapter("start"), "strategy");
+    assert.equal(nextAppTourChapter("strategy"), "rivals");
+    assert.equal(nextAppTourChapter("rivals"), null);
+  });
+
+  it("parst URL-Parameter", () => {
+    assert.equal(parseAppTourChapterParam("1"), "all");
+    assert.equal(parseAppTourChapterParam("all"), "all");
+    assert.equal(parseAppTourChapterParam("strategy"), "strategy");
+    assert.equal(parseAppTourChapterParam("nope"), null);
   });
 });
