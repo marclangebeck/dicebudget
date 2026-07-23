@@ -151,7 +151,7 @@ export const APP_TOUR_STEPS_RIVALS: AppTourStep[] = [
     id: "rivals-manage",
     chapter: "rivals",
     title: "Rivalen verwalten",
-    body: "Unter Einstellungen → Rivalen: anlegen, umbenennen, zusammenführen oder löschen. Von der Statistik gibt es einen Direktlink.",
+    body: "Über das Menü → Rivalen verwalten: anlegen, umbenennen, zusammenführen oder löschen. Von der Statistik gibt es einen Direktlink.",
   },
 ];
 

@@ -42,6 +42,17 @@ function TourIcon() {
   );
 }
 
+function RivalsIcon() {
+  return (
+    <svg className="app-footer-menu-icon" viewBox="0 0 24 24" aria-hidden fill="none">
+      <circle cx="9" cy="8" r="3" />
+      <circle cx="16.5" cy="9.5" r="2.5" />
+      <path d="M3.5 18.5c.8-2.8 2.9-4.5 5.5-4.5s4.7 1.7 5.5 4.5" />
+      <path d="M13.2 18.5c.4-1.6 1.4-2.8 2.9-3.3 1.8-.6 3.7.2 4.9 1.8" />
+    </svg>
+  );
+}
+
 function SupportIcon() {
   return (
     <svg className="app-footer-menu-icon" viewBox="0 0 24 24" aria-hidden fill="none">
@@ -111,6 +122,13 @@ const MENU_ENTRIES: MenuEntry[] = [
     hint: "Start, Strategy & Rivalen",
     href: "/app?tour=all",
     icon: <TourIcon />,
+  },
+  {
+    key: "rivals",
+    label: "Rivalen verwalten",
+    hint: "Anlegen, umbenennen, mergen",
+    href: "/settings/rivals",
+    icon: <RivalsIcon />,
   },
   {
     key: "support",

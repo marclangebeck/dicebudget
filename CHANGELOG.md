@@ -11,7 +11,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **App-Tour:** Einstieg aus dem Hamburger-Menü (nicht mehr unter Einstellungen); Kapitel A/B/C weiter über `/app?tour=all`
 - **App-Tour Kapitel A/B/C:** Start & Navigation, Strategy/Pool (Abweichungen zum klassischen Würfeln) und Statistik/Rivalen; Auto-Start verkettet alle Kapitel
 - **App-Tour:** Geführte Tour beim ersten Start; Häkchen „nicht erneut anzeigen“; erneut startbar über das Menü
-- **Rivalen verwalten:** Eigener Bereich in den Einstellungen (anlegen, umbenennen, löschen, zusammenführen); Link von der Statistik (`/settings?open=rivals`)
+- **Rivalen verwalten:** Einstieg aus dem Hamburger-Menü und eigene Seite `/settings/rivals` (anlegen, umbenennen, löschen, zusammenführen); Link von der Statistik; nicht mehr unter Einstellungen
 - **Rivalen-Profile:** Lokale Namen statt nur Alias; Statistik „Meine Rivalen“; unbekannt klar markiert; Migration bestehender Aliase
 
 ### Changed
@@ -29,7 +29,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Fortschritt 25/50/75 %:** Hinweis vorn/zurück (ohne Abstand), Overlay per „Weiter“ wegklickbar
 - **Statistik (A+B):** Kompakter Hero mit Bilanz, Siegquote und KPIs; Sortierung; Paarungs-Badges und Duellbalken
 - **Startscreen Solo/Multi:** 3D-Würfel ohne Puls-Ring und Glow, ~30 % größer und zentrierter; nur noch der Card-Hintergrund
-- **Screenshot:** Button „Bild“ in der Fußleiste; Kamera-Blitz, Vorschau vor dem Teilen, Toast statt Menü-Reopen; Hamburger mit Tour, Support und Rechtlichem
+- **Screenshot:** Button „Bild“ in der Fußleiste; Kamera-Blitz, Vorschau vor dem Teilen, Toast statt Menü-Reopen; Hamburger mit Tour, Rivalen, Support und Rechtlichem
 
 ### Fixed
 - **Statistik:** Badge „Top-Rivalität“ auf Paarungs-Accordions oben mittig statt links im Trigger

@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { LabsUnlockDialog } from "@/components/LabsUnlockDialog";
 import { SettingsGameActions } from "@/components/settings/SettingsGameActions";
@@ -29,14 +29,8 @@ import {
   setAppSettings,
   type AppSettings,
 } from "@/lib/uiPrefs";
-import { RivalManagePanel } from "@/components/RivalManagePanel";
-import {
-  loadRivalProfiles,
-  subscribeRivalProfiles,
-} from "@/lib/rivalProfiles";
 
 type SettingsSectionId =
-  | "rivals"
   | "mode"
   | "visuals"
   | "solo"
@@ -45,6 +39,7 @@ type SettingsSectionId =
   | "house-rules";
 
 function SettingsPageInner() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const fromParam = searchParams.get("from");
   const returnTarget = parseSettingsReturn(fromParam);
@@ -52,12 +47,10 @@ function SettingsPageInner() {
   const [feedbackPrefs, setFeedbackPrefsState] = useState<GameFeedbackPrefs>(
     DEFAULT_GAME_FEEDBACK_PREFS,
   );
-  const [rivalCount, setRivalCount] = useState(0);
   const [labsUnlocked, setLabsUnlocked] = useState(false);
   const [showLabsUnlock, setShowLabsUnlock] = useState(false);
   const [featureRevision, setFeatureRevision] = useState(0);
   const [openSections, setOpenSections] = useState<Record<SettingsSectionId, boolean>>({
-    rivals: false,
     mode: false,
     visuals: false,
     solo: false,
@@ -69,19 +62,13 @@ function SettingsPageInner() {
   useEffect(() => {
     setSettingsState(getAppSettings());
     setFeedbackPrefsState(getGameFeedbackPrefs());
-    setRivalCount(loadRivalProfiles().length);
   }, []);
 
   useEffect(() => {
-    return subscribeRivalProfiles(() => setRivalCount(loadRivalProfiles().length));
-  }, []);
-
-  useEffect(() => {
-    const open = searchParams.get("open");
-    if (open === "rivals") {
-      setOpenSections((current) => ({ ...current, rivals: true }));
+    if (searchParams.get("open") === "rivals") {
+      router.replace("/settings/rivals");
     }
-  }, [searchParams]);
+  }, [router, searchParams]);
 
   useEffect(() => {
     setLabsUnlocked(isLabsUnlocked());
@@ -133,20 +120,6 @@ function SettingsPageInner() {
       />
 
       <div className="settings-list">
-        <SettingsSection
-          id="rivals"
-          title="Rivalen verwalten"
-          summary={
-            rivalCount === 0
-              ? "Noch keine"
-              : `${rivalCount} ${rivalCount === 1 ? "Rival" : "Rivalen"}`
-          }
-          open={openSections.rivals}
-          onToggle={() => toggleSection("rivals")}
-        >
-          <RivalManagePanel />
-        </SettingsSection>
-
         <SettingsSection
           id="mode"
           title="Spielmodus"
