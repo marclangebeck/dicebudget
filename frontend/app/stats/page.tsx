@@ -11,7 +11,7 @@ import { PairingAccordionItem } from "@/components/PairingAccordionItem";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { StatsHeroPanel } from "@/components/StatsHeroPanel";
 import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
-import { loadDisplayNames, upsertRivalName } from "@/lib/rivalProfiles";
+import { loadDisplayNames } from "@/lib/rivalProfiles";
 import { PlayerAliasOverlay } from "@/components/PlayerAliasOverlay";
 import { PairingEditOverlay } from "@/components/PairingEditOverlay";
 import { buildStatsOverview } from "@/lib/statsOverview";
@@ -298,8 +298,8 @@ function StatsPageInner() {
           aliases={aliases}
           currentAlias={aliases[normalizePublicPlayerId(editingPlayerId)]}
           onClose={() => setEditingPlayerId(null)}
-          onSave={(alias) => {
-            setAliases(upsertRivalName(editingPlayerId, alias));
+          onSave={(displayNames) => {
+            setAliases(displayNames);
             setEditingPlayerId(null);
             setDetailReloadToken((value) => value + 1);
           }}

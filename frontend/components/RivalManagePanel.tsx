@@ -92,8 +92,8 @@ export function RivalManagePanel() {
   return (
     <div className="rival-manage">
       <p className="rival-manage-hint">
-        Namen gelten nur auf diesem Gerät. Nach Multi-Spielen kannst du Gegner hier benennen
-        oder zusammenführen (z. B. nach Gerätewechsel).
+        Namen gelten nur auf diesem Gerät. Manuell angelegte Rivalen verknüpfst du in der
+        Statistik: Unbekannten Gegner antippen → Rivalen aus der Liste wählen.
       </p>
 
       <form onSubmit={handleCreate} className="rival-manage-create">

@@ -9525,3 +9525,56 @@ html.zoomable-route.legal-route .legal-page-scroll {
 .stats-rivals-manage-link:hover {
   border-color: rgba(214, 168, 90, 0.45);
 }
+
+.rival-link-card {
+  max-height: min(85vh, 36rem);
+  overflow-y: auto;
+}
+
+.rival-link-list-label {
+  margin: 0 0 0.4rem;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #047857;
+}
+
+.rival-link-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 11rem;
+  overflow-y: auto;
+}
+
+.rival-link-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  width: 100%;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(4, 120, 87, 0.2);
+  background: rgba(236, 253, 245, 0.65);
+  padding: 0.45rem 0.65rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rival-link-chip.is-selected {
+  border-color: rgba(4, 120, 87, 0.55);
+  background: rgba(167, 243, 208, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(4, 120, 87, 0.25);
+}
+
+.rival-link-chip-name {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: #064e3b;
+}
+
+.rival-link-chip-meta {
+  font-size: 0.65rem;
+  color: #047857;
+}

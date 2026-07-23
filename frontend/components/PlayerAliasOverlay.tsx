@@ -1,7 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { playerLabel, shortPlayerId } from "@/lib/playerIdentity";
+import {
+  linkPlayerToRival,
+  loadRivalProfiles,
+  rivalLinkedIdsLabel,
+  upsertRivalName,
+  type RivalProfile,
+} from "@/lib/rivalProfiles";
 
 type Props = {
   playerId: string;
@@ -9,7 +16,8 @@ type Props = {
   currentAlias?: string;
   aliases?: Record<string, string>;
   onClose: () => void;
-  onSave: (alias: string) => void;
+  /** Nach Speichern: aktualisierte Display-Namen (Alias-Map-kompatibel). */
+  onSave: (displayNames: Record<string, string>) => void;
 };
 
 export function PlayerAliasOverlay({
@@ -21,10 +29,36 @@ export function PlayerAliasOverlay({
   onSave,
 }: Props) {
   const [aliasInput, setAliasInput] = useState(currentAlias ?? "");
+  const [selectedRivalId, setSelectedRivalId] = useState<string | null>(null);
+  const [rivals, setRivals] = useState<RivalProfile[]>([]);
 
   useEffect(() => {
     setAliasInput(currentAlias ?? "");
+    setSelectedRivalId(null);
+    setRivals(loadRivalProfiles());
   }, [currentAlias, playerId]);
+
+  const sortedRivals = useMemo(() => {
+    return [...rivals].sort((a, b) => {
+      const aUnlinked = a.playerIds.length === 0 ? 0 : 1;
+      const bUnlinked = b.playerIds.length === 0 ? 0 : 1;
+      if (aUnlinked !== bUnlinked) return aUnlinked - bUnlinked;
+      return a.name.localeCompare(b.name, "de");
+    });
+  }, [rivals]);
+
+  function pickRival(profile: RivalProfile) {
+    setSelectedRivalId(profile.id);
+    setAliasInput(profile.name);
+  }
+
+  function handleSave() {
+    if (selectedRivalId) {
+      onSave(linkPlayerToRival(playerId, selectedRivalId));
+      return;
+    }
+    onSave(upsertRivalName(playerId, aliasInput));
+  }
 
   return (
     <div
@@ -33,7 +67,7 @@ export function PlayerAliasOverlay({
       aria-modal="true"
       aria-labelledby="player-alias-title"
     >
-      <div className="play-complete-card w-full max-w-sm text-left">
+      <div className="play-complete-card rival-link-card w-full max-w-sm text-left">
         <p id="player-alias-title" className="play-complete-kicker">
           Rivalen lokal benennen
         </p>
@@ -41,15 +75,37 @@ export function PlayerAliasOverlay({
           Aktuell: <strong className="text-strong">{playerLabel(playerId, ownPlayerId, aliases)}</strong>
         </p>
         <p className="text-muted mt-1 text-xs">
-          Der Name gilt nur auf diesem Gerät (Rivalen-Profil). Serverseitig bleibt die
-          Pseudo-ID {shortPlayerId(playerId)}.
+          Pseudo-ID {shortPlayerId(playerId)} — wähle einen bestehenden Rivalen oder gib einen
+          neuen Namen ein.
         </p>
 
+        {sortedRivals.length > 0 && (
+          <div className="rival-link-list mt-3">
+            <p className="rival-link-list-label">Bestehenden Rivalen verknüpfen</p>
+            <div className="rival-link-chips">
+              {sortedRivals.map((profile) => (
+                <button
+                  key={profile.id}
+                  type="button"
+                  className={`rival-link-chip${selectedRivalId === profile.id ? " is-selected" : ""}`}
+                  onClick={() => pickRival(profile)}
+                >
+                  <span className="rival-link-chip-name">{profile.name}</span>
+                  <span className="rival-link-chip-meta">{rivalLinkedIdsLabel(profile)}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <label className="mt-4 flex flex-col gap-1 text-sm">
-          <span className="text-secondary">Name</span>
+          <span className="text-secondary">Oder neuer Name</span>
           <input
             value={aliasInput}
-            onChange={(e) => setAliasInput(e.target.value)}
+            onChange={(e) => {
+              setAliasInput(e.target.value);
+              setSelectedRivalId(null);
+            }}
             maxLength={40}
             className="glass-input px-3 py-2"
             placeholder="z. B. Nicole"
@@ -63,10 +119,11 @@ export function PlayerAliasOverlay({
           </button>
           <button
             type="button"
-            onClick={() => onSave(aliasInput)}
+            onClick={handleSave}
             className="btn-primary w-full py-2 text-sm"
+            disabled={!selectedRivalId && !aliasInput.trim()}
           >
-            Speichern
+            {selectedRivalId ? "Verknüpfen" : "Speichern"}
           </button>
         </div>
       </div>

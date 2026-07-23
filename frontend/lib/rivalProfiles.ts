@@ -184,6 +184,30 @@ export function upsertRivalName(playerId: string, name: string): Record<string, 
   return loadDisplayNames();
 }
 
+/** Unbekannte playerId mit bestehendem Rivalen-Profil verknüpfen. */
+export function linkPlayerToRival(playerId: string, rivalId: string): Record<string, string> {
+  const normalizedId = normalizePublicPlayerId(playerId);
+  const profiles = loadRivalProfiles();
+  const target = profiles.find((profile) => profile.id === rivalId);
+  if (!target || !normalizedId) return loadDisplayNames();
+
+  const next = profiles.map((profile) => {
+    const withoutId = {
+      ...profile,
+      playerIds: profile.playerIds.filter((id) => id !== normalizedId),
+    };
+    if (profile.id === rivalId) {
+      return {
+        ...withoutId,
+        playerIds: [...new Set([...withoutId.playerIds, normalizedId])],
+      };
+    }
+    return withoutId;
+  });
+  writeProfiles(next);
+  return loadDisplayNames();
+}
+
 /** Manuell Rival anlegen (ohne verknüpfte ID — Verknüpfung später beim Benennen). */
 export function createRival(name: string): RivalProfile | null {
   const trimmed = name.trim();

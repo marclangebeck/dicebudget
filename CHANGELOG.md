@@ -4,6 +4,9 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
+### Fixed
+- **Rivalen verknüpfen:** Beim Benennen unbekannter Gegner bestehende Rivalen auswählen (nicht nur neuer Name)
+
 ### Added
 - **Rivalen verwalten:** Eigener Bereich in den Einstellungen (anlegen, umbenennen, löschen, zusammenführen); Link von der Statistik (`/settings?open=rivals`)
 - **App-Tour:** Geführte Kurz-Tour (inkl. Wurf-Pool) beim ersten Start; Häkchen „nicht erneut anzeigen“; in Einstellungen starten/steuern (`/app?tour=1`)

@@ -8,7 +8,7 @@ import { getSessionLobby, getSessionRanking, joinSession, createGameSession } fr
 import { saveActiveGame } from "@/lib/activeGame";
 import { ResumeLobbySheet } from "@/components/ResumeLobbySheet";
 import type { SessionLobbyDto, SessionRankingDto } from "@/lib/sessionTypes";
-import { loadDisplayNames, upsertRivalName } from "@/lib/rivalProfiles";
+import { loadDisplayNames } from "@/lib/rivalProfiles";
 import type { PlayerAliasMap } from "@/lib/playerAliases";
 import { PlayerAliasOverlay } from "@/components/PlayerAliasOverlay";
 import { normalizePublicPlayerId, getOrCreatePlayerId, playerLabel } from "@/lib/playerIdentity";
@@ -329,8 +329,8 @@ function MultiJoinInner() {
           aliases={aliases}
           currentAlias={aliases[normalizePublicPlayerId(editingPlayerId)]}
           onClose={() => setEditingPlayerId(null)}
-          onSave={(alias) => {
-            setAliases(upsertRivalName(editingPlayerId, alias));
+          onSave={(displayNames) => {
+            setAliases(displayNames);
             setEditingPlayerId(null);
           }}
         />

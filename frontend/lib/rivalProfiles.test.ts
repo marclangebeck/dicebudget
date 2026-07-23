@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, it } from "node:test";
 import {
   createRival,
   getRivalDisplayMap,
+  linkPlayerToRival,
   loadDisplayNames,
   loadRivalProfiles,
   mergeRivals,
@@ -75,5 +76,14 @@ describe("rivalProfiles", () => {
     const after = loadRivalProfiles();
     assert.equal(after.length, 1);
     assert.equal(after[0]?.name, "Nicole");
+  });
+
+  it("verknüpft playerId mit manuell angelegtem Rivalen", () => {
+    const created = createRival("Nicole");
+    assert.ok(created);
+    linkPlayerToRival("abc-999", created!.id);
+    assert.equal(getRivalDisplayMap()["abc-999"], "Nicole");
+    const profile = loadRivalProfiles().find((row) => row.name === "Nicole");
+    assert.ok(profile?.playerIds.includes("abc-999"));
   });
 });
