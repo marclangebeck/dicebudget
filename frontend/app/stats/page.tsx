@@ -11,7 +11,12 @@ import { PairingAccordionItem } from "@/components/PairingAccordionItem";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { StatsHeroPanel } from "@/components/StatsHeroPanel";
 import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
-import { loadDisplayNames } from "@/lib/rivalProfiles";
+import {
+  loadDisplayNames,
+  loadRivalProfiles,
+  subscribeRivalProfiles,
+  type RivalProfile,
+} from "@/lib/rivalProfiles";
 import { PlayerAliasOverlay } from "@/components/PlayerAliasOverlay";
 import { PairingEditOverlay } from "@/components/PairingEditOverlay";
 import { buildStatsOverview } from "@/lib/statsOverview";
@@ -28,6 +33,11 @@ import {
   canFilterPairingsByOwnPlayer,
   pairingExcludesOwnPlayer,
 } from "@/lib/hiddenPairings";
+import {
+  loadSelfRivalProfileId,
+  resolveOwnPlayerIds,
+  subscribeSelfIdentity,
+} from "@/lib/selfIdentity";
 
 const SORT_OPTIONS: { id: PairingSortMode; label: string }[] = [
   { id: "recent", label: "Zuletzt" },
@@ -43,6 +53,8 @@ function StatsPageInner() {
   const [stats, setStats] = useState<StatsDto | null>(null);
   const [ownPlayerId, setOwnPlayerId] = useState("");
   const [aliases, setAliases] = useState<PlayerAliasMap>({});
+  const [rivalProfiles, setRivalProfiles] = useState<RivalProfile[]>([]);
+  const [selfProfileId, setSelfProfileId] = useState<string | null>(null);
   const [editingPlayerId, setEditingPlayerId] = useState<string | null>(null);
   const [editingPairing, setEditingPairing] = useState<{
     group: MergedPairingSummary;
@@ -78,6 +90,19 @@ function StatsPageInner() {
   useEffect(() => {
     setOwnPlayerId(getOrCreatePlayerId());
     setAliases(loadDisplayNames());
+    setRivalProfiles(loadRivalProfiles());
+    setSelfProfileId(loadSelfRivalProfileId());
+    const unsubRivals = subscribeRivalProfiles(() => {
+      setRivalProfiles(loadRivalProfiles());
+      setAliases(loadDisplayNames());
+    });
+    const unsubSelf = subscribeSelfIdentity(() => {
+      setSelfProfileId(loadSelfRivalProfileId());
+    });
+    return () => {
+      unsubRivals();
+      unsubSelf();
+    };
   }, []);
 
   useEffect(() => {
@@ -94,23 +119,30 @@ function StatsPageInner() {
     [pairings, aliases, ownPlayerId],
   );
 
+  const ownPlayerIds = useMemo(
+    () =>
+      resolveOwnPlayerIds(ownPlayerId, aliases, rivalProfiles, selfProfileId),
+    [ownPlayerId, aliases, rivalProfiles, selfProfileId],
+  );
+
+  const canFilterOwn = useMemo(() => {
+    // Explizit „Das bin ich“ → immer filtern (auch ohne aktuelle Geräte-ID in den Daten).
+    if (selfProfileId) return true;
+    return canFilterPairingsByOwnPlayer(
+      mergedPairings,
+      ownPlayerId,
+      normalizePublicPlayerId,
+      aliases,
+      ownPlayerIds,
+    );
+  }, [mergedPairings, ownPlayerId, aliases, ownPlayerIds, selfProfileId]);
+
   /**
-   * Fremde Paarungen nur ausblenden, wenn wir dich in mindestens einer Paarung
-   * erkennen (ID oder gleicher Alias). Sonst alle anzeigen — sonst wirkt die
-   * Statistik leer, wenn die Geräte-ID nicht in den historischen Paarungen steckt.
+   * Fremde Paarungen ausblenden, sobald wir dich erkennen (Geräte-ID, Alias
+   * oder Rivalen-Profil „Das bin ich“). Sonst alle anzeigen + Hinweis.
    */
   const ownPairings = useMemo(() => {
-    if (!ownPlayerId) return mergedPairings;
-    if (
-      !canFilterPairingsByOwnPlayer(
-        mergedPairings,
-        ownPlayerId,
-        normalizePublicPlayerId,
-        aliases,
-      )
-    ) {
-      return mergedPairings;
-    }
+    if (!ownPlayerId || !canFilterOwn) return mergedPairings;
     return mergedPairings.filter(
       (pairing) =>
         !pairingExcludesOwnPlayer(
@@ -118,9 +150,10 @@ function StatsPageInner() {
           ownPlayerId,
           normalizePublicPlayerId,
           aliases,
+          ownPlayerIds,
         ),
     );
-  }, [mergedPairings, ownPlayerId, aliases]);
+  }, [mergedPairings, ownPlayerId, aliases, ownPlayerIds, canFilterOwn]);
 
   const foreignPairingCount = mergedPairings.length - ownPairings.length;
 
@@ -223,8 +256,15 @@ function StatsPageInner() {
       {foreignPairingCount > 0 && (
         <p className="stats-foreign-filter-note">
           {foreignPairingCount === 1
-            ? "1 Paarung ohne deine ID ist nur hier ausgeblendet."
-            : `${foreignPairingCount} Paarungen ohne deine ID sind nur hier ausgeblendet.`}
+            ? "1 Paarung ohne dich ist nur hier ausgeblendet."
+            : `${foreignPairingCount} Paarungen ohne dich sind nur hier ausgeblendet.`}
+        </p>
+      )}
+
+      {!loading && !error && !canFilterOwn && mergedPairings.length > 0 && (
+        <p className="stats-foreign-filter-note">
+          Fremde Paarungen (z. B. Malte vs. Nicole) bleiben sichtbar, bis du unter{" "}
+          <Link href="/settings/rivals">Rivalen</Link> bei dir „Das bin ich“ tippst.
         </p>
       )}
 

@@ -47,16 +47,29 @@ export function subscribeHiddenPairings(listener: () => void): () => void {
   return () => window.removeEventListener(HIDDEN_PAIRINGS_CHANGED_EVENT, listener);
 }
 
+/** Paarung enthält mindestens eine der eigenen Player-IDs. */
+export function pairingIncludesOwnIds(
+  pairing: { playerA: string; playerB: string },
+  ownIds: ReadonlySet<string>,
+  normalize: (id: string) => string,
+): boolean {
+  if (ownIds.size === 0) return false;
+  return (
+    ownIds.has(normalize(pairing.playerA)) || ownIds.has(normalize(pairing.playerB))
+  );
+}
+
 /**
- * Ob die Paarung dich enthält: exakte Player-ID oder dieselbe lokale Alias-Identität
- * (Zweit-IDs mit gleichem Namen wie du).
+ * Ob die Paarung dich enthält: Geräte-ID, Alias-Zweit-IDs oder „Das bin ich“-Profil.
  */
 export function pairingIncludesOwnPlayer(
   pairing: { playerA: string; playerB: string },
   ownPlayerId: string,
   normalize: (id: string) => string,
   aliases: Record<string, string> = {},
+  ownIds?: ReadonlySet<string>,
 ): boolean {
+  if (ownIds) return pairingIncludesOwnIds(pairing, ownIds, normalize);
   if (!ownPlayerId) return true;
   const own = normalize(ownPlayerId);
   const ownAlias = aliases[own]?.trim().toLowerCase() ?? "";
@@ -70,26 +83,31 @@ export function pairingIncludesOwnPlayer(
   return false;
 }
 
-/** True, wenn auf diesem Gerät überhaupt erkennbar ist, wer „du“ bist. */
+/** True, wenn mindestens eine Paarung zu den eigenen IDs passt. */
 export function canFilterPairingsByOwnPlayer(
   pairings: { playerA: string; playerB: string }[],
   ownPlayerId: string,
   normalize: (id: string) => string,
   aliases: Record<string, string> = {},
+  ownIds?: ReadonlySet<string>,
 ): boolean {
+  if (ownIds) {
+    return pairings.some((pairing) => pairingIncludesOwnIds(pairing, ownIds, normalize));
+  }
   if (!ownPlayerId) return false;
   return pairings.some((pairing) =>
     pairingIncludesOwnPlayer(pairing, ownPlayerId, normalize, aliases),
   );
 }
 
-/** Paarung enthält dich nicht (inkl. Alias-Zweit-IDs). */
 export function pairingExcludesOwnPlayer(
   pairing: { playerA: string; playerB: string },
   ownPlayerId: string,
   normalize: (id: string) => string,
   aliases: Record<string, string> = {},
+  ownIds?: ReadonlySet<string>,
 ): boolean {
+  if (ownIds) return !pairingIncludesOwnIds(pairing, ownIds, normalize);
   if (!ownPlayerId) return false;
   return !pairingIncludesOwnPlayer(pairing, ownPlayerId, normalize, aliases);
 }

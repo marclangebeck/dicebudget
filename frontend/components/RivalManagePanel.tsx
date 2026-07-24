@@ -11,9 +11,15 @@ import {
   subscribeRivalProfiles,
   type RivalProfile,
 } from "@/lib/rivalProfiles";
+import {
+  loadSelfRivalProfileId,
+  setSelfRivalProfileId,
+  subscribeSelfIdentity,
+} from "@/lib/selfIdentity";
 
 export function RivalManagePanel() {
   const [profiles, setProfiles] = useState<RivalProfile[]>([]);
+  const [selfProfileId, setSelfProfileIdState] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
@@ -22,11 +28,17 @@ export function RivalManagePanel() {
 
   function refresh() {
     setProfiles(loadRivalProfiles());
+    setSelfProfileIdState(loadSelfRivalProfileId());
   }
 
   useEffect(() => {
     refresh();
-    return subscribeRivalProfiles(refresh);
+    const unsubRivals = subscribeRivalProfiles(refresh);
+    const unsubSelf = subscribeSelfIdentity(refresh);
+    return () => {
+      unsubRivals();
+      unsubSelf();
+    };
   }, []);
 
   function handleCreate(e: React.FormEvent) {
@@ -68,6 +80,7 @@ export function RivalManagePanel() {
     deleteRival(profile.id);
     if (mergeSourceId === profile.id) setMergeSourceId("");
     if (editingId === profile.id) setEditingId(null);
+    if (selfProfileId === profile.id) setSelfRivalProfileId(null);
     refresh();
   }
 
@@ -84,17 +97,28 @@ export function RivalManagePanel() {
     );
     if (!ok) return;
     mergeRivals(targetId, mergeSourceId);
+    if (selfProfileId === mergeSourceId) setSelfRivalProfileId(targetId);
     setMergeSourceId("");
     setError(null);
+    refresh();
+  }
+
+  function handleSetSelf(profile: RivalProfile) {
+    if (selfProfileId === profile.id) {
+      setSelfRivalProfileId(null);
+    } else {
+      setSelfRivalProfileId(profile.id);
+    }
     refresh();
   }
 
   return (
     <div className="rival-manage">
       <p className="rival-manage-hint">
-        Namen gelten nur auf diesem Gerät. Doppelte Einträge derselben Person: bei einem
-        „Zusammenführen“ tippen, beim anderen „Hier zusammenführen“. Manuell angelegte Rivalen
-        verknüpfst du in der Statistik: Unbekannten Gegner antippen → Rivalen wählen.
+        Namen gelten nur auf diesem Gerät. Tippe bei dir selbst „Das bin ich“, damit fremde
+        Paarungen in der Statistik ausgeblendet werden. Doppelte Einträge: bei einem
+        „Zusammenführen“, beim anderen „Hier zusammenführen“. Unbekannte Gegner verknüpfst du
+        in der Statistik.
       </p>
 
       <form onSubmit={handleCreate} className="rival-manage-create">
@@ -117,8 +141,9 @@ export function RivalManagePanel() {
       {error && <p className="rival-manage-error">{error}</p>}
 
       {profiles.length === 0 ? (
-        <p className="rival-manage-empty">Noch keine Rivalen. Lege einen Namen an oder benenne
-          Gegner in der Statistik.</p>
+        <p className="rival-manage-empty">
+          Noch keine Rivalen. Lege einen Namen an oder benenne Gegner in der Statistik.
+        </p>
       ) : (
         <ul className="rival-manage-list">
           {profiles.map((profile) => (
@@ -150,10 +175,21 @@ export function RivalManagePanel() {
               ) : (
                 <>
                   <div className="rival-manage-item-main">
-                    <p className="rival-manage-name">{profile.name}</p>
+                    <p className="rival-manage-name">
+                      {profile.name}
+                      {selfProfileId === profile.id ? " · Das bist du" : ""}
+                    </p>
                     <p className="rival-manage-meta">{rivalLinkedIdsLabel(profile)}</p>
                   </div>
                   <div className="rival-manage-item-actions">
+                    <button
+                      type="button"
+                      className={`rival-manage-btn${selfProfileId === profile.id ? " is-active" : ""}`}
+                      aria-pressed={selfProfileId === profile.id}
+                      onClick={() => handleSetSelf(profile)}
+                    >
+                      {selfProfileId === profile.id ? "Das bin ich ✓" : "Das bin ich"}
+                    </button>
                     <button
                       type="button"
                       className="rival-manage-btn"
