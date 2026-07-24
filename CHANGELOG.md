@@ -11,6 +11,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Hausregel auto (2 Spieler, Strategy):** Wer zuerst den gesamten oberen Bereich (alle Spiele × 6 Felder) voll hat, erhält die offenen oberen Felder des Rivalen als Pool + Overlay
 
 ### Fixed
+- **Statistik-Filter:** Paarungen bleiben sichtbar, wenn die Geräte-ID fehlt oder nur per Alias zusammengeführt ist (kein leerer Stats-Screen mehr)
 - **Hamburger Rivalen/Tour:** Interne Menü-Ziele per `router.push` nach Menü-Schließen (nicht mehr Link+onClose) — verhindert Sprung auf den Startscreen in Capacitor
 - **App-Tour aus Menü:** Startet die Overlay-Tour zuverlässig (Event + Pending), statt nur auf den Startscreen zu wechseln
 - **Rivalen verknüpfen:** Beim Benennen unbekannter Gegner bestehende Rivalen auswählen (nicht nur neuer Name)
