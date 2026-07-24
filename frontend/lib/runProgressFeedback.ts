@@ -15,11 +15,18 @@ export type ProgressPositionHint = "ahead" | "behind" | "even";
 export type RunProgressOverlayState = {
   percent: ProgressMilestonePercent;
   positionHint?: ProgressPositionHint | null;
+  /** Eigener Score minus bester Gegner (positiv = Führung). */
+  scoreDelta?: number | null;
 };
 
 export type ProgressPositionContext =
   | { kind: "lobby"; lobby: SessionLobbyDto; ownPlayerId: string }
   | { kind: "table"; ownSide: TableModeSide; runs: Record<TableModeSide, RunDto | null> };
+
+export type ProgressPositionResolved = {
+  hint: ProgressPositionHint;
+  scoreDelta: number;
+};
 
 function countScoredFields(run: RunDto): number {
   return run.games.flatMap((g) => g.fields).filter((f) => f.score !== null).length;
@@ -35,19 +42,20 @@ function progressPercent(run: RunDto): number {
   return (countScoredFields(run) / total) * 100;
 }
 
-export function resolveProgressPositionHint(
+export function resolveProgressPosition(
   run: RunDto,
   context: ProgressPositionContext | null,
-): ProgressPositionHint | null {
+): ProgressPositionResolved | null {
   if (!context) return null;
 
   if (context.kind === "table") {
     const otherSide: TableModeSide = context.ownSide === "left" ? "right" : "left";
     const otherRun = context.runs[otherSide];
     if (!otherRun) return null;
-    if (run.totalScore > otherRun.totalScore) return "ahead";
-    if (run.totalScore < otherRun.totalScore) return "behind";
-    return "even";
+    const scoreDelta = run.totalScore - otherRun.totalScore;
+    if (scoreDelta > 0) return { hint: "ahead", scoreDelta };
+    if (scoreDelta < 0) return { hint: "behind", scoreDelta };
+    return { hint: "even", scoreDelta: 0 };
   }
 
   const ownNorm = normalizePublicPlayerId(context.ownPlayerId);
@@ -60,9 +68,18 @@ export function resolveProgressPositionHint(
     ?.totalScore;
   if (bestOther == null) return null;
 
-  if (myScore > bestOther) return "ahead";
-  if (myScore < bestOther) return "behind";
-  return "even";
+  const scoreDelta = myScore - bestOther;
+  if (scoreDelta > 0) return { hint: "ahead", scoreDelta };
+  if (scoreDelta < 0) return { hint: "behind", scoreDelta };
+  return { hint: "even", scoreDelta: 0 };
+}
+
+/** @deprecated Prefer resolveProgressPosition */
+export function resolveProgressPositionHint(
+  run: RunDto,
+  context: ProgressPositionContext | null,
+): ProgressPositionHint | null {
+  return resolveProgressPosition(run, context)?.hint ?? null;
 }
 
 export function progressPositionLabel(hint: ProgressPositionHint | null | undefined): string | null {
@@ -70,6 +87,18 @@ export function progressPositionLabel(hint: ProgressPositionHint | null | undefi
   if (hint === "behind") return "Du liegst zurück";
   if (hint === "even") return "Gleichauf";
   return null;
+}
+
+export function progressScoreDeltaLabel(
+  hint: ProgressPositionHint | null | undefined,
+  scoreDelta: number | null | undefined,
+): string | null {
+  if (hint == null || scoreDelta == null || hint === "even") return null;
+  const abs = Math.abs(scoreDelta);
+  if (hint === "ahead") {
+    return abs === 1 ? "1 Punkt voraus" : `${abs} Punkte voraus`;
+  }
+  return abs === 1 ? "1 Punkt zurück" : `${abs} Punkte zurück`;
 }
 
 export function buildProgressMilestoneAfterField(
@@ -86,9 +115,11 @@ export function buildProgressMilestoneAfterField(
   for (const milestone of PROGRESS_MILESTONES) {
     if (alreadyShown.has(milestone)) continue;
     if (beforePct < milestone && afterPct >= milestone) {
+      const position = resolveProgressPosition(runAfter, context ?? null);
       return {
         percent: milestone,
-        positionHint: resolveProgressPositionHint(runAfter, context ?? null),
+        positionHint: position?.hint ?? null,
+        scoreDelta: position?.scoreDelta ?? null,
       };
     }
   }

@@ -307,6 +307,17 @@ export async function completeField(
   const isCorrection = field.score !== null;
   const isRollSaleEntry = run.rollSaleFreeFillActive && !isCorrection;
 
+  const runBeforeAuto = await prisma.run.findUnique({
+    where: { id: runId },
+    include: {
+      games: {
+        orderBy: { index: "asc" },
+        include: { fields: true },
+      },
+    },
+  });
+  if (!runBeforeAuto) throw new RunNotFoundError();
+
   if (isRollSaleEntry) {
     if (!run.useStrategyRules) {
       throw new InvalidInputError("Verkaufs-Freifeld nur im Strategy-Modus");
@@ -339,7 +350,9 @@ export async function completeField(
       await recalculateRunTotals(runId, tx);
     });
 
-    return getRunById(runId);
+    const { applyAutoHouseRulesAfterComplete } = await import("./houseRulesService.js");
+    const { events } = await applyAutoHouseRulesAfterComplete(runId, runBeforeAuto);
+    return { run: await getRunById(runId), events };
   }
 
   assertManualEntry(score, rollsUsed, run.useStrategyRules);
@@ -404,7 +417,13 @@ export async function completeField(
     await recalculateRunTotals(runId, tx);
   });
 
-  return getRunById(runId);
+  let events: import("./houseRulesService.js").HouseRuleAutoEvent[] = [];
+  if (!isCorrection) {
+    const { applyAutoHouseRulesAfterComplete } = await import("./houseRulesService.js");
+    events = (await applyAutoHouseRulesAfterComplete(runId, runBeforeAuto)).events;
+  }
+
+  return { run: await getRunById(runId), events };
 }
 
 /** Letzten Eintrag vollständig löschen (nur das zuletzt bewertete Feld). */

@@ -88,3 +88,41 @@ export function qualifiesYatzyStreakPenalty(fields: ScoredHistoryField[]): boole
 export function halvePoolRoundedDown(pool: number): number {
   return Math.floor(pool / 2);
 }
+
+const UPPER_FIELD_TYPE_SET = new Set(["ONES", "TWOS", "THREES", "FOURS", "FIVES", "SIXES"]);
+
+type UpperFieldRow = {
+  fieldType: string;
+  score: number | null;
+};
+
+type UpperGameRow = {
+  fields: UpperFieldRow[];
+};
+
+/** Offene Felder im oberen Bereich über alle Spiele (z. B. 6 Spiele × 6 = 36). */
+export function countOpenUpperFields(games: UpperGameRow[]): number {
+  let open = 0;
+  for (const game of games) {
+    for (const field of game.fields) {
+      if (UPPER_FIELD_TYPE_SET.has(field.fieldType) && field.score === null) {
+        open += 1;
+      }
+    }
+  }
+  return open;
+}
+
+export function isRunUpperComplete(games: UpperGameRow[]): boolean {
+  return countOpenUpperFields(games) === 0;
+}
+
+/** Höchste scoredSequence der letzten beiden Alle-Fünfe-Einträge, sonst null. */
+export function yatzyStreakPenaltyMarker(fields: ScoredHistoryField[]): number | null {
+  if (!qualifiesYatzyStreakPenalty(fields)) return null;
+  const scored = fields
+    .filter((f) => f.score !== null && f.scoredSequence !== null)
+    .sort((a, b) => (a.scoredSequence ?? 0) - (b.scoredSequence ?? 0));
+  const lastTwo = scored.slice(-2);
+  return Math.max(lastTwo[0]!.scoredSequence ?? 0, lastTwo[1]!.scoredSequence ?? 0);
+}

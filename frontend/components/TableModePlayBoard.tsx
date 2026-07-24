@@ -43,7 +43,9 @@ import type { SessionLobbyDto } from "@/lib/sessionTypes";
 import type { FieldDto, RunDto } from "@/lib/types";
 import { AchievementOverlay } from "@/components/AchievementOverlay";
 import { RunProgressOverlay } from "@/components/RunProgressOverlay";
+import { RuleEventOverlay } from "@/components/RuleEventOverlay";
 import { MatchAnalysisView } from "@/components/MatchAnalysisView";
+import { ruleEventFromDto } from "@/lib/ruleEventFeedback";
 
 type Props = {
   inviteCode: string;
@@ -74,8 +76,10 @@ export function TableModePlayBoard({ inviteCode }: Props) {
   const [endgameScoreInput, setEndgameScoreInput] = useState("");
   const {
     achievementOverlay,
+    ruleEventOverlay,
     progressOverlay,
     closeAchievementOverlay,
+    closeRuleEventOverlay,
     closeProgressOverlay,
     presentFeedbackAfterField,
     clearAllFeedbackOverlays,
@@ -245,7 +249,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
       const gameBefore = activeRun.games.find((g) =>
         g.fields.some((f) => f.id === activeFieldId),
       );
-      const { run: updated } = await completeField(
+      const { run: updated, events: houseEvents = [] } = await completeField(
         activeRun.id,
         activeFieldId,
         score,
@@ -283,11 +287,14 @@ export function TableModePlayBoard({ inviteCode }: Props) {
             }
           : null,
       );
+      const ruleOverlays = houseEvents
+        .map((event) => ruleEventFromDto(event))
+        .filter((event): event is NonNullable<typeof event> => event != null);
       await refreshAfterChange(activeSide, updated);
       if (progress) {
         shownSet.add(progress.percent);
       }
-      presentFeedbackAfterField(achievement, progress);
+      presentFeedbackAfterField(achievement, progress, ruleOverlays);
       resetEntry();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Eintrag fehlgeschlagen");
@@ -737,10 +744,15 @@ export function TableModePlayBoard({ inviteCode }: Props) {
         />
       )}
 
-      {progressOverlay && (
+      {ruleEventOverlay && !achievementOverlay && (
+        <RuleEventOverlay event={ruleEventOverlay} onClose={closeRuleEventOverlay} />
+      )}
+
+      {progressOverlay && !achievementOverlay && !ruleEventOverlay && (
         <RunProgressOverlay
           percent={progressOverlay.percent}
           positionHint={progressOverlay.positionHint}
+          scoreDelta={progressOverlay.scoreDelta}
           onClose={closeProgressOverlay}
         />
       )}

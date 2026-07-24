@@ -35,4 +35,25 @@ describe("houseRules (frontend)", () => {
     assert.equal(canBurnHouseRule(run, "f1", true), false);
     assert.equal(canBurnHouseRule(run, null, false), false);
   });
+
+  it("countOpenUpperFields über mehrere Spiele", async () => {
+    const { countOpenUpperFields, isRunUpperComplete } = await import("./houseRules.js");
+    const games = [
+      {
+        fields: [
+          { fieldType: "ONES" as const, score: 3 },
+          { fieldType: "TWOS" as const, score: null },
+          { fieldType: "KNIFFEL" as const, score: null },
+        ],
+      },
+      {
+        fields: [
+          { fieldType: "ONES" as const, score: null },
+          { fieldType: "TWOS" as const, score: 4 },
+        ],
+      },
+    ];
+    assert.equal(countOpenUpperFields(games), 2);
+    assert.equal(isRunUpperComplete(games), false);
+  });
 });

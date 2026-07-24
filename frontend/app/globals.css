@@ -9345,6 +9345,70 @@ html.zoomable-route.legal-route .legal-page-scroll {
   color: #fde68a;
 }
 
+.run-progress-delta {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fef3c7;
+}
+
+.rule-event-overlay {
+  position: fixed;
+}
+
+.rule-event-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgba(2, 6, 23, 0.42);
+  backdrop-filter: blur(3px);
+  cursor: pointer;
+}
+
+.rule-event-card {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 20rem);
+  border-radius: 1.25rem;
+  border: 1px solid rgba(214, 168, 90, 0.35);
+  padding: 1.15rem 1rem 1rem;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(214, 168, 90, 0.22), transparent 55%),
+    linear-gradient(160deg, #0f172a 0%, #1e293b 100%);
+  box-shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.85);
+  color: #f8fafc;
+}
+
+.rule-event-kicker {
+  margin: 0;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.rule-event-badge {
+  margin: 0.45rem 0 0;
+  font-size: 1.65rem;
+  font-weight: 900;
+  color: #fde68a;
+}
+
+.rule-event-title {
+  margin: 0.35rem 0 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.rule-event-sub {
+  margin: 0.4rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: #cbd5e1;
+}
+
 @keyframes run-progress-pulse {
   0% {
     opacity: 0.45;
@@ -9622,6 +9686,13 @@ html.zoomable-route.legal-route .legal-page-scroll {
 
 .stats-rivals-manage-link:hover {
   border-color: rgba(214, 168, 90, 0.45);
+}
+
+.stats-foreign-filter-note {
+  margin: 0 0 0.25rem;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: #94a3b8;
 }
 
 .rival-link-card {

@@ -24,6 +24,7 @@ import {
 } from "@/lib/statsPairingInsights";
 import type { StatsDto } from "@/lib/statsTypes";
 import type { PlayerAliasMap } from "@/lib/playerAliases";
+import { pairingExcludesOwnPlayer } from "@/lib/hiddenPairings";
 
 const SORT_OPTIONS: { id: PairingSortMode; label: string }[] = [
   { id: "recent", label: "Zuletzt" },
@@ -90,19 +91,30 @@ function StatsPageInner() {
     [pairings, aliases, ownPlayerId],
   );
 
+  /** Nur Paarungen mit eigener ID — fremde Einträge nur lokal ausblenden. */
+  const ownPairings = useMemo(() => {
+    if (!ownPlayerId) return mergedPairings;
+    return mergedPairings.filter(
+      (pairing) =>
+        !pairingExcludesOwnPlayer(pairing, ownPlayerId, normalizePublicPlayerId),
+    );
+  }, [mergedPairings, ownPlayerId]);
+
+  const foreignPairingCount = mergedPairings.length - ownPairings.length;
+
   const overview = useMemo(
-    () => buildStatsOverview(mergedPairings, stats, ownPlayerId, aliases),
-    [mergedPairings, stats, ownPlayerId, aliases],
+    () => buildStatsOverview(ownPairings, stats, ownPlayerId, aliases),
+    [ownPairings, stats, ownPlayerId, aliases],
   );
 
   const featuredKey = useMemo(
-    () => pickFeaturedPairingKey(mergedPairings),
-    [mergedPairings],
+    () => pickFeaturedPairingKey(ownPairings),
+    [ownPairings],
   );
 
   const sortedPairings = useMemo(
-    () => sortPairings(mergedPairings, sortMode),
-    [mergedPairings, sortMode],
+    () => sortPairings(ownPairings, sortMode),
+    [ownPairings, sortMode],
   );
 
   const exitSelectMode = useCallback(() => {
@@ -129,7 +141,7 @@ function StatsPageInner() {
   }, []);
 
   const handleReset = useCallback(async () => {
-    const chosen = mergedPairings.filter((p) => selectedKeys.has(p.key));
+    const chosen = ownPairings.filter((p) => selectedKeys.has(p.key));
     if (chosen.length === 0) return;
     const labels = chosen
       .map(
@@ -172,7 +184,7 @@ function StatsPageInner() {
     } finally {
       setResetting(false);
     }
-  }, [mergedPairings, selectedKeys, ownPlayerId, aliases, exitSelectMode, refreshPairings]);
+  }, [ownPairings, selectedKeys, ownPlayerId, aliases, exitSelectMode, refreshPairings]);
 
   return (
     <div className="stats-screen flex flex-col gap-2.5 pb-2">
@@ -186,7 +198,15 @@ function StatsPageInner() {
         Rivalen verwalten
       </Link>
 
-      {!loading && !error && mergedPairings.length > 0 && (
+      {foreignPairingCount > 0 && (
+        <p className="stats-foreign-filter-note">
+          {foreignPairingCount === 1
+            ? "1 Paarung ohne deine ID ist nur hier ausgeblendet."
+            : `${foreignPairingCount} Paarungen ohne deine ID sind nur hier ausgeblendet.`}
+        </p>
+      )}
+
+      {!loading && !error && ownPairings.length > 0 && (
         <StatsHeroPanel overview={overview} />
       )}
 
@@ -196,7 +216,7 @@ function StatsPageInner() {
         <p className="glass-alert-success px-3 py-2 text-sm">{resetNotice}</p>
       )}
 
-      {!loading && !error && mergedPairings.length > 0 && (
+      {!loading && !error && ownPairings.length > 0 && (
         <>
           <div className="stats-sort-row" role="toolbar" aria-label="Paarungen sortieren">
             {SORT_OPTIONS.map((option) => (
@@ -254,7 +274,7 @@ function StatsPageInner() {
         <p className="stats-empty-state">Lade Paarungen …</p>
       )}
 
-      {!loading && !error && mergedPairings.length === 0 && (
+      {!loading && !error && ownPairings.length === 0 && (
         <div className="stats-empty-state stats-empty-state--cta">
           <p>Noch keine Paarungen. Spiele mindestens eine Multiplayer-Runde zu Ende.</p>
           <Link href="/multi" className="setup-host-submit mt-3 inline-flex min-h-10 items-center px-4 no-underline">
@@ -263,7 +283,7 @@ function StatsPageInner() {
         </div>
       )}
 
-      {!loading && mergedPairings.length > 0 && (
+      {!loading && ownPairings.length > 0 && (
         <ul className="stats-pairing-list">
           {sortedPairings.map((pairing) => {
             const highlight = getPairingHighlight(pairing, ownPlayerId, featuredKey);

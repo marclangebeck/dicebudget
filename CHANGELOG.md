@@ -4,6 +4,12 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
+### Added
+- **Fortschritt 25/50/75 %:** Punktdifferenz zum Gegner im Overlay („X Punkte voraus/zurück“)
+- **Statistik:** Paarungen ohne eigene Player-ID werden nur lokal ausgeblendet (Server unverändert)
+- **Hausregel auto (2 Spieler, Strategy):** 2× Alle Fünfe ≤3 Würfe halbieren Gegner-Pool automatisch + Overlay
+- **Hausregel auto (2 Spieler, Strategy):** Wer zuerst den gesamten oberen Bereich (alle Spiele × 6 Felder) voll hat, erhält die offenen oberen Felder des Rivalen als Pool + Overlay
+
 ### Fixed
 - **Hamburger Rivalen/Tour:** Interne Menü-Ziele per `router.push` nach Menü-Schließen (nicht mehr Link+onClose) — verhindert Sprung auf den Startscreen in Capacitor
 - **App-Tour aus Menü:** Startet die Overlay-Tour zuverlässig (Event + Pending), statt nur auf den Startscreen zu wechseln

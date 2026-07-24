@@ -86,7 +86,13 @@ export function HouseRulesTableActions({
           </button>
         )}
 
-        {yatzyEnabled && (
+        {yatzyEnabled && lobby && lobby.playerCount === 2 && (
+          <p className="house-rules-action-hint text-[0.65rem]">
+            2× Alle Fünfe (≤3 Würfe): Pool-Strafe wird automatisch angewendet.
+          </p>
+        )}
+
+        {yatzyEnabled && lobby && lobby.playerCount > 2 && (
           <div className="house-rules-subpanel rounded-lg border p-2">
             <p className="text-xs font-semibold">2× Alle Fünfe (≤3 Würfe)</p>
             <p className="house-rules-action-hint mt-0.5 text-[0.65rem]">
@@ -94,23 +100,17 @@ export function HouseRulesTableActions({
             </p>
             {canYatzyStreak ? (
               <div className="mt-2 flex gap-2">
-                {opponents.length === 1 ? (
-                  <p className="house-rules-action-hint flex-1 text-xs">
-                    Gegner: Spieler {opponents[0]!.orderIndex + 1}
-                  </p>
-                ) : (
-                  <select
-                    value={yatzyVictimId || opponents[0]?.id || ""}
-                    onChange={(e) => setYatzyVictimId(e.target.value)}
-                    className="glass-input min-h-9 flex-1 px-2 text-xs"
-                  >
-                    {opponents.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        Spieler {p.orderIndex + 1}
-                      </option>
-                    ))}
-                  </select>
-                )}
+                <select
+                  value={yatzyVictimId || opponents[0]?.id || ""}
+                  onChange={(e) => setYatzyVictimId(e.target.value)}
+                  className="glass-input min-h-9 flex-1 px-2 text-xs"
+                >
+                  {opponents.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      Spieler {p.orderIndex + 1}
+                    </option>
+                  ))}
+                </select>
                 <button
                   type="button"
                   disabled={busy || opponents.length === 0}

@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { StatsRatingToggle } from "@/components/StatsRatingToggle";
 import { AchievementOverlay } from "@/components/AchievementOverlay";
 import { RunProgressOverlay } from "@/components/RunProgressOverlay";
+import { RuleEventOverlay } from "@/components/RuleEventOverlay";
 import { RunCompleteOverlay } from "@/components/RunCompleteOverlay";
 import { MatchAnalysisView } from "@/components/MatchAnalysisView";
 import { RunFinishScreen } from "@/components/RunFinishScreen";
@@ -38,6 +39,7 @@ import { isFeatureEnabled } from "@/lib/featureFlags";
 import { buildAchievementAfterField } from "@/lib/achievementFeedback";
 import { useQueuedFeedbackOverlays } from "@/lib/feedbackOverlayQueue";
 import { buildProgressMilestoneAfterField } from "@/lib/runProgressFeedback";
+import { ruleEventFromDto } from "@/lib/ruleEventFeedback";
 import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
 import { APP_HOME_PATH } from "@/lib/branding";
 import {
@@ -84,8 +86,10 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   const [sheetReviewAfterComplete, setSheetReviewAfterComplete] = useState(false);
   const {
     achievementOverlay,
+    ruleEventOverlay,
     progressOverlay,
     closeAchievementOverlay,
+    closeRuleEventOverlay,
     closeProgressOverlay,
     presentFeedbackAfterField,
     clearAllFeedbackOverlays,
@@ -368,18 +372,22 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     setBusy(true);
     setError(null);
     try {
-      const updated = isLocalSolo
-        ? completeLocalSoloField(runId, activeFieldId, score, effectiveRolls, yatzyArg)
-        : (
-            await completeField(
-              runId,
-              activeFieldId,
-              score,
-              effectiveRolls,
-              playerSecret,
-              yatzyArg,
-            )
-          ).run;
+      let updated: RunDto;
+      let houseEvents: import("@/lib/ruleEventFeedback").HouseRuleAutoEventDto[] = [];
+      if (isLocalSolo) {
+        updated = completeLocalSoloField(runId, activeFieldId, score, effectiveRolls, yatzyArg);
+      } else {
+        const result = await completeField(
+          runId,
+          activeFieldId,
+          score,
+          effectiveRolls,
+          playerSecret,
+          yatzyArg,
+        );
+        updated = result.run;
+        houseEvents = result.events ?? [];
+      }
       const gameBefore = run.games.find((g) =>
         g.fields.some((f) => f.id === activeFieldId),
       );
@@ -405,6 +413,9 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
           ? { kind: "lobby", lobby, ownPlayerId: getOrCreatePlayerId() }
           : null,
       );
+      const ruleOverlays = houseEvents
+        .map((event) => ruleEventFromDto(event))
+        .filter((event): event is NonNullable<typeof event> => event != null);
       setRun(updated);
       resetEntry();
       setActiveFieldId(null);
@@ -424,7 +435,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         if (progress) {
           shownProgressRef.current.add(progress.percent);
         }
-        presentFeedbackAfterField(achievement, progress);
+        presentFeedbackAfterField(achievement, progress, ruleOverlays);
       }
       void refreshLobby();
     } catch (e) {
@@ -929,10 +940,15 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         />
       )}
 
-      {progressOverlay && !showCompleteOverlay && (
+      {ruleEventOverlay && !showCompleteOverlay && !achievementOverlay && (
+        <RuleEventOverlay event={ruleEventOverlay} onClose={closeRuleEventOverlay} />
+      )}
+
+      {progressOverlay && !showCompleteOverlay && !achievementOverlay && !ruleEventOverlay && (
         <RunProgressOverlay
           percent={progressOverlay.percent}
           positionHint={progressOverlay.positionHint}
+          scoreDelta={progressOverlay.scoreDelta}
           onClose={closeProgressOverlay}
         />
       )}

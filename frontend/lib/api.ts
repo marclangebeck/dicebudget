@@ -7,6 +7,7 @@ import type { SessionMatchAnalysisDto } from "./matchAnalysisTypes";
 import type { PairingSummaryDto } from "./pairingTypes";
 import type { RunDto } from "./types";
 import type { SessionLobbyDto, SessionRankingDto } from "./sessionTypes";
+import type { HouseRuleAutoEventDto } from "@/lib/ruleEventFeedback";
 import { getApiBase } from "@/lib/apiBase";
 
 type ApiRequestInit = Omit<RequestInit, "headers"> & {
@@ -94,11 +95,14 @@ export function completeField(
   if (yatzyDieValue !== undefined) {
     body.yatzyDieValue = yatzyDieValue;
   }
-  return request<{ run: RunDto }>(`/runs/${runId}/fields/${fieldId}/complete`, {
-    method: "POST",
-    body: JSON.stringify(body),
-    playerSecret,
-  });
+  return request<{ run: RunDto; events?: HouseRuleAutoEventDto[] }>(
+    `/runs/${runId}/fields/${fieldId}/complete`,
+    {
+      method: "POST",
+      body: JSON.stringify(body),
+      playerSecret,
+    },
+  );
 }
 
 export function finalizeSessionStats(

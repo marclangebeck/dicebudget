@@ -1,5 +1,12 @@
 import { prisma } from "../db/prisma.js";
-import { BURN_POOL_COST, hasAnyFullFieldTypeRow, qualifiesYatzyStreakPenalty } from "../domain/houseRules.js";
+import {
+  BURN_POOL_COST,
+  countOpenUpperFields,
+  hasAnyFullFieldTypeRow,
+  isRunUpperComplete,
+  qualifiesYatzyStreakPenalty,
+  yatzyStreakPenaltyMarker,
+} from "../domain/houseRules.js";
 import { RUN_STATUS } from "../domain/fieldTypes.js";
 import { getRunById } from "./getRun.js";
 import { assertRunPlayerAccess } from "./runPlayerAuth.js";
@@ -23,6 +30,18 @@ export class RollSaleNotAvailableError extends Error {
     this.name = "RollSaleNotAvailableError";
   }
 }
+
+export type HouseRuleAutoEvent =
+  | {
+      type: "yatzy_streak_penalty";
+      poolsLost: number;
+      victimPlayerId: string;
+      victimPlayerName: string;
+    }
+  | {
+      type: "upper_race_pool";
+      poolsGained: number;
+    };
 
 async function loadActiveRun(runId: string) {
   const run = await prisma.run.findUnique({
@@ -112,10 +131,19 @@ export async function applyYatzyStreakPenalty(
 
   const victimRun = await loadActiveRun(victim.runId);
   const newPool = Math.floor(victimRun.rollsInPool / 2);
+  const marker = yatzyStreakPenaltyMarker(allFields);
 
-  await prisma.run.update({
-    where: { id: victim.runId },
-    data: { rollsInPool: newPool },
+  await prisma.$transaction(async (tx) => {
+    await tx.run.update({
+      where: { id: victim.runId },
+      data: { rollsInPool: newPool },
+    });
+    if (marker != null) {
+      await tx.run.update({
+        where: { id: runId },
+        data: { yatzyStreakPenaltyAtSequence: marker },
+      });
+    }
   });
 
   return {
@@ -217,4 +245,110 @@ export async function applyRollSale(
     buyerPlayerId: buyer.id,
     pools,
   };
+}
+
+type RunSnapshotForAuto = {
+  id: string;
+  useStrategyRules: boolean;
+  upperRacePoolCredited: boolean;
+  yatzyStreakPenaltyAtSequence: number | null;
+  games: { fields: { fieldType: string; score: number | null; rollsUsed: number; scoredSequence: number | null }[] }[];
+};
+
+/**
+ * Nach Feldeintrag: automatische Duell-Hausregeln (nur 2 Spieler, Strategy).
+ * - 2× Alle Fünfe ≤3 Würfe → Gegner-Pool halbieren
+ * - Oberer Bereich zuerst voll → offene obere Felder des Rivalen als Pool
+ */
+export async function applyAutoHouseRulesAfterComplete(
+  runId: string,
+  before: RunSnapshotForAuto,
+): Promise<{ events: HouseRuleAutoEvent[] }> {
+  const events: HouseRuleAutoEvent[] = [];
+  if (!before.useStrategyRules) return { events };
+
+  const beneficiary = await prisma.player.findFirst({
+    where: { runId },
+    include: {
+      session: {
+        include: {
+          players: {
+            include: {
+              run: {
+                include: {
+                  games: {
+                    orderBy: { index: "asc" },
+                    include: { fields: true },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+  if (!beneficiary?.session || beneficiary.session.players.length !== 2) {
+    return { events };
+  }
+
+  const opponent = beneficiary.session.players.find((p) => p.id !== beneficiary.id);
+  if (!opponent) return { events };
+
+  const afterRun = await loadActiveRun(runId);
+  const fieldsBefore = before.games.flatMap((g) => g.fields);
+  const fieldsAfter = afterRun.games.flatMap((g) => g.fields);
+
+  const markerAfter = yatzyStreakPenaltyMarker(fieldsAfter);
+  const qualifiedBefore = qualifiesYatzyStreakPenalty(fieldsBefore);
+  const alreadyApplied =
+    markerAfter != null &&
+    before.yatzyStreakPenaltyAtSequence != null &&
+    before.yatzyStreakPenaltyAtSequence >= markerAfter;
+
+  if (!qualifiedBefore && markerAfter != null && !alreadyApplied) {
+    const victimRun = opponent.run;
+    const oldPool = victimRun.rollsInPool;
+    const newPool = Math.floor(oldPool / 2);
+    const poolsLost = oldPool - newPool;
+    await prisma.$transaction(async (tx) => {
+      await tx.run.update({
+        where: { id: victimRun.id },
+        data: { rollsInPool: newPool },
+      });
+      await tx.run.update({
+        where: { id: runId },
+        data: { yatzyStreakPenaltyAtSequence: markerAfter },
+      });
+    });
+    events.push({
+      type: "yatzy_streak_penalty",
+      poolsLost,
+      victimPlayerId: opponent.id,
+      victimPlayerName: opponent.name,
+    });
+  }
+
+  const upperBefore = isRunUpperComplete(before.games);
+  const upperAfter = isRunUpperComplete(afterRun.games);
+  if (!upperBefore && upperAfter && !before.upperRacePoolCredited) {
+    const openUpper = countOpenUpperFields(opponent.run.games);
+    if (openUpper > 0) {
+      await prisma.run.update({
+        where: { id: runId },
+        data: {
+          rollsInPool: { increment: openUpper },
+          upperRacePoolCredited: true,
+        },
+      });
+      events.push({ type: "upper_race_pool", poolsGained: openUpper });
+    } else {
+      await prisma.run.update({
+        where: { id: runId },
+        data: { upperRacePoolCredited: true },
+      });
+    }
+  }
+
+  return { events };
 }

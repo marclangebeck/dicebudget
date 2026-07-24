@@ -37,13 +37,13 @@ fieldsRouter.post("/:fieldId/complete", async (req, res, next) => {
       res.status(400).json({ error: "yatzyDieValue must be a number" });
       return;
     }
-    const run = await completeField(
+    const { run, events } = await completeField(
       runId,
       fieldId,
       { score, rollsUsed, yatzyDieValue },
       readPlayerSecret(req),
     );
-    res.json({ run });
+    res.json({ run, events: events ?? [] });
   } catch (error) {
     next(error);
   }
