@@ -24,7 +24,10 @@ import {
 } from "@/lib/statsPairingInsights";
 import type { StatsDto } from "@/lib/statsTypes";
 import type { PlayerAliasMap } from "@/lib/playerAliases";
-import { pairingExcludesOwnPlayer } from "@/lib/hiddenPairings";
+import {
+  canFilterPairingsByOwnPlayer,
+  pairingExcludesOwnPlayer,
+} from "@/lib/hiddenPairings";
 
 const SORT_OPTIONS: { id: PairingSortMode; label: string }[] = [
   { id: "recent", label: "Zuletzt" },
@@ -91,14 +94,33 @@ function StatsPageInner() {
     [pairings, aliases, ownPlayerId],
   );
 
-  /** Nur Paarungen mit eigener ID — fremde Einträge nur lokal ausblenden. */
+  /**
+   * Fremde Paarungen nur ausblenden, wenn wir dich in mindestens einer Paarung
+   * erkennen (ID oder gleicher Alias). Sonst alle anzeigen — sonst wirkt die
+   * Statistik leer, wenn die Geräte-ID nicht in den historischen Paarungen steckt.
+   */
   const ownPairings = useMemo(() => {
     if (!ownPlayerId) return mergedPairings;
+    if (
+      !canFilterPairingsByOwnPlayer(
+        mergedPairings,
+        ownPlayerId,
+        normalizePublicPlayerId,
+        aliases,
+      )
+    ) {
+      return mergedPairings;
+    }
     return mergedPairings.filter(
       (pairing) =>
-        !pairingExcludesOwnPlayer(pairing, ownPlayerId, normalizePublicPlayerId),
+        !pairingExcludesOwnPlayer(
+          pairing,
+          ownPlayerId,
+          normalizePublicPlayerId,
+          aliases,
+        ),
     );
-  }, [mergedPairings, ownPlayerId]);
+  }, [mergedPairings, ownPlayerId, aliases]);
 
   const foreignPairingCount = mergedPairings.length - ownPairings.length;
 

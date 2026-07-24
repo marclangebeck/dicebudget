@@ -47,13 +47,49 @@ export function subscribeHiddenPairings(listener: () => void): () => void {
   return () => window.removeEventListener(HIDDEN_PAIRINGS_CHANGED_EVENT, listener);
 }
 
-/** Paarung enthält die eigene öffentliche Player-ID nicht. */
+/**
+ * Ob die Paarung dich enthält: exakte Player-ID oder dieselbe lokale Alias-Identität
+ * (Zweit-IDs mit gleichem Namen wie du).
+ */
+export function pairingIncludesOwnPlayer(
+  pairing: { playerA: string; playerB: string },
+  ownPlayerId: string,
+  normalize: (id: string) => string,
+  aliases: Record<string, string> = {},
+): boolean {
+  if (!ownPlayerId) return true;
+  const own = normalize(ownPlayerId);
+  const ownAlias = aliases[own]?.trim().toLowerCase() ?? "";
+
+  for (const side of [pairing.playerA, pairing.playerB]) {
+    const id = normalize(side);
+    if (id === own) return true;
+    const sideAlias = aliases[id]?.trim().toLowerCase() ?? "";
+    if (ownAlias && sideAlias && sideAlias === ownAlias) return true;
+  }
+  return false;
+}
+
+/** True, wenn auf diesem Gerät überhaupt erkennbar ist, wer „du“ bist. */
+export function canFilterPairingsByOwnPlayer(
+  pairings: { playerA: string; playerB: string }[],
+  ownPlayerId: string,
+  normalize: (id: string) => string,
+  aliases: Record<string, string> = {},
+): boolean {
+  if (!ownPlayerId) return false;
+  return pairings.some((pairing) =>
+    pairingIncludesOwnPlayer(pairing, ownPlayerId, normalize, aliases),
+  );
+}
+
+/** Paarung enthält dich nicht (inkl. Alias-Zweit-IDs). */
 export function pairingExcludesOwnPlayer(
   pairing: { playerA: string; playerB: string },
   ownPlayerId: string,
   normalize: (id: string) => string,
+  aliases: Record<string, string> = {},
 ): boolean {
   if (!ownPlayerId) return false;
-  const own = normalize(ownPlayerId);
-  return normalize(pairing.playerA) !== own && normalize(pairing.playerB) !== own;
+  return !pairingIncludesOwnPlayer(pairing, ownPlayerId, normalize, aliases);
 }
