@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { getPairingSummaries, getStats } from "@/lib/api";
 import {
   buildHomeRecordShareText,
@@ -9,10 +8,16 @@ import {
 import { mergePairingSummaries } from "@/lib/pairingMerge";
 import type { PairingSummaryDto } from "@/lib/pairingTypes";
 import { getOrCreatePlayerId } from "@/lib/playerIdentity";
+import {
+  loadHiddenPairingKeys,
+  pairingIsHidden,
+  subscribeHiddenPairings,
+} from "@/lib/hiddenPairings";
 import { loadDisplayNames } from "@/lib/rivalProfiles";
 import type { PlayerAliasMap } from "@/lib/playerAliases";
 import { buildStatsOverview } from "@/lib/statsOverview";
 import type { StatsDto } from "@/lib/statsTypes";
+import { useEffect, useMemo, useState } from "react";
 
 export function useHomeHeroData() {
   const [stats, setStats] = useState<StatsDto | null>(null);
@@ -20,10 +25,13 @@ export function useHomeHeroData() {
   const [pairingsError, setPairingsError] = useState<string | null>(null);
   const [ownPlayerId, setOwnPlayerId] = useState("");
   const [aliases, setAliases] = useState<PlayerAliasMap>({});
+  const [hiddenKeys, setHiddenKeys] = useState<Set<string>>(() => new Set());
 
   useEffect(() => {
     setOwnPlayerId(getOrCreatePlayerId());
     setAliases(loadDisplayNames());
+    setHiddenKeys(loadHiddenPairingKeys());
+    return subscribeHiddenPairings(() => setHiddenKeys(loadHiddenPairingKeys()));
   }, []);
 
   useEffect(() => {
@@ -40,8 +48,13 @@ export function useHomeHeroData() {
       );
   }, []);
 
-  const mergedPairings =
-    pairings === null ? null : mergePairingSummaries(pairings, aliases, ownPlayerId);
+  const mergedPairings = useMemo(() => {
+    if (pairings === null) return null;
+    return mergePairingSummaries(pairings, aliases, ownPlayerId).filter(
+      (pairing) => !pairingIsHidden(pairing, hiddenKeys),
+    );
+  }, [pairings, aliases, ownPlayerId, hiddenKeys]);
+
   const overview =
     mergedPairings === null
       ? null

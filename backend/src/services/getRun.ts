@@ -5,24 +5,36 @@ import { sortFields } from "../domain/fieldTypes.js";
 import { prisma } from "../db/prisma.js";
 import { findLastScoredFieldId } from "./scoredSequence.js";
 
-const runInclude = {
-  games: {
-    orderBy: { index: "asc" as const },
-    include: {
-      fields: {
-        orderBy: { fieldType: "asc" as const },
-        include: {
-          rolls: { orderBy: { rollNumber: "asc" as const } },
+type GetRunOptions = {
+  /** Default true. Nach Feldeintrag oft unnötig (weniger Joins/JSON). */
+  includeRolls?: boolean;
+};
+
+function buildRunInclude(includeRolls: boolean) {
+  return {
+    games: {
+      orderBy: { index: "asc" as const },
+      include: {
+        fields: {
+          orderBy: { fieldType: "asc" as const },
+          ...(includeRolls
+            ? {
+                include: {
+                  rolls: { orderBy: { rollNumber: "asc" as const } },
+                },
+              }
+            : {}),
         },
       },
     },
-  },
-};
+  };
+}
 
-export async function getRunById(runId: string) {
+export async function getRunById(runId: string, options?: GetRunOptions) {
+  const includeRolls = options?.includeRolls !== false;
   const run = await prisma.run.findUnique({
     where: { id: runId },
-    include: runInclude,
+    include: buildRunInclude(includeRolls),
   });
 
   if (!run) return null;
@@ -56,19 +68,25 @@ export async function getRunById(runId: string) {
           ...summary,
           extraYatzyDieValues: parseExtraYatzyDieValues(game.extraYatzyDieValues),
         },
-        fields: sortedFields.map((field) => ({
-          id: field.id,
-          fieldType: field.fieldType,
-          score: field.score,
-          rollsUsed: field.rollsUsed,
-          scoredSequence: field.scoredSequence,
-          yatzyDieValue: field.yatzyDieValue,
-          rolls: field.rolls.map((roll) => ({
-            id: roll.id,
-            rollNumber: roll.rollNumber,
-            diceValues: JSON.parse(roll.diceValues) as number[],
-          })),
-        })),
+        fields: sortedFields.map((field) => {
+          const rolls =
+            includeRolls && "rolls" in field && Array.isArray(field.rolls)
+              ? field.rolls.map((roll: { id: string; rollNumber: number; diceValues: string }) => ({
+                  id: roll.id,
+                  rollNumber: roll.rollNumber,
+                  diceValues: JSON.parse(roll.diceValues) as number[],
+                }))
+              : [];
+          return {
+            id: field.id,
+            fieldType: field.fieldType,
+            score: field.score,
+            rollsUsed: field.rollsUsed,
+            scoredSequence: field.scoredSequence,
+            yatzyDieValue: field.yatzyDieValue,
+            rolls,
+          };
+        }),
       };
     }),
   };

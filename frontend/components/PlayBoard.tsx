@@ -139,11 +139,11 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   }, [load]);
 
   // Lobby nur gezielt nachladen (Start + nach eigener Eintragung + Abschluss), kein Polling.
-  const refreshLobby = useCallback(async () => {
+  const refreshLobby = useCallback(async (options?: { lite?: boolean }) => {
     if (!inviteCode) return;
     setLobbyRefreshing(true);
     try {
-      const { session } = await getSessionLobby(inviteCode);
+      const { session } = await getSessionLobby(inviteCode, options);
       setLobby(session);
       if (session.showOpponentPool && session.players.length === 2) {
         const myId = normalizePublicPlayerId(getOrCreatePlayerId());
@@ -426,7 +426,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
           setRun(finished);
           setShowCompleteOverlay(false);
           setSheetReviewAfterComplete(false);
-          await refreshLobby();
+          void refreshLobby();
           return;
         }
         setSheetReviewAfterComplete(false);
@@ -437,7 +437,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         }
         presentFeedbackAfterField(achievement, progress, ruleOverlays);
       }
-      void refreshLobby();
+      void refreshLobby({ lite: true });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Eintrag fehlgeschlagen");
     } finally {

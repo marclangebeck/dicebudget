@@ -302,9 +302,10 @@ export function createGameSession(
   });
 }
 
-export function getSessionLobby(inviteCode: string) {
+export function getSessionLobby(inviteCode: string, options?: { lite?: boolean }) {
+  const lite = options?.lite ? "?lite=1" : "";
   return request<{ session: SessionLobbyDto }>(
-    `/sessions/invite/${encodeURIComponent(inviteCode)}`,
+    `/sessions/invite/${encodeURIComponent(inviteCode)}${lite}`,
   );
 }
 

@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   canFilterPairingsByOwnPlayer,
+  keysToHideForPairing,
   pairingExcludesOwnPlayer,
   pairingIncludesOwnIds,
   pairingIncludesOwnPlayer,
+  pairingIsHidden,
 } from "./hiddenPairings";
 import { normalizePublicPlayerId } from "./playerIdentity";
 import { resolveOwnPlayerIds } from "./selfIdentity";
@@ -77,6 +79,14 @@ describe("pairingIncludesOwnPlayer", () => {
       ),
       false,
     );
+  });
+
+  it("hides via merged or source key", () => {
+    const pairing = { key: "m:a|b", sourceKeys: ["a::b", "c::d"] };
+    const hidden = new Set(keysToHideForPairing(pairing));
+    assert.equal(pairingIsHidden(pairing, hidden), true);
+    assert.equal(pairingIsHidden({ key: "other", sourceKeys: [] }, hidden), false);
+    assert.equal(pairingIsHidden({ key: "x", sourceKeys: ["a::b"] }, hidden), true);
   });
 });
 

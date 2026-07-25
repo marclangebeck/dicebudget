@@ -10,6 +10,7 @@ import { SettingsRangeCard } from "@/components/settings/SettingsRangeCard";
 import { SettingsSection } from "@/components/settings/SettingsSection";
 import { SettingsToggleCard } from "@/components/settings/SettingsToggleCard";
 import { getHouseRuleInfo, type HouseRuleInfo } from "@/lib/houseRuleInfo";
+import { getVisualFeedbackInfo } from "@/lib/visualFeedbackInfo";
 import { MODE_CLASSIC_LABEL, MODE_STRATEGY_LABEL } from "@/lib/branding";
 import {
   FEATURE_FLAGS_CHANGED_EVENT,
@@ -51,7 +52,9 @@ function SettingsPageInner() {
   );
   const [labsUnlocked, setLabsUnlocked] = useState(false);
   const [showLabsUnlock, setShowLabsUnlock] = useState(false);
-  const [ruleInfo, setRuleInfo] = useState<HouseRuleInfo | null>(null);
+  const [ruleInfo, setRuleInfo] = useState<Pick<HouseRuleInfo, "title" | "body"> | null>(
+    null,
+  );
   const [featureRevision, setFeatureRevision] = useState(0);
   const [openSections, setOpenSections] = useState<Record<SettingsSectionId, boolean>>({
     mode: false,
@@ -154,18 +157,21 @@ function SettingsPageInner() {
             description="Overlays bei Bonus, unterer Spalte, Große Straße und Alle Fünfe."
             checked={feedbackPrefs.animationsEnabled}
             onChange={(value) => updateFeedback({ animationsEnabled: value })}
+            onInfo={() => setRuleInfo(getVisualFeedbackInfo("animations"))}
           />
           <SettingsToggleCard
             title="Sounds"
             description="Akustische Hinweise bei Erfolgen und Fortschritts-Meilensteinen."
             checked={feedbackPrefs.soundsEnabled}
             onChange={(value) => updateFeedback({ soundsEnabled: value })}
+            onInfo={() => setRuleInfo(getVisualFeedbackInfo("sounds"))}
           />
           <SettingsToggleCard
             title="Fortschritt (25 / 50 / 75 %)"
             description="Kurzer Hinweis, wenn ein Viertel der Würfe absolviert ist."
             checked={feedbackPrefs.progressHintsEnabled}
             onChange={(value) => updateFeedback({ progressHintsEnabled: value })}
+            onInfo={() => setRuleInfo(getVisualFeedbackInfo("progress"))}
           />
         </SettingsSection>
 

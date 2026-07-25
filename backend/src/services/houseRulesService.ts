@@ -280,6 +280,14 @@ export async function applyAutoHouseRulesAfterComplete(
   const beneficiary = await prisma.player.findFirst({
     where: { runId },
     include: {
+      run: {
+        include: {
+          games: {
+            orderBy: { index: "asc" },
+            include: { fields: true },
+          },
+        },
+      },
       session: {
         include: {
           players: {
@@ -306,7 +314,7 @@ export async function applyAutoHouseRulesAfterComplete(
   const opponent = session.players.find((p) => p.id !== beneficiary.id);
   if (!opponent) return { events };
 
-  const afterRun = await loadActiveRun(runId);
+  const afterRun = beneficiary.run;
   const fieldsBefore = before.games.flatMap((g) => g.fields);
   const fieldsAfter = afterRun.games.flatMap((g) => g.fields);
 
@@ -352,7 +360,7 @@ export async function applyAutoHouseRulesAfterComplete(
       before.yatzyStreakPenaltyAtSequence >= markerAfter;
 
     if (!qualifiedBefore && markerAfter != null && !alreadyApplied) {
-      const victimRun = await loadActiveRun(opponent.runId);
+      const victimRun = opponent.run;
       const oldPool = victimRun.rollsInPool;
       const newPool = Math.floor(oldPool / 2);
       const poolsLost = oldPool - newPool;

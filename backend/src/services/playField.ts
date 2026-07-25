@@ -124,15 +124,20 @@ async function recalculateRunTotals(runId: string, tx: Parameters<Parameters<typ
     include: { fields: true },
   });
 
-  let totalScore = 0;
-  for (const game of games) {
-    const breakdown = computeGameBreakdown(game.fields, game.extraYatzyBonus);
-    await tx.game.update({
-      where: { id: game.id },
-      data: { score: breakdown.gameTotal },
-    });
-    totalScore += breakdown.gameTotal;
-  }
+  const breakdowns = games.map((game) => ({
+    id: game.id,
+    gameTotal: computeGameBreakdown(game.fields, game.extraYatzyBonus).gameTotal,
+  }));
+  const totalScore = breakdowns.reduce((sum, row) => sum + row.gameTotal, 0);
+
+  await Promise.all(
+    breakdowns.map((row) =>
+      tx.game.update({
+        where: { id: row.id },
+        data: { score: row.gameTotal },
+      }),
+    ),
+  );
 
   await tx.run.update({
     where: { id: runId },
@@ -298,25 +303,29 @@ export async function completeField(
   input: { score: number; rollsUsed: number; yatzyDieValue?: number },
   playerSecret?: string,
 ) {
-  await assertRunPlayerAccess(runId, playerSecret);
-  const { score, rollsUsed, yatzyDieValue } = input;
-
-  const field = await loadFieldForRun(runId, fieldId);
+  const [, field] = await Promise.all([
+    assertRunPlayerAccess(runId, playerSecret),
+    loadFieldForRun(runId, fieldId),
+  ]);
   if (!field) throw new FieldNotFoundError();
+  const { score, rollsUsed, yatzyDieValue } = input;
   const run = field.game.run;
   const isCorrection = field.score !== null;
   const isRollSaleEntry = run.rollSaleFreeFillActive && !isCorrection;
+  const needsAutoHouseRules = run.useStrategyRules && !isCorrection;
 
-  const runBeforeAuto = await prisma.run.findUnique({
-    where: { id: runId },
-    include: {
-      games: {
-        orderBy: { index: "asc" },
-        include: { fields: true },
-      },
-    },
-  });
-  if (!runBeforeAuto) throw new RunNotFoundError();
+  const runBeforeAuto = needsAutoHouseRules
+    ? await prisma.run.findUnique({
+        where: { id: runId },
+        include: {
+          games: {
+            orderBy: { index: "asc" },
+            include: { fields: true },
+          },
+        },
+      })
+    : null;
+  if (needsAutoHouseRules && !runBeforeAuto) throw new RunNotFoundError();
 
   if (isRollSaleEntry) {
     if (!run.useStrategyRules) {
@@ -350,9 +359,12 @@ export async function completeField(
       await recalculateRunTotals(runId, tx);
     });
 
-    const { applyAutoHouseRulesAfterComplete } = await import("./houseRulesService.js");
-    const { events } = await applyAutoHouseRulesAfterComplete(runId, runBeforeAuto);
-    return { run: await getRunById(runId), events };
+    let events: import("./houseRulesService.js").HouseRuleAutoEvent[] = [];
+    if (runBeforeAuto) {
+      const { applyAutoHouseRulesAfterComplete } = await import("./houseRulesService.js");
+      events = (await applyAutoHouseRulesAfterComplete(runId, runBeforeAuto)).events;
+    }
+    return { run: await getRunById(runId, { includeRolls: false }), events };
   }
 
   assertManualEntry(score, rollsUsed, run.useStrategyRules);
@@ -418,12 +430,12 @@ export async function completeField(
   });
 
   let events: import("./houseRulesService.js").HouseRuleAutoEvent[] = [];
-  if (!isCorrection) {
+  if (runBeforeAuto) {
     const { applyAutoHouseRulesAfterComplete } = await import("./houseRulesService.js");
     events = (await applyAutoHouseRulesAfterComplete(runId, runBeforeAuto)).events;
   }
 
-  return { run: await getRunById(runId), events };
+  return { run: await getRunById(runId, { includeRolls: false }), events };
 }
 
 /** Letzten Eintrag vollständig löschen (nur das zuletzt bewertete Feld). */

@@ -279,7 +279,11 @@ export async function createGameSession(
   };
 }
 
-export async function getSessionLobbyByInvite(inviteCode: string) {
+export async function getSessionLobbyByInvite(
+  inviteCode: string,
+  options?: { includeStandings?: boolean },
+) {
+  const includeStandings = options?.includeStandings !== false;
   const session = await prisma.gameSession.findUnique({
     where: { inviteCode: inviteCode.toUpperCase() },
     include: {
@@ -302,7 +306,9 @@ export async function getSessionLobbyByInvite(inviteCode: string) {
 
   if (!session) return null;
 
-  const leagueStandings = await getLeagueStandings(session.leagueId);
+  const leagueStandings = includeStandings
+    ? await getLeagueStandings(session.leagueId)
+    : [];
 
   const improver = session.poolEndgameImproverId
     ? session.players.find((p) => p.id === session.poolEndgameImproverId)

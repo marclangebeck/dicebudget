@@ -214,7 +214,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
 
   async function refreshAfterChange(side: TableModeSide, updated: RunDto) {
     setRuns((current) => ({ ...current, [side]: updated }));
-    const { session } = await getSessionLobby(inviteCode);
+    const { session } = await getSessionLobby(inviteCode, { lite: true });
     setLobby(session);
   }
 
@@ -290,12 +290,13 @@ export function TableModePlayBoard({ inviteCode }: Props) {
       const ruleOverlays = houseEvents
         .map((event) => ruleEventFromDto(event))
         .filter((event): event is NonNullable<typeof event> => event != null);
-      await refreshAfterChange(activeSide, updated);
+      setRuns((current) => ({ ...current, [activeSide]: updated }));
       if (progress) {
         shownSet.add(progress.percent);
       }
       presentFeedbackAfterField(achievement, progress, ruleOverlays);
       resetEntry();
+      void refreshAfterChange(activeSide, updated);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Eintrag fehlgeschlagen");
     } finally {

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { getPairingSummaries, getStats, resetPairings } from "@/lib/api";
+import { getPairingSummaries, getStats } from "@/lib/api";
 import type { PairingSummaryDto } from "@/lib/pairingTypes";
 import { mergePairingSummaries, type MergedPairingSummary } from "@/lib/pairingMerge";
 import { playerLabel } from "@/lib/playerIdentity";
@@ -31,7 +31,13 @@ import type { StatsDto } from "@/lib/statsTypes";
 import type { PlayerAliasMap } from "@/lib/playerAliases";
 import {
   canFilterPairingsByOwnPlayer,
+  clearHiddenPairingKeys,
+  hidePairingKeys,
+  keysToHideForPairing,
+  loadHiddenPairingKeys,
   pairingExcludesOwnPlayer,
+  pairingIsHidden,
+  subscribeHiddenPairings,
 } from "@/lib/hiddenPairings";
 import {
   loadSelfRivalProfileId,
@@ -65,8 +71,9 @@ function StatsPageInner() {
   const [selectMode, setSelectMode] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [openKeys, setOpenKeys] = useState<Set<string>>(new Set());
-  const [resetting, setResetting] = useState(false);
-  const [resetNotice, setResetNotice] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteNotice, setDeleteNotice] = useState<string | null>(null);
+  const [hiddenKeys, setHiddenKeys] = useState<Set<string>>(() => new Set());
   const [sortMode, setSortMode] = useState<PairingSortMode>("recent");
   const [detailReloadToken, setDetailReloadToken] = useState(0);
 
@@ -92,6 +99,7 @@ function StatsPageInner() {
     setAliases(loadDisplayNames());
     setRivalProfiles(loadRivalProfiles());
     setSelfProfileId(loadSelfRivalProfileId());
+    setHiddenKeys(loadHiddenPairingKeys());
     const unsubRivals = subscribeRivalProfiles(() => {
       setRivalProfiles(loadRivalProfiles());
       setAliases(loadDisplayNames());
@@ -99,9 +107,13 @@ function StatsPageInner() {
     const unsubSelf = subscribeSelfIdentity(() => {
       setSelfProfileId(loadSelfRivalProfileId());
     });
+    const unsubHidden = subscribeHiddenPairings(() => {
+      setHiddenKeys(loadHiddenPairingKeys());
+    });
     return () => {
       unsubRivals();
       unsubSelf();
+      unsubHidden();
     };
   }, []);
 
@@ -140,22 +152,54 @@ function StatsPageInner() {
   /**
    * Fremde Paarungen ausblenden, sobald wir dich erkennen (Geräte-ID, Alias
    * oder Rivalen-Profil „Das bin ich“). Sonst alle anzeigen + Hinweis.
+   * Manuell gelöschte Paarungen bleiben lokal ausgeblendet.
    */
   const ownPairings = useMemo(() => {
-    if (!ownPlayerId || !canFilterOwn) return mergedPairings;
-    return mergedPairings.filter(
-      (pairing) =>
-        !pairingExcludesOwnPlayer(
-          pairing,
-          ownPlayerId,
-          normalizePublicPlayerId,
-          aliases,
-          ownPlayerIds,
-        ),
-    );
+    const scoped =
+      !ownPlayerId || !canFilterOwn
+        ? mergedPairings
+        : mergedPairings.filter(
+            (pairing) =>
+              !pairingExcludesOwnPlayer(
+                pairing,
+                ownPlayerId,
+                normalizePublicPlayerId,
+                aliases,
+                ownPlayerIds,
+              ),
+          );
+    return scoped.filter((pairing) => !pairingIsHidden(pairing, hiddenKeys));
+  }, [mergedPairings, ownPlayerId, aliases, ownPlayerIds, canFilterOwn, hiddenKeys]);
+
+  const foreignPairingCount = useMemo(() => {
+    if (!ownPlayerId || !canFilterOwn) return 0;
+    return mergedPairings.filter((pairing) =>
+      pairingExcludesOwnPlayer(
+        pairing,
+        ownPlayerId,
+        normalizePublicPlayerId,
+        aliases,
+        ownPlayerIds,
+      ),
+    ).length;
   }, [mergedPairings, ownPlayerId, aliases, ownPlayerIds, canFilterOwn]);
 
-  const foreignPairingCount = mergedPairings.length - ownPairings.length;
+  const manuallyHiddenCount = useMemo(() => {
+    const scoped =
+      !ownPlayerId || !canFilterOwn
+        ? mergedPairings
+        : mergedPairings.filter(
+            (pairing) =>
+              !pairingExcludesOwnPlayer(
+                pairing,
+                ownPlayerId,
+                normalizePublicPlayerId,
+                aliases,
+                ownPlayerIds,
+              ),
+          );
+    return scoped.filter((pairing) => pairingIsHidden(pairing, hiddenKeys)).length;
+  }, [mergedPairings, ownPlayerId, aliases, ownPlayerIds, canFilterOwn, hiddenKeys]);
 
   const overview = useMemo(
     () => buildStatsOverview(ownPairings, stats, ownPlayerId, aliases),
@@ -195,7 +239,7 @@ function StatsPageInner() {
     });
   }, []);
 
-  const handleReset = useCallback(async () => {
+  const handleDeleteSelected = useCallback(() => {
     const chosen = ownPairings.filter((p) => selectedKeys.has(p.key));
     if (chosen.length === 0) return;
     const labels = chosen
@@ -209,37 +253,42 @@ function StatsPageInner() {
       )
       .join("\n");
     const confirmed = window.confirm(
-      `Folgende Paarungen wirklich endgültig zurücksetzen?\n\n${labels}\n\n` +
-        "Die zugehörigen abgeschlossenen 2-Spieler-Runden werden serverseitig gelöscht " +
-        "und betreffen alle Geräte. Ligapunkte in betroffenen Serien werden neu berechnet. " +
-        "Das kann nicht rückgängig gemacht werden.",
+      `Folgende Paarungen aus deiner Statistik entfernen?\n\n${labels}\n\n` +
+        "Nur auf diesem Gerät. Rivalen bleiben erhalten. " +
+        "Server-Daten und andere Geräte sind unverändert. " +
+        "Du kannst ausgeblendete Paarungen später wieder anzeigen.",
     );
     if (!confirmed) return;
 
-    const sourceKeys = [...new Set(chosen.flatMap((p) => p.sourceKeys))];
-    setResetting(true);
+    setDeleting(true);
     setError(null);
-    setResetNotice(null);
+    setDeleteNotice(null);
     try {
-      const result = await resetPairings(sourceKeys);
-      let notice = `${result.deletedSessions} Runde(n) zurückgesetzt.`;
-      if (result.leaguesRebuilt > 0) {
-        notice += ` Ligapunkte in ${result.leaguesRebuilt} Serie(n) neu berechnet.`;
-      }
-      if (result.skippedMultiPlayer > 0) {
-        notice += ` ${result.skippedMultiPlayer} Mehr-Spieler-Runde(n) wurden zum Schutz anderer Paarungen nicht gelöscht.`;
-      }
-      setResetNotice(notice);
+      const keys = chosen.flatMap((pairing) => keysToHideForPairing(pairing));
+      setHiddenKeys(hidePairingKeys(keys));
+      setDeleteNotice(
+        chosen.length === 1
+          ? "1 Paarung aus der Statistik entfernt."
+          : `${chosen.length} Paarungen aus der Statistik entfernt.`,
+      );
       exitSelectMode();
       setOpenKeys(new Set());
-      await refreshPairings();
       setDetailReloadToken((value) => value + 1);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Zurücksetzen fehlgeschlagen");
     } finally {
-      setResetting(false);
+      setDeleting(false);
     }
-  }, [ownPairings, selectedKeys, ownPlayerId, aliases, exitSelectMode, refreshPairings]);
+  }, [ownPairings, selectedKeys, ownPlayerId, aliases, exitSelectMode]);
+
+  const handleRestoreHidden = useCallback(() => {
+    if (manuallyHiddenCount === 0) return;
+    const confirmed = window.confirm(
+      `${manuallyHiddenCount === 1 ? "1 ausgeblendete Paarung" : `${manuallyHiddenCount} ausgeblendete Paarungen`} wieder in der Statistik anzeigen?`,
+    );
+    if (!confirmed) return;
+    clearHiddenPairingKeys();
+    setHiddenKeys(new Set());
+    setDeleteNotice("Ausgeblendete Paarungen wieder sichtbar.");
+  }, [manuallyHiddenCount]);
 
   return (
     <div className="stats-screen flex flex-col gap-2.5 pb-2">
@@ -274,54 +323,71 @@ function StatsPageInner() {
 
       {error && <p className="glass-alert-error px-3 py-2 text-sm">{error}</p>}
 
-      {resetNotice && (
-        <p className="glass-alert-success px-3 py-2 text-sm">{resetNotice}</p>
+      {deleteNotice && (
+        <p className="glass-alert-success px-3 py-2 text-sm">{deleteNotice}</p>
       )}
 
-      {!loading && !error && ownPairings.length > 0 && (
+      {!loading && !error && (ownPairings.length > 0 || manuallyHiddenCount > 0) && (
         <>
-          <div className="stats-sort-row" role="toolbar" aria-label="Paarungen sortieren">
-            {SORT_OPTIONS.map((option) => (
-              <button
-                key={option.id}
-                type="button"
-                className={`stats-sort-chip${sortMode === option.id ? " stats-sort-chip--active" : ""}`}
-                aria-pressed={sortMode === option.id}
-                onClick={() => setSortMode(option.id)}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
+          {ownPairings.length > 0 && (
+            <div className="stats-sort-row" role="toolbar" aria-label="Paarungen sortieren">
+              {SORT_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  className={`stats-sort-chip${sortMode === option.id ? " stats-sort-chip--active" : ""}`}
+                  aria-pressed={sortMode === option.id}
+                  onClick={() => setSortMode(option.id)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          )}
 
           <div className="flex flex-wrap items-center justify-between gap-2">
             {!selectMode ? (
-              <button
-                type="button"
-                className="btn-chip px-3 py-1 text-xs"
-                onClick={() => {
-                  setResetNotice(null);
-                  setSelectMode(true);
-                }}
-              >
-                Statistik zurücksetzen
-              </button>
+              <>
+                {ownPairings.length > 0 && (
+                  <button
+                    type="button"
+                    className="btn-chip px-3 py-1 text-xs"
+                    onClick={() => {
+                      setDeleteNotice(null);
+                      setSelectMode(true);
+                    }}
+                  >
+                    Paarungen löschen
+                  </button>
+                )}
+                {manuallyHiddenCount > 0 && (
+                  <button
+                    type="button"
+                    className="btn-chip px-3 py-1 text-xs"
+                    onClick={handleRestoreHidden}
+                  >
+                    {manuallyHiddenCount === 1
+                      ? "1 gelöschte wieder anzeigen"
+                      : `${manuallyHiddenCount} gelöschte wieder anzeigen`}
+                  </button>
+                )}
+              </>
             ) : (
               <>
                 <button
                   type="button"
                   className="btn-danger px-3 py-1 text-xs"
-                  disabled={selectedKeys.size === 0 || resetting}
-                  onClick={() => void handleReset()}
+                  disabled={selectedKeys.size === 0 || deleting}
+                  onClick={handleDeleteSelected}
                 >
-                  {resetting
-                    ? "Wird zurückgesetzt …"
-                    : `Ausgewählte zurücksetzen (${selectedKeys.size})`}
+                  {deleting
+                    ? "Wird entfernt …"
+                    : `Ausgewählte löschen (${selectedKeys.size})`}
                 </button>
                 <button
                   type="button"
                   className="btn-chip px-3 py-1 text-xs"
-                  disabled={resetting}
+                  disabled={deleting}
                   onClick={exitSelectMode}
                 >
                   Abbrechen
@@ -338,10 +404,16 @@ function StatsPageInner() {
 
       {!loading && !error && ownPairings.length === 0 && (
         <div className="stats-empty-state stats-empty-state--cta">
-          <p>Noch keine Paarungen. Spiele mindestens eine Multiplayer-Runde zu Ende.</p>
-          <Link href="/multi" className="setup-host-submit mt-3 inline-flex min-h-10 items-center px-4 no-underline">
-            Multi starten
-          </Link>
+          <p>
+            {manuallyHiddenCount > 0
+              ? "Keine sichtbaren Paarungen. Du kannst gelöschte Paarungen wieder anzeigen."
+              : "Noch keine Paarungen. Spiele mindestens eine Multiplayer-Runde zu Ende."}
+          </p>
+          {manuallyHiddenCount === 0 && (
+            <Link href="/multi" className="setup-host-submit mt-3 inline-flex min-h-10 items-center px-4 no-underline">
+              Multi starten
+            </Link>
+          )}
         </div>
       )}
 

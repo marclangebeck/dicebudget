@@ -2,8 +2,10 @@
 
 import type { HouseRuleInfo } from "@/lib/houseRuleInfo";
 
+type InfoContent = Pick<HouseRuleInfo, "title" | "body">;
+
 type Props = {
-  info: HouseRuleInfo | null;
+  info: InfoContent | null;
   onClose: () => void;
 };
 

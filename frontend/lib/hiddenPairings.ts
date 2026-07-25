@@ -35,10 +35,30 @@ export function hidePairingKeys(keys: string[]): Set<string> {
   return new Set(next);
 }
 
+/** Merged-Key und alle Quell-Keys speichern, damit Zusammenführungen verborgen bleiben. */
+export function keysToHideForPairing(pairing: {
+  key: string;
+  sourceKeys?: string[];
+}): string[] {
+  return [pairing.key, ...(pairing.sourceKeys ?? [])].filter(Boolean);
+}
+
+export function pairingIsHidden(
+  pairing: { key: string; sourceKeys?: string[] },
+  hidden: ReadonlySet<string>,
+): boolean {
+  if (hidden.has(pairing.key)) return true;
+  return (pairing.sourceKeys ?? []).some((key) => hidden.has(key));
+}
+
 export function unhidePairingKey(key: string): Set<string> {
   const next = readKeys().filter((value) => value !== key);
   writeKeys(next);
   return new Set(next);
+}
+
+export function clearHiddenPairingKeys(): void {
+  writeKeys([]);
 }
 
 export function subscribeHiddenPairings(listener: () => void): () => void {

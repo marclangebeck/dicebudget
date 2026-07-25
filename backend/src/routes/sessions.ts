@@ -73,7 +73,13 @@ sessionsRouter.post("/", createSessionLimiter, async (req, res, next) => {
 
 sessionsRouter.get("/invite/:inviteCode", async (req, res, next) => {
   try {
-    const lobby = await getSessionLobbyByInvite(req.params.inviteCode);
+    const lite =
+      req.query.lite === "1" ||
+      req.query.lite === "true" ||
+      req.query.standings === "0";
+    const lobby = await getSessionLobbyByInvite(req.params.inviteCode, {
+      includeStandings: !lite,
+    });
     if (!lobby) {
       res.status(404).json({ error: "Session not found" });
       return;
