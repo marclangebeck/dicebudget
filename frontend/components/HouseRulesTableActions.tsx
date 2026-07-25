@@ -4,12 +4,19 @@ import { useState } from "react";
 import type { SessionLobbyDto } from "@/lib/sessionTypes";
 import type { RunDto } from "@/lib/types";
 import { isFeatureEnabled } from "@/lib/featureFlags";
+import { getHouseRuleInfo, type HouseRuleInfo } from "@/lib/houseRuleInfo";
 import { qualifiesYatzyStreakPenalty } from "@/lib/houseRules";
+import { HouseRuleInfoOverlay } from "@/components/HouseRuleInfoOverlay";
 import { RollSaleOverlay } from "@/components/RollSaleOverlay";
 
 export function isExtraHouseRulesUiAvailable(isLocalSolo: boolean, useStrategyRules: boolean): boolean {
   if (!useStrategyRules) return false;
-  if (!isFeatureEnabled("houseRulesRollSale") && !isFeatureEnabled("houseRulesYatzyStreak")) {
+  if (
+    !isFeatureEnabled("houseRulesRollSale") &&
+    !isFeatureEnabled("houseRulesYatzyStreak") &&
+    !isFeatureEnabled("houseRulesYatzyTriple") &&
+    !isFeatureEnabled("houseRulesUpperRace")
+  ) {
     return false;
   }
   return !isLocalSolo;
@@ -28,6 +35,33 @@ type HouseRulesTableActionsProps = {
   variant?: "entry" | "popover";
 };
 
+function RuleTitle({
+  title,
+  infoKey,
+  onInfo,
+}: {
+  title: string;
+  infoKey: string;
+  onInfo: (info: HouseRuleInfo) => void;
+}) {
+  return (
+    <p className="text-xs font-semibold settings-rule-title-row">
+      <span>{title}</span>
+      <button
+        type="button"
+        className="house-rule-info-btn"
+        aria-label={`Info zu ${title}`}
+        onClick={() => {
+          const info = getHouseRuleInfo(infoKey);
+          if (info) onInfo(info);
+        }}
+      >
+        i
+      </button>
+    </p>
+  );
+}
+
 export function HouseRulesTableActions({
   run,
   inviteCode,
@@ -41,9 +75,12 @@ export function HouseRulesTableActions({
 }: HouseRulesTableActionsProps) {
   const [rollSaleOpen, setRollSaleOpen] = useState(false);
   const [yatzyVictimId, setYatzyVictimId] = useState("");
+  const [ruleInfo, setRuleInfo] = useState<HouseRuleInfo | null>(null);
 
   const rollSaleEnabled = isFeatureEnabled("houseRulesRollSale");
   const yatzyEnabled = isFeatureEnabled("houseRulesYatzyStreak");
+  const yatzyTripleEnabled = isFeatureEnabled("houseRulesYatzyTriple");
+  const upperRaceEnabled = isFeatureEnabled("houseRulesUpperRace");
 
   if (!isExtraHouseRulesUiAvailable(isLocalSolo, run.useStrategyRules)) {
     return null;
@@ -79,7 +116,29 @@ export function HouseRulesTableActions({
             onClick={() => setRollSaleOpen(true)}
             className="house-rules-action min-h-9 px-3 text-left text-xs font-semibold disabled:opacity-45"
           >
-            Wurf verkaufen
+            <span className="settings-rule-title-row">
+              Wurf verkaufen
+              <span
+                role="button"
+                tabIndex={0}
+                className="house-rule-info-btn"
+                aria-label="Info zu Wurf verkaufen"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setRuleInfo(getHouseRuleInfo("rollSale"));
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setRuleInfo(getHouseRuleInfo("rollSale"));
+                  }
+                }}
+              >
+                i
+              </span>
+            </span>
             <span className="house-rules-action-hint block font-normal">
               Verkäufer braucht eine volle Feldzeile
             </span>
@@ -87,14 +146,35 @@ export function HouseRulesTableActions({
         )}
 
         {yatzyEnabled && lobby && lobby.playerCount === 2 && (
-          <p className="house-rules-action-hint text-[0.65rem]">
-            2× Alle Fünfe (≤3 Würfe): Pool-Strafe wird automatisch angewendet.
-          </p>
+          <div className="house-rules-subpanel rounded-lg border p-2">
+            <RuleTitle title="2× Alle Fünfe" infoKey="yatzyStreak2" onInfo={setRuleInfo} />
+            <p className="house-rules-action-hint mt-0.5 text-[0.65rem]">
+              ≤3 Würfe: Pool-Strafe wird automatisch angewendet.
+            </p>
+          </div>
+        )}
+
+        {yatzyTripleEnabled && lobby && lobby.playerCount === 2 && (
+          <div className="house-rules-subpanel rounded-lg border p-2">
+            <RuleTitle title="3× Alle Fünfe" infoKey="yatzyStreak3" onInfo={setRuleInfo} />
+            <p className="house-rules-action-hint mt-0.5 text-[0.65rem]">
+              ≤3 Würfe: Gegner verliert den gesamten Pool (automatisch).
+            </p>
+          </div>
+        )}
+
+        {upperRaceEnabled && lobby && lobby.playerCount === 2 && (
+          <div className="house-rules-subpanel rounded-lg border p-2">
+            <RuleTitle title="Oberer Bereich zuerst" infoKey="upperRace" onInfo={setRuleInfo} />
+            <p className="house-rules-action-hint mt-0.5 text-[0.65rem]">
+              Offene obere Felder des Rivalen als Pool (automatisch).
+            </p>
+          </div>
         )}
 
         {yatzyEnabled && lobby && lobby.playerCount > 2 && (
           <div className="house-rules-subpanel rounded-lg border p-2">
-            <p className="text-xs font-semibold">2× Alle Fünfe (≤3 Würfe)</p>
+            <RuleTitle title="2× Alle Fünfe (≤3 Würfe)" infoKey="yatzyStreak2" onInfo={setRuleInfo} />
             <p className="house-rules-action-hint mt-0.5 text-[0.65rem]">
               Gegner verliert die Hälfte des Pools (abrunden).
             </p>
@@ -146,6 +226,7 @@ export function HouseRulesTableActions({
           }}
         />
       )}
+      <HouseRuleInfoOverlay info={ruleInfo} onClose={() => setRuleInfo(null)} />
     </>
   );
 }

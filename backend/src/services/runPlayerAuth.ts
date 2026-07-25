@@ -2,7 +2,9 @@ import { prisma } from "../db/prisma.js";
 
 export class ForbiddenRunError extends Error {
   constructor() {
-    super("Invalid or missing player token for multiplayer run");
+    super(
+      "Spieler-Anmeldung ungültig oder abgelaufen. Bitte dem Raum erneut beitreten.",
+    );
     this.name = "ForbiddenRunError";
   }
 }

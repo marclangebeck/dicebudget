@@ -177,6 +177,24 @@ export function assertValidSessionPlayers(count: number): void {
   }
 }
 
+export type SessionHouseRuleFlags = {
+  ruleYatzyStreak2?: boolean;
+  ruleYatzyTriple?: boolean;
+  ruleUpperRace?: boolean;
+};
+
+function sumEnteredDiceScores(
+  games: { fields: { score: number | null }[] }[],
+): number {
+  let sum = 0;
+  for (const game of games) {
+    for (const field of game.fields) {
+      if (field.score !== null) sum += field.score;
+    }
+  }
+  return sum;
+}
+
 export async function createGameSession(
   gameCount: number,
   maxPlayers: number,
@@ -184,9 +202,14 @@ export async function createGameSession(
   leagueCode?: string,
   showOpponentPool = false,
   poolEndgameEnabled = false,
+  houseRules: SessionHouseRuleFlags = {},
 ) {
   assertValidGameCount(gameCount);
   assertValidSessionPlayers(maxPlayers);
+
+  const ruleYatzyStreak2 = houseRules.ruleYatzyStreak2 !== false;
+  const ruleYatzyTriple = houseRules.ruleYatzyTriple !== false;
+  const ruleUpperRace = houseRules.ruleUpperRace !== false;
 
   const session = await prisma.$transaction(async (tx) => {
     const inviteCode = await generateUniqueInviteCode(tx);
@@ -224,6 +247,9 @@ export async function createGameSession(
         useStrategyRules,
         showOpponentPool,
         poolEndgameEnabled: poolEndgameEnabled && useStrategyRules,
+        ruleYatzyStreak2: useStrategyRules && ruleYatzyStreak2,
+        ruleYatzyTriple: useStrategyRules && ruleYatzyTriple,
+        ruleUpperRace: useStrategyRules && ruleUpperRace,
         status: SESSION_STATUS.OPEN,
         leagueId,
         roundNumber,
@@ -242,6 +268,9 @@ export async function createGameSession(
     useStrategyRules: session.useStrategyRules,
     showOpponentPool: session.showOpponentPool,
     poolEndgameEnabled: session.poolEndgameEnabled,
+    ruleYatzyStreak2: session.ruleYatzyStreak2,
+    ruleYatzyTriple: session.ruleYatzyTriple,
+    ruleUpperRace: session.ruleUpperRace,
     status: session.status,
     createdAt: session.createdAt.toISOString(),
     leagueCode: session.league.leagueCode,
@@ -258,7 +287,14 @@ export async function getSessionLobbyByInvite(inviteCode: string) {
       players: {
         orderBy: { orderIndex: "asc" },
         include: {
-          run: { select: { status: true, totalScore: true, rollsInPool: true } },
+          run: {
+            select: {
+              status: true,
+              totalScore: true,
+              rollsInPool: true,
+              games: { select: { fields: { select: { score: true } } } },
+            },
+          },
         },
       },
     },
@@ -284,6 +320,9 @@ export async function getSessionLobbyByInvite(inviteCode: string) {
     poolEndgameImproverPlayerId: improver
       ? publicPlayerIdFromStoredName(improver.name)
       : null,
+    ruleYatzyStreak2: session.ruleYatzyStreak2,
+    ruleYatzyTriple: session.ruleYatzyTriple,
+    ruleUpperRace: session.ruleUpperRace,
     status: session.status,
     createdAt: session.createdAt.toISOString(),
     leagueCode: session.league.leagueCode,
@@ -296,6 +335,8 @@ export async function getSessionLobbyByInvite(inviteCode: string) {
       orderIndex: p.orderIndex,
       runFinished: isRunTerminal(p.run.status),
       totalScore: p.run.totalScore,
+      /** Nur eingetragene Feldpunkte (ohne oberen Bonus / Extra-Yatzy). */
+      diceScore: sumEnteredDiceScores(p.run.games),
       /** Pool nur offenlegen, wenn der Host es für die Partie erlaubt hat. */
       rollsInPool: session.showOpponentPool ? p.run.rollsInPool : null,
     })),

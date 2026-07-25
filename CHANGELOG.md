@@ -10,7 +10,14 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Hausregel auto (2 Spieler, Strategy):** 2× Alle Fünfe ≤3 Würfe halbieren Gegner-Pool automatisch + Overlay
 - **Hausregel auto (2 Spieler, Strategy):** Wer zuerst den gesamten oberen Bereich (alle Spiele × 6 Felder) voll hat, erhält die offenen oberen Felder des Rivalen als Pool + Overlay
 
+### Added
+- **Hausregel 3× Alle Fünfe:** Gegner verliert gesamten Pool (automatisch im Duell) + Overlay; Toggle unter Hausregeln
+- **Hausregeln-Toggles:** Oberer-Bereich-Rennen und 3× Alle Fünfe; Info-„i“-Overlay pro Regel
+- **Session-Flags:** Host-Toggles für Auto-Hausregeln werden beim Raum-Erstellen übernommen
+
 ### Fixed
+- **Paarung bearbeiten:** Baseline-Korrektur ohne Admin-API-Key (iOS ohne eingebetteten Key)
+- **Fortschritt 25/50/75 %:** Punktdifferenz nur aus eingetragenen Feldpunkten (ohne oberen Bonus / Extra-Yatzy)
 - **Statistik-Filter:** Paarungen bleiben sichtbar, wenn die Geräte-ID fehlt oder nur per Alias zusammengeführt ist (kein leerer Stats-Screen mehr)
 - **Hamburger Rivalen/Tour:** Interne Menü-Ziele per `router.push` nach Menü-Schließen (nicht mehr Link+onClose) — verhindert Sprung auf den Startscreen in Capacitor
 - **App-Tour aus Menü:** Startet die Overlay-Tour zuverlässig (Event + Pending), statt nur auf den Startscreen zu wechseln

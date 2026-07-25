@@ -31,6 +31,10 @@ sessionsRouter.post("/", createSessionLimiter, async (req, res, next) => {
         : Boolean(req.body.useStrategyRules);
     const showOpponentPool = Boolean(req.body?.showOpponentPool);
     const poolEndgameEnabled = Boolean(req.body?.poolEndgameEnabled);
+    const houseRulesBody =
+      req.body?.houseRules && typeof req.body.houseRules === "object"
+        ? (req.body.houseRules as Record<string, unknown>)
+        : {};
     if (Number.isNaN(gameCount) || Number.isNaN(maxPlayers)) {
       res.status(400).json({ error: "gameCount and maxPlayers required" });
       return;
@@ -46,6 +50,20 @@ sessionsRouter.post("/", createSessionLimiter, async (req, res, next) => {
       leagueCode,
       showOpponentPool,
       poolEndgameEnabled,
+      {
+        ruleYatzyStreak2:
+          houseRulesBody.ruleYatzyStreak2 === undefined
+            ? undefined
+            : Boolean(houseRulesBody.ruleYatzyStreak2),
+        ruleYatzyTriple:
+          houseRulesBody.ruleYatzyTriple === undefined
+            ? undefined
+            : Boolean(houseRulesBody.ruleYatzyTriple),
+        ruleUpperRace:
+          houseRulesBody.ruleUpperRace === undefined
+            ? undefined
+            : Boolean(houseRulesBody.ruleUpperRace),
+      },
     );
     res.status(201).json({ session });
   } catch (error) {

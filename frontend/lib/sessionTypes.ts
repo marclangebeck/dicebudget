@@ -20,6 +20,9 @@ export type SessionLobbyDto = {
   poolEndgameResolved: boolean;
   /** Öffentliche playerId des Pool-Siegers, oder null (kein eindeutiger Sieger / noch offen). */
   poolEndgameImproverPlayerId: string | null;
+  ruleYatzyStreak2?: boolean;
+  ruleYatzyTriple?: boolean;
+  ruleUpperRace?: boolean;
   status: string;
   createdAt: string;
   leagueCode: string;
@@ -32,6 +35,8 @@ export type SessionLobbyDto = {
     orderIndex: number;
     runFinished: boolean;
     totalScore: number;
+    /** Eingetragene Feldpunkte ohne oberen Bonus / Extra-Yatzy. */
+    diceScore?: number;
     /** Wurf-Pool des Spielers; nur gesetzt, wenn der Host es erlaubt hat. */
     rollsInPool: number | null;
   }[];

@@ -18,6 +18,8 @@ export type FeatureDefinition = {
   stage: FeatureStage;
   /** Standard im Labor, wenn noch kein Toggle gesetzt wurde. */
   defaultLabsOn?: boolean;
+  /** Key für Info-Overlay (houseRuleInfo). */
+  infoKey?: string;
 };
 
 /**
@@ -31,6 +33,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
     description: "Ungültiger Wurf am Tisch: −1 Pool, physisch neu würfeln.",
     stage: "labs",
     defaultLabsOn: true,
+    infoKey: "burn",
   },
   houseRulesRollSale: {
     id: "houseRulesRollSale",
@@ -38,6 +41,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
     description: "Bei voller Feldzeile Wurf verkaufen, Freifeld ohne Würfeln.",
     stage: "labs",
     defaultLabsOn: true,
+    infoKey: "rollSale",
   },
   houseRulesYatzyStreak: {
     id: "houseRulesYatzyStreak",
@@ -45,6 +49,24 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
     description: "Zwei Alle Fünfe (≤3 Würfe) hintereinander: Gegner verliert halben Pool.",
     stage: "labs",
     defaultLabsOn: true,
+    infoKey: "yatzyStreak2",
+  },
+  houseRulesYatzyTriple: {
+    id: "houseRulesYatzyTriple",
+    title: "Hausregel: 3× Alle Fünfe",
+    description: "Drei Alle Fünfe (≤3 Würfe) hintereinander: Gegner verliert den gesamten Pool.",
+    stage: "labs",
+    defaultLabsOn: true,
+    infoKey: "yatzyStreak3",
+  },
+  houseRulesUpperRace: {
+    id: "houseRulesUpperRace",
+    title: "Hausregel: Oberer Bereich zuerst",
+    description:
+      "Wer zuerst alle oberen Felder (Spiele × 6) voll hat, erhält die offenen oberen Felder des Rivalen als Pool.",
+    stage: "labs",
+    defaultLabsOn: true,
+    infoKey: "upperRace",
   },
 };
 
@@ -96,6 +118,26 @@ export function isFeatureEnabled(featureId: string): boolean {
   const pref = getLabsFeaturePref(featureId);
   if (typeof pref === "boolean") return pref;
   return Boolean(feature.defaultLabsOn);
+}
+
+/** Session-Flags für Auto-Hausregeln: ohne Labs-Unlock Standard an (wie bisher). */
+export function sessionHouseRuleFlagsFromPrefs(): {
+  ruleYatzyStreak2: boolean;
+  ruleYatzyTriple: boolean;
+  ruleUpperRace: boolean;
+} {
+  if (!isLabsUnlocked()) {
+    return {
+      ruleYatzyStreak2: true,
+      ruleYatzyTriple: true,
+      ruleUpperRace: true,
+    };
+  }
+  return {
+    ruleYatzyStreak2: isFeatureEnabled("houseRulesYatzyStreak"),
+    ruleYatzyTriple: isFeatureEnabled("houseRulesYatzyTriple"),
+    ruleUpperRace: isFeatureEnabled("houseRulesUpperRace"),
+  };
 }
 
 export function subscribeFeatureFlags(listener: () => void): () => void {

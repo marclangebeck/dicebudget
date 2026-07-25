@@ -9352,6 +9352,38 @@ html.zoomable-route.legal-route .legal-page-scroll {
   color: #fef3c7;
 }
 
+.settings-rule-title-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.house-rule-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  background: rgba(15, 23, 42, 0.55);
+  color: #e2e8f0;
+  font-size: 0.65rem;
+  font-weight: 800;
+  font-style: italic;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.house-rule-info-btn:hover,
+.house-rule-info-btn:focus-visible {
+  border-color: rgba(253, 230, 138, 0.7);
+  color: #fde68a;
+  outline: none;
+}
+
 .rule-event-overlay {
   position: fixed;
 }

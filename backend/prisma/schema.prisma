@@ -61,6 +61,10 @@ model GameSession {
   poolEndgameEnabled    Boolean @default(false) @map("pool_endgame_enabled")
   poolEndgameImproverId String? @map("pool_endgame_improver_id")
   poolEndgameResolved   Boolean @default(false) @map("pool_endgame_resolved")
+  // Auto house-rule toggles (set by host when creating session)
+  ruleYatzyStreak2  Boolean  @default(true) @map("rule_yatzy_streak_2")
+  ruleYatzyTriple   Boolean  @default(true) @map("rule_yatzy_triple")
+  ruleUpperRace     Boolean  @default(true) @map("rule_upper_race")
   status            String   @default("OPEN")
   leagueId          String   @map("league_id")
   league            League   @relation(fields: [leagueId], references: [id], onDelete: Cascade)
@@ -101,6 +105,8 @@ model Run {
   upperRacePoolCredited Boolean @default(false) @map("upper_race_pool_credited")
   // scoredSequence marker of last auto yatzy-streak penalty
   yatzyStreakPenaltyAtSequence Int? @map("yatzy_streak_penalty_at_sequence")
+  // scoredSequence marker of last auto 3x yatzy wipe
+  yatzyTriplePenaltyAtSequence Int? @map("yatzy_triple_penalty_at_sequence")
   extraYatzyCount   Int      @default(0) @map("extra_yatzy_count")
   nextScoredSequence Int     @default(1) @map("next_scored_sequence")
   status            String   @default("ACTIVE")

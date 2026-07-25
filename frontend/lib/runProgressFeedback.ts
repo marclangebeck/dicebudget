@@ -42,6 +42,24 @@ function progressPercent(run: RunDto): number {
   return (countScoredFields(run) / total) * 100;
 }
 
+/** Summe eingetragener Feldpunkte — ohne oberen Bonus (+35) und ohne Extra-Yatzy. */
+export function enteredDiceScore(run: RunDto): number {
+  let sum = 0;
+  for (const game of run.games) {
+    for (const field of game.fields) {
+      if (field.score !== null) sum += field.score;
+    }
+  }
+  return sum;
+}
+
+function deltaFromScores(myScore: number, otherScore: number): ProgressPositionResolved {
+  const scoreDelta = myScore - otherScore;
+  if (scoreDelta > 0) return { hint: "ahead", scoreDelta };
+  if (scoreDelta < 0) return { hint: "behind", scoreDelta };
+  return { hint: "even", scoreDelta: 0 };
+}
+
 export function resolveProgressPosition(
   run: RunDto,
   context: ProgressPositionContext | null,
@@ -52,26 +70,23 @@ export function resolveProgressPosition(
     const otherSide: TableModeSide = context.ownSide === "left" ? "right" : "left";
     const otherRun = context.runs[otherSide];
     if (!otherRun) return null;
-    const scoreDelta = run.totalScore - otherRun.totalScore;
-    if (scoreDelta > 0) return { hint: "ahead", scoreDelta };
-    if (scoreDelta < 0) return { hint: "behind", scoreDelta };
-    return { hint: "even", scoreDelta: 0 };
+    return deltaFromScores(enteredDiceScore(run), enteredDiceScore(otherRun));
   }
 
   const ownNorm = normalizePublicPlayerId(context.ownPlayerId);
-  const ranked = [...context.lobby.players].sort((a, b) => b.totalScore - a.totalScore);
-  const myIndex = ranked.findIndex((player) => normalizePublicPlayerId(player.playerId) === ownNorm);
-  if (myIndex < 0 || ranked.length < 2) return null;
+  const myDice = enteredDiceScore(run);
+  const others = context.lobby.players.filter(
+    (player) => normalizePublicPlayerId(player.playerId) !== ownNorm,
+  );
+  if (others.length === 0) return null;
 
-  const myScore = run.totalScore;
-  const bestOther = ranked.find((player) => normalizePublicPlayerId(player.playerId) !== ownNorm)
-    ?.totalScore;
-  if (bestOther == null) return null;
+  const bestOtherDice = Math.max(
+    ...others.map((player) =>
+      typeof player.diceScore === "number" ? player.diceScore : player.totalScore,
+    ),
+  );
 
-  const scoreDelta = myScore - bestOther;
-  if (scoreDelta > 0) return { hint: "ahead", scoreDelta };
-  if (scoreDelta < 0) return { hint: "behind", scoreDelta };
-  return { hint: "even", scoreDelta: 0 };
+  return deltaFromScores(myDice, bestOtherDice);
 }
 
 /** @deprecated Prefer resolveProgressPosition */

@@ -7,6 +7,7 @@ import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { JoinByCodeForm } from "@/components/JoinByCodeForm";
 import { createGameSession, joinSession } from "@/lib/api";
 import { saveActiveGame } from "@/lib/activeGame";
+import { sessionHouseRuleFlagsFromPrefs } from "@/lib/featureFlags";
 import { upsertRivalName } from "@/lib/rivalProfiles";
 import { shareInviteCode } from "@/lib/shareSocial";
 import { settingsHrefWithReturn } from "@/lib/settingsReturn";
@@ -44,6 +45,7 @@ export default function MultiHostPage() {
         undefined,
         settings.useStrategyRules && settings.showOpponentPool,
         settings.useStrategyRules && settings.poolEndgameEnabled,
+        sessionHouseRuleFlagsFromPrefs(),
       );
       if (settings.tableModeEnabled) {
         const leftPlayerId = createTableModePlayerId();

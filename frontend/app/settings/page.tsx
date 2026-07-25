@@ -3,11 +3,13 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
+import { HouseRuleInfoOverlay } from "@/components/HouseRuleInfoOverlay";
 import { LabsUnlockDialog } from "@/components/LabsUnlockDialog";
 import { SettingsGameActions } from "@/components/settings/SettingsGameActions";
 import { SettingsRangeCard } from "@/components/settings/SettingsRangeCard";
 import { SettingsSection } from "@/components/settings/SettingsSection";
 import { SettingsToggleCard } from "@/components/settings/SettingsToggleCard";
+import { getHouseRuleInfo, type HouseRuleInfo } from "@/lib/houseRuleInfo";
 import { MODE_CLASSIC_LABEL, MODE_STRATEGY_LABEL } from "@/lib/branding";
 import {
   FEATURE_FLAGS_CHANGED_EVENT,
@@ -49,6 +51,7 @@ function SettingsPageInner() {
   );
   const [labsUnlocked, setLabsUnlocked] = useState(false);
   const [showLabsUnlock, setShowLabsUnlock] = useState(false);
+  const [ruleInfo, setRuleInfo] = useState<HouseRuleInfo | null>(null);
   const [featureRevision, setFeatureRevision] = useState(0);
   const [openSections, setOpenSections] = useState<Record<SettingsSectionId, boolean>>({
     mode: false,
@@ -307,7 +310,7 @@ function SettingsPageInner() {
                 Entwickler-Vorschau
               </p>
               <p className="settings-compact-text settings-compact-text--sm">
-                Code eingeben, um Brennt, Wurf verkaufen und 2× Alle Fünfe zu testen.
+                Code eingeben, um alle Hausregeln (Brennt, Verkauf, Alle Fünfe, Oberer Bereich) zu testen.
               </p>
               <button
                 type="button"
@@ -326,6 +329,11 @@ function SettingsPageInner() {
                   description={feature.description}
                   checked={isFeatureEnabled(feature.id)}
                   onChange={(value) => setLabsFeaturePref(feature.id, value)}
+                  onInfo={
+                    feature.infoKey
+                      ? () => setRuleInfo(getHouseRuleInfo(feature.infoKey))
+                      : undefined
+                  }
                 />
               ))}
               <div className="settings-compact-card settings-compact-card--wide settings-compact-card--slim settings-compact-card--labs">
@@ -352,6 +360,7 @@ function SettingsPageInner() {
         onClose={() => setShowLabsUnlock(false)}
         onUnlocked={() => setLabsUnlocked(true)}
       />
+      <HouseRuleInfoOverlay info={ruleInfo} onClose={() => setRuleInfo(null)} />
     </div>
   );
 }

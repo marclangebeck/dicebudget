@@ -51,9 +51,29 @@ async function request<T>(path: string, init?: ApiRequestInit): Promise<T> {
     body = {};
   }
   if (!res.ok) {
-    throw new Error(body.error ?? `Request failed (${res.status})`);
+    throw new Error(translateApiError(body.error, res.status));
   }
   return body as T;
+}
+
+function translateApiError(message: string | undefined, status: number): string {
+  const raw = (message ?? "").trim();
+  if (
+    raw === "Invalid or missing player token for multiplayer run" ||
+    raw.includes("player token")
+  ) {
+    return "Spieler-Anmeldung ungültig oder abgelaufen. Bitte dem Raum erneut beitreten.";
+  }
+  if (
+    raw === "Invalid or missing admin API key" ||
+    raw.toLowerCase().includes("admin api key")
+  ) {
+    return "Admin-Schlüssel fehlt oder ist falsch. Paarungen bearbeiten geht ohne Key; Löschen braucht den Web-/Env-Key.";
+  }
+  if (raw === "Admin API not configured") {
+    return "Admin-API nicht konfiguriert (Server).";
+  }
+  return raw || `Anfrage fehlgeschlagen (${status})`;
 }
 
 export function createRun(gameCount: number, useStrategyRules = true) {
@@ -262,6 +282,11 @@ export function createGameSession(
   leagueCode?: string,
   showOpponentPool = false,
   poolEndgameEnabled = false,
+  houseRules?: {
+    ruleYatzyStreak2?: boolean;
+    ruleYatzyTriple?: boolean;
+    ruleUpperRace?: boolean;
+  },
 ) {
   return request<{ session: SessionLobbyDto }>("/sessions", {
     method: "POST",
@@ -272,6 +297,7 @@ export function createGameSession(
       leagueCode,
       showOpponentPool,
       poolEndgameEnabled,
+      houseRules,
     }),
   });
 }

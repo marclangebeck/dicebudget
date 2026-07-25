@@ -100,15 +100,26 @@ type ScoredHistoryField = {
   score: number | null;
 };
 
-export function qualifiesYatzyStreakPenalty(fields: ScoredHistoryField[]): boolean {
-  const scored = fields
+function scoredHistory(fields: ScoredHistoryField[]): ScoredHistoryField[] {
+  return fields
     .filter((f) => f.score !== null && f.scoredSequence != null)
     .sort((a, b) => (a.scoredSequence ?? 0) - (b.scoredSequence ?? 0));
+}
+
+function isFastYatzy(field: ScoredHistoryField): boolean {
+  return field.fieldType === "KNIFFEL" && field.rollsUsed >= 1 && field.rollsUsed <= 3;
+}
+
+export function qualifiesYatzyStreakPenalty(fields: ScoredHistoryField[]): boolean {
+  const scored = scoredHistory(fields);
   if (scored.length < 2) return false;
-  const lastTwo = scored.slice(-2);
-  return lastTwo.every(
-    (f) => f.fieldType === "KNIFFEL" && f.rollsUsed >= 1 && f.rollsUsed <= 3,
-  );
+  return scored.slice(-2).every(isFastYatzy);
+}
+
+export function qualifiesYatzyTriplePenalty(fields: ScoredHistoryField[]): boolean {
+  const scored = scoredHistory(fields);
+  if (scored.length < 3) return false;
+  return scored.slice(-3).every(isFastYatzy);
 }
 
 export function halvePoolRoundedDown(pool: number): number {
@@ -143,9 +154,16 @@ export function isRunUpperComplete(games: GameRow[]): boolean {
 
 export function yatzyStreakPenaltyMarker(fields: ScoredHistoryField[]): number | null {
   if (!qualifiesYatzyStreakPenalty(fields)) return null;
-  const scored = fields
-    .filter((f) => f.score !== null && f.scoredSequence != null)
-    .sort((a, b) => (a.scoredSequence ?? 0) - (b.scoredSequence ?? 0));
-  const lastTwo = scored.slice(-2);
+  const lastTwo = scoredHistory(fields).slice(-2);
   return Math.max(lastTwo[0]!.scoredSequence ?? 0, lastTwo[1]!.scoredSequence ?? 0);
+}
+
+export function yatzyTriplePenaltyMarker(fields: ScoredHistoryField[]): number | null {
+  if (!qualifiesYatzyTriplePenalty(fields)) return null;
+  const lastThree = scoredHistory(fields).slice(-3);
+  return Math.max(
+    lastThree[0]!.scoredSequence ?? 0,
+    lastThree[1]!.scoredSequence ?? 0,
+    lastThree[2]!.scoredSequence ?? 0,
+  );
 }
