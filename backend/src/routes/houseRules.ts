@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { readPlayerSecret } from "./readPlayerSecret.js";
+import { isBurnMode } from "../domain/houseRules.js";
 import {
   applyBurnRoll,
   applyYatzyStreakPenalty,
@@ -18,9 +19,16 @@ houseRulesRouter.post("/burn", async (req, res, next) => {
       res.status(400).json({ error: "fieldId required" });
       return;
     }
+    const modeRaw = req.body?.mode;
+    const mode = modeRaw === undefined || modeRaw === null ? "reroll" : modeRaw;
+    if (!isBurnMode(mode)) {
+      res.status(400).json({ error: "mode must be reroll or set_face" });
+      return;
+    }
     const run = await applyBurnRoll(
       routeParam((req.params as { runId: string }).runId),
       fieldId.trim(),
+      mode,
       readPlayerSecret(req),
     );
     res.json({ run });

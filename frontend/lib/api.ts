@@ -179,10 +179,15 @@ export function abandonRun(runId: string, playerSecret?: string) {
   });
 }
 
-export function applyBurnRoll(runId: string, fieldId: string, playerSecret?: string) {
+export function applyBurnRoll(
+  runId: string,
+  fieldId: string,
+  mode: "reroll" | "set_face" = "reroll",
+  playerSecret?: string,
+) {
   return request<{ run: RunDto }>(`/runs/${runId}/house-rules/burn`, {
     method: "POST",
-    body: JSON.stringify({ fieldId }),
+    body: JSON.stringify({ fieldId, mode }),
     playerSecret,
   });
 }

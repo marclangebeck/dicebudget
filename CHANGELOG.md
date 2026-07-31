@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **Einswurf-Sound:** Kurzer Ping bei Strategy-Eintrag mit genau 1 Wurf und Score &gt; 0 (kein Overlay; nicht bei Achievement/Korrektur/Verkauf)
 - **Spalten-Pool-Boni (M40):** Erster Spieler: Spalte oben mit Bonus / unten voll / gleiche Spalte komplett — je +2 Pool (max. 6); Labs + Session-Flag
 - **Menü-Version (M39):** Hamburger zeigt `Version 2.0 (…)` aus `NEXT_PUBLIC_APP_VERSION` / `NEXT_PUBLIC_APP_BUILD`
 - **Fortschritt 25/50/75 %:** Punktdifferenz zum Gegner im Overlay („X Punkte voraus/zurück“)
@@ -16,6 +17,8 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Statistik:** Paarungen lokal ausblenden (`hiddenPairings`); Wiederherstellen; Startscreen-Bilanz berücksichtigt Hide-Liste
 
 ### Changed
+- **InApp-Käufe (Features):** Wording „Hausregeln“ in Spielregeln/Tour/Overlays durch „InApp-Käufe (Features)“ ersetzt (Vorbereitung Monetarisierung)
+- **Brennt:** Zwei Optionen — Neu würfeln (−1 Pool, nur brennender Würfel; Rest liegen lassen) oder Augenzahl selbst (−2 Pool, daneben legen)
 - **Paarung bearbeiten (M38):** Siege/Diff nur noch mit Admin-Key (widerruft die temporäre Öffnung für iOS ohne Key)
 - **Feldeintrag-Performance:** weniger Queries, Complete ohne Roll-Historie, Lobby mid-game `?lite=1`, Overlay vor Lobby-Wait
 - **Hausregel Brennt:** Pool-Kosten 1 (siehe auch unten); Auto-Regeln nur bei Session-Flag + Strategy-Duell

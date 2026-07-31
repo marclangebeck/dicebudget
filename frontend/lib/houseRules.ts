@@ -1,8 +1,17 @@
 import type { FieldTypeId, RunDto } from "@/lib/types";
 
+/** @deprecated Prefer BURN_POOL_COST_REROLL */
 export const BURN_POOL_COST = 1;
+export const BURN_POOL_COST_REROLL = 1;
+export const BURN_POOL_COST_SET_FACE = 2;
 
-/** Brennt: leeres Feld gewählt, Eintrag noch nicht gebucht (nicht Korrektur). */
+export type BurnMode = "reroll" | "set_face";
+
+export function burnPoolCost(mode: BurnMode): number {
+  return mode === "set_face" ? BURN_POOL_COST_SET_FACE : BURN_POOL_COST_REROLL;
+}
+
+/** Brennt: leeres Feld gewählt, Eintrag noch nicht gebucht (nicht Korrektur). Mind. 1 Pool. */
 export function canBurnHouseRule(
   run: RunDto,
   activeFieldId: string | null,
@@ -10,10 +19,20 @@ export function canBurnHouseRule(
 ): boolean {
   if (!activeFieldId || run.status !== "ACTIVE" || !run.useStrategyRules) return false;
   if (isCorrection) return false;
-  if (run.rollsInPool < BURN_POOL_COST) return false;
+  if (run.rollsInPool < BURN_POOL_COST_REROLL) return false;
   const field = run.games.flatMap((g) => g.fields).find((f) => f.id === activeFieldId);
   if (!field || field.score !== null) return false;
   return field.rollsUsed === 0;
+}
+
+export function canBurnMode(
+  run: RunDto,
+  activeFieldId: string | null,
+  isCorrection: boolean,
+  mode: BurnMode,
+): boolean {
+  if (!canBurnHouseRule(run, activeFieldId, isCorrection)) return false;
+  return run.rollsInPool >= burnPoolCost(mode);
 }
 
 const UPPER_FACE: Record<string, 1 | 2 | 3 | 4 | 5 | 6> = {

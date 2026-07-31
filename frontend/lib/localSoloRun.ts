@@ -1,6 +1,6 @@
 import { computeGameBreakdown, gameIndexForExtraYatzyClick } from "@/lib/gameScoring";
 import { poolDeltaForComplete } from "@/lib/gameRules";
-import { BURN_POOL_COST, isValidRollSaleScore } from "@/lib/houseRules";
+import { burnPoolCost, isValidRollSaleScore } from "@/lib/houseRules";
 import { SHEET_ROWS } from "@/lib/labels";
 import type { FieldDto, FieldTypeId, GameDto, RunDto } from "@/lib/types";
 
@@ -168,7 +168,11 @@ export function getLocalSoloRun(runId: string): RunDto {
   return deepClone(state.run);
 }
 
-export function burnLocalSoloRoll(runId: string, fieldId: string): RunDto {
+export function burnLocalSoloRoll(
+  runId: string,
+  fieldId: string,
+  mode: "reroll" | "set_face" = "reroll",
+): RunDto {
   const state = getState(runId);
   const run = state.run;
   if (run.status !== "ACTIVE") throw new Error("Run is not active");
@@ -178,10 +182,11 @@ export function burnLocalSoloRoll(runId: string, fieldId: string): RunDto {
     throw new Error("Brennt nur am Anfang eines Wurfes");
   }
   if (field.rollsUsed > 0) throw new Error("Brennt nur am Anfang eines Wurfes");
-  if (run.rollsInPool < BURN_POOL_COST) {
-    throw new Error(`Nicht genug Pool für Brennt (benötigt ${BURN_POOL_COST})`);
+  const cost = burnPoolCost(mode);
+  if (run.rollsInPool < cost) {
+    throw new Error(`Nicht genug Pool für Brennt (benötigt ${cost})`);
   }
-  run.rollsInPool -= BURN_POOL_COST;
+  run.rollsInPool -= cost;
   return saveState(state);
 }
 

@@ -22,7 +22,7 @@ export function RuleEventOverlay({ event, onClose }: Props) {
         onClick={onClose}
       />
       <div className="rule-event-card relative z-10 text-center">
-        <p className="rule-event-kicker">Hausregel</p>
+        <p className="rule-event-kicker">Feature</p>
         <p className="rule-event-badge tabular-nums">{event.badge}</p>
         <h2 id="rule-event-title" className="rule-event-title">
           {event.title}

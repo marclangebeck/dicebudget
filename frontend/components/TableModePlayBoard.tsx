@@ -25,11 +25,15 @@ import {
 } from "@/lib/api";
 import { APP_HOME_PATH } from "@/lib/branding";
 import { poolDeltaForComplete } from "@/lib/gameRules";
-import { BURN_POOL_COST, canBurnHouseRule } from "@/lib/houseRules";
+import { canBurnHouseRule, type BurnMode } from "@/lib/houseRules";
 import { isFeatureEnabled } from "@/lib/featureFlags";
 import { buildAchievementAfterField } from "@/lib/achievementFeedback";
 import { useQueuedFeedbackOverlays } from "@/lib/feedbackOverlayQueue";
 import { buildProgressMilestoneAfterField } from "@/lib/runProgressFeedback";
+import {
+  playFirstRollRewardSound,
+  shouldPlayFirstRollReward,
+} from "@/lib/achievementSound";
 import type { SessionMatchAnalysisDto } from "@/lib/matchAnalysisTypes";
 import { allFieldsScored, getLastScoredFieldId, isRunEnded } from "@/lib/runUtils";
 import { loadDisplayNames } from "@/lib/rivalProfiles";
@@ -290,6 +294,18 @@ export function TableModePlayBoard({ inviteCode }: Props) {
       const ruleOverlays = houseEvents
         .map((event) => ruleEventFromDto(event))
         .filter((event): event is NonNullable<typeof event> => event != null);
+      if (
+        shouldPlayFirstRollReward({
+          useStrategyRules: activeRun.useStrategyRules,
+          rollsUsed: effectiveRolls,
+          score,
+          isCorrection,
+          rollSaleEntry,
+          hasAchievement: achievement != null,
+        })
+      ) {
+        playFirstRollRewardSound();
+      }
       setRuns((current) => ({ ...current, [activeSide]: updated }));
       if (progress) {
         shownSet.add(progress.percent);
@@ -410,9 +426,14 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     }
   }
 
-  async function handleBurn(fieldId: string) {
+  async function handleBurn(fieldId: string, mode: BurnMode) {
     if (!activeSide || !activePlayer || !activeRun) return;
-    if (!window.confirm(`Brennt: ${BURN_POOL_COST} Pool abziehen und physisch neu würfeln?`)) {
+    const costLabel = mode === "set_face" ? "2 Pool" : "1 Pool";
+    const actionLabel =
+      mode === "set_face"
+        ? "Würfel daneben legen und Augenzahl selbst wählen"
+        : "brennenden Würfel neu würfeln (Rest darf liegen bleiben)";
+    if (!window.confirm(`Brennt (−${costLabel}): ${actionLabel}?`)) {
       return;
     }
     setBusy(true);
@@ -421,6 +442,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
       const { run: updated } = await applyBurnRoll(
         activeRun.id,
         fieldId,
+        mode,
         activePlayer.playerSecret,
       );
       await refreshAfterChange(activeSide, updated);
@@ -778,7 +800,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
             !activeRun.rollSaleFreeFillActive
           }
           canBurn={canBurnHouseRule(activeRun, activeFieldId, isCorrection)}
-          onBurn={() => activeFieldId && void handleBurn(activeFieldId)}
+          onBurn={(mode) => activeFieldId && void handleBurn(activeFieldId, mode)}
           inviteCode={inviteCode}
           lobby={lobby}
           isLocalSolo={false}

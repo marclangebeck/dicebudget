@@ -122,8 +122,8 @@ export const APP_TOUR_STEPS_STRATEGY: AppTourStep[] = [
   {
     id: "house-rules",
     chapter: "strategy",
-    title: "Hausregeln (Updates)",
-    body: "Optional im Feature-Labor: Brennt (−1 Pool, Feld leeren), Wurf verkaufen, 2× Alle Fünfe. Weitere Regeln kommen später als App-Updates — Labor hält sie testbar, bevor sie für alle frei sind.",
+    title: "InApp-Käufe (Features)",
+    body: "Optional freischaltbar: Brennt (−1/−2 Pool), Wurf verkaufen, 2× Alle Fünfe und mehr. Weitere Features kommen später — die Vorschau hält sie testbar, bevor sie für alle verfügbar sind.",
   },
 ];
 

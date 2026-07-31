@@ -304,7 +304,7 @@ function SettingsPageInner() {
 
         <SettingsSection
           id="house-rules"
-          title="Hausregeln"
+          title="InApp-Käufe (Features)"
           summary={houseRulesSummary}
           variant="labs"
           open={openSections["house-rules"]}
@@ -316,7 +316,7 @@ function SettingsPageInner() {
                 Entwickler-Vorschau
               </p>
               <p className="settings-compact-text settings-compact-text--sm">
-                Code eingeben, um alle Hausregeln (Brennt, Verkauf, Alle Fünfe, Oberer Bereich) zu testen.
+                Code eingeben, um alle Features (Brennt, Verkauf, Alle Fünfe, Oberer Bereich) zu testen.
               </p>
               <button
                 type="button"

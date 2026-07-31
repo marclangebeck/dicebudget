@@ -304,6 +304,39 @@ export function playProgressMilestoneSound(percent: 25 | 50 | 75): void {
   playChord(ctx, t0 + 0.22, [base, base * 1.5], 0.35, { gain: 0.12, type: "triangle" });
 }
 
+/**
+ * Kurzer Belohnungs-Ping für Eintrag mit genau 1 Wurf (Strategy).
+ * Leiser und kürzer als Achievement-Sounds.
+ */
+export function playFirstRollRewardSound(): void {
+  if (!getFeedbackSoundsEnabled() || prefersReducedFeedback()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const t0 = ctx.currentTime + 0.015;
+  playTone(ctx, 1046.5, t0, 0.12, { type: "sine", gain: 0.09, pan: -0.12, attack: 0.01 });
+  playTone(ctx, 1318.5, t0 + 0.08, 0.18, { type: "triangle", gain: 0.07, pan: 0.15, attack: 0.012 });
+}
+
+/** Ob der Einswurf-Ping gespielt werden soll (ohne Parallel-Lärm zu Achievements). */
+export function shouldPlayFirstRollReward(input: {
+  useStrategyRules: boolean;
+  rollsUsed: number;
+  score: number;
+  isCorrection: boolean;
+  rollSaleEntry: boolean;
+  hasAchievement: boolean;
+}): boolean {
+  return (
+    input.useStrategyRules &&
+    !input.rollSaleEntry &&
+    !input.isCorrection &&
+    !input.hasAchievement &&
+    input.rollsUsed === 1 &&
+    input.score > 0
+  );
+}
+
 export function playAchievementSound(type: AchievementType): void {
   if (!getFeedbackSoundsEnabled() || prefersReducedFeedback()) return;
   const ctx = getAudioContext();

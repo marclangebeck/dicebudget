@@ -29,15 +29,16 @@ export type FeatureDefinition = {
 export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
   houseRulesBurn: {
     id: "houseRulesBurn",
-    title: "Hausregel: Brennt",
-    description: "Ungültiger Wurf am Tisch: −1 Pool, physisch neu würfeln.",
+    title: "Brennt",
+    description:
+      "Brennender Würfel: neu würfeln (−1 Pool, Rest liegen lassen) oder Augenzahl selbst (−2 Pool).",
     stage: "labs",
     defaultLabsOn: true,
     infoKey: "burn",
   },
   houseRulesRollSale: {
     id: "houseRulesRollSale",
-    title: "Hausregel: Wurf verkaufen",
+    title: "Wurf verkaufen",
     description: "Bei voller Feldzeile Wurf verkaufen, Freifeld ohne Würfeln.",
     stage: "labs",
     defaultLabsOn: true,
@@ -45,7 +46,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
   },
   houseRulesYatzyStreak: {
     id: "houseRulesYatzyStreak",
-    title: "Hausregel: 2× Alle Fünfe",
+    title: "2× Alle Fünfe",
     description: "Zwei echte Alle Fünfe (50, ≤3 Würfe) hintereinander: Gegner verliert halben Pool.",
     stage: "labs",
     defaultLabsOn: true,
@@ -53,7 +54,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
   },
   houseRulesYatzyTriple: {
     id: "houseRulesYatzyTriple",
-    title: "Hausregel: 3× Alle Fünfe",
+    title: "3× Alle Fünfe",
     description: "Drei echte Alle Fünfe (50, ≤3 Würfe) hintereinander: Gegner verliert den gesamten Pool.",
     stage: "labs",
     defaultLabsOn: true,
@@ -61,7 +62,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
   },
   houseRulesUpperRace: {
     id: "houseRulesUpperRace",
-    title: "Hausregel: Oberer Bereich zuerst",
+    title: "Oberer Bereich zuerst",
     description:
       "Wer zuerst alle oberen Felder (Spiele × 6) voll hat, erhält die offenen oberen Felder des Rivalen als Pool.",
     stage: "labs",
@@ -70,7 +71,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
   },
   houseRulesColumnPoolBonuses: {
     id: "houseRulesColumnPoolBonuses",
-    title: "Hausregel: Spalten-Pool-Boni",
+    title: "Spalten-Pool-Boni",
     description:
       "Erster mit Spalten-Bonus oben (+2), unten voll (+2), gleiche Spalte komplett (+2); max. 6 Pool.",
     stage: "labs",

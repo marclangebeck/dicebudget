@@ -1,9 +1,10 @@
 import { prisma } from "../db/prisma.js";
 import {
-  BURN_POOL_COST,
+  burnPoolCost,
   COLUMN_POOL_BONUS,
   countOpenUpperFields,
   hasAnyFullFieldTypeRow,
+  isBurnMode,
   isRunUpperComplete,
   newlyAchievedColumnGoal,
   qualifiesYatzyStreakPenalty,
@@ -13,6 +14,7 @@ import {
   runHasAnyColumnUpperBonus,
   yatzyStreakPenaltyMarker,
   yatzyTriplePenaltyMarker,
+  type BurnMode,
 } from "../domain/houseRules.js";
 import { RUN_STATUS } from "../domain/fieldTypes.js";
 import { getRunById } from "./getRun.js";
@@ -83,12 +85,16 @@ async function loadActiveRun(runId: string) {
   return run;
 }
 
-/** Brennt: −1 Pool am Anfang eines Wurfes (Feld gewählt, noch nicht eingetragen). */
+/** Brennt: Pool abziehen am Anfang eines Wurfes (Feld gewählt, noch nicht eingetragen). */
 export async function applyBurnRoll(
   runId: string,
   fieldId: string,
+  mode: BurnMode = "reroll",
   playerSecret?: string,
 ) {
+  if (!isBurnMode(mode)) {
+    throw new HouseRuleError("Ungültige Brennt-Option");
+  }
   await assertRunPlayerAccess(runId, playerSecret);
   const run = await loadActiveRun(runId);
   if (!run.useStrategyRules) {
@@ -104,15 +110,16 @@ export async function applyBurnRoll(
     throw new HouseRuleError("Brennt nur am Anfang eines Wurfes");
   }
 
-  if (run.rollsInPool < BURN_POOL_COST) {
+  const cost = burnPoolCost(mode);
+  if (run.rollsInPool < cost) {
     throw new RollLimitError(
-      `Nicht genug Pool für Brennt (benötigt ${BURN_POOL_COST}, vorhanden ${run.rollsInPool})`,
+      `Nicht genug Pool für Brennt (benötigt ${cost}, vorhanden ${run.rollsInPool})`,
     );
   }
 
   await prisma.run.update({
     where: { id: runId },
-    data: { rollsInPool: { decrement: BURN_POOL_COST } },
+    data: { rollsInPool: { decrement: cost } },
   });
 
   return getRunById(runId);

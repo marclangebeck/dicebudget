@@ -17,7 +17,7 @@ export const HOUSE_RULE_INFO: Record<HouseRuleInfoKey, HouseRuleInfo> = {
     key: "burn",
     title: "Brennt",
     body:
-      "Wenn ein Wurf am Tisch ungültig ist (z. B. Würfel vom Tisch), kostet das 1 Pool. Danach wird physisch neu gewürfelt. Nur am Anfang eines leeren Feldes, nicht bei Korrekturen.",
+      "Wenn ein Würfel am Tisch „brennt“ (z. B. vom Tisch): Neu würfeln kostet 1 Pool — nur der brennende Würfel wird nochmal geworfen, die anderen dürfen liegen bleiben. Augenzahl selbst setzen (Würfel daneben legen) kostet 2 Pool. Nur am Anfang eines leeren Feldes, nicht bei Korrekturen.",
   },
   rollSale: {
     key: "rollSale",

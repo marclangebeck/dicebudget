@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   BURN_POOL_COST,
+  BURN_POOL_COST_SET_FACE,
+  burnPoolCost,
   canBurnHouseRule,
   isFieldTypeRowFull,
   qualifiesYatzyStreakPenalty,
@@ -22,8 +24,10 @@ describe("houseRules (frontend)", () => {
     assert.equal(isFieldTypeRowFull(games, "FOUR_OF_A_KIND"), true);
   });
 
-  it("BURN_POOL_COST", () => {
+  it("BURN_POOL_COST und burnPoolCost", () => {
     assert.equal(BURN_POOL_COST, 1);
+    assert.equal(burnPoolCost("reroll"), 1);
+    assert.equal(burnPoolCost("set_face"), BURN_POOL_COST_SET_FACE);
   });
 
   it("canBurnHouseRule bei leerem Feld vor Eintrag", () => {

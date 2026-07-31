@@ -7,7 +7,12 @@ import {
   isExtraHouseRulesUiAvailable,
 } from "@/components/HouseRulesTableActions";
 import { strategyRollChipOptions } from "@/lib/gameRules";
-import { rollSaleAllowedScores, BURN_POOL_COST } from "@/lib/houseRules";
+import {
+  BURN_POOL_COST_REROLL,
+  BURN_POOL_COST_SET_FACE,
+  rollSaleAllowedScores,
+  type BurnMode,
+} from "@/lib/houseRules";
 import { FIELD_LABELS, fieldScoreChoices } from "@/lib/labels";
 import type { FieldDto, RunDto } from "@/lib/types";
 import type { SessionLobbyDto } from "@/lib/sessionTypes";
@@ -27,7 +32,7 @@ type Props = {
   rollSaleMode?: boolean;
   burnEnabled?: boolean;
   canBurn?: boolean;
-  onBurn?: () => void;
+  onBurn?: (mode: BurnMode) => void;
   inviteCode?: string;
   lobby?: SessionLobbyDto | null;
   isLocalSolo?: boolean;
@@ -227,27 +232,54 @@ export function ScoreEntryPanel({
 
           {burnEnabled && onBurn && !rollSaleMode && (
             <div className="play-entry-section play-entry-house-rules">
-              <p className="play-entry-section-label mb-1.5">Hausregel</p>
-              <button
-                type="button"
-                disabled={run.status !== "ACTIVE" || busy || !canBurn}
-                onClick={onBurn}
-                className="play-entry-burn-btn disabled:opacity-45"
-              >
-                Brennt (−{BURN_POOL_COST} Pool)
-              </button>
+              <p className="play-entry-section-label mb-1.5">Brennt</p>
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  disabled={
+                    run.status !== "ACTIVE" ||
+                    busy ||
+                    !canBurn ||
+                    run.rollsInPool < BURN_POOL_COST_REROLL
+                  }
+                  onClick={() => onBurn("reroll")}
+                  className="play-entry-burn-btn disabled:opacity-45"
+                >
+                  Neu würfeln (−{BURN_POOL_COST_REROLL} Pool)
+                </button>
+                <p className="play-entry-hint">
+                  Brennenden Würfel nochmal würfeln — die anderen dürfen liegen bleiben.
+                </p>
+                <button
+                  type="button"
+                  disabled={
+                    run.status !== "ACTIVE" ||
+                    busy ||
+                    !canBurn ||
+                    run.rollsInPool < BURN_POOL_COST_SET_FACE
+                  }
+                  onClick={() => onBurn("set_face")}
+                  className="play-entry-burn-btn disabled:opacity-45"
+                >
+                  Augenzahl selbst (−{BURN_POOL_COST_SET_FACE} Pool)
+                </button>
+                <p className="play-entry-hint">
+                  Brennenden Würfel daneben legen und die Augenzahl selbst wählen.
+                </p>
+              </div>
               {!canBurn && (
                 <p className="play-entry-hint mt-1">
-                  {run.rollsInPool < BURN_POOL_COST
-                    ? `Nicht genug Pool (benötigt ${BURN_POOL_COST}).`
+                  {run.rollsInPool < BURN_POOL_COST_REROLL
+                    ? `Nicht genug Pool (mind. ${BURN_POOL_COST_REROLL}).`
                     : isCorrection
                       ? "Nicht bei Korrekturen."
                       : "Nur bevor der Eintrag gebucht ist."}
                 </p>
               )}
-              {canBurn && (
+              {canBurn && run.rollsInPool < BURN_POOL_COST_SET_FACE && (
                 <p className="play-entry-hint mt-1">
-                  Physisch neu würfeln, bevor du Punkte einträgst.
+                  Für „Augenzahl selbst“ brauchst du {BURN_POOL_COST_SET_FACE} Pool
+                  (vorhanden {run.rollsInPool}).
                 </p>
               )}
             </div>

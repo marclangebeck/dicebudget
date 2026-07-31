@@ -7,6 +7,20 @@ import {
 } from "./gameScoring.js";
 
 export const BURN_POOL_COST = 1;
+/** Brennt: brennenden Würfel neu würfeln, Rest liegen lassen. */
+export const BURN_POOL_COST_REROLL = 1;
+/** Brennt: Würfel daneben legen und Augenzahl selbst wählen. */
+export const BURN_POOL_COST_SET_FACE = 2;
+
+export type BurnMode = "reroll" | "set_face";
+
+export function isBurnMode(value: unknown): value is BurnMode {
+  return value === "reroll" || value === "set_face";
+}
+
+export function burnPoolCost(mode: BurnMode): number {
+  return mode === "set_face" ? BURN_POOL_COST_SET_FACE : BURN_POOL_COST_REROLL;
+}
 
 const UPPER_FACE: Record<string, 1 | 2 | 3 | 4 | 5 | 6> = {
   ONES: 1,

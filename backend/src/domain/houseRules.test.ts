@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   BURN_POOL_COST,
+  BURN_POOL_COST_SET_FACE,
+  burnPoolCost,
   gameColumnHasFullCombo,
   gameColumnHasLowerComplete,
   gameColumnHasUpperBonus,
@@ -160,7 +162,9 @@ describe("houseRules", () => {
     );
   });
 
-  it("BURN_POOL_COST ist 1", () => {
+  it("BURN_POOL_COST und burnPoolCost", () => {
     assert.equal(BURN_POOL_COST, 1);
+    assert.equal(burnPoolCost("reroll"), 1);
+    assert.equal(burnPoolCost("set_face"), BURN_POOL_COST_SET_FACE);
   });
 });
