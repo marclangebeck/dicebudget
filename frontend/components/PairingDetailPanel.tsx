@@ -48,7 +48,7 @@ export function PairingDetailPanel({
       {onEditPairing && (
         <div className="flex justify-end">
           <button type="button" className="btn-chip px-3 py-1 text-xs" onClick={onEditPairing}>
-            ✏️ Paarung bearbeiten
+            Siege/Diff (Admin)
           </button>
         </div>
       )}

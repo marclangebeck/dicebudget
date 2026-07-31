@@ -46,7 +46,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
   houseRulesYatzyStreak: {
     id: "houseRulesYatzyStreak",
     title: "Hausregel: 2× Alle Fünfe",
-    description: "Zwei Alle Fünfe (≤3 Würfe) hintereinander: Gegner verliert halben Pool.",
+    description: "Zwei echte Alle Fünfe (50, ≤3 Würfe) hintereinander: Gegner verliert halben Pool.",
     stage: "labs",
     defaultLabsOn: true,
     infoKey: "yatzyStreak2",
@@ -54,7 +54,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
   houseRulesYatzyTriple: {
     id: "houseRulesYatzyTriple",
     title: "Hausregel: 3× Alle Fünfe",
-    description: "Drei Alle Fünfe (≤3 Würfe) hintereinander: Gegner verliert den gesamten Pool.",
+    description: "Drei echte Alle Fünfe (50, ≤3 Würfe) hintereinander: Gegner verliert den gesamten Pool.",
     stage: "labs",
     defaultLabsOn: true,
     infoKey: "yatzyStreak3",
@@ -67,6 +67,15 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
     stage: "labs",
     defaultLabsOn: true,
     infoKey: "upperRace",
+  },
+  houseRulesColumnPoolBonuses: {
+    id: "houseRulesColumnPoolBonuses",
+    title: "Hausregel: Spalten-Pool-Boni",
+    description:
+      "Erster mit Spalten-Bonus oben (+2), unten voll (+2), gleiche Spalte komplett (+2); max. 6 Pool.",
+    stage: "labs",
+    defaultLabsOn: true,
+    infoKey: "columnPoolBonuses",
   },
 };
 
@@ -125,18 +134,21 @@ export function sessionHouseRuleFlagsFromPrefs(): {
   ruleYatzyStreak2: boolean;
   ruleYatzyTriple: boolean;
   ruleUpperRace: boolean;
+  ruleColumnPoolBonuses: boolean;
 } {
   if (!isLabsUnlocked()) {
     return {
       ruleYatzyStreak2: true,
       ruleYatzyTriple: true,
       ruleUpperRace: true,
+      ruleColumnPoolBonuses: true,
     };
   }
   return {
     ruleYatzyStreak2: isFeatureEnabled("houseRulesYatzyStreak"),
     ruleYatzyTriple: isFeatureEnabled("houseRulesYatzyTriple"),
     ruleUpperRace: isFeatureEnabled("houseRulesUpperRace"),
+    ruleColumnPoolBonuses: isFeatureEnabled("houseRulesColumnPoolBonuses"),
   };
 }
 

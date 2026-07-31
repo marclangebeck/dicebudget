@@ -1,16 +1,16 @@
 # Milestone-Roadmap — Umsetzung Projektanalyse
 
 **Erstellt:** 2026-06-11  
-**Aktualisiert:** 2026-06-15 (M36 Hausregeln Session geplant)  
+**Aktualisiert:** 2026-07-31 (M37–M41 spezifiziert; kein Produktcode ohne GO)  
 **Basis:** Vollständige Projektanalyse (Backend, Frontend, Release)  
 **Branch:** `milestone-22-prep`  
 **Produktcode-HEAD:** siehe `git log -1`  
-**Nächster Milestone:** **M30** App Store Release  
-**Arbeitsweise:** Pro Milestone ein **GO** vom Nutzer, danach Umsetzung in Sprints, dann Abnahme.
+**Nächster Milestone:** **M30** oder nach Nutzer-Prio **M37**  
+**Arbeitsweise:** Pro Milestone ein **GO** vom Nutzer, danach Umsetzung in Sprints, dann Abnahme. **Kein Produktcode ohne GO.**
 
 **Vor M30 umgesetzt (nicht nummeriert):** Feature-Labor (`5e621ac`), Hausregeln Strategy (Brennt / Verkauf / 2× Alle Fünfe) hinter Labor-Toggles — **bis M36:** jeder Spieler schaltet lokal per Code frei (Labor-Zwischenstand, bewusst OK).
 
-**Geplant nach M30:** **M36** Hausregeln öffentlich + Session-Toggles (Host legt Regeln für alle fest).
+**Geplant:** **M36** nach M30; **M37–M41** laut Nutzer-Wunschliste (Details unten).
 
 Dieses Dokument ergänzt `docs/milestones_active.md`. Nach Abschluss eines Milestones: Eintrag in `CHANGELOG.md`, Update `HANDOVER.md`, optional Archivierung hier.
 
@@ -27,14 +27,19 @@ Dieses Dokument ergänzt `docs/milestones_active.md`. Nach Abschluss eines Miles
 | **M27** | Frontend-Tests & Stabilität | 3 | 2 Agent-Sessions | Empfohlen vor Release — **abgenommen 2026-06-11** |
 | **M28** | Frontend-Architektur & Bundle | 3 | 2–3 Agent-Sessions | Nach Release möglich |
 | **M29** | Technische Schulden & Security-Patch | 3 | 1–2 Agent-Sessions | Empfohlen vor Release — **abgenommen 2026-06-11** |
-| **M30** | App Store Release (organisatorisch) | 3 | 1–2 Wochen (Nutzer + Apple) | **Release — als Nächstes** |
-| **M36** | Hausregeln öffentlich & Session-Toggles | 3 | 1–2 Agent-Sessions | **v1.1 Produkt** — nach M30 |
+| **M30** | App Store Release (organisatorisch) | 3 | 1–2 Wochen (Nutzer + Apple) | **Release** |
+| **M37** | Fortschritts-Delta Feldpunkte (Bugfix) | 2 | 1 Agent-Session | Hoch — **spezifiziert** |
+| **M41** | 2×/3× Alle Fünfe nur Score 50 | 1–2 | ≤1 Agent-Session | Hoch — **spezifiziert** |
+| **M39** | Versionsanzeige Hamburger-Menü | 1 | ≤1 Agent-Session | UX — **spezifiziert** |
+| **M38** | Paarungs-Rollen & Sync | 3 | 2 Agent-Sessions | Mittel — **spezifiziert** |
+| **M40** | Spalten-Pool-Boni (Hausregel) | 3 | 1–2 Agent-Sessions | Produkt — **Spezifikation zur Freigabe** |
+| **M36** | Hausregeln öffentlich & Session-Toggles | 3 | 1–2 Agent-Sessions | **v1.1** — nach M30 |
 | **M31** | Post-Release v1.1 — Plattform | 3 | 2–3 Agent-Sessions | v1.1 |
 | **M32** | DevOps & Betrieb | 3 | 1–2 Agent-Sessions | v1.1 |
 | **M33** | Produkt v1.2 — Komfort | 3 | 2–3 Agent-Sessions | v1.2 |
 | **M34** | Skalierung (nur bei Bedarf) | 2 | Planung + GO | v2.x |
 
-**Empfohlene Release-Reihenfolge:** M23 → M24 → (M25–M27 parallel möglich) → M29 → M30 → **M36** → M28/M31+
+**Empfohlene Reihenfolge (Nutzer-Prio):** M37 → M41 → M39 → M38 → M40 (nach Regel-Freigabe) · M30 parallel · M36 nach M30
 
 ---
 
@@ -588,7 +593,7 @@ Offen aus Nutzer-Diskussion (nicht Teil M24): Web-Zugang nach App-Store-Release 
 **Status:** geplant (GO nach M30).  
 **Ziel:** Hausregeln werden ein **frei zugänglicher Einstellungsbereich** — wie Gegner-Pool sichtbar oder Pool-Endspiel. Der **Host legt die Regeln beim Multi-Start** fest; **alle Spieler** sehen dieselbe UI, **ohne Labor-Code pro Gerät**.
 
-**Ausgangslage (Labor, bis M36):**
+**Ausgangslage (Labor, bis M36; Stand `f5a2665`):** Session-Flags für Auto-Regeln und Host-Übernahme beim Raum-Erstellen sind **teilweise** schon da; Labor-PIN und öffentliche Multi-UI fehlen noch.
 
 - Freischaltung über `NEXT_PUBLIC_LABS_PIN` + `localStorage` (`labsAccess.ts`, `featureFlags.ts`).
 - UI prüft `isFeatureEnabled("houseRules*")` **nur lokal** — Gegner ohne Code sieht nichts.
@@ -652,6 +657,208 @@ Offen aus Nutzer-Diskussion (nicht Teil M24): Web-Zugang nach App-Store-Release 
 **Neuer Agent:** ein Agent pro Sprint 36.x; GO vom Nutzer vor Sprint 36.1.
 
 **Referenz (Ist-Implementierung Labor):** `backend/src/domain/houseRules.ts`, `houseRulesService.ts`, `HouseRulesPanel.tsx`, `HouseRulesTableActions.tsx`, `ScoreEntryPanel.tsx`, `labsAccess.ts`, `featureFlags.ts`.
+
+---
+
+## M37 — Fortschritts-Delta 25/50/75 % nur Feldpunkte (Bugfix)
+
+**Status:** spezifiziert; **wartet auf GO**. Kein Code ohne Auftrag.  
+**Prio:** 1 (Nutzer-Wunschliste 2026-07-31).
+
+### Soll-Verhalten
+
+Bei Erreichen von 25 %, 50 % bzw. 75 % **eingetragener Felder** (Meilenstein = Feldanteil, unverändert):
+
+1. Summe **nur eingetragener Feld-Scores** des eigenen Runs (jedes Feld mit `score !== null`, inkl. 0).
+2. **Nicht** enthalten: oberer Bonus (+35), Extra-Alle-Fünfe (+100), Pool, sonstige Zuschläge.
+3. Vergleich mit dem **anderen Teilnehmer** derselben Session (Duell) bzw. Tischmodus-Gegenseite — gleiche Definition (nur Feldpunkte).
+4. Overlay-Text: „X Punkte voraus/zurück“ aus dieser Differenz.
+
+### Ist / vermutete Ursachen (Code-Review, Stand `f5a2665`)
+
+| Fund | Datei | Risiko |
+|------|-------|--------|
+| Overlay baut Delta mit **Lobby-Snapshot vor** `refreshLobby` | `PlayBoard.tsx` (~408–440) | Gegner-`diceScore` kann veraltet sein |
+| Fallback `player.diceScore ?? player.totalScore` | `runProgressFeedback.ts` | `totalScore` enthält Bonus/Extra-Yatzy → falsche Differenz |
+| Eigener Score aus `enteredDiceScore(runAfter)` ist korrekt gedacht | `runProgressFeedback.ts` | OK, wenn Gegner-Seite ebenfalls nur Feldpunkte liefert |
+| Backend liefert `diceScore` bereits als Feldsumme | `sessionService.ts` `sumEnteredDiceScores` | API-Seite OK |
+
+### Sprint 37.1 — Diagnose + Fix Domain/UI
+
+| # | Aufgabe | Dateien (voraussichtlich) |
+|---|---------|---------------------------|
+| 1 | Reproduktion: Duell-Fixture, bekannte Feldsummen, Overlay-Delta prüfen | manuell / Unit |
+| 2 | Fallback auf `totalScore` entfernen oder nur wenn kein `diceScore`-Feld existiert und dann explizit Feldsumme aus Run | `runProgressFeedback.ts` |
+| 3 | Vor Delta-Berechnung: frischen Lite-Lobby-Snapshot **oder** Gegner-Feldsumme aus verfügbaren Runs nutzen (ohne Polling) | `PlayBoard.tsx`, ggf. `TableModePlayBoard.tsx` |
+| 4 | Unit-Tests: Bonus/+Extra-Yatzy dürfen Delta nicht verfälschen; 0-Felder zählen | `runProgressFeedback.test.ts` (neu/erweitern) |
+
+### Sprint 37.2 — Abnahme
+
+| # | Aufgabe |
+|---|---------|
+| 1 | Manuell Multi 2P: bekannte Differenz nur aus Feldzellen vs. Overlay |
+| 2 | Tischmodus gleiche Prüfung |
+| 3 | CHANGELOG + kurze Notiz in `HANDOVER.md` |
+
+### Abnahme M37
+
+- [ ] Bei 25/50/75 % stimmt die angezeigte Punktdifferenz mit „Summe Feldwerte Spieler A − Summe Feldwerte Spieler B“ überein.
+- [ ] Oberer Bonus und Extra-Alle-Fünfe ändern die Differenz nicht.
+- [ ] Frontend-Unit-Tests grün; kein neuer Dauerprozess/Polling.
+
+### Nicht im Scope
+
+- Neues Polling gegen Lobby.
+- Änderung der Meilenstein-Schwellen (weiter 25/50/75 % der Felder).
+
+---
+
+## M38 — Paarungen: Spieler-Merge vs. Admin-Bereinigung & Sync
+
+**Status:** spezifiziert; **wartet auf GO** (Rollenmodell mit Nutzer abstimmen).  
+**Prio:** 2.
+
+### Problem
+
+Änderungen an Paarungen auf dem Handy wirken lokal auf die eigene Statistik, aber **nicht** konsistent auf allen Geräten, auf denen dieselben Spieler vorkommen.
+
+### Ist (Stand `f5a2665`)
+
+| Aktion | Wirkung | Sync |
+|--------|---------|------|
+| Paarung „löschen“ | `hiddenPairings` in `localStorage` | **nur dieses Gerät** |
+| Siege/Diff bearbeiten (Baseline) | Server `POST /stats/pairings/baseline` **ohne** Admin-Key | global für alle Clients nach Reload |
+| Rivalen-Namen / „Das bin ich“ | lokal | kein Sync |
+| Server-Reset Paarungen | `POST /stats/pairings/reset` + Admin-Key | global, destruktiv |
+
+### Soll (Vorschlag — zur Freigabe)
+
+| Rolle | Darf | Darf nicht |
+|-------|------|------------|
+| **Spieler** | IDs/Namen zusammenführen (Identität/Aliase), eigene Anzeige filtern | Paarungen dauerhaft für alle löschen/bereinigen |
+| **Admin** (du) | Paarungen bereinigen/löschen (Server), ggf. Baseline-Korrekturen | — |
+| **Alle Geräte** | Nach Admin-Bereinigung dieselbe Server-Bilanz sehen, wo die Spieler vorkommen | — |
+
+Lokal bleiben dürfen: reine Anzeige-Präferenzen („fremde Paarungen ausblenden“, „Das bin ich“), sofern klar als gerätebezogen gekennzeichnet.
+
+### Sprint 38.1 — Rollen & API
+
+| # | Aufgabe |
+|---|---------|
+| 1 | UX-Text: „Löschen“ = lokal vs. Admin-Bereinigung trennen |
+| 2 | Destruktive Bereinigung nur mit Admin-Key (UI nur wenn Key vorhanden / Admin-Modus) |
+| 3 | Baseline-Schreiben: entscheiden — Admin-only **oder** Spieler mit Audit; Tests an Ist-Verhalten anpassen (heute 3 Failures erwarten noch Key-Pflicht) |
+
+### Sprint 38.2 — Identität zusammenführen
+
+| # | Aufgabe |
+|---|---------|
+| 1 | Bestehende Rivalen-Merge / Alias-Flows prüfen; dokumentieren was lokal bleibt |
+| 2 | Optional: serverseitige Identity-Links nur mit GO (größerer Scope — ggf. Folge-Milestone) |
+
+### Sprint 38.3 — Abnahme Sync
+
+| # | Aufgabe |
+|---|---------|
+| 1 | Zwei Geräte: Admin bereinigt → beide sehen aktualisierte Paarungsliste |
+| 2 | Spieler blendet lokal aus → anderes Gerät unverändert |
+| 3 | CHANGELOG, `decisions.md` falls Auth-Modell sich ändert |
+
+### Abnahme M38
+
+- [ ] Klar getrennte UX: lokal ausblenden vs. Admin bereinigen.
+- [ ] Admin-Bereinigung wirkt serverseitig für alle Clients.
+- [ ] Spieler können weiterhin Namen/IDs für sich zuordnen (Merge), ohne globale Löschung.
+- [ ] Backend-Tests Stats-Auth wieder konsistent mit gewähltem Modell.
+
+### Offen vor GO
+
+- Soll Baseline-Bearbeitung (Siege/Diff nachtragen) **nur Admin** oder weiter jeder Spieler?
+- Braucht „IDs zusammenfügen“ echtes Server-Merge oder reicht verbesserte lokale Rivalen-UI?
+
+---
+
+## M39 — Versionsnummer im Hamburger-Menü
+
+**Status:** spezifiziert; **wartet auf GO**.  
+**Prio:** 3.
+
+### Soll
+
+Im Hamburger-Menü (Footer unter den Einträgen oder unter Branding) eine **aktuelle Versionszeile**, z. B. `Version 2.0 (29)` auf iOS und eine passende Web-Kennung auf dem Browser-Build.
+
+### Ist
+
+- `AppFooterMenu.tsx`: Branding „DiceBudget / Strategy Edition“, Fußzeile „Würfel. Strategie. Bilanz.“ — **keine Version**.
+- `frontend/package.json`: `0.1.0` (nicht die Store-Version).
+- iOS: Marketing `2.0`, Build-Nummer in Xcode / Connect.
+
+### Sprint 39.1
+
+| # | Aufgabe | Dateien |
+|---|---------|---------|
+| 1 | Single Source: z. B. `frontend/lib/appVersion.ts` + Build-Inject (`NEXT_PUBLIC_APP_VERSION` / `NEXT_PUBLIC_APP_BUILD`) | `appVersion.ts`, `.env.production.example` |
+| 2 | Anzeige in `AppFooterMenu` (dezent, lesbar) | `AppFooterMenu.tsx`, CSS |
+| 3 | iOS: gleiche Strings beim `build:ios` / dokumentieren Abgleich mit Xcode-Build | `GOiOS.md` / `docs/ios_current.md` |
+| 4 | CHANGELOG |
+
+### Abnahme M39
+
+- [ ] Menü zeigt Version auf Web und in der App.
+- [ ] Nach TestFlight-Upload stimmt angezeigte Build-Nummer mit Connect überein (Prozess dokumentiert).
+
+---
+
+## M40 — Hausregel: Spalten-Pool-Boni (oben / unten / Kombi)
+
+**Status:** umgesetzt (Code); Backend-Deploy + Migration durch Nutzer.  
+**Prio:** 4.
+
+### Freigegebene Regeln (implementiert)
+
+| Punkt | Entscheidung |
+|-------|----------------|
+| Wettbewerb | Nur der **erste** Spieler in der Session |
+| Oberer Bonus | **Pflicht** (+35) → +2 Pool |
+| Unterer Bereich | 7 Felder unter 1–6 → +2 Pool |
+| C | gleiche Spaltennummer, oben+Bonus und unten → +2 Pool |
+| Maximum | 6 Pool |
+| Modus | Nur **Strategy** |
+| Aktivierung | Labs-Toggle + Session-Flag `ruleColumnPoolBonuses` |
+| `ruleUpperRace` | bleibt **parallel** |
+
+### Dateien
+
+- Migration `20260731120000_column_pool_bonuses`
+- Domain `houseRules.ts`, Service `houseRulesService.ts`, Session/API/Flags/Overlays
+
+---
+
+## M41 — 2× / 3× Alle Fünfe nur bei echtem Treffer (Score 50)
+
+**Status:** umgesetzt (Code); Backend-Deploy für Live-Auto-Regeln.  
+**Prio:** 5.
+
+### Bug (behoben)
+
+`isFastYatzy` prüfte nur `KNIFFEL` + ≤3 Würfe — **ohne** `score === 50`. Null-Einträge lösten Halbierung/Nullung aus.
+
+### Soll (implementiert)
+
+- 2× hintereinander Alle Fünfe mit **je 50** und ≤3 Würfen → Gegner-Pool **halbiert**.
+- 3× hintereinander mit **je 50** und ≤3 Würfen → Gegner-Pool **0**.
+- Score **0** (oder ≠ 50) zählt nicht.
+
+### Dateien
+
+- `backend/src/domain/houseRules.ts`, `houseRules.test.ts`
+- `frontend/lib/houseRules.ts`, `houseRules.test.ts`, `houseRuleInfo.ts`
+
+### Abnahme M41
+
+- [x] Unit-Tests: 0+0 / 50+0 → keine Strafe; 50+50 → ja; 50×3 → Triple
+- [ ] Backend Prod deploy (Nutzer)
+- [ ] Manuell: zwei Null-Alle-Fünfe ändern Gegner-Pool nicht
 
 ---
 

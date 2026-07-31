@@ -2,11 +2,17 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   BURN_POOL_COST,
+  gameColumnHasFullCombo,
+  gameColumnHasLowerComplete,
+  gameColumnHasUpperBonus,
   hasAnyFullFieldTypeRow,
   isFieldTypeRowFull,
   isValidRollSaleScore,
+  newlyAchievedColumnGoal,
   qualifiesYatzyStreakPenalty,
+  qualifiesYatzyTriplePenalty,
   rollSaleAllowedScores,
+  runHasAnyColumnUpperBonus,
 } from "./houseRules.js";
 
 describe("houseRules", () => {
@@ -46,13 +52,112 @@ describe("houseRules", () => {
     assert.equal(hasAnyFullFieldTypeRow(games), true);
   });
 
-  it("qualifiesYatzyStreakPenalty bei zwei Alle Fünfe ≤3", () => {
+  it("qualifiesYatzyStreakPenalty bei zwei Alle Fünfe 50 ≤3", () => {
     const fields = [
       { fieldType: "ONES", score: 3, rollsUsed: 2, scoredSequence: 1 },
       { fieldType: "KNIFFEL", score: 50, rollsUsed: 3, scoredSequence: 2 },
       { fieldType: "KNIFFEL", score: 50, rollsUsed: 2, scoredSequence: 3 },
     ];
     assert.equal(qualifiesYatzyStreakPenalty(fields), true);
+  });
+
+  it("qualifiesYatzyStreakPenalty nicht bei Null-Einträgen", () => {
+    const fields = [
+      { fieldType: "KNIFFEL", score: 0, rollsUsed: 2, scoredSequence: 1 },
+      { fieldType: "KNIFFEL", score: 0, rollsUsed: 3, scoredSequence: 2 },
+    ];
+    assert.equal(qualifiesYatzyStreakPenalty(fields), false);
+  });
+
+  it("qualifiesYatzyStreakPenalty nicht bei 50 dann 0", () => {
+    const fields = [
+      { fieldType: "KNIFFEL", score: 50, rollsUsed: 2, scoredSequence: 1 },
+      { fieldType: "KNIFFEL", score: 0, rollsUsed: 3, scoredSequence: 2 },
+    ];
+    assert.equal(qualifiesYatzyStreakPenalty(fields), false);
+  });
+
+  it("qualifiesYatzyTriplePenalty nur bei drei Treffern 50", () => {
+    const hit = [
+      { fieldType: "KNIFFEL", score: 50, rollsUsed: 1, scoredSequence: 1 },
+      { fieldType: "KNIFFEL", score: 50, rollsUsed: 2, scoredSequence: 2 },
+      { fieldType: "KNIFFEL", score: 50, rollsUsed: 3, scoredSequence: 3 },
+    ];
+    const withZero = [
+      { fieldType: "KNIFFEL", score: 50, rollsUsed: 1, scoredSequence: 1 },
+      { fieldType: "KNIFFEL", score: 50, rollsUsed: 2, scoredSequence: 2 },
+      { fieldType: "KNIFFEL", score: 0, rollsUsed: 3, scoredSequence: 3 },
+    ];
+    assert.equal(qualifiesYatzyTriplePenalty(hit), true);
+    assert.equal(qualifiesYatzyTriplePenalty(withZero), false);
+  });
+
+  it("gameColumnHasUpperBonus braucht Summe ≥ 63", () => {
+    const withBonus = [
+      { fieldType: "ONES", score: 3 },
+      { fieldType: "TWOS", score: 6 },
+      { fieldType: "THREES", score: 9 },
+      { fieldType: "FOURS", score: 12 },
+      { fieldType: "FIVES", score: 15 },
+      { fieldType: "SIXES", score: 18 },
+    ];
+    const withoutBonus = [
+      { fieldType: "ONES", score: 1 },
+      { fieldType: "TWOS", score: 2 },
+      { fieldType: "THREES", score: 3 },
+      { fieldType: "FOURS", score: 4 },
+      { fieldType: "FIVES", score: 5 },
+      { fieldType: "SIXES", score: 6 },
+    ];
+    assert.equal(gameColumnHasUpperBonus(withBonus), true);
+    assert.equal(gameColumnHasUpperBonus(withoutBonus), false);
+  });
+
+  it("gameColumnHasLowerComplete und FullCombo", () => {
+    const lower = [
+      { fieldType: "THREE_OF_A_KIND", score: 20 },
+      { fieldType: "FOUR_OF_A_KIND", score: 24 },
+      { fieldType: "FULL_HOUSE", score: 25 },
+      { fieldType: "SMALL_STRAIGHT", score: 30 },
+      { fieldType: "LARGE_STRAIGHT", score: 40 },
+      { fieldType: "KNIFFEL", score: 50 },
+      { fieldType: "CHANCE", score: 20 },
+    ];
+    const upperBonus = [
+      { fieldType: "ONES", score: 3 },
+      { fieldType: "TWOS", score: 6 },
+      { fieldType: "THREES", score: 9 },
+      { fieldType: "FOURS", score: 12 },
+      { fieldType: "FIVES", score: 15 },
+      { fieldType: "SIXES", score: 18 },
+    ];
+    assert.equal(gameColumnHasLowerComplete(lower), true);
+    assert.equal(gameColumnHasFullCombo([...upperBonus, ...lower]), true);
+    assert.equal(gameColumnHasFullCombo(upperBonus), false);
+  });
+
+  it("newlyAchievedColumnGoal", () => {
+    const empty = [{ fields: [{ fieldType: "ONES", score: null }] }];
+    const fullUpper = [
+      {
+        fields: [
+          { fieldType: "ONES", score: 3 },
+          { fieldType: "TWOS", score: 6 },
+          { fieldType: "THREES", score: 9 },
+          { fieldType: "FOURS", score: 12 },
+          { fieldType: "FIVES", score: 15 },
+          { fieldType: "SIXES", score: 18 },
+        ],
+      },
+    ];
+    assert.equal(
+      newlyAchievedColumnGoal(empty, fullUpper, runHasAnyColumnUpperBonus),
+      true,
+    );
+    assert.equal(
+      newlyAchievedColumnGoal(fullUpper, fullUpper, runHasAnyColumnUpperBonus),
+      false,
+    );
   });
 
   it("BURN_POOL_COST ist 1", () => {

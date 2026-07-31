@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { getPairingSummaries, getStats } from "@/lib/api";
+import { getPairingSummaries, getStats, hasAdminApiKey, resetPairings } from "@/lib/api";
 import type { PairingSummaryDto } from "@/lib/pairingTypes";
 import { mergePairingSummaries, type MergedPairingSummary } from "@/lib/pairingMerge";
 import { playerLabel } from "@/lib/playerIdentity";
@@ -76,6 +76,7 @@ function StatsPageInner() {
   const [hiddenKeys, setHiddenKeys] = useState<Set<string>>(() => new Set());
   const [sortMode, setSortMode] = useState<PairingSortMode>("recent");
   const [detailReloadToken, setDetailReloadToken] = useState(0);
+  const isAdmin = hasAdminApiKey();
 
   const refreshPairings = useCallback(async () => {
     setLoading(true);
@@ -253,7 +254,7 @@ function StatsPageInner() {
       )
       .join("\n");
     const confirmed = window.confirm(
-      `Folgende Paarungen aus deiner Statistik entfernen?\n\n${labels}\n\n` +
+      `Folgende Paarungen hier ausblenden?\n\n${labels}\n\n` +
         "Nur auf diesem Gerät. Rivalen bleiben erhalten. " +
         "Server-Daten und andere Geräte sind unverändert. " +
         "Du kannst ausgeblendete Paarungen später wieder anzeigen.",
@@ -268,8 +269,8 @@ function StatsPageInner() {
       setHiddenKeys(hidePairingKeys(keys));
       setDeleteNotice(
         chosen.length === 1
-          ? "1 Paarung aus der Statistik entfernt."
-          : `${chosen.length} Paarungen aus der Statistik entfernt.`,
+          ? "1 Paarung hier ausgeblendet."
+          : `${chosen.length} Paarungen hier ausgeblendet.`,
       );
       exitSelectMode();
       setOpenKeys(new Set());
@@ -278,6 +279,59 @@ function StatsPageInner() {
       setDeleting(false);
     }
   }, [ownPairings, selectedKeys, ownPlayerId, aliases, exitSelectMode]);
+
+  const handleServerResetSelected = useCallback(async () => {
+    if (!isAdmin) return;
+    const chosen = ownPairings.filter((p) => selectedKeys.has(p.key));
+    if (chosen.length === 0) return;
+    const labels = chosen
+      .map(
+        (p) =>
+          `${playerLabel(p.playerA, ownPlayerId, aliases)} vs. ${playerLabel(
+            p.playerB,
+            ownPlayerId,
+            aliases,
+          )}`,
+      )
+      .join("\n");
+    const confirmed = window.confirm(
+      `ADMIN: Paarungen auf dem Server endgültig bereinigen?\n\n${labels}\n\n` +
+        "Löscht abgeschlossene 2-Spieler-Runden und manuelle Baselines dieser Paarungen. " +
+        "Wirkt auf allen Geräten. Nicht rückgängig.",
+    );
+    if (!confirmed) return;
+
+    setDeleting(true);
+    setError(null);
+    setDeleteNotice(null);
+    try {
+      const keys = chosen.flatMap((pairing) => keysToHideForPairing(pairing));
+      const result = await resetPairings(keys);
+      setDeleteNotice(
+        `Server bereinigt: ${result.deletedSessions} Session(s) gelöscht` +
+          (result.skippedMultiPlayer > 0
+            ? `, ${result.skippedMultiPlayer} Mehrspieler-Sessions übersprungen`
+            : "") +
+          ".",
+      );
+      exitSelectMode();
+      setOpenKeys(new Set());
+      await refreshPairings();
+      setDetailReloadToken((value) => value + 1);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Server-Bereinigung fehlgeschlagen");
+    } finally {
+      setDeleting(false);
+    }
+  }, [
+    isAdmin,
+    ownPairings,
+    selectedKeys,
+    ownPlayerId,
+    aliases,
+    exitSelectMode,
+    refreshPairings,
+  ]);
 
   const handleRestoreHidden = useCallback(() => {
     if (manuallyHiddenCount === 0) return;
@@ -301,6 +355,12 @@ function StatsPageInner() {
       <Link href="/settings/rivals" className="stats-rivals-manage-link">
         Rivalen verwalten
       </Link>
+      <p className="stats-foreign-filter-note">
+        Namen und „Das bin ich“ gelten nur auf diesem Gerät.{" "}
+        {isAdmin
+          ? "Als Admin kannst du Siege/Diff und Server-Bereinigung für alle Geräte steuern."
+          : "Gemeinsame Zahlen kommen vom Server; Bereinigen und Siege nachtragen nur der Admin."}
+      </p>
 
       {foreignPairingCount > 0 && (
         <p className="stats-foreign-filter-note">
@@ -357,7 +417,7 @@ function StatsPageInner() {
                       setSelectMode(true);
                     }}
                   >
-                    Paarungen löschen
+                    Paarungen auswählen
                   </button>
                 )}
                 {manuallyHiddenCount > 0 && (
@@ -367,8 +427,8 @@ function StatsPageInner() {
                     onClick={handleRestoreHidden}
                   >
                     {manuallyHiddenCount === 1
-                      ? "1 gelöschte wieder anzeigen"
-                      : `${manuallyHiddenCount} gelöschte wieder anzeigen`}
+                      ? "1 ausgeblendete wieder anzeigen"
+                      : `${manuallyHiddenCount} ausgeblendete wieder anzeigen`}
                   </button>
                 )}
               </>
@@ -376,14 +436,26 @@ function StatsPageInner() {
               <>
                 <button
                   type="button"
-                  className="btn-danger px-3 py-1 text-xs"
+                  className="btn-chip px-3 py-1 text-xs"
                   disabled={selectedKeys.size === 0 || deleting}
                   onClick={handleDeleteSelected}
                 >
                   {deleting
-                    ? "Wird entfernt …"
-                    : `Ausgewählte löschen (${selectedKeys.size})`}
+                    ? "Wird ausgeblendet …"
+                    : `Hier ausblenden (${selectedKeys.size})`}
                 </button>
+                {isAdmin && (
+                  <button
+                    type="button"
+                    className="btn-danger px-3 py-1 text-xs"
+                    disabled={selectedKeys.size === 0 || deleting}
+                    onClick={() => void handleServerResetSelected()}
+                  >
+                    {deleting
+                      ? "Server …"
+                      : `Server bereinigen (${selectedKeys.size})`}
+                  </button>
+                )}
                 <button
                   type="button"
                   className="btn-chip px-3 py-1 text-xs"
@@ -406,7 +478,7 @@ function StatsPageInner() {
         <div className="stats-empty-state stats-empty-state--cta">
           <p>
             {manuallyHiddenCount > 0
-              ? "Keine sichtbaren Paarungen. Du kannst gelöschte Paarungen wieder anzeigen."
+              ? "Keine sichtbaren Paarungen. Du kannst ausgeblendete Paarungen wieder anzeigen."
               : "Noch keine Paarungen. Spiele mindestens eine Multiplayer-Runde zu Ende."}
           </p>
           {manuallyHiddenCount === 0 && (
@@ -430,7 +502,9 @@ function StatsPageInner() {
                 open={openKeys.has(pairing.key)}
                 onToggle={() => toggleOpen(pairing.key)}
                 onEditPlayerAlias={selectMode ? undefined : setEditingPlayerId}
-                onEditPairing={selectMode ? undefined : setEditingPairing}
+                onEditPairing={
+                  selectMode || !isAdmin ? undefined : setEditingPairing
+                }
                 selectable={selectMode}
                 selected={selectedKeys.has(pairing.key)}
                 onToggleSelect={() => toggleSelected(pairing.key)}

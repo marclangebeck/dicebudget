@@ -93,7 +93,7 @@ export function PairingEditOverlay({
     >
       <div className="play-complete-card w-full max-w-sm text-left">
         <p id="pairing-edit-title" className="play-complete-kicker">
-          Paarung bearbeiten
+          Paarung bearbeiten (Admin)
         </p>
         <p className="text-secondary mt-2 text-sm">
           <strong className="text-strong">{labelA}</strong>
@@ -101,8 +101,8 @@ export function PairingEditOverlay({
           <strong className="text-strong">{labelB}</strong>
         </p>
         <p className="text-muted mt-1 text-xs">
-          Gesamtwerte inkl. Runden außerhalb der App. Wird auf allen Geräten
-          gespeichert.
+          Globale Korrektur inkl. Runden außerhalb der App. Wird auf dem Server
+          gespeichert und gilt für alle Geräte.
         </p>
 
         <div className="mt-4 grid grid-cols-2 gap-3">

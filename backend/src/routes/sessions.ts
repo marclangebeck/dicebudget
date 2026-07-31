@@ -63,6 +63,10 @@ sessionsRouter.post("/", createSessionLimiter, async (req, res, next) => {
           houseRulesBody.ruleUpperRace === undefined
             ? undefined
             : Boolean(houseRulesBody.ruleUpperRace),
+        ruleColumnPoolBonuses:
+          houseRulesBody.ruleColumnPoolBonuses === undefined
+            ? undefined
+            : Boolean(houseRulesBody.ruleColumnPoolBonuses),
       },
     );
     res.status(201).json({ session });

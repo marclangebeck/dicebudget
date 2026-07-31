@@ -1,5 +1,10 @@
 import type { FieldTypeId } from "./fieldTypes.js";
 import { FIELD_TYPES_PER_GAME } from "./fieldTypes.js";
+import {
+  LOWER_FIELD_TYPES,
+  UPPER_BONUS_POINTS,
+  computeGameBreakdown,
+} from "./gameScoring.js";
 
 export const BURN_POOL_COST = 1;
 
@@ -80,7 +85,12 @@ function scoredHistory(fields: ScoredHistoryField[]): ScoredHistoryField[] {
 }
 
 function isFastYatzy(field: ScoredHistoryField): boolean {
-  return field.fieldType === "KNIFFEL" && field.rollsUsed >= 1 && field.rollsUsed <= 3;
+  return (
+    field.fieldType === "KNIFFEL" &&
+    field.score === 50 &&
+    field.rollsUsed >= 1 &&
+    field.rollsUsed <= 3
+  );
 }
 
 /** Letzte zwei Einträge sind Alle Fünfe mit ≤ 3 Würfen. */
@@ -145,4 +155,57 @@ export function yatzyTriplePenaltyMarker(fields: ScoredHistoryField[]): number |
     lastThree[1]!.scoredSequence ?? 0,
     lastThree[2]!.scoredSequence ?? 0,
   );
+}
+
+// --- M40: Spalten-Pool-Boni (+2 / +2 / +2, max. 6, nur Erster in der Session) ---
+
+export const COLUMN_POOL_BONUS = 2;
+
+type ColumnFieldRow = {
+  fieldType: string;
+  score: number | null;
+};
+
+type ColumnGameRow = {
+  fields: ColumnFieldRow[];
+};
+
+/** Eine Spalte: alle 1–6 voll und oberer Bonus (+35). */
+export function gameColumnHasUpperBonus(fields: ColumnFieldRow[]): boolean {
+  return computeGameBreakdown(fields).bonus === UPPER_BONUS_POINTS;
+}
+
+/** Eine Spalte: alle 7 unteren Felder eingetragen. */
+export function gameColumnHasLowerComplete(fields: ColumnFieldRow[]): boolean {
+  for (const fieldType of LOWER_FIELD_TYPES) {
+    const field = fields.find((f) => f.fieldType === fieldType);
+    if (!field || field.score === null) return false;
+  }
+  return true;
+}
+
+/** Dieselbe Spalte: oberer Bonus und unterer Bereich voll. */
+export function gameColumnHasFullCombo(fields: ColumnFieldRow[]): boolean {
+  return gameColumnHasUpperBonus(fields) && gameColumnHasLowerComplete(fields);
+}
+
+export function runHasAnyColumnUpperBonus(games: ColumnGameRow[]): boolean {
+  return games.some((game) => gameColumnHasUpperBonus(game.fields));
+}
+
+export function runHasAnyColumnLowerComplete(games: ColumnGameRow[]): boolean {
+  return games.some((game) => gameColumnHasLowerComplete(game.fields));
+}
+
+export function runHasAnyColumnFullCombo(games: ColumnGameRow[]): boolean {
+  return games.some((game) => gameColumnHasFullCombo(game.fields));
+}
+
+/** True, wenn der Run den Zustand neu erreicht hat (vorher false, nachher true). */
+export function newlyAchievedColumnGoal(
+  beforeGames: ColumnGameRow[],
+  afterGames: ColumnGameRow[],
+  predicate: (games: ColumnGameRow[]) => boolean,
+): boolean {
+  return !predicate(beforeGames) && predicate(afterGames);
 }

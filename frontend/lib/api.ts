@@ -21,6 +21,11 @@ function getAdminApiKey(): string | undefined {
   return key || undefined;
 }
 
+/** True, wenn der Build einen Admin-Key für Stats-Korrekturen mitbringt (M38). */
+export function hasAdminApiKey(): boolean {
+  return Boolean(getAdminApiKey());
+}
+
 async function request<T>(path: string, init?: ApiRequestInit): Promise<T> {
   const { playerSecret, adminKey, ...fetchRest } = init ?? {};
   const headers = new Headers({ "Content-Type": "application/json" });
@@ -286,6 +291,7 @@ export function createGameSession(
     ruleYatzyStreak2?: boolean;
     ruleYatzyTriple?: boolean;
     ruleUpperRace?: boolean;
+    ruleColumnPoolBonuses?: boolean;
   },
 ) {
   return request<{ session: SessionLobbyDto }>("/sessions", {

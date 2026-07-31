@@ -15,7 +15,8 @@ export function isExtraHouseRulesUiAvailable(isLocalSolo: boolean, useStrategyRu
     !isFeatureEnabled("houseRulesRollSale") &&
     !isFeatureEnabled("houseRulesYatzyStreak") &&
     !isFeatureEnabled("houseRulesYatzyTriple") &&
-    !isFeatureEnabled("houseRulesUpperRace")
+    !isFeatureEnabled("houseRulesUpperRace") &&
+    !isFeatureEnabled("houseRulesColumnPoolBonuses")
   ) {
     return false;
   }
@@ -81,6 +82,7 @@ export function HouseRulesTableActions({
   const yatzyEnabled = isFeatureEnabled("houseRulesYatzyStreak");
   const yatzyTripleEnabled = isFeatureEnabled("houseRulesYatzyTriple");
   const upperRaceEnabled = isFeatureEnabled("houseRulesUpperRace");
+  const columnPoolEnabled = isFeatureEnabled("houseRulesColumnPoolBonuses");
 
   if (!isExtraHouseRulesUiAvailable(isLocalSolo, run.useStrategyRules)) {
     return null;
@@ -168,6 +170,15 @@ export function HouseRulesTableActions({
             <RuleTitle title="Oberer Bereich zuerst" infoKey="upperRace" onInfo={setRuleInfo} />
             <p className="house-rules-action-hint mt-0.5 text-[0.65rem]">
               Offene obere Felder des Rivalen als Pool (automatisch).
+            </p>
+          </div>
+        )}
+
+        {columnPoolEnabled && (
+          <div className="house-rules-subpanel rounded-lg border p-2">
+            <RuleTitle title="Spalten-Pool-Boni" infoKey="columnPoolBonuses" onInfo={setRuleInfo} />
+            <p className="house-rules-action-hint mt-0.5 text-[0.65rem]">
+              Erster: Spalte oben mit Bonus / unten voll / durchgängig — je +2 Pool (auto).
             </p>
           </div>
         )}

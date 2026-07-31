@@ -5,23 +5,34 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **Spalten-Pool-Boni (M40):** Erster Spieler: Spalte oben mit Bonus / unten voll / gleiche Spalte komplett — je +2 Pool (max. 6); Labs + Session-Flag
+- **Menü-Version (M39):** Hamburger zeigt `Version 2.0 (…)` aus `NEXT_PUBLIC_APP_VERSION` / `NEXT_PUBLIC_APP_BUILD`
 - **Fortschritt 25/50/75 %:** Punktdifferenz zum Gegner im Overlay („X Punkte voraus/zurück“)
-- **Statistik:** Paarungen ohne eigene Player-ID werden nur lokal ausgeblendet (Server unverändert)
-- **Hausregel auto (2 Spieler, Strategy):** 2× Alle Fünfe ≤3 Würfe halbieren Gegner-Pool automatisch + Overlay
-- **Hausregel auto (2 Spieler, Strategy):** Wer zuerst den gesamten oberen Bereich (alle Spiele × 6 Felder) voll hat, erhält die offenen oberen Felder des Rivalen als Pool + Overlay
+- **Hausregel auto (2 Spieler, Strategy):** 2× Alle Fünfe ≤3 Würfe → Gegner-Pool **halbiert** + Overlay
+- **Hausregel auto (2 Spieler, Strategy):** 3× Alle Fünfe ≤3 Würfe → Gegner-Pool **0** + Overlay (Vorrang vor 2×)
+- **Hausregel auto (2 Spieler, Strategy):** Wer zuerst den gesamten oberen Bereich (Spiele × 6) voll hat, erhält die offenen oberen Felder des Rivalen als Pool + Overlay
+- **Hausregeln-Toggles / Info-„i“:** Labs-Toggles inkl. Oberer-Bereich und 3×; Info-Overlay pro Regel und unter Visuelle Einblendungen
+- **Session-Flags:** Host-Toggles (`ruleYatzyStreak2`, `ruleYatzyTriple`, `ruleUpperRace`) beim Raum-Erstellen
+- **Statistik:** Paarungen lokal ausblenden (`hiddenPairings`); Wiederherstellen; Startscreen-Bilanz berücksichtigt Hide-Liste
 
-### Added
-- **Hausregel 3× Alle Fünfe:** Gegner verliert gesamten Pool (automatisch im Duell) + Overlay; Toggle unter Hausregeln
-- **Hausregeln-Toggles:** Oberer-Bereich-Rennen und 3× Alle Fünfe; Info-„i“-Overlay pro Regel
-- **Session-Flags:** Host-Toggles für Auto-Hausregeln werden beim Raum-Erstellen übernommen
+### Changed
+- **Paarung bearbeiten (M38):** Siege/Diff nur noch mit Admin-Key (widerruft die temporäre Öffnung für iOS ohne Key)
+- **Feldeintrag-Performance:** weniger Queries, Complete ohne Roll-Historie, Lobby mid-game `?lite=1`, Overlay vor Lobby-Wait
+- **Hausregel Brennt:** Pool-Kosten 1 (siehe auch unten); Auto-Regeln nur bei Session-Flag + Strategy-Duell
 
 ### Fixed
+- **Paarungen Rollen (M38):** Baseline + Server-Reset wieder nur mit Admin-Key; Spieler blenden lokal aus; klare UX „Hier ausblenden“ / „Server bereinigen“
+- **2×/3× Alle Fünfe (M41):** Streak nur bei echtem Treffer (`score === 50`); Null-Einträge lösen keine Pool-Halbierung/-Nullung
+- **Fortschritt 25/50/75 % (M37):** Delta nur aus Lobby-`diceScore` / Feldsumme — kein Fallback auf `totalScore`; bei Meilenstein frische Lite-Lobby vor Overlay
 - **Paarung bearbeiten:** Baseline-Korrektur ohne Admin-API-Key (iOS ohne eingebetteten Key)
 - **Fortschritt 25/50/75 %:** Punktdifferenz nur aus eingetragenen Feldpunkten (ohne oberen Bonus / Extra-Yatzy)
-- **Statistik-Filter:** Paarungen bleiben sichtbar, wenn die Geräte-ID fehlt oder nur per Alias zusammengeführt ist (kein leerer Stats-Screen mehr)
+- **Statistik-Filter:** Paarungen bleiben sichtbar mit Alias / „Das bin ich“ (kein leerer Stats-Screen mehr)
 - **Hamburger Rivalen/Tour:** Interne Menü-Ziele per `router.push` nach Menü-Schließen (nicht mehr Link+onClose) — verhindert Sprung auf den Startscreen in Capacitor
 - **App-Tour aus Menü:** Startet die Overlay-Tour zuverlässig (Event + Pending), statt nur auf den Startscreen zu wechseln
 - **Rivalen verknüpfen:** Beim Benennen unbekannter Gegner bestehende Rivalen auswählen (nicht nur neuer Name)
+
+### Docs
+- **HANDOVER / milestones_active / ios_current / milestones:** Stand HEAD `f5a2665`, Build 29, M36-Teilfortschritt Session-Flags
 
 ### Added
 - **App-Tour:** Einstieg aus dem Hamburger-Menü (nicht mehr unter Einstellungen); Kapitel A/B/C weiter über `/app?tour=all`

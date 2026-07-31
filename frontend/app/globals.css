@@ -2910,13 +2910,26 @@ html.zoomable-route.legal-route .legal-page-scroll {
   position: relative;
   z-index: 1;
   margin: 0;
-  padding: 0.35rem 0.85rem 0.72rem;
+  padding: 0.35rem 0.85rem 0.15rem;
   font-size: 0.56rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   text-align: center;
   color: rgba(148, 163, 184, 0.72);
+}
+
+.app-footer-menu-version {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 0 0.85rem 0.72rem;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-align: center;
+  color: rgba(148, 163, 184, 0.55);
+  font-variant-numeric: tabular-nums;
 }
 
 .app-legal-icon {

@@ -4,6 +4,8 @@ import {
   BURN_POOL_COST,
   canBurnHouseRule,
   isFieldTypeRowFull,
+  qualifiesYatzyStreakPenalty,
+  qualifiesYatzyTriplePenalty,
   rollSaleAllowedScores,
 } from "./houseRules.js";
 
@@ -55,5 +57,41 @@ describe("houseRules (frontend)", () => {
     ];
     assert.equal(countOpenUpperFields(games), 2);
     assert.equal(isRunUpperComplete(games), false);
+  });
+
+  it("qualifiesYatzyStreakPenalty nur bei Score 50", () => {
+    assert.equal(
+      qualifiesYatzyStreakPenalty([
+        { fieldType: "KNIFFEL", score: 50, rollsUsed: 2, scoredSequence: 1 },
+        { fieldType: "KNIFFEL", score: 50, rollsUsed: 3, scoredSequence: 2 },
+      ]),
+      true,
+    );
+    assert.equal(
+      qualifiesYatzyStreakPenalty([
+        { fieldType: "KNIFFEL", score: 0, rollsUsed: 2, scoredSequence: 1 },
+        { fieldType: "KNIFFEL", score: 0, rollsUsed: 3, scoredSequence: 2 },
+      ]),
+      false,
+    );
+  });
+
+  it("qualifiesYatzyTriplePenalty nur bei drei Treffern 50", () => {
+    assert.equal(
+      qualifiesYatzyTriplePenalty([
+        { fieldType: "KNIFFEL", score: 50, rollsUsed: 1, scoredSequence: 1 },
+        { fieldType: "KNIFFEL", score: 50, rollsUsed: 2, scoredSequence: 2 },
+        { fieldType: "KNIFFEL", score: 50, rollsUsed: 3, scoredSequence: 3 },
+      ]),
+      true,
+    );
+    assert.equal(
+      qualifiesYatzyTriplePenalty([
+        { fieldType: "KNIFFEL", score: 50, rollsUsed: 1, scoredSequence: 1 },
+        { fieldType: "KNIFFEL", score: 50, rollsUsed: 2, scoredSequence: 2 },
+        { fieldType: "KNIFFEL", score: 0, rollsUsed: 3, scoredSequence: 3 },
+      ]),
+      false,
+    );
   });
 });

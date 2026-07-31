@@ -1,11 +1,16 @@
 import { prisma } from "../db/prisma.js";
 import {
   BURN_POOL_COST,
+  COLUMN_POOL_BONUS,
   countOpenUpperFields,
   hasAnyFullFieldTypeRow,
   isRunUpperComplete,
+  newlyAchievedColumnGoal,
   qualifiesYatzyStreakPenalty,
   qualifiesYatzyTriplePenalty,
+  runHasAnyColumnFullCombo,
+  runHasAnyColumnLowerComplete,
+  runHasAnyColumnUpperBonus,
   yatzyStreakPenaltyMarker,
   yatzyTriplePenaltyMarker,
 } from "../domain/houseRules.js";
@@ -48,6 +53,18 @@ export type HouseRuleAutoEvent =
     }
   | {
       type: "upper_race_pool";
+      poolsGained: number;
+    }
+  | {
+      type: "column_pool_upper";
+      poolsGained: number;
+    }
+  | {
+      type: "column_pool_lower";
+      poolsGained: number;
+    }
+  | {
+      type: "column_pool_combo";
       poolsGained: number;
     };
 
@@ -265,10 +282,9 @@ type RunSnapshotForAuto = {
 };
 
 /**
- * Nach Feldeintrag: automatische Duell-Hausregeln (nur 2 Spieler, Strategy).
- * - 3× Alle Fünfe ≤3 Würfe → Gegner-Pool auf 0
- * - 2× Alle Fünfe ≤3 Würfe → Gegner-Pool halbieren (wenn nicht schon Triple)
- * - Oberer Bereich zuerst voll → offene obere Felder des Rivalen als Pool
+ * Nach Feldeintrag: automatische Hausregeln (Strategy + Session).
+ * Duell (2 Spieler): 2×/3× Alle Fünfe, Oberer-Bereich-Race.
+ * Beliebige Spielerzahl: Spalten-Pool-Boni (M40), nur Erster in der Session.
  */
 export async function applyAutoHouseRulesAfterComplete(
   runId: string,
@@ -306,102 +322,187 @@ export async function applyAutoHouseRulesAfterComplete(
       },
     },
   });
-  if (!beneficiary?.session || beneficiary.session.players.length !== 2) {
+  if (!beneficiary?.session) {
     return { events };
   }
 
   const session = beneficiary.session;
-  const opponent = session.players.find((p) => p.id !== beneficiary.id);
-  if (!opponent) return { events };
-
   const afterRun = beneficiary.run;
   const fieldsBefore = before.games.flatMap((g) => g.fields);
   const fieldsAfter = afterRun.games.flatMap((g) => g.fields);
 
-  let appliedYatzyPenalty = false;
+  if (session.players.length === 2) {
+    const opponent = session.players.find((p) => p.id !== beneficiary.id);
+    if (opponent) {
+      let appliedYatzyPenalty = false;
 
-  if (session.ruleYatzyTriple) {
-    const tripleMarker = yatzyTriplePenaltyMarker(fieldsAfter);
-    const tripleBefore = qualifiesYatzyTriplePenalty(fieldsBefore);
-    const tripleAlready =
-      tripleMarker != null &&
-      before.yatzyTriplePenaltyAtSequence != null &&
-      before.yatzyTriplePenaltyAtSequence >= tripleMarker;
+      if (session.ruleYatzyTriple) {
+        const tripleMarker = yatzyTriplePenaltyMarker(fieldsAfter);
+        const tripleBefore = qualifiesYatzyTriplePenalty(fieldsBefore);
+        const tripleAlready =
+          tripleMarker != null &&
+          before.yatzyTriplePenaltyAtSequence != null &&
+          before.yatzyTriplePenaltyAtSequence >= tripleMarker;
 
-    if (!tripleBefore && tripleMarker != null && !tripleAlready) {
-      const victimRun = opponent.run;
-      const poolsLost = victimRun.rollsInPool;
-      await prisma.$transaction(async (tx) => {
-        await tx.run.update({
-          where: { id: victimRun.id },
-          data: { rollsInPool: 0 },
-        });
-        await tx.run.update({
-          where: { id: runId },
-          data: { yatzyTriplePenaltyAtSequence: tripleMarker },
-        });
-      });
-      events.push({
-        type: "yatzy_triple_penalty",
-        poolsLost,
-        victimPlayerId: opponent.id,
-        victimPlayerName: opponent.name,
-      });
-      appliedYatzyPenalty = true;
+        if (!tripleBefore && tripleMarker != null && !tripleAlready) {
+          const victimRun = opponent.run;
+          const poolsLost = victimRun.rollsInPool;
+          await prisma.$transaction(async (tx) => {
+            await tx.run.update({
+              where: { id: victimRun.id },
+              data: { rollsInPool: 0 },
+            });
+            await tx.run.update({
+              where: { id: runId },
+              data: { yatzyTriplePenaltyAtSequence: tripleMarker },
+            });
+          });
+          events.push({
+            type: "yatzy_triple_penalty",
+            poolsLost,
+            victimPlayerId: opponent.id,
+            victimPlayerName: opponent.name,
+          });
+          appliedYatzyPenalty = true;
+        }
+      }
+
+      if (session.ruleYatzyStreak2 && !appliedYatzyPenalty) {
+        const markerAfter = yatzyStreakPenaltyMarker(fieldsAfter);
+        const qualifiedBefore = qualifiesYatzyStreakPenalty(fieldsBefore);
+        const alreadyApplied =
+          markerAfter != null &&
+          before.yatzyStreakPenaltyAtSequence != null &&
+          before.yatzyStreakPenaltyAtSequence >= markerAfter;
+
+        if (!qualifiedBefore && markerAfter != null && !alreadyApplied) {
+          const victimRun = opponent.run;
+          const oldPool = victimRun.rollsInPool;
+          const newPool = Math.floor(oldPool / 2);
+          const poolsLost = oldPool - newPool;
+          await prisma.$transaction(async (tx) => {
+            await tx.run.update({
+              where: { id: victimRun.id },
+              data: { rollsInPool: newPool },
+            });
+            await tx.run.update({
+              where: { id: runId },
+              data: { yatzyStreakPenaltyAtSequence: markerAfter },
+            });
+          });
+          events.push({
+            type: "yatzy_streak_penalty",
+            poolsLost,
+            victimPlayerId: opponent.id,
+            victimPlayerName: opponent.name,
+          });
+        }
+      }
+
+      if (session.ruleUpperRace) {
+        const upperBefore = isRunUpperComplete(before.games);
+        const upperAfter = isRunUpperComplete(afterRun.games);
+        if (!upperBefore && upperAfter && !before.upperRacePoolCredited) {
+          const openUpper = countOpenUpperFields(opponent.run.games);
+          if (openUpper > 0) {
+            await prisma.run.update({
+              where: { id: runId },
+              data: {
+                rollsInPool: { increment: openUpper },
+                upperRacePoolCredited: true,
+              },
+            });
+            events.push({ type: "upper_race_pool", poolsGained: openUpper });
+          } else {
+            await prisma.run.update({
+              where: { id: runId },
+              data: { upperRacePoolCredited: true },
+            });
+          }
+        }
+      }
     }
   }
 
-  if (session.ruleYatzyStreak2 && !appliedYatzyPenalty) {
-    const markerAfter = yatzyStreakPenaltyMarker(fieldsAfter);
-    const qualifiedBefore = qualifiesYatzyStreakPenalty(fieldsBefore);
-    const alreadyApplied =
-      markerAfter != null &&
-      before.yatzyStreakPenaltyAtSequence != null &&
-      before.yatzyStreakPenaltyAtSequence >= markerAfter;
+  if (session.ruleColumnPoolBonuses) {
+    // Frische Session-Flags lesen (Race: nur Erster gewinnt).
+    const sessionFlags = await prisma.gameSession.findUnique({
+      where: { id: session.id },
+      select: {
+        columnPoolUpperCredited: true,
+        columnPoolLowerCredited: true,
+        columnPoolComboCredited: true,
+      },
+    });
+    if (sessionFlags) {
+      const awardUpper =
+        !sessionFlags.columnPoolUpperCredited &&
+        newlyAchievedColumnGoal(
+          before.games,
+          afterRun.games,
+          runHasAnyColumnUpperBonus,
+        );
+      const awardLower =
+        !sessionFlags.columnPoolLowerCredited &&
+        newlyAchievedColumnGoal(
+          before.games,
+          afterRun.games,
+          runHasAnyColumnLowerComplete,
+        );
+      const awardCombo =
+        !sessionFlags.columnPoolComboCredited &&
+        newlyAchievedColumnGoal(
+          before.games,
+          afterRun.games,
+          runHasAnyColumnFullCombo,
+        );
 
-    if (!qualifiedBefore && markerAfter != null && !alreadyApplied) {
-      const victimRun = opponent.run;
-      const oldPool = victimRun.rollsInPool;
-      const newPool = Math.floor(oldPool / 2);
-      const poolsLost = oldPool - newPool;
-      await prisma.$transaction(async (tx) => {
-        await tx.run.update({
-          where: { id: victimRun.id },
-          data: { rollsInPool: newPool },
-        });
-        await tx.run.update({
-          where: { id: runId },
-          data: { yatzyStreakPenaltyAtSequence: markerAfter },
-        });
-      });
-      events.push({
-        type: "yatzy_streak_penalty",
-        poolsLost,
-        victimPlayerId: opponent.id,
-        victimPlayerName: opponent.name,
-      });
-    }
-  }
+      if (awardUpper || awardLower || awardCombo) {
+        const awarded: HouseRuleAutoEvent[] = [];
+        await prisma.$transaction(async (tx) => {
+          const fresh = await tx.gameSession.findUnique({
+            where: { id: session.id },
+            select: {
+              columnPoolUpperCredited: true,
+              columnPoolLowerCredited: true,
+              columnPoolComboCredited: true,
+            },
+          });
+          if (!fresh) return;
 
-  if (session.ruleUpperRace) {
-    const upperBefore = isRunUpperComplete(before.games);
-    const upperAfter = isRunUpperComplete(afterRun.games);
-    if (!upperBefore && upperAfter && !before.upperRacePoolCredited) {
-      const openUpper = countOpenUpperFields(opponent.run.games);
-      if (openUpper > 0) {
-        await prisma.run.update({
-          where: { id: runId },
-          data: {
-            rollsInPool: { increment: openUpper },
-            upperRacePoolCredited: true,
-          },
+          const doUpper = awardUpper && !fresh.columnPoolUpperCredited;
+          const doLower = awardLower && !fresh.columnPoolLowerCredited;
+          const doCombo = awardCombo && !fresh.columnPoolComboCredited;
+          const actualGain =
+            (doUpper ? COLUMN_POOL_BONUS : 0) +
+            (doLower ? COLUMN_POOL_BONUS : 0) +
+            (doCombo ? COLUMN_POOL_BONUS : 0);
+          if (actualGain === 0) return;
+
+          await tx.gameSession.update({
+            where: { id: session.id },
+            data: {
+              ...(doUpper ? { columnPoolUpperCredited: true } : {}),
+              ...(doLower ? { columnPoolLowerCredited: true } : {}),
+              ...(doCombo ? { columnPoolComboCredited: true } : {}),
+            },
+          });
+          await tx.run.update({
+            where: { id: runId },
+            data: { rollsInPool: { increment: actualGain } },
+          });
+
+          if (doUpper) {
+            awarded.push({ type: "column_pool_upper", poolsGained: COLUMN_POOL_BONUS });
+          }
+          if (doLower) {
+            awarded.push({ type: "column_pool_lower", poolsGained: COLUMN_POOL_BONUS });
+          }
+          if (doCombo) {
+            awarded.push({ type: "column_pool_combo", poolsGained: COLUMN_POOL_BONUS });
+          }
         });
-        events.push({ type: "upper_race_pool", poolsGained: openUpper });
-      } else {
-        await prisma.run.update({
-          where: { id: runId },
-          data: { upperRacePoolCredited: true },
-        });
+        events.push(...awarded);
       }
     }
   }

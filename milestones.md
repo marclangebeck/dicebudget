@@ -23,14 +23,15 @@ Nur bei Bedarf:
 ## Aktueller Kurzstand
 
 - Branch: `milestone-22-prep`
-- Produktcode-HEAD: `23f24e6`
+- Produktcode-HEAD: `f5a2665`
 - Web/API live: https://dicebudget.bottle-trade.de
-- iOS: TestFlight `2.0 (28)`; nächster Upload **`2.0 (29)`** auf Web-HEAD
-- Letzte Features: UX-Politur II; geplant **M36** Hausregeln Session-Toggles (nach M30)
+- iOS: TestFlight `2.0 (28)`; nächster Upload **`2.0 (29)`** auf HEAD `f5a2665`
+- Letzte Features: Auto-Hausregeln (2×/3× / Oberer Bereich), Statistik lokal löschen, Feldeintrag-Perf
+- Spezifiziert (kein Code ohne GO): **M37–M41** (Delta, Paarungen, Version, Spalten-Pool, Alle-Fünfe-50); **M36** nach M30
 
 ## Offene Prioritaeten
 
-1. iOS Build 29 (`npm run build:ios` + Archive + Upload).
-2. M30 TestFlight-Regression (neue UX + Hausregeln/Labor).
-3. App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`.
+1. Nutzer-Prio M37–M41 (GO je Milestone) — siehe `docs/milestones_active.md`.
+2. iOS Build 29 (`npm run build:ios` + Archive + Upload).
+3. M30 TestFlight-Regression / App Store Connect.
 4. `milestone-22-prep` → `main` nach Release-Freigabe.

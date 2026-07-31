@@ -46,9 +46,8 @@ statsRouter.post("/pairings/reset", requireAdminKey, async (req, res, next) => {
   }
 });
 
-/** Baseline-Korrektur ohne Admin-Key: Client-Key ist ohnehin public (NEXT_PUBLIC_);
- *  sonst scheitern iOS-Builds ohne eingebetteten Key mit „Admin API key“-Fehler. */
-statsRouter.post("/pairings/baseline", async (req, res, next) => {
+/** Baseline-Korrektur nur mit Admin-Key (M38): globale Bilanz, nicht pro Spieler-Gerät. */
+statsRouter.post("/pairings/baseline", requireAdminKey, async (req, res, next) => {
   try {
     const raw = (req.body as { entries?: unknown })?.entries;
     if (!Array.isArray(raw)) {

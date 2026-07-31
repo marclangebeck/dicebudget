@@ -53,11 +53,41 @@ export function enteredDiceScore(run: RunDto): number {
   return sum;
 }
 
+/**
+ * Feldpunkt-Summe eines Lobby-Spielers.
+ * Nutzt nur `diceScore` — niemals `totalScore` (enthält Bonus/Extra-Yatzy).
+ */
+export function lobbyPlayerDiceScore(
+  player: { diceScore?: number },
+): number | null {
+  return typeof player.diceScore === "number" && Number.isFinite(player.diceScore)
+    ? player.diceScore
+    : null;
+}
+
 function deltaFromScores(myScore: number, otherScore: number): ProgressPositionResolved {
   const scoreDelta = myScore - otherScore;
   if (scoreDelta > 0) return { hint: "ahead", scoreDelta };
   if (scoreDelta < 0) return { hint: "behind", scoreDelta };
   return { hint: "even", scoreDelta: 0 };
+}
+
+/** Ob der Feldanteil einen neuen 25/50/75-%-Meilenstein kreuzt (ohne Overlay-Prefs). */
+export function wouldCrossProgressMilestone(
+  runBefore: RunDto,
+  runAfter: RunDto,
+  alreadyShown: ReadonlySet<number>,
+): ProgressMilestonePercent | null {
+  const beforePct = progressPercent(runBefore);
+  const afterPct = progressPercent(runAfter);
+
+  for (const milestone of PROGRESS_MILESTONES) {
+    if (alreadyShown.has(milestone)) continue;
+    if (beforePct < milestone && afterPct >= milestone) {
+      return milestone;
+    }
+  }
+  return null;
 }
 
 export function resolveProgressPosition(
@@ -80,12 +110,12 @@ export function resolveProgressPosition(
   );
   if (others.length === 0) return null;
 
-  const bestOtherDice = Math.max(
-    ...others.map((player) =>
-      typeof player.diceScore === "number" ? player.diceScore : player.totalScore,
-    ),
-  );
+  const otherDiceScores = others
+    .map((player) => lobbyPlayerDiceScore(player))
+    .filter((score): score is number => score !== null);
+  if (otherDiceScores.length === 0) return null;
 
+  const bestOtherDice = Math.max(...otherDiceScores);
   return deltaFromScores(myDice, bestOtherDice);
 }
 
@@ -124,19 +154,13 @@ export function buildProgressMilestoneAfterField(
 ): RunProgressOverlayState | null {
   if (!getProgressHintsEnabled()) return null;
 
-  const beforePct = progressPercent(runBefore);
-  const afterPct = progressPercent(runAfter);
+  const milestone = wouldCrossProgressMilestone(runBefore, runAfter, alreadyShown);
+  if (milestone == null) return null;
 
-  for (const milestone of PROGRESS_MILESTONES) {
-    if (alreadyShown.has(milestone)) continue;
-    if (beforePct < milestone && afterPct >= milestone) {
-      const position = resolveProgressPosition(runAfter, context ?? null);
-      return {
-        percent: milestone,
-        positionHint: position?.hint ?? null,
-        scoreDelta: position?.scoreDelta ?? null,
-      };
-    }
-  }
-  return null;
+  const position = resolveProgressPosition(runAfter, context ?? null);
+  return {
+    percent: milestone,
+    positionHint: position?.hint ?? null,
+    scoreDelta: position?.scoreDelta ?? null,
+  };
 }

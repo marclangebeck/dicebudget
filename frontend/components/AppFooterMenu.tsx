@@ -11,6 +11,7 @@ import {
   IMPRESSUM_PATH,
   PRIVACY_PATH,
 } from "@/lib/branding";
+import { formatAppVersionLabel } from "@/lib/appVersion";
 import { requestAppTour } from "@/lib/appTourPrefs";
 import { useFocusTrap } from "@/lib/useFocusTrap";
 
@@ -301,6 +302,9 @@ export function AppFooterMenu({ open, onClose }: Props) {
         </ul>
 
         <p className="app-footer-menu-foot">Würfel. Strategie. Bilanz.</p>
+        <p className="app-footer-menu-version" aria-label="App-Version">
+          {formatAppVersionLabel()}
+        </p>
       </nav>
     </div>
   );

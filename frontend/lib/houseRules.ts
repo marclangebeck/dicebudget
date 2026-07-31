@@ -107,7 +107,12 @@ function scoredHistory(fields: ScoredHistoryField[]): ScoredHistoryField[] {
 }
 
 function isFastYatzy(field: ScoredHistoryField): boolean {
-  return field.fieldType === "KNIFFEL" && field.rollsUsed >= 1 && field.rollsUsed <= 3;
+  return (
+    field.fieldType === "KNIFFEL" &&
+    field.score === 50 &&
+    field.rollsUsed >= 1 &&
+    field.rollsUsed <= 3
+  );
 }
 
 export function qualifiesYatzyStreakPenalty(fields: ScoredHistoryField[]): boolean {

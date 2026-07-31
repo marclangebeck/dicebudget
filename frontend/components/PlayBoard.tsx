@@ -38,7 +38,10 @@ import { BURN_POOL_COST, canBurnHouseRule } from "@/lib/houseRules";
 import { isFeatureEnabled } from "@/lib/featureFlags";
 import { buildAchievementAfterField } from "@/lib/achievementFeedback";
 import { useQueuedFeedbackOverlays } from "@/lib/feedbackOverlayQueue";
-import { buildProgressMilestoneAfterField } from "@/lib/runProgressFeedback";
+import {
+  buildProgressMilestoneAfterField,
+  wouldCrossProgressMilestone,
+} from "@/lib/runProgressFeedback";
 import { ruleEventFromDto } from "@/lib/ruleEventFeedback";
 import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
 import { APP_HOME_PATH } from "@/lib/branding";
@@ -140,7 +143,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
 
   // Lobby nur gezielt nachladen (Start + nach eigener Eintragung + Abschluss), kein Polling.
   const refreshLobby = useCallback(async (options?: { lite?: boolean }) => {
-    if (!inviteCode) return;
+    if (!inviteCode) return null;
     setLobbyRefreshing(true);
     try {
       const { session } = await getSessionLobby(inviteCode, options);
@@ -154,8 +157,10 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       } else {
         setOpponentPool(null);
       }
+      return session;
     } catch {
       // Anzeige ist optional – Fehler hier nicht ins Spiel durchreichen.
+      return null;
     } finally {
       setLobbyRefreshing(false);
     }
@@ -405,12 +410,25 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
               yatzyArg ?? null,
             )
           : null;
+      // Bei Meilenstein: frische Lite-Lobby für Gegner-Feldpunkte (kein totalScore-Fallback).
+      let lobbyForProgress = lobby;
+      const crossesMilestone =
+        !!inviteCode &&
+        wouldCrossProgressMilestone(run, updated, shownProgressRef.current) != null;
+      if (crossesMilestone) {
+        const fresh = await refreshLobby({ lite: true });
+        if (fresh) lobbyForProgress = fresh;
+      }
       const progress = buildProgressMilestoneAfterField(
         run,
         updated,
         shownProgressRef.current,
-        inviteCode && lobby && lobby.playerCount >= 2
-          ? { kind: "lobby", lobby, ownPlayerId: getOrCreatePlayerId() }
+        inviteCode && lobbyForProgress && lobbyForProgress.playerCount >= 2
+          ? {
+              kind: "lobby",
+              lobby: lobbyForProgress,
+              ownPlayerId: getOrCreatePlayerId(),
+            }
           : null,
       );
       const ruleOverlays = houseEvents
@@ -437,7 +455,9 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         }
         presentFeedbackAfterField(achievement, progress, ruleOverlays);
       }
-      void refreshLobby({ lite: true });
+      if (!crossesMilestone) {
+        void refreshLobby({ lite: true });
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Eintrag fehlgeschlagen");
     } finally {

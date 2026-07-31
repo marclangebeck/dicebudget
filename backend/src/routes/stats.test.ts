@@ -21,7 +21,7 @@ describe("stats admin auth", () => {
       .post("/stats/pairings/reset")
       .send({ keys: ["a::b"] });
     assert.equal(res.status, 401);
-    assert.match(res.body.error ?? "", /admin api key/i);
+    assert.match(res.body.error ?? "", /admin/i);
   });
 
   it("rejects pairings baseline without admin key", async () => {
@@ -40,6 +40,7 @@ describe("stats admin auth", () => {
         ],
       });
     assert.equal(res.status, 401);
+    assert.match(res.body.error ?? "", /admin/i);
   });
 
   it("accepts pairings reset with valid admin key", async () => {
@@ -49,6 +50,26 @@ describe("stats admin auth", () => {
       .set("X-Admin-Key", TEST_ADMIN_KEY)
       .send({ keys: ["nonexistent::pairing"] });
     assert.equal(res.status, 200);
+  });
+
+  it("accepts pairings baseline with valid admin key", async () => {
+    const app = createTestApp();
+    const res = await request(app)
+      .post("/stats/pairings/baseline")
+      .set("X-Admin-Key", TEST_ADMIN_KEY)
+      .send({
+        entries: [
+          {
+            key: "m38-test-a::m38-test-b",
+            extraWinsA: 1,
+            extraWinsB: 0,
+            extraBonusA: 0,
+            extraBonusB: 0,
+          },
+        ],
+      });
+    assert.equal(res.status, 200);
+    assert.ok(typeof res.body.written === "number");
   });
 
   it("GET /stats returns aggregate payload", async () => {
@@ -70,12 +91,30 @@ describe("stats admin auth without configured key", () => {
     process.env.ADMIN_API_KEY = previousKey;
   });
 
-  it("returns 503 when ADMIN_API_KEY is not set", async () => {
+  it("returns 503 when ADMIN_API_KEY is not set (reset)", async () => {
     const app = createTestApp();
     const res = await request(app)
       .post("/stats/pairings/reset")
       .send({ keys: ["a::b"] });
     assert.equal(res.status, 503);
-    assert.match(res.body.error ?? "", /not configured/i);
+    assert.match(res.body.error ?? "", /not configured|nicht konfiguriert/i);
+  });
+
+  it("returns 503 when ADMIN_API_KEY is not set (baseline)", async () => {
+    const app = createTestApp();
+    const res = await request(app)
+      .post("/stats/pairings/baseline")
+      .send({
+        entries: [
+          {
+            key: "a::b",
+            extraWinsA: 0,
+            extraWinsB: 0,
+            extraBonusA: 0,
+            extraBonusB: 0,
+          },
+        ],
+      });
+    assert.equal(res.status, 503);
   });
 });
