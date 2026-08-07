@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AppFooterMenu } from "@/components/AppFooterMenu";
 import { AppToast } from "@/components/AppToast";
@@ -65,6 +66,7 @@ function MenuIcon({ open }: { open: boolean }) {
 }
 
 export function AppLegalFooter() {
+  const pathname = usePathname() ?? "";
   const [menuOpen, setMenuOpen] = useState(false);
   const [screenshotBusy, setScreenshotBusy] = useState(false);
   const [sharing, setSharing] = useState(false);
@@ -73,6 +75,14 @@ export function AppLegalFooter() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const previewBlobRef = useRef<Blob | null>(null);
+
+  const homeActive =
+    pathname === APP_HOME_PATH ||
+    pathname === "/" ||
+    pathname.startsWith(`${APP_HOME_PATH}/`);
+  const statsActive = pathname === "/stats" || pathname.startsWith("/stats/");
+  const settingsActive =
+    pathname === "/settings" || pathname.startsWith("/settings/");
 
   const clearPreview = useCallback(() => {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -140,15 +150,27 @@ export function AppLegalFooter() {
   return (
     <>
       <footer className="app-legal-footer app-legal-footer--5">
-        <Link href={APP_HOME_PATH} className="app-legal-link app-legal-link--primary">
+        <Link
+          href={APP_HOME_PATH}
+          className={`app-legal-link${homeActive ? " app-legal-link--active" : ""}`}
+          aria-current={homeActive ? "page" : undefined}
+        >
           <HomeIcon />
           <span>Home</span>
         </Link>
-        <Link href="/stats" className="app-legal-link">
+        <Link
+          href="/stats"
+          className={`app-legal-link${statsActive ? " app-legal-link--active" : ""}`}
+          aria-current={statsActive ? "page" : undefined}
+        >
           <StatsIcon />
           <span>Statistik</span>
         </Link>
-        <Link href="/settings" className="app-legal-link">
+        <Link
+          href="/settings"
+          className={`app-legal-link${settingsActive ? " app-legal-link--active" : ""}`}
+          aria-current={settingsActive ? "page" : undefined}
+        >
           <SettingsIcon />
           <span>Spielregeln</span>
         </Link>
