@@ -53,9 +53,10 @@ Priorität laut Nutzer. Details und Sprints: `docs/milestone-roadmap-analysis.md
 
 ### M38 — Paarungen: Sync vs. Admin-Bereinigung
 
-**Status:** umgesetzt (Code); Backend-Deploy nötig.  
+**Status:** umgesetzt; **Stufe 0** (2026-08): Admin-Workflow UI (Baseline / Server bereinigen global; lokales Ausblenden mit Extra-Warnung).  
 **Rollen:** Spieler = lokal ausblenden + Rivalen/Namen; Admin = Siege/Diff + Server bereinigen.  
-**API:** `baseline` wieder `requireAdminKey` (Tests angepasst).
+**API:** `baseline` wieder `requireAdminKey` (Tests angepasst).  
+**Offen optional:** Stufe A — pseudonyme `playerId`-Links nur bei nachgewiesenem Bilanz-Filter-Drift (ohne Klarnamen).
 
 ### M39 — Versionsnummer im Hamburger-Menü
 
