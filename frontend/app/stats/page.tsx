@@ -44,6 +44,7 @@ import {
   resolveOwnPlayerIds,
   subscribeSelfIdentity,
 } from "@/lib/selfIdentity";
+import { useForegroundRefresh } from "@/lib/useForegroundRefresh";
 
 const SORT_OPTIONS: { id: PairingSortMode; label: string }[] = [
   { id: "recent", label: "Zuletzt" },
@@ -78,8 +79,8 @@ function StatsPageInner() {
   const [detailReloadToken, setDetailReloadToken] = useState(0);
   const isAdmin = hasAdminApiKey();
 
-  const refreshPairings = useCallback(async () => {
-    setLoading(true);
+  const refreshPairings = useCallback(async (opts?: { quiet?: boolean }) => {
+    if (!opts?.quiet) setLoading(true);
     setError(null);
     try {
       const [{ pairings: data }, { stats: statsData }] = await Promise.all([
@@ -91,7 +92,7 @@ function StatsPageInner() {
     } catch (e) {
       setError(e instanceof Error ? e.message : "Statistik nicht geladen");
     } finally {
-      setLoading(false);
+      if (!opts?.quiet) setLoading(false);
     }
   }, []);
 
@@ -121,6 +122,10 @@ function StatsPageInner() {
   useEffect(() => {
     void refreshPairings();
   }, [refreshPairings]);
+
+  useForegroundRefresh(() => {
+    void refreshPairings({ quiet: true });
+  });
 
   useEffect(() => {
     if (!deepLinkKey) return;
@@ -269,8 +274,8 @@ function StatsPageInner() {
       setHiddenKeys(hidePairingKeys(keys));
       setDeleteNotice(
         chosen.length === 1
-          ? "1 Paarung hier ausgeblendet."
-          : `${chosen.length} Paarungen hier ausgeblendet.`,
+          ? "1 Paarung nur auf diesem Gerät ausgeblendet (andere Geräte unverändert)."
+          : `${chosen.length} Paarungen nur auf diesem Gerät ausgeblendet (andere Geräte unverändert).`,
       );
       exitSelectMode();
       setOpenKeys(new Set());
@@ -358,8 +363,8 @@ function StatsPageInner() {
       <p className="stats-foreign-filter-note">
         Namen und „Das bin ich“ gelten nur auf diesem Gerät.{" "}
         {isAdmin
-          ? "Als Admin kannst du Siege/Diff und Server-Bereinigung für alle Geräte steuern."
-          : "Gemeinsame Zahlen kommen vom Server; Bereinigen und Siege nachtragen nur der Admin."}
+          ? "Als Admin: Siege/Diff und „Server bereinigen“ gelten für alle Geräte. „Hier ausblenden“ nur lokal."
+          : "Gemeinsame Zahlen kommen vom Server; Bereinigen und Siege nachtragen nur der Admin. „Hier ausblenden“ nur auf diesem Gerät."}
       </p>
 
       {foreignPairingCount > 0 && (
@@ -409,16 +414,28 @@ function StatsPageInner() {
             {!selectMode ? (
               <>
                 {ownPairings.length > 0 && (
-                  <button
-                    type="button"
-                    className="btn-chip px-3 py-1 text-xs"
-                    onClick={() => {
-                      setDeleteNotice(null);
-                      setSelectMode(true);
-                    }}
-                  >
-                    Paarungen auswählen
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      className="btn-chip px-3 py-1 text-xs"
+                      onClick={() => {
+                        setDeleteNotice(null);
+                        void refreshPairings();
+                      }}
+                    >
+                      Aktualisieren
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-chip px-3 py-1 text-xs"
+                      onClick={() => {
+                        setDeleteNotice(null);
+                        setSelectMode(true);
+                      }}
+                    >
+                      Paarungen auswählen
+                    </button>
+                  </>
                 )}
                 {manuallyHiddenCount > 0 && (
                   <button
@@ -442,7 +459,7 @@ function StatsPageInner() {
                 >
                   {deleting
                     ? "Wird ausgeblendet …"
-                    : `Hier ausblenden (${selectedKeys.size})`}
+                    : `Hier ausblenden · nur Gerät (${selectedKeys.size})`}
                 </button>
                 {isAdmin && (
                   <button
@@ -453,7 +470,7 @@ function StatsPageInner() {
                   >
                     {deleting
                       ? "Server …"
-                      : `Server bereinigen (${selectedKeys.size})`}
+                      : `Server bereinigen · alle Geräte (${selectedKeys.size})`}
                   </button>
                 )}
                 <button
@@ -467,6 +484,12 @@ function StatsPageInner() {
               </>
             )}
           </div>
+          {selectMode && (
+            <p className="stats-foreign-filter-note">
+              „Hier ausblenden“ = nur dieses Handy. Für alle Spieler: Admin →{" "}
+              <strong>Server bereinigen</strong>.
+            </p>
+          )}
         </>
       )}
 

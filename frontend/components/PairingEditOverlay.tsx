@@ -58,9 +58,23 @@ export function PairingEditOverlay({
     return 0;
   }, [diff, favor]);
 
+  const typedWinsA = clampNonNegative(winsA);
+  const typedWinsB = clampNonNegative(winsB);
+  const belowAppFloor = typedWinsA < appWinsA || typedWinsB < appWinsB;
+  const hasAppWinsFloor = appWinsA > 0 || appWinsB > 0;
+
   const handleSave = async () => {
-    const totalWinsA = Math.max(appWinsA, clampNonNegative(winsA));
-    const totalWinsB = Math.max(appWinsB, clampNonNegative(winsB));
+    const totalWinsA = Math.max(appWinsA, typedWinsA);
+    const totalWinsB = Math.max(appWinsB, typedWinsB);
+    if (belowAppFloor) {
+      setWinsA(String(totalWinsA));
+      setWinsB(String(totalWinsB));
+      setError(
+        "Unter App-Siege geht nur über „Server bereinigen“ (Paarung auswählen). " +
+          "Gespeichert werden mindestens die App-Siege.",
+      );
+      return;
+    }
     const writes = buildBaselineWrites(
       merged,
       sourceSummaries,
@@ -104,6 +118,20 @@ export function PairingEditOverlay({
           Globale Korrektur inkl. Runden außerhalb der App. Wird auf dem Server
           gespeichert und gilt für alle Geräte.
         </p>
+        {hasAppWinsFloor && (
+          <p className="text-muted mt-2 rounded-lg border border-[color:var(--border-subtle,#d4d4d8)] px-3 py-2 text-xs leading-snug">
+            App-Siege ({appWinsA}:{appWinsB}) sind die Untergrenze. Niedriger geht
+            nur über Statistik → Paarung auswählen →{" "}
+            <strong className="text-strong">Server bereinigen</strong> (löscht echte
+            App-Runden für alle Geräte).
+          </p>
+        )}
+        {belowAppFloor && (
+          <p className="glass-alert-error mt-2 px-3 py-2 text-xs leading-snug">
+            Die eingegebenen Siege liegen unter den App-Siegen. Bitte anheben oder
+            zuerst Server bereinigen.
+          </p>
+        )}
 
         <div className="mt-4 grid grid-cols-2 gap-3">
           <label className="flex flex-col gap-1 text-sm">

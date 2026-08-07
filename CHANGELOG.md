@@ -17,6 +17,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Statistik:** Paarungen lokal ausblenden (`hiddenPairings`); Wiederherstellen; Startscreen-Bilanz berücksichtigt Hide-Liste
 
 ### Changed
+- **Statistik Sync-Klarheit:** „Hier ausblenden · nur Gerät“ vs. „Server bereinigen · alle Geräte“; Baseline-Hinweis wenn App-Siege die Untergrenze sind; Stats/Home laden bei App-Fokus neu + Button „Aktualisieren“
 - **InApp-Käufe (Features):** Wording „Hausregeln“ in Spielregeln/Tour/Overlays durch „InApp-Käufe (Features)“ ersetzt (Vorbereitung Monetarisierung)
 - **Brennt:** Zwei Optionen — Neu würfeln (−1 Pool, nur brennender Würfel; Rest liegen lassen) oder Augenzahl selbst (−2 Pool, daneben legen)
 - **Paarung bearbeiten (M38):** Siege/Diff nur noch mit Admin-Key (widerruft die temporäre Öffnung für iOS ohne Key)

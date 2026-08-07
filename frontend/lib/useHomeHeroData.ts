@@ -17,7 +17,8 @@ import { loadDisplayNames } from "@/lib/rivalProfiles";
 import type { PlayerAliasMap } from "@/lib/playerAliases";
 import { buildStatsOverview } from "@/lib/statsOverview";
 import type { StatsDto } from "@/lib/statsTypes";
-import { useEffect, useMemo, useState } from "react";
+import { useForegroundRefresh } from "@/lib/useForegroundRefresh";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export function useHomeHeroData() {
   const [stats, setStats] = useState<StatsDto | null>(null);
@@ -34,19 +35,25 @@ export function useHomeHeroData() {
     return subscribeHiddenPairings(() => setHiddenKeys(loadHiddenPairingKeys()));
   }, []);
 
-  useEffect(() => {
+  const refreshServerStats = useCallback(() => {
     void getStats()
       .then(({ stats: data }) => setStats(data))
       .catch(() => setStats(null));
-  }, []);
-
-  useEffect(() => {
     void getPairingSummaries()
-      .then(({ pairings: data }) => setPairings(data))
+      .then(({ pairings: data }) => {
+        setPairings(data);
+        setPairingsError(null);
+      })
       .catch((e) =>
         setPairingsError(e instanceof Error ? e.message : "Paarungen nicht geladen"),
       );
   }, []);
+
+  useEffect(() => {
+    refreshServerStats();
+  }, [refreshServerStats]);
+
+  useForegroundRefresh(refreshServerStats);
 
   const mergedPairings = useMemo(() => {
     if (pairings === null) return null;
