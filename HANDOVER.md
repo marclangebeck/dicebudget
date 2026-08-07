@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** *(nach Stabilitäts-Commit setzen)*  
+**Produktcode-HEAD:** `f3a1ed0` (Stabilitäts-Review: Admin-Key Web, Finalize, Baseline-Fortschreiben)  
 **Sprache:** Deutsch  
 **Stand Doku:** 2026-08-07
 
@@ -25,7 +25,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M3
 | Bereich | Status |
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
-| Branch | `milestone-22-prep` |
+| Branch | `milestone-22-prep` @ `f3a1ed0` |
 | Roadmap | **M30** App Store Release als Nächstes (Agreement, Preis 1,19 €, Metadaten, Submit) |
 | Entwickler-Vorschau | **InApp-Käufe (Features)** auf `/settings` nach Code (`NEXT_PUBLIC_LABS_PIN`) — früher „Hausregeln“ |
 | iOS/TestFlight | Version `2.0`; Builds bis **~45+** in Connect; Admin-UI nur wenn `NEXT_PUBLIC_ADMIN_API_KEY` im **Mac**-Build steckt |
@@ -107,7 +107,7 @@ Sprache: Deutsch
 
 Regeln: Keine Commits ohne ausdrückliches GO. Kein sudo. Keine Watcher/Polling/Dauerprozesse. Nach Code-Änderungen nummerierte [Server]/[Mac]-Befehle (AGENT_RULES §9). Frontend-Build: cd frontend && npm run build. Backend-Deploy nur Nutzer: sudo bash infra/scripts/deploy-backend-prod.sh.
 
-Stand: Stabilitäts-Review (Admin-Key Web, Finalize, Absolute Baseline Fortschreiben, Neue-Runde-Flags, Cache); M37–M41; M30 offen.
+Stand: Stabilitäts-Review HEAD `f3a1ed0` (Admin-Key Web, Finalize, Baseline-Fortschreiben); M37–M41; M30 offen.
 
 Antworte auf Deutsch. Kleine Inkremente, vor größeren Features GO einholen.
 ```

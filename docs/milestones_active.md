@@ -2,7 +2,7 @@
 
 **Stand:** 2026-08-07  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** *(Stabilitäts-Review — Commit-Hash nach Push)*  
+**Produktcode-HEAD:** `f3a1ed0` (Stabilitäts-Review)  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de — Frontend Unit-Tests **71** grün  
 **Backend:** Migrationen u. a. `20260807120000_pairing_baseline_absolute`, `20260807140000_pairing_baseline_app_snapshot` — Deploy nach Stabilitäts-Batch
 
@@ -81,7 +81,7 @@ Details: `docs/milestone-roadmap-analysis.md` → Abschnitt **M36**.
 
 ### Stabilitäts-Review 2026-08-07
 
-**Status:** implementiert (Commit nach Push); Backend- + Frontend-Tests grün.
+**Status:** implementiert (HEAD `f3a1ed0`); Backend- + Frontend-Tests grün.
 
 - Öffentliches Web **ohne** `NEXT_PUBLIC_ADMIN_API_KEY` im Bundle; Admin nur Mac-Admin-Build.
 - `finalizeSessionStats` atomar (erste Entscheidung gewinnt); Pairing-Cache nach Finalize.
