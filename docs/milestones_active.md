@@ -1,80 +1,68 @@
 # Aktive Milestones - dice.budget
 
-**Stand:** 2026-07-31  
+**Stand:** 2026-08-07  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `f5a2665` (Hausregeln auto/Toggles/Info, Fortschritt-Delta, Statistik lokal, Feldeintrag schneller)  
-**Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de — **Backend-Deploy** (Migration `20260725120000` + HEAD) bei Bedarf prüfen
+**Produktcode-HEAD:** `f5c9ae7` (M37–M41; Stats absolut + Verwalten; Footer; Zoom; Brennt 2 Optionen; InApp-Käufe-Wording)  
+**Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de — Frontend Unit-Tests **69** grün  
+**Backend:** Migrationen u. a. `20260731120000_column_pool_bonuses`, `20260807120000_pairing_baseline_absolute` — bei Zweifel `deploy-backend-prod.sh`
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
 
 ## Aktueller Milestone
 
-### Milestone 21 - iOS-App / App Store
+### Milestone 21 / M30 - iOS-App / App Store Release
 
-**Status:** in Arbeit.
+**Status:** in Arbeit — technisch Feature-fertig für Release-Kandidat; organisatorisch **M30** offen.
 
 Technische Basis ist erledigt:
 
-- Capacitor 7, iOS-Projekt und Bundle `de.bottletrade.dicebudget` sind vorhanden.
-- Native App startet direkt auf `/app`.
-- Native API-Basis zeigt auf `https://dicebudget.bottle-trade.de/api`.
-- TestFlight ist aktiv; **aktueller Build `2.0 (28)`** mit Produktcode **`d8b5952`** (Cinematic Editorial Startscreen).
-- **Web-HEAD `f5a2665`:** UX-Politur II + Auto-Hausregeln (2×/3× Alle Fünfe, Oberer Bereich), Info-„i“, Fortschritts-Delta nur Feldpunkte, Statistik Paarungen lokal löschen, Feldeintrag-Performance — **noch nicht in iOS** (Build 29 ausstehend).
-- iOS-UI kommt nur aus `npm run build:ios` auf dem Mac (`ios/App/App/public/` ist gitignored).
+- Capacitor 7, Bundle `de.bottletrade.dicebudget`, Native Start `/app`, API Prod.
+- TestFlight **Version 2.0**, Builds bis **~45+**; Release-Kandidat = HEAD `f5c9ae7` + frischer `build:ios`.
+- iOS-UI nur aus `npm run build:ios` auf dem Mac; Admin-UI braucht `NEXT_PUBLIC_ADMIN_API_KEY` im Mac-`.env.production`.
 
 Offen (M30):
 
-- iOS-Upload **Build `2.0 (29)`** nach `npm run build:ios` auf Mac (HEAD `f5a2665`).
-- TestFlight-Regression: siehe `docs/ios_current.md` (inkl. neue Hausregeln, Fortschritt-Delta, Statistik lokal löschen).
-- App Store Connect: Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
-- Backend Prod: Migration + Deploy prüfen, falls Auto-Regeln live fehlen.
+- TestFlight-Regression auf aktuellem HEAD (Checkliste `docs/ios_current.md`).
+- App Store Connect: Paid Agreement, Bank/Steuer, Preis **1,19 €**, Screenshots/Metadaten, Build wählen, Submit for Review.
+- Details: `docs/ios_current.md`, `docs/testflight-app-store.md` Phase 7.
 
-Details: `docs/ios_current.md`.
+## Geplante / umgesetzte Nutzer-Wunschliste (M37–M41)
 
-## Geplante Milestones
+Details: `docs/milestone-roadmap-analysis.md`. Code ist umgesetzt; nächster organisatorischer Schritt ist **M30**.
 
-### Nutzer-Wunschliste 2026-07-31 (M37–M41) — Spezifikation, kein Code ohne GO
-
-Priorität laut Nutzer. Details und Sprints: `docs/milestone-roadmap-analysis.md`. **Kein Produktcode** bis GO je Milestone.
-
-| Prio | Milestone | Kurz |
-|------|-----------|------|
-| 1 | **M37** Fortschritts-Delta 25/50/75 % | Nur Feldpunkte Spieler vs. Mitspieler; Bugfix |
-| 2 | **M38** Paarungs-Rollen & Sync | Spieler: IDs/Namen; Admin: Bereinigen; gleiche Bilanz |
-| 3 | **M39** Versionsanzeige Menü | Hamburger zeigt aktuelle Version |
-| 4 | **M40** Spalten-Pool-Boni | Oben/Unten/Kombi +2 Pool, max. 6 — **Spezifikation zur Freigabe** |
-| 5 | **M41** 2×/3× Alle Fünfe nur bei 50 | Null-Einträge lösen keine Pool-Strafe |
+| Prio | Milestone | Status |
+|------|-----------|--------|
+| 1 | **M37** Fortschritts-Delta nur Feldpunkte | umgesetzt |
+| 2 | **M38** Paarungs-Rollen & Sync (Stufe 0) | umgesetzt (+ absolute Baseline `isAbsolute`, Verwalten-Menü) |
+| 3 | **M39** Versionsanzeige Menü | umgesetzt |
+| 4 | **M40** Spalten-Pool-Boni | umgesetzt (Migration nötig auf Prod) |
+| 5 | **M41** 2×/3× Alle Fünfe nur bei 50 | umgesetzt |
 
 ### M37 — Fortschritts-Delta nur Feldpunkte (Bugfix)
 
-**Status:** umgesetzt (Code); wartet auf Commit/Frontend-Build-Abnahme.  
-**Ist-Fix:** kein `totalScore`-Fallback; bei Meilenstein frische Lite-Lobby; Unit-Tests `runProgressFeedback.test.ts`.  
-**Soll:** Summe nur eingetragener Feld-Scores (ohne Bonus/Extra-Yatzy) von mir vs. dem anderen Teilnehmer; Anzeige bei 25/50/75 %.
+**Status:** umgesetzt.  
+**Ist:** Summe nur eingetragener Feld-Scores (ohne Bonus/Extra-Yatzy); Tests `runProgressFeedback.test.ts`.
 
 ### M38 — Paarungen: Sync vs. Admin-Bereinigung
 
-**Status:** umgesetzt; **Stufe 0** (2026-08): Admin-Workflow UI (Baseline / Server bereinigen global; lokales Ausblenden mit Extra-Warnung).  
-**Rollen:** Spieler = lokal ausblenden + Rivalen/Namen; Admin = Siege/Diff + Server bereinigen.  
-**API:** `baseline` wieder `requireAdminKey` (Tests angepasst).  
-**Offen optional:** Stufe A — pseudonyme `playerId`-Links nur bei nachgewiesenem Bilanz-Filter-Drift (ohne Klarnamen).
+**Status:** umgesetzt; Stufe 0 + absolute Wins/Diff (`isAbsolute`); UI **Verwalten**.  
+**Rollen:** Spieler = lokal ausblenden + Rivalen; Admin = Siege/Diff + Server-Löschen.  
+**Offen optional:** Stufe A — pseudonyme `playerId`-Links nur bei nachgewiesenem Drift.
 
 ### M39 — Versionsnummer im Hamburger-Menü
 
-**Status:** umgesetzt (Code); Frontend-Build.  
-**Anzeige:** `Version 2.0 (web)` bzw. nach iOS-Build `Version 2.0 (29)` via Env.  
-**Dateien:** `appVersion.ts`, `AppFooterMenu.tsx`, `.env.production` / example.
+**Status:** umgesetzt.  
+**Anzeige:** `Version 2.0 (web)` bzw. `Version 2.0 (<NEXT_PUBLIC_APP_BUILD>)`.
 
 ### M40 — Hausregel: Spalten-Pool-Boni (oben / unten / Kombi)
 
-**Status:** umgesetzt (Code); **Backend-Deploy + Migration** nötig.  
-**Freigabe 2026-07-31:** Erster Spieler; Bonus Pflicht; 7 untere Felder; nur Strategy; Labs+Flag; `ruleUpperRace` parallel; C gleiche Spalte.  
-**Migration:** `20260731120000_column_pool_bonuses`
+**Status:** umgesetzt; Prod-Migration `20260731120000_column_pool_bonuses` prüfen.  
+**Scope:** Strategy, Labs + Session-Flag; Freigabe 2026-07-31.
 
 ### M41 — 2×/3× Alle Fünfe nur bei Score 50
 
-**Status:** umgesetzt (Code); Backend-Deploy nötig für Auto-Regeln live.  
-**Ist-Fix:** `isFastYatzy` verlangt `score === 50`; Tests Backend+Frontend; Info-Texte angepasst.  
-**Soll:** Nur echte Alle-Fünfe-Treffer (50) zählen; 3× hintereinander → Gegner-Pool 0.
+**Status:** umgesetzt.  
+**Ist:** `isFastYatzy` verlangt `score === 50`.
 
 ### M36 — Hausregeln öffentlich & Session-Toggles
 
@@ -90,14 +78,24 @@ Details: `docs/milestone-roadmap-analysis.md` → Abschnitt **M36**.
 
 ## Letzte Abgeschlossene Milestones
 
+### Stats absolut, Verwalten, UX 2026-08
+
+**Status:** implementiert (HEAD `f5c9ae7`); Frontend Unit-Tests **69** grün.
+
+- Absolute Paarungs-Baseline (`isAbsolute`): Siege + Diff geräteübergreifend ohne Additiv-Drift.
+- Statistik-Admin: **Verwalten**-Menü; „Löschen · Server, alle Geräte“.
+- Footer aktiver Tab; iOS-Fokus-Zoom-Fix Stats/Settings.
+- Brennt: zwei Optionen (−1 / −2); Wording **InApp-Käufe (Features)**.
+- Migration: `20260807120000_pairing_baseline_absolute`.
+
 ### Hausregeln Auto, Statistik lokal, Feldeintrag-Perf 2026-07-31
 
-**Status:** implementiert (HEAD `f5a2665`); Frontend Unit-Tests 55 grün; Backend-Deploy/Migration ggf. noch prüfen; iOS Build 29 ausstehend.
+**Status:** implementiert (früher HEAD `f5a2665`); in aktuellem HEAD enthalten.
 
 - **Auto-Hausregeln** (2 Spieler, Strategy): 2× Alle Fünfe → Pool halbieren; 3× → Pool 0; Oberer Bereich zuerst → Rivalen-offene Oberfelder als Pool; Overlays.
 - **Labs-Toggles + Info-„i“**; Session-Flags vom Host; Visuelle-Einblendungen-Info.
 - **Fortschritt 25/50/75 %:** Punktdifferenz nur eingetragene Feld-Scores (ohne +35 / Extra-Yatzy).
-- **Statistik:** „Das bin ich“ / Aliase; Paarungen lokal ausblenden (`hiddenPairings`); Baseline ohne Admin-Key.
+- **Statistik:** „Das bin ich“ / Aliase; Paarungen lokal ausblenden (`hiddenPairings`).
 - **Performance:** schneller `completeField`, Lobby `?lite=1`, Overlay vor Lobby-Wait.
 
 Dateien: `houseRules.ts`, `houseRulesService.ts`, `runProgressFeedback.ts`, `hiddenPairings.ts`, `playField.ts`, `sessionService.ts`, Migration `20260725120000_house_rule_toggles_and_triple`

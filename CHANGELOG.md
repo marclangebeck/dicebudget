@@ -17,6 +17,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Statistik:** Paarungen lokal ausblenden (`hiddenPairings`); Wiederherstellen; Startscreen-Bilanz berücksichtigt Hide-Liste
 
 ### Changed
+- **Doku 2026-08-07:** HANDOVER / ios_current / milestones_active / GOiOS / milestones auf HEAD `f5c9ae7`, TestFlight 2.0 (~45+), M30, absolute Stats, Verwalten-Menü
 - **Statistik Verwalten-Menü:** Aktualisieren, Auswählen/Löschen und „ausgeblendete wieder anzeigen“ hinter „Verwalten“; Admin-Löschen als „Löschen · Server, alle Geräte“
 - **Stats Admin Stufe 0:** Workflow-Banner; Auswahl „Korrigieren / bereinigen“; Server bereinigen primär; lokales Ausblenden nur mit Extra-Admin-Warnung; Baseline-Text ohne Klarname-Anspruch — Stufe A (playerId-Links) bewusst später
 - **Statistik Sync-Klarheit:** „Hier ausblenden · nur Gerät“ vs. „Server bereinigen · alle Geräte“; Baseline-Hinweis wenn App-Siege die Untergrenze sind; Stats/Home laden bei App-Fokus neu + Button „Aktualisieren“

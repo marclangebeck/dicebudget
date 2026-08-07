@@ -13,14 +13,15 @@ Diese Datei ist ein Kompatibilitaets-Index. Fuer aktuellen iOS-/TestFlight-/App-
 
 - Bundle ID: `de.bottletrade.dicebudget`
 - Version in App Store Connect: `2.0`
-- Aktueller TestFlight-Build: `2.0 (28)` (Produktcode `d8b5952`)
-- **Nächster Upload:** `2.0 (29)` auf HEAD `f5a2665` (`git pull` + `npm run build:ios`)
+- TestFlight: Builds bis **~45+** (Stand 2026-08-07); Release-Kandidat = HEAD `f5c9ae7` + `build:ios`
 - Details und Checkliste: `docs/ios_current.md`
+- Nächster organisatorischer Schritt: **M30** Store-Submit (Phase 7)
 
 ## Wichtig
 
 - Web-Deploy und iOS-Release sind getrennt; `ios/App/App/public/` ist gitignored.
-- Nach UI-Aenderungen: Mac `git pull`, `NEXT_PUBLIC_LABS_PIN` in `.env.production`, `npm run build:ios` (öffnet Xcode), Archive/Upload.
-- **Menü-Version:** Vor `build:ios` in `frontend/.env.production` setzen: `NEXT_PUBLIC_APP_VERSION=2.0` und `NEXT_PUBLIC_APP_BUILD=<Xcode-Build>` (z. B. `29`), damit das Hamburger-Menü `Version 2.0 (29)` zeigt.
+- Nach UI-Aenderungen: Mac `git reset --hard origin/milestone-22-prep`, Env setzen, `npm run build:ios`, Archive/Upload.
+- **Menü-Version:** `NEXT_PUBLIC_APP_VERSION` + `NEXT_PUBLIC_APP_BUILD` = Xcode-Build.
+- **Admin-Stats:** `NEXT_PUBLIC_ADMIN_API_KEY` muss vor `build:ios` in Mac-`.env.production` stehen.
 - Bei `git pull`-Fehler: `git restore frontend/package-lock.json` vor Pull (vom Projektroot).
 - Der verbindliche Sync-Workflow steht in `AGENT_RULES.md` Sektion 9.

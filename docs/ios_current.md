@@ -1,8 +1,8 @@
 # iOS Aktuell - dice.budget
 
-**Stand:** 2026-07-31  
+**Stand:** 2026-08-07  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD (Web):** `f5a2665`  
+**Produktcode-HEAD (Web):** `f5c9ae7`  
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
@@ -10,9 +10,21 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 ## Aktueller Stand
 
 - App Store Connect: **Version 2.0**.
-- **TestFlight `2.0 (28)` (aktuell in Connect):** Produktcode **`d8b5952`** — Cinematic Editorial Startscreen.
-- **Nächster geplanter Upload: `2.0 (29)`** — HEAD `f5a2665`: UX-Politur II + Auto-Hausregeln (2×/3× Alle Fünfe, Oberer Bereich), Info-„i“, Fortschritts-Delta nur Feldpunkte, Statistik Paarungen lokal löschen / „Das bin ich“, Feldeintrag-Performance.
-- Web/API live: https://dicebudget.bottle-trade.de (nach Server-Build auf aktuellem HEAD; Backend-Deploy ggf. separat)
+- TestFlight: Builds bis **2.0 (45+)** wurden hochgeladen (Stand Nutzer 2026-08-07); Installationen können hinterherhinken — immer **Menü → Version 2.0 (xx)** prüfen.
+- **Release-Kandidat für M30:** aktueller HEAD `f5c9ae7` (oder neuer) mit frischem `npm run build:ios`.
+- Web/API live: https://dicebudget.bottle-trade.de
+
+### Mac `.env.production` (kritisch)
+
+| Variable | Zweck |
+|----------|--------|
+| `NEXT_PUBLIC_LABS_PIN` | InApp-Käufe (Features) freischalten |
+| `NEXT_PUBLIC_ADMIN_API_KEY` | Stats-Admin-UI (**Löschen · Server**, Siege/Diff) — muss Backend `ADMIN_API_KEY` entsprechen; **fehlt der Key im Bundle, gibt es keine Admin-Buttons** |
+| `NEXT_PUBLIC_APP_VERSION` | z. B. `2.0` |
+| `NEXT_PUBLIC_APP_BUILD` | muss **Xcode Build** entsprechen (z. B. `46`) |
+| `NEXT_PUBLIC_SITE_URL` | empfohlen `https://dicebudget.bottle-trade.de` |
+
+Admin-Key nur auf dem Admin-Gerät einbauen; Spieler-Builds ohne Key sind ok.
 
 ## iOS-Bundle (kritisch)
 
@@ -23,83 +35,57 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 | **`npm run build:ios` auf Mac** | **Ja** (`cap sync` → `ios/App/App/public/`) |
 | Xcode Archive ohne `build:ios` | Nein |
 
-`frontend/ios/App/App/public/` ist in `.gitignore`.
+`frontend/ios/App/App/public/` ist in `.gitignore`. Befehle nur auf dem **Mac**, nicht auf dem Linux-Server.
 
 ## Mac-Workflow (TestFlight / App Store Connect)
 
 ```bash
 cd ~/projects/kniffel
 git restore frontend/package-lock.json
-git pull origin milestone-22-prep
+git fetch origin
+git reset --hard origin/milestone-22-prep
 git log -1 --oneline
 ```
 
-Erwartet: `f5a2665` (oder neuerer Commit auf dem Branch).
+Erwartet: `f5c9ae7` (oder neuer).
 
 ```bash
 cd ~/projects/kniffel/frontend
-```
-
-`NEXT_PUBLIC_LABS_PIN`, ggf. `NEXT_PUBLIC_ADMIN_API_KEY` und für das Menü **`NEXT_PUBLIC_APP_BUILD=<Xcode-Build>`** (z. B. `29`) in `.env.production` setzen:
-
-```bash
 grep -E 'NEXT_PUBLIC_LABS_PIN|NEXT_PUBLIC_ADMIN_API_KEY|NEXT_PUBLIC_APP_VERSION|NEXT_PUBLIC_APP_BUILD' .env.production
 ```
 
 ```bash
 npm install
 npm run build:ios
-brew unlink rsync
 ```
 
-`build:ios` öffnet danach automatisch Xcode (`npm run open:ios`).
-
-Optional Bundle-Check:
-
-```bash
-grep -c home-cinematic-door ios/App/App/public/_next/static/css/*.css
-ls -lt ios/App/App/public/_next/static/css/ | head -3
-```
-
-Xcode öffnen:
-
-```bash
-npm run open:ios
-```
-
-(`build:ios` ruft das am Ende automatisch auf.)
-
-Manuell mit vollem Befehl:
-
-```bash
-env PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin" open ios/App/App.xcworkspace
-```
+`build:ios` öffnet Xcode. `brew unlink rsync` nur bei Upload-Problemen mit Homebrew-rsync.
 
 ### In Xcode (Archive → App Store Connect)
 
 1. **Product → Clean Build Folder** (⇧⌘K)
-2. Target **App** → **General** → **Build** erhöhen: **29** (aktuell in TestFlight: **28**)
+2. Target **App** → **General** → **Build** = Wert aus `NEXT_PUBLIC_APP_BUILD`
 3. Scheme **App**, Ziel **Any iOS Device (arm64)**
 4. **Product → Archive**
 5. Organizer → **Distribute App** → **App Store Connect** → **Upload**
-6. In App Store Connect: Build unter **TestFlight** warten (Verarbeitung), dann auf Gerät testen
+6. TestFlight: Verarbeitung abwarten; Gruppe **Freunde** zuweisen falls nötig; **Intern** oft automatisch für Entwickler-Accounts
 
-Ausführliche Connect-Schritte: `docs/testflight-app-store.md`, Einsteiger: `docs/ios-xcode-anleitung.md`.
+Ausführlich: `docs/testflight-app-store.md`, Einsteiger: `docs/ios-xcode-anleitung.md`. **M30 Store-Submit:** Phase 7 in `docs/testflight-app-store.md`.
 
-## TestFlight-Checkliste (Build 29+, HEAD `f5a2665`)
+## TestFlight-Checkliste (HEAD `f5c9ae7`+)
 
-- **Einstellungen:** Ein-Screen, Solo/Multi-Start, Hausregeln nach Code, iPad-Namen leer tippbar
-- **Hausregeln:** Brennt; Verkauf; 2×/3× Alle Fünfe (auto im Duell); Oberer Bereich zuerst; Info-„i“ pro Regel + Visuelle Einblendungen
-- **Fortschritt 25/50/75 %:** vorn/zurück mit Punktdifferenz nur Feldpunkte (ohne oberen Bonus)
-- **Statistik:** Hero/Badges; „Das bin ich“; Paarungen lokal löschen/wiederherstellen; Baseline ohne Admin-Key
-- **Spielanalyse:** Kern „Warum verloren?“; Graph alle 10 %; Details eingeklappt
-- **Screenshot:** Footer „Bild“, Blitz, Vorschau, Toast
-- **Startscreen / UX:** Cinematic, Hamburger-Sheet, Accordion Einstellungen/Statistik, Abschluss-Buttons
-- Entwickler-Vorschau: Code pro Gerät auf `/settings`
-- Multi Code teilen, Pool-Endspiel, Alle Fünfe Eintrag; Feldeintrag spürbar schneller
+- **Menü:** Version 2.0 (Build-Nr.); aktiver Footer-Tab sichtbar
+- **Spielregeln:** Bereich **InApp-Käufe (Features)** nach Labs-Code
+- **Brennt:** zwei Optionen (−1 / −2 Pool)
+- **Statistik:** **Verwalten**-Menü; Admin: Löschen · Server / Siege-Diff; absolute Diff nach erneutem Speichern auf beiden Geräten gleich
+- **Zoom:** Fokus in Namens-/Siege-Feldern darf die Seite nicht dauerhaft vergrößern
+- Fortschritt 25/50/75 %, Multi, Solo, Screenshot „Bild“
+- Spalten-Pool-Boni / Auto-Alle-Fünfe nur mit Labs + Strategy-Duell
 
 ## Typische Fehler
 
 - **UI alt trotz Pull** → `npm run build:ios` fehlte vor Archive
-- **Labor-Code ungültig** → `NEXT_PUBLIC_LABS_PIN` fehlt in `.env.production` oder Build nach PIN-Änderung nicht wiederholt
-- **Build-Nummer nicht erhöht** → Upload wird von Connect abgelehnt oder ersetzt nichts Sichtbares
+- **Kein Admin in TestFlight** → `NEXT_PUBLIC_ADMIN_API_KEY` fehlte in Mac-`.env.production` vor dem Build
+- **Labor-Code ungültig** → PIN fehlt oder Build nach PIN-Änderung nicht wiederholt
+- **Build-Nummer nicht erhöht** → Upload abgelehnt / alte Version bleibt aktiv
+- **Intern nicht sichtbar** → Build neu hochladen oder **Freunde** zuweisen; TestFlight aktualisieren
