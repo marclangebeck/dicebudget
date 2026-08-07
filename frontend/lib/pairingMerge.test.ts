@@ -77,7 +77,7 @@ describe("mergePairingSummaries", () => {
 });
 
 describe("buildBaselineWrites", () => {
-  it("schreibt manuelle Anteile auf Repräsentanten-Key", () => {
+  it("schreibt absolute Ziel-Siege auf Repräsentanten-Key", () => {
     const src = summary({
       key: "src-key",
       playerA: "opponent",
@@ -105,7 +105,75 @@ describe("buildBaselineWrites", () => {
 
     assert.equal(writes.length, 1);
     assert.equal(writes[0]?.key, "src-key");
-    assert.equal(writes[0]?.extraWinsA, 3);
-    assert.equal(writes[0]?.extraWinsB, 1);
+    assert.equal(writes[0]?.isAbsolute, true);
+    assert.equal(writes[0]?.extraWinsA, 5);
+    assert.equal(writes[0]?.extraWinsB, 2);
+  });
+
+  it("Multi-Key: Absolute auf repKey; Merge-Max hält Ziel trotz zweitem App-Key", () => {
+    const k1 = summary({
+      key: "aaa::host",
+      playerA: "aaa",
+      playerB: "host",
+      playerAWins: 2,
+      playerBWins: 1,
+      playerAAppWins: 2,
+      playerBAppWins: 1,
+    });
+    const k2 = summary({
+      key: "bbb::host",
+      playerA: "bbb",
+      playerB: "host",
+      playerAWins: 3,
+      playerBWins: 2,
+      playerAAppWins: 3,
+      playerBAppWins: 2,
+    });
+    const aliases = { aaa: "Nicole", bbb: "Nicole" };
+    const merged = mergePairingSummaries([k1, k2], aliases, "host")[0];
+    assert.ok(merged);
+
+    const writes = buildBaselineWrites(merged, [k1, k2], aliases, "host", {
+      totalWinsA: 20,
+      totalWinsB: 10,
+      netDiff: 0,
+    });
+    assert.equal(writes.length, 2);
+    assert.ok(writes.every((w) => w.isAbsolute));
+    const withWins = writes.filter((w) => w.extraWinsA + w.extraWinsB > 0);
+    assert.equal(withWins.length, 1);
+    assert.equal(withWins[0]!.extraWinsA + withWins[0]!.extraWinsB, 30);
+
+    // Nach absolutem Fold: ein Key trägt 20:10 (bzw. getauscht), der andere nur App.
+    const folded = [
+      summary({
+        key: "aaa::host",
+        playerA: "aaa",
+        playerB: "host",
+        playerAAppWins: 2,
+        playerBAppWins: 1,
+        playerAWins: 20,
+        playerBWins: 10,
+      }),
+      summary({
+        key: "bbb::host",
+        playerA: "bbb",
+        playerB: "host",
+        playerAAppWins: 3,
+        playerBAppWins: 2,
+        playerAWins: 3,
+        playerBWins: 2,
+      }),
+    ];
+    const again = mergePairingSummaries(folded, aliases, "host")[0];
+    assert.ok(again);
+    assert.equal(again.playerAWins, 20);
+    assert.equal(again.playerBWins, 10);
+
+    // Ohne Alias: kein Aufaddieren des Ziels — separate Zeilen.
+    const raw = mergePairingSummaries(folded, {}, "host");
+    assert.equal(raw.length, 2);
+    const absoluteRow = raw.find((r) => r.playerAWins === 20 || r.playerBWins === 20);
+    assert.ok(absoluteRow);
   });
 });

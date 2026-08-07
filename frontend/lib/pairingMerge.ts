@@ -64,24 +64,36 @@ export function isMergedPairingKey(key: string): boolean {
  * Fasst Paarungs-Übersichten anhand gleicher Aliase zusammen. Die Orientierung
  * (A/B) wird über die kanonischen Identitäten deterministisch festgelegt, damit
  * Quell-Paarungen mit vertauschten Seiten korrekt addiert werden.
+ *
+ * Hat mindestens eine Quelle einen Baseline-Override (Wins ≠ App-Wins), werden
+ * Gesamt-Siege per Max zusammengeführt — sonst würde ein absoluter Zielstand
+ * geräteabhängig zu App-Siegen anderer Keys addiert.
  */
 export function mergePairingSummaries(
   summaries: PairingSummaryDto[],
   aliases: Record<string, string> | undefined,
   ownId: string | undefined,
 ): MergedPairingSummary[] {
-  const map = new Map<string, MergedPairingSummary>();
+  const map = new Map<
+    string,
+    MergedPairingSummary & { _hasOverride: boolean; _maxWinsA: number; _maxWinsB: number }
+  >();
 
   for (const s of summaries) {
     const canonA = canonicalIdentity(s.playerA, aliases, ownId);
     const canonB = canonicalIdentity(s.playerB, aliases, ownId);
     const key = mergedKeyFor(canonA, canonB);
-    // Quell-Seite A landet auf mergedB, wenn ihre Canon "größer" ist.
     const swap = canonA > canonB;
     const sideAId = swap ? s.playerB : s.playerA;
     const sideBId = swap ? s.playerA : s.playerB;
     const repA = representative(sideAId, ownId);
     const repB = representative(sideBId, ownId);
+
+    const srcWinsA = swap ? s.playerBWins : s.playerAWins;
+    const srcWinsB = swap ? s.playerAWins : s.playerBWins;
+    const srcAppA = swap ? s.playerBAppWins : s.playerAAppWins;
+    const srcAppB = swap ? s.playerAAppWins : s.playerBAppWins;
+    const override = srcWinsA !== srcAppA || srcWinsB !== srcAppB;
 
     let acc = map.get(key);
     if (!acc) {
@@ -104,20 +116,22 @@ export function mergePairingSummaries(
         playerBTotalScore: 0,
         lastPlayedAt: null,
         sourceKeys: [],
+        _hasOverride: false,
+        _maxWinsA: 0,
+        _maxWinsB: 0,
       };
       map.set(key, acc);
     }
 
-    // Eigene ID als Repräsentant bevorzugen, damit weiterhin „Du" angezeigt wird.
     if (isOwn(sideAId, ownId)) acc.playerA = ownId!;
     if (isOwn(sideBId, ownId)) acc.playerB = ownId!;
 
     acc.roundsPlayed += s.roundsPlayed;
     acc.appRoundsPlayed += s.appRoundsPlayed;
-    acc.playerAWins += swap ? s.playerBWins : s.playerAWins;
-    acc.playerBWins += swap ? s.playerAWins : s.playerBWins;
-    acc.playerAAppWins += swap ? s.playerBAppWins : s.playerAAppWins;
-    acc.playerBAppWins += swap ? s.playerAAppWins : s.playerBAppWins;
+    acc.playerAWins += srcWinsA;
+    acc.playerBWins += srcWinsB;
+    acc.playerAAppWins += srcAppA;
+    acc.playerBAppWins += srcAppB;
     acc.ties += s.ties;
     acc.playerABonusPoints += swap ? s.playerBBonusPoints : s.playerABonusPoints;
     acc.playerBBonusPoints += swap ? s.playerABonusPoints : s.playerBBonusPoints;
@@ -127,14 +141,27 @@ export function mergePairingSummaries(
     acc.playerBTotalScore += swap ? s.playerATotalScore : s.playerBTotalScore;
     acc.lastPlayedAt = maxDate(acc.lastPlayedAt, s.lastPlayedAt);
     acc.sourceKeys.push(s.key);
+    if (override) acc._hasOverride = true;
+    acc._maxWinsA = Math.max(acc._maxWinsA, srcWinsA);
+    acc._maxWinsB = Math.max(acc._maxWinsB, srcWinsB);
   }
 
-  return [...map.values()].sort((a, b) => {
-    const da = a.lastPlayedAt ?? "";
-    const db = b.lastPlayedAt ?? "";
-    if (da !== db) return db.localeCompare(da);
-    return b.roundsPlayed - a.roundsPlayed;
-  });
+  return [...map.values()]
+    .map((acc) => {
+      if (acc._hasOverride) {
+        acc.playerAWins = Math.max(acc._maxWinsA, acc.playerAAppWins);
+        acc.playerBWins = Math.max(acc._maxWinsB, acc.playerBAppWins);
+        acc.roundsPlayed = acc.playerAWins + acc.playerBWins + acc.ties;
+      }
+      const { _hasOverride: _, _maxWinsA: __, _maxWinsB: ___, ...rest } = acc;
+      return rest;
+    })
+    .sort((a, b) => {
+      const da = a.lastPlayedAt ?? "";
+      const db = b.lastPlayedAt ?? "";
+      if (da !== db) return db.localeCompare(da);
+      return b.roundsPlayed - a.roundsPlayed;
+    });
 }
 
 /**
@@ -181,6 +208,8 @@ export type PairingBaselineWrite = {
   extraWinsB: number;
   extraBonusA: number;
   extraBonusB: number;
+  /** Absoluter Zielstand (nicht Additiv) — für geräteübergreifenden Sync. */
+  isAbsolute: boolean;
 };
 
 export type DesiredPairingTotals = {
@@ -192,13 +221,11 @@ export type DesiredPairingTotals = {
 };
 
 /**
- * Übersetzt die gewünschten Gesamtwerte einer (ggf. zusammengeführten) Paarung
- * in manuelle Baseline-Schreibaufträge. Der manuelle Anteil = Gesamt − App.
- * App-Siege sind die Untergrenze (echte Runden lassen sich nur über „Löschen"
- * entfernen). Die Netto-Differenz wird einseitig (A oder B) abgelegt.
- *
- * Die volle Baseline landet auf einem Repräsentanten-Quell-Key; alle weiteren
- * Quell-Keys der Gruppe werden auf 0 gesetzt, damit der Wert eindeutig bleibt.
+ * Übersetzt gewünschte Gesamtwerte in Baseline-Schreibaufträge.
+ * Speichert ABSOLUTE Siege (isAbsolute), damit alle Geräte denselben Stand
+ * sehen — unabhängig vom lokalen Alias-Merge.
+ * App-Siege bleiben die UI-Untergrenze. Differenz-Boni bleiben additiv zum App-Netto.
+ * Volle Absolute-Siege landen auf einem Repräsentanten-Key; andere Keys der Gruppe → 0.
  */
 export function buildBaselineWrites(
   merged: MergedPairingSummary,
@@ -209,8 +236,8 @@ export function buildBaselineWrites(
 ): PairingBaselineWrite[] {
   const appWinsA = merged.playerAAppWins;
   const appWinsB = merged.playerBAppWins;
-  const manualWinsA = Math.max(0, Math.round(desired.totalWinsA) - appWinsA);
-  const manualWinsB = Math.max(0, Math.round(desired.totalWinsB) - appWinsB);
+  const absoluteWinsA = Math.max(appWinsA, Math.round(desired.totalWinsA));
+  const absoluteWinsB = Math.max(appWinsB, Math.round(desired.totalWinsB));
 
   const currentManualNet = merged.playerAManualBonus - merged.playerBManualBonus;
   const totalNet = merged.playerABonusPoints - merged.playerBBonusPoints;
@@ -227,10 +254,16 @@ export function buildBaselineWrites(
     const src = sourceSummaries.find((s) => s.key === key);
     if (!src) continue;
     if (key !== repKey) {
-      writes.push({ key, extraWinsA: 0, extraWinsB: 0, extraBonusA: 0, extraBonusB: 0 });
+      writes.push({
+        key,
+        extraWinsA: 0,
+        extraWinsB: 0,
+        extraBonusA: 0,
+        extraBonusB: 0,
+        isAbsolute: true,
+      });
       continue;
     }
-    // Orientierung dieser Quell-Paarung relativ zur zusammengeführten Sicht.
     const swap =
       canonicalIdentity(src.playerA, aliases, ownId) >
       canonicalIdentity(src.playerB, aliases, ownId);
@@ -238,17 +271,19 @@ export function buildBaselineWrites(
       swap
         ? {
             key,
-            extraWinsA: manualWinsB,
-            extraWinsB: manualWinsA,
+            extraWinsA: absoluteWinsB,
+            extraWinsB: absoluteWinsA,
             extraBonusA: manualBonusB,
             extraBonusB: manualBonusA,
+            isAbsolute: true,
           }
         : {
             key,
-            extraWinsA: manualWinsA,
-            extraWinsB: manualWinsB,
+            extraWinsA: absoluteWinsA,
+            extraWinsB: absoluteWinsB,
             extraBonusA: manualBonusA,
             extraBonusB: manualBonusB,
+            isAbsolute: true,
           },
     );
   }

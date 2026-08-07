@@ -260,6 +260,7 @@ export type PairingBaselineEntry = {
   extraWinsB: number;
   extraBonusA: number;
   extraBonusB: number;
+  isAbsolute?: boolean;
   note?: string | null;
 };
 

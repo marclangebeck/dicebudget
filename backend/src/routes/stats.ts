@@ -66,6 +66,7 @@ statsRouter.post("/pairings/baseline", requireAdminKey, async (req, res, next) =
         extraWinsB: Number(o.extraWinsB),
         extraBonusA: Number(o.extraBonusA),
         extraBonusB: Number(o.extraBonusB),
+        isAbsolute: o.isAbsolute === true || o.isAbsolute === "true" || o.isAbsolute === 1,
         note: typeof o.note === "string" ? o.note : null,
       });
     }

@@ -132,11 +132,10 @@ async function loadManualBaselines() {
 }
 
 /**
- * Rechnet manuell nachgetragene Werte (außerhalb der App gespielt) in die
- * Gesamt-Statistik ein: erhöht Gesamt-Siege und Gesamt-Differenz je Spieler,
- * lässt die App-Werte (`*AppWins`, `appRoundsPlayed`, `rounds`) unberührt.
- * Existiert für ein Paar noch kein App-Eintrag, wird ein reiner Baseline-
- * Eintrag erzeugt, damit die Paarung trotzdem erscheint.
+ * Rechnet manuell nachgetragene Werte in die Gesamt-Statistik ein.
+ * - Legacy (isAbsolute=false): extraWins werden zu App-Siegen addiert.
+ * - Absolut (isAbsolute=true): extraWins sind der Ziel-Gesamtstand der Paarung
+ *   (geräteübergreifend stabil, unabhängig vom lokalen Alias-Merge).
  */
 export function foldManualBaselines(
   map: Map<string, PairingAccumulator>,
@@ -146,6 +145,7 @@ export function foldManualBaselines(
     extraWinsB: number;
     extraBonusA: number;
     extraBonusB: number;
+    isAbsolute?: boolean;
   }[],
 ): void {
   for (const baseline of baselines) {
@@ -164,14 +164,25 @@ export function foldManualBaselines(
     const winsB = Math.max(0, Math.trunc(baseline.extraWinsB));
     const bonusA = Math.max(0, Math.trunc(baseline.extraBonusA));
     const bonusB = Math.max(0, Math.trunc(baseline.extraBonusB));
+    const absolute = Boolean(baseline.isAbsolute);
 
-    acc.roundsPlayed += winsA + winsB;
-    acc.playerAWins += winsA;
-    acc.playerBWins += winsB;
-    acc.playerABonusPoints += bonusA;
-    acc.playerBBonusPoints += bonusB;
-    acc.playerAManualBonus += bonusA;
-    acc.playerBManualBonus += bonusB;
+    if (absolute) {
+      acc.playerAWins = winsA;
+      acc.playerBWins = winsB;
+      acc.roundsPlayed = winsA + winsB + acc.ties;
+      acc.playerABonusPoints += bonusA;
+      acc.playerBBonusPoints += bonusB;
+      acc.playerAManualBonus += bonusA;
+      acc.playerBManualBonus += bonusB;
+    } else {
+      acc.roundsPlayed += winsA + winsB;
+      acc.playerAWins += winsA;
+      acc.playerBWins += winsB;
+      acc.playerABonusPoints += bonusA;
+      acc.playerBBonusPoints += bonusB;
+      acc.playerAManualBonus += bonusA;
+      acc.playerBManualBonus += bonusB;
+    }
   }
 }
 
@@ -430,6 +441,8 @@ export type PairingBaselineInput = {
   extraWinsB: number;
   extraBonusA: number;
   extraBonusB: number;
+  /** Absolut: extraWins = Ziel-Gesamtstand; sonst additiv (Legacy). */
+  isAbsolute?: boolean;
   note?: string | null;
 };
 
@@ -440,11 +453,8 @@ function clampInt(value: unknown): number {
 }
 
 /**
- * Schreibt manuell nachgetragene Werte für Paarungen (außerhalb der App
- * gespielt). Pro Eintrag wird anhand des kanonischen Paar-Schlüssels ge-upsertet.
- * Sind alle Werte 0 und keine Notiz gesetzt, wird ein vorhandener Eintrag
- * gelöscht (hält die Tabelle sauber). Gibt die Zahl geschriebener/gelöschter
- * Einträge zurück.
+ * Schreibt manuell nachgetragene Werte für Paarungen.
+ * Neue Admin-Korrekturen setzen isAbsolute=true (Zielstand für alle Geräte).
  */
 export async function upsertPairingBaselines(
   inputs: PairingBaselineInput[],
@@ -463,6 +473,7 @@ export async function upsertPairingBaselines(
     const extraWinsB = clampInt(input.extraWinsB);
     const extraBonusA = clampInt(input.extraBonusA);
     const extraBonusB = clampInt(input.extraBonusB);
+    const isAbsolute = Boolean(input.isAbsolute);
     const note = typeof input.note === "string" && input.note.trim() ? input.note.trim() : null;
 
     const isEmpty =
@@ -482,8 +493,16 @@ export async function upsertPairingBaselines(
 
     await prisma.pairingManualBaseline.upsert({
       where: { pairingKey: key },
-      update: { extraWinsA, extraWinsB, extraBonusA, extraBonusB, note },
-      create: { pairingKey: key, extraWinsA, extraWinsB, extraBonusA, extraBonusB, note },
+      update: { extraWinsA, extraWinsB, extraBonusA, extraBonusB, isAbsolute, note },
+      create: {
+        pairingKey: key,
+        extraWinsA,
+        extraWinsB,
+        extraBonusA,
+        extraBonusB,
+        isAbsolute,
+        note,
+      },
     });
     written += 1;
   }

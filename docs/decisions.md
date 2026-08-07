@@ -67,6 +67,7 @@ npm run build
 - Dauerhafte Multiplayer-Vergleiche benoetigen serverseitige pseudonyme Matchdaten.
 - "Gar nichts auf dem Server speichern" und "geraeteuebergreifende Langzeitvergleiche" sind nicht gleichzeitig erreichbar.
 - **Stats-Sync Stufe 0 (2026-08):** Globale Korrektur nur Admin-Baseline und „Server bereinigen“. „Hier ausblenden“ ist bewusst nur lokal und darf nicht als Sync-Werkzeug gelten. Keine zentralen Anzeigenamen — Datenschutzmodell unveraendert.
+- **Baseline absolut (2026-08):** Admin-Siege werden als absoluter Zielstand gespeichert (`is_absolute`), damit alle Geraete denselben Stand sehen; Legacy-Baselines bleiben additiv. Client-Merge nutzt bei Override Max statt Summe.
 - **Stufe A (optional, spaeter):** Pseudonyme Geraete-`playerId`-Links nur bei nachgewiesenem Drift der „meine Bilanz“-Filter — weiterhin ohne Klarname auf dem Server.
 
 ## Produktentscheidungen

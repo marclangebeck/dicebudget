@@ -115,9 +115,9 @@ export function PairingEditOverlay({
           <strong className="text-strong">{labelB}</strong>
         </p>
         <p className="text-muted mt-1 text-xs">
-          Admin-Workflow: Hier Siege/Diff für <strong>alle Geräte</strong> setzen.
-          Unter App-Siege nur nach „Server bereinigen“. Keine Klarnamen — nur
-          Server-Zahlen.
+          Admin-Workflow: Hier setzt du den <strong>Ziel-Gesamtstand</strong> für
+          alle Geräte (absolut, nicht „draufrechnen“). Unter App-Siege nur nach
+          „Server bereinigen“. Keine Klarnamen auf dem Server.
         </p>
         {hasAppWinsFloor && (
           <p className="text-muted mt-2 rounded-lg border border-[color:var(--border-subtle,#d4d4d8)] px-3 py-2 text-xs leading-snug">
