@@ -6580,6 +6580,48 @@ html.zoomable-route.legal-route .legal-page-scroll {
   gap: 0.32rem;
 }
 
+.stats-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.stats-tools-toggle {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  padding: 0.28rem 0.75rem;
+  color: rgba(248, 250, 252, 0.92);
+  font-size: 0.72rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.stats-tools-toggle.is-open {
+  border-color: rgba(214, 168, 90, 0.45);
+  background: rgba(214, 168, 90, 0.16);
+}
+
+.stats-tools-toggle-chevron {
+  font-size: 0.7rem;
+  opacity: 0.85;
+}
+
+.stats-tools-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.85rem;
+  background: rgba(15, 23, 42, 0.35);
+  padding: 0.55rem;
+}
+
 .stats-sort-chip {
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 999px;

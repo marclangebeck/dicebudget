@@ -77,6 +77,7 @@ function StatsPageInner() {
   const [hiddenKeys, setHiddenKeys] = useState<Set<string>>(() => new Set());
   const [sortMode, setSortMode] = useState<PairingSortMode>("recent");
   const [detailReloadToken, setDetailReloadToken] = useState(0);
+  const [toolsOpen, setToolsOpen] = useState(false);
   const isAdmin = hasAdminApiKey();
 
   const refreshPairings = useCallback(async (opts?: { quiet?: boolean }) => {
@@ -311,10 +312,10 @@ function StatsPageInner() {
       )
       .join("\n");
     const confirmed = window.confirm(
-      `ADMIN — globale Korrektur für alle Geräte\n\n${labels}\n\n` +
-        "Löscht abgeschlossene 2-Spieler-Runden und manuelle Baselines dieser Paarungen. " +
+      `ADMIN — Paarung(en) auf dem Server löschen?\n\n${labels}\n\n` +
+        "Löscht abgeschlossene 2-Spieler-Runden und manuelle Baselines. " +
         "Danach sehen alle Handys dieselben Zahlen (nach Aktualisieren/App-Fokus). " +
-        "Nicht rückgängig. „Hier ausblenden“ ersetzt das nicht.",
+        "Nicht rückgängig. „Ausblenden“ ersetzt das nicht.",
     );
     if (!confirmed) return;
 
@@ -325,7 +326,7 @@ function StatsPageInner() {
       const keys = chosen.flatMap((pairing) => keysToHideForPairing(pairing));
       const result = await resetPairings(keys);
       setDeleteNotice(
-        `Server bereinigt (alle Geräte): ${result.deletedSessions} Session(s) gelöscht` +
+        `Gelöscht (Server, alle Geräte): ${result.deletedSessions} Session(s)` +
           (result.skippedMultiPlayer > 0
             ? `, ${result.skippedMultiPlayer} Mehrspieler-Sessions übersprungen`
             : "") +
@@ -381,11 +382,10 @@ function StatsPageInner() {
 
       {isAdmin && (
         <p className="glass-alert-success px-3 py-2 text-xs leading-snug">
-          <strong>Admin-Workflow (Stufe 0):</strong> Globale Korrektur nur über{" "}
-          <strong>Paarung tippen → Siege/Diff</strong> oder{" "}
-          <strong>auswählen → Server bereinigen</strong>. „Hier ausblenden“ nie für
-          Sync nutzen — sonst bleiben andere Handys unverändert. Nach Korrektur:
-          Aktualisieren bzw. App in den Vordergrund.
+          <strong>Admin-Workflow (Stufe 0):</strong> Globale Korrektur über{" "}
+          <strong>Verwalten → Auswählen</strong> und dann{" "}
+          <strong>Löschen · Server</strong> oder Paarung tippen → Siege/Diff.
+          „Ausblenden“ nie für Sync nutzen.
         </p>
       )}
 
@@ -432,94 +432,122 @@ function StatsPageInner() {
             </div>
           )}
 
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            {!selectMode ? (
-              <>
-                {ownPairings.length > 0 && (
+          <div className="stats-tools">
+            <button
+              type="button"
+              className={`stats-tools-toggle${toolsOpen || selectMode ? " is-open" : ""}`}
+              aria-expanded={toolsOpen || selectMode}
+              onClick={() => {
+                if (selectMode) {
+                  exitSelectMode();
+                  setToolsOpen(false);
+                  return;
+                }
+                setToolsOpen((open) => !open);
+              }}
+            >
+              <span>Verwalten</span>
+              <span className="stats-tools-toggle-chevron" aria-hidden>
+                {toolsOpen || selectMode ? "▾" : "▸"}
+              </span>
+            </button>
+
+            {(toolsOpen || selectMode) && (
+              <div className="stats-tools-panel" role="group" aria-label="Statistik verwalten">
+                {!selectMode ? (
                   <>
+                    {ownPairings.length > 0 && (
+                      <>
+                        <button
+                          type="button"
+                          className="btn-chip px-3 py-1.5 text-xs"
+                          onClick={() => {
+                            setDeleteNotice(null);
+                            void refreshPairings({ quiet: true });
+                            setDeleteNotice("Statistik aktualisiert.");
+                          }}
+                        >
+                          Aktualisieren
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-chip px-3 py-1.5 text-xs"
+                          onClick={() => {
+                            setDeleteNotice(null);
+                            setSelectMode(true);
+                          }}
+                        >
+                          {isAdmin ? "Auswählen · korrigieren / löschen" : "Paarungen auswählen"}
+                        </button>
+                      </>
+                    )}
+                    {manuallyHiddenCount > 0 && (
+                      <button
+                        type="button"
+                        className="btn-chip px-3 py-1.5 text-xs"
+                        onClick={handleRestoreHidden}
+                      >
+                        {manuallyHiddenCount === 1
+                          ? "1 ausgeblendete wieder anzeigen"
+                          : `${manuallyHiddenCount} ausgeblendete wieder anzeigen`}
+                      </button>
+                    )}
+                    {ownPairings.length === 0 && manuallyHiddenCount === 0 && (
+                      <p className="stats-foreign-filter-note mb-0">Keine Aktionen verfügbar.</p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        className="btn-danger px-3 py-1.5 text-xs"
+                        disabled={selectedKeys.size === 0 || deleting}
+                        onClick={() => void handleServerResetSelected()}
+                      >
+                        {deleting
+                          ? "Löschen …"
+                          : `Löschen · Server, alle Geräte (${selectedKeys.size})`}
+                      </button>
+                    )}
                     <button
                       type="button"
-                      className="btn-chip px-3 py-1 text-xs"
-                      onClick={() => {
-                        setDeleteNotice(null);
-                        void refreshPairings();
-                      }}
+                      className="btn-chip px-3 py-1.5 text-xs"
+                      disabled={selectedKeys.size === 0 || deleting}
+                      onClick={handleDeleteSelected}
                     >
-                      Aktualisieren
+                      {deleting
+                        ? "Wird ausgeblendet …"
+                        : `Ausblenden · nur dieses Gerät (${selectedKeys.size})`}
                     </button>
                     <button
                       type="button"
-                      className="btn-chip px-3 py-1 text-xs"
+                      className="btn-chip px-3 py-1.5 text-xs"
+                      disabled={deleting}
                       onClick={() => {
-                        setDeleteNotice(null);
-                        setSelectMode(true);
+                        exitSelectMode();
+                        setToolsOpen(true);
                       }}
                     >
-                      {isAdmin ? "Korrigieren / bereinigen" : "Paarungen auswählen"}
+                      Abbrechen
                     </button>
                   </>
                 )}
-                {manuallyHiddenCount > 0 && (
-                  <button
-                    type="button"
-                    className="btn-chip px-3 py-1 text-xs"
-                    onClick={handleRestoreHidden}
-                  >
-                    {manuallyHiddenCount === 1
-                      ? "1 ausgeblendete wieder anzeigen"
-                      : `${manuallyHiddenCount} ausgeblendete wieder anzeigen`}
-                  </button>
-                )}
-              </>
-            ) : (
-              <>
-                {isAdmin && (
-                  <button
-                    type="button"
-                    className="btn-danger px-3 py-1 text-xs"
-                    disabled={selectedKeys.size === 0 || deleting}
-                    onClick={() => void handleServerResetSelected()}
-                  >
-                    {deleting
-                      ? "Server …"
-                      : `Server bereinigen · alle Geräte (${selectedKeys.size})`}
-                  </button>
-                )}
-                <button
-                  type="button"
-                  className="btn-chip px-3 py-1 text-xs"
-                  disabled={selectedKeys.size === 0 || deleting}
-                  onClick={handleDeleteSelected}
-                >
-                  {deleting
-                    ? "Wird ausgeblendet …"
-                    : isAdmin
-                      ? `Nur Gerät ausblenden (${selectedKeys.size})`
-                      : `Hier ausblenden · nur Gerät (${selectedKeys.size})`}
-                </button>
-                <button
-                  type="button"
-                  className="btn-chip px-3 py-1 text-xs"
-                  disabled={deleting}
-                  onClick={exitSelectMode}
-                >
-                  Abbrechen
-                </button>
-              </>
+              </div>
             )}
           </div>
           {selectMode && (
             <p className="stats-foreign-filter-note">
               {isAdmin ? (
                 <>
-                  Primär: <strong>Server bereinigen</strong> (alle Geräte) oder Paarung
-                  tippen → Siege/Diff. „Nur Gerät ausblenden“ ändert nichts für andere
-                  Handys.
+                  Paarung(en) anhaken. <strong>Löschen · Server</strong> entfernt sie für alle
+                  Geräte. Oder eine Paarung tippen → Siege/Diff setzen. „Ausblenden“ gilt nur
+                  hier.
                 </>
               ) : (
                 <>
-                  „Hier ausblenden“ = nur dieses Handy. Für alle Spieler: Admin →{" "}
-                  <strong>Server bereinigen</strong>.
+                  „Ausblenden“ = nur dieses Handy. Endgültig für alle: Admin →{" "}
+                  <strong>Löschen · Server</strong>.
                 </>
               )}
             </p>
