@@ -1,6 +1,17 @@
+import type { Viewport } from "next";
 import type { ReactNode } from "react";
 import { SetupScreenLayout } from "@/components/SetupScreenLayout";
 
+/** Einstellungen: kein Fokus-/Pinch-Zoom (wie Statistik/Spiel). */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  themeColor: "#242528",
+};
+
 export default function SettingsLayout({ children }: { children: ReactNode }) {
-  return <SetupScreenLayout allowPinchZoom>{children}</SetupScreenLayout>;
+  return <SetupScreenLayout>{children}</SetupScreenLayout>;
 }

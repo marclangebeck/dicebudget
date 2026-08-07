@@ -7,11 +7,11 @@ type Props = {
   children: ReactNode;
   /** false = komplett starr (Einzelspiel); true = nur innerer Bereich scrollt (Lobby) */
   scrollable?: boolean;
-  /** true = Browser-Zoom erlauben (Settings, Statistik). */
+  /** true = Browser-Zoom erlauben (nur wo bewusst gewünscht). */
   allowPinchZoom?: boolean;
 };
 
-/** Solo / Multi: fester Viewport; Settings/Statistik mit Zoom. */
+/** Solo / Multi / Settings / Statistik: fester Viewport; Zoom optional. */
 export function SetupScreenLayout({
   children,
   scrollable = true,

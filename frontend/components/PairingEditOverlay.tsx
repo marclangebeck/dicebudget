@@ -143,7 +143,7 @@ export function PairingEditOverlay({
               min={appWinsA}
               value={winsA}
               onChange={(e) => setWinsA(e.target.value)}
-              className="glass-input px-3 py-2 tabular-nums"
+              className="glass-input px-3 py-2 text-base tabular-nums"
             />
             {appWinsA > 0 && (
               <span className="text-muted text-[11px]">
@@ -159,7 +159,7 @@ export function PairingEditOverlay({
               min={appWinsB}
               value={winsB}
               onChange={(e) => setWinsB(e.target.value)}
-              className="glass-input px-3 py-2 tabular-nums"
+              className="glass-input px-3 py-2 text-base tabular-nums"
             />
             {appWinsB > 0 && (
               <span className="text-muted text-[11px]">
@@ -178,12 +178,12 @@ export function PairingEditOverlay({
               min={0}
               value={diff}
               onChange={(e) => setDiff(e.target.value)}
-              className="glass-input w-24 px-3 py-2 tabular-nums"
+              className="glass-input w-24 px-3 py-2 text-base tabular-nums"
             />
             <select
               value={favor}
               onChange={(e) => setFavor(e.target.value as FavorSide)}
-              className="glass-input flex-1 px-2 py-2"
+              className="glass-input flex-1 px-2 py-2 text-base"
               aria-label="Differenz zugunsten"
             >
               <option value="A">zugunsten {labelA}</option>

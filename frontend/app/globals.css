@@ -373,6 +373,8 @@ body {
   color: var(--input-text);
   caret-color: var(--input-text);
   -webkit-text-fill-color: var(--input-text);
+  /* iOS Safari/WKWebView zoomt sonst bei Fokus auf Inputs < 16px heran. */
+  font-size: 16px;
   box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 

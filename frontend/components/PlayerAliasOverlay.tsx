@@ -107,7 +107,7 @@ export function PlayerAliasOverlay({
               setSelectedRivalId(null);
             }}
             maxLength={40}
-            className="glass-input px-3 py-2"
+            className="glass-input px-3 py-2 text-base"
             placeholder="z. B. Nicole"
             autoFocus
           />

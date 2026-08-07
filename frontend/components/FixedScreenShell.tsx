@@ -9,7 +9,7 @@ type RouteClass = "home-route" | "setup-route" | "play-route";
 type Props = {
   routeClass: RouteClass;
   children: ReactNode;
-  /** false = Browser-Zoom erlauben (Settings, Statistik). */
+  /** false = Browser-Zoom erlauben (nur bewusst). */
   blockPinchZoom?: boolean;
 };
 

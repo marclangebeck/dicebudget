@@ -26,6 +26,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Hausregel Brennt:** Pool-Kosten 1 (siehe auch unten); Auto-Regeln nur bei Session-Flag + Strategy-Duell
 
 ### Fixed
+- **Stats/Settings Zoom:** Pinch-Zoom aus; Viewport `maximumScale: 1`; `glass-input` mind. 16px — verhindert iOS-Fokus-Zoom, der nur per Menüwechsel zurücksetzte
 - **Paarungs-Baseline absolut:** Admin-Siege und Punktedifferenz speichern Zielstand (`isAbsolute`), nicht Additiv zu geräteabhängigem Alias-Merge — verhindert „dazuaddiert/weggenommen“ (z. B. +237 vs. −581)
 - **Paarungen Rollen (M38):** Baseline + Server-Reset wieder nur mit Admin-Key; Spieler blenden lokal aus; klare UX „Hier ausblenden“ / „Server bereinigen“
 - **2×/3× Alle Fünfe (M41):** Streak nur bei echtem Treffer (`score === 50`); Null-Einträge lösen keine Pool-Halbierung/-Nullung
