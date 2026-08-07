@@ -170,10 +170,11 @@ export function foldManualBaselines(
       acc.playerAWins = winsA;
       acc.playerBWins = winsB;
       acc.roundsPlayed = winsA + winsB + acc.ties;
-      acc.playerABonusPoints += bonusA;
-      acc.playerBBonusPoints += bonusB;
-      acc.playerAManualBonus += bonusA;
-      acc.playerBManualBonus += bonusB;
+      // Absolute Diff: Bonus-Punkte ersetzen den Gesamtstand (nicht auf App-Diff addieren).
+      acc.playerABonusPoints = bonusA;
+      acc.playerBBonusPoints = bonusB;
+      acc.playerAManualBonus = bonusA;
+      acc.playerBManualBonus = bonusB;
     } else {
       acc.roundsPlayed += winsA + winsB;
       acc.playerAWins += winsA;

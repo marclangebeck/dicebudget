@@ -26,7 +26,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Hausregel Brennt:** Pool-Kosten 1 (siehe auch unten); Auto-Regeln nur bei Session-Flag + Strategy-Duell
 
 ### Fixed
-- **Paarungs-Baseline absolut:** Admin-Siege speichern Zielstand (`isAbsolute`), nicht Additiv zu geräteabhängigem Alias-Merge — verhindert „dazuaddiert/weggenommen“ auf anderen Handys
+- **Paarungs-Baseline absolut:** Admin-Siege und Punktedifferenz speichern Zielstand (`isAbsolute`), nicht Additiv zu geräteabhängigem Alias-Merge — verhindert „dazuaddiert/weggenommen“ (z. B. +237 vs. −581)
 - **Paarungen Rollen (M38):** Baseline + Server-Reset wieder nur mit Admin-Key; Spieler blenden lokal aus; klare UX „Hier ausblenden“ / „Server bereinigen“
 - **2×/3× Alle Fünfe (M41):** Streak nur bei echtem Treffer (`score === 50`); Null-Einträge lösen keine Pool-Halbierung/-Nullung
 - **Fortschritt 25/50/75 % (M37):** Delta nur aus Lobby-`diceScore` / Feldsumme — kein Fallback auf `totalScore`; bei Meilenstein frische Lite-Lobby vor Overlay

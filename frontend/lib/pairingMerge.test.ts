@@ -108,6 +108,75 @@ describe("buildBaselineWrites", () => {
     assert.equal(writes[0]?.isAbsolute, true);
     assert.equal(writes[0]?.extraWinsA, 5);
     assert.equal(writes[0]?.extraWinsB, 2);
+    assert.equal(writes[0]?.extraBonusA, 12);
+    assert.equal(writes[0]?.extraBonusB, 0);
+  });
+
+  it("Multi-Key: Absolute Diff bleibt 237 trotz zweitem App-Key", () => {
+    const k1 = summary({
+      key: "aaa::host",
+      playerA: "aaa",
+      playerB: "host",
+      playerAWins: 2,
+      playerBWins: 1,
+      playerAAppWins: 2,
+      playerBAppWins: 1,
+      playerABonusPoints: 100,
+      playerBBonusPoints: 50,
+    });
+    const k2 = summary({
+      key: "bbb::host",
+      playerA: "bbb",
+      playerB: "host",
+      playerAWins: 3,
+      playerBWins: 2,
+      playerAAppWins: 3,
+      playerBAppWins: 2,
+      playerABonusPoints: 400,
+      playerBBonusPoints: 100,
+    });
+    const aliases = { aaa: "Nicole", bbb: "Nicole" };
+    const merged = mergePairingSummaries([k1, k2], aliases, "host")[0];
+    assert.ok(merged);
+
+    const writes = buildBaselineWrites(merged, [k1, k2], aliases, "host", {
+      totalWinsA: 20,
+      totalWinsB: 10,
+      netDiff: 237,
+    });
+    const withBonus = writes.find((w) => w.extraBonusA + w.extraBonusB > 0);
+    assert.ok(withBonus);
+    assert.equal(withBonus.extraBonusA + withBonus.extraBonusB, 237);
+
+    const folded = [
+      summary({
+        key: "aaa::host",
+        playerA: "aaa",
+        playerB: "host",
+        playerAAppWins: 2,
+        playerBAppWins: 1,
+        playerAWins: 20,
+        playerBWins: 10,
+        playerABonusPoints: 237,
+        playerBBonusPoints: 0,
+        playerAManualBonus: 237,
+        playerBManualBonus: 0,
+      }),
+      summary({
+        key: "bbb::host",
+        playerA: "bbb",
+        playerB: "host",
+        playerAAppWins: 3,
+        playerBAppWins: 2,
+        playerAWins: 3,
+        playerBWins: 2,
+        playerABonusPoints: 400,
+        playerBBonusPoints: 100,
+      }),
+    ];
+    const again = mergePairingSummaries(folded, aliases, "host")[0];
+    assert.ok(again);
+    assert.equal(again.playerABonusPoints - again.playerBBonusPoints, 237);
   });
 
   it("Multi-Key: Absolute auf repKey; Merge-Max hält Ziel trotz zweitem App-Key", () => {
@@ -144,7 +213,6 @@ describe("buildBaselineWrites", () => {
     assert.equal(withWins.length, 1);
     assert.equal(withWins[0]!.extraWinsA + withWins[0]!.extraWinsB, 30);
 
-    // Nach absolutem Fold: ein Key trägt 20:10 (bzw. getauscht), der andere nur App.
     const folded = [
       summary({
         key: "aaa::host",
@@ -170,7 +238,6 @@ describe("buildBaselineWrites", () => {
     assert.equal(again.playerAWins, 20);
     assert.equal(again.playerBWins, 10);
 
-    // Ohne Alias: kein Aufaddieren des Ziels — separate Zeilen.
     const raw = mergePairingSummaries(folded, {}, "host");
     assert.equal(raw.length, 2);
     const absoluteRow = raw.find((r) => r.playerAWins === 20 || r.playerBWins === 20);

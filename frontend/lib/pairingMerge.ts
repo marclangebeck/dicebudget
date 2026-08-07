@@ -66,8 +66,8 @@ export function isMergedPairingKey(key: string): boolean {
  * Quell-Paarungen mit vertauschten Seiten korrekt addiert werden.
  *
  * Hat mindestens eine Quelle einen Baseline-Override (Wins ≠ App-Wins), werden
- * Gesamt-Siege per Max zusammengeführt — sonst würde ein absoluter Zielstand
- * geräteabhängig zu App-Siegen anderer Keys addiert.
+ * Gesamt-Siege per Max zusammengeführt und die absolute Diff vom Override-Key
+ * übernommen — sonst würde der Zielstand geräteabhängig zu App-Werten addiert.
  */
 export function mergePairingSummaries(
   summaries: PairingSummaryDto[],
@@ -76,7 +76,15 @@ export function mergePairingSummaries(
 ): MergedPairingSummary[] {
   const map = new Map<
     string,
-    MergedPairingSummary & { _hasOverride: boolean; _maxWinsA: number; _maxWinsB: number }
+    MergedPairingSummary & {
+      _hasOverride: boolean;
+      _maxWinsA: number;
+      _maxWinsB: number;
+      _overrideBonusA: number | null;
+      _overrideBonusB: number | null;
+      _overrideManualA: number | null;
+      _overrideManualB: number | null;
+    }
   >();
 
   for (const s of summaries) {
@@ -93,7 +101,15 @@ export function mergePairingSummaries(
     const srcWinsB = swap ? s.playerAWins : s.playerBWins;
     const srcAppA = swap ? s.playerBAppWins : s.playerAAppWins;
     const srcAppB = swap ? s.playerAAppWins : s.playerBAppWins;
-    const override = srcWinsA !== srcAppA || srcWinsB !== srcAppB;
+    const srcBonusA = swap ? s.playerBBonusPoints : s.playerABonusPoints;
+    const srcBonusB = swap ? s.playerABonusPoints : s.playerBBonusPoints;
+    const srcManualA = swap ? s.playerBManualBonus : s.playerAManualBonus;
+    const srcManualB = swap ? s.playerAManualBonus : s.playerBManualBonus;
+    const override =
+      srcWinsA !== srcAppA ||
+      srcWinsB !== srcAppB ||
+      srcManualA > 0 ||
+      srcManualB > 0;
 
     let acc = map.get(key);
     if (!acc) {
@@ -119,6 +135,10 @@ export function mergePairingSummaries(
         _hasOverride: false,
         _maxWinsA: 0,
         _maxWinsB: 0,
+        _overrideBonusA: null,
+        _overrideBonusB: null,
+        _overrideManualA: null,
+        _overrideManualB: null,
       };
       map.set(key, acc);
     }
@@ -133,15 +153,27 @@ export function mergePairingSummaries(
     acc.playerAAppWins += srcAppA;
     acc.playerBAppWins += srcAppB;
     acc.ties += s.ties;
-    acc.playerABonusPoints += swap ? s.playerBBonusPoints : s.playerABonusPoints;
-    acc.playerBBonusPoints += swap ? s.playerABonusPoints : s.playerBBonusPoints;
-    acc.playerAManualBonus += swap ? s.playerBManualBonus : s.playerAManualBonus;
-    acc.playerBManualBonus += swap ? s.playerAManualBonus : s.playerBManualBonus;
+    acc.playerABonusPoints += srcBonusA;
+    acc.playerBBonusPoints += srcBonusB;
+    acc.playerAManualBonus += srcManualA;
+    acc.playerBManualBonus += srcManualB;
     acc.playerATotalScore += swap ? s.playerBTotalScore : s.playerATotalScore;
     acc.playerBTotalScore += swap ? s.playerATotalScore : s.playerBTotalScore;
     acc.lastPlayedAt = maxDate(acc.lastPlayedAt, s.lastPlayedAt);
     acc.sourceKeys.push(s.key);
-    if (override) acc._hasOverride = true;
+    if (override) {
+      acc._hasOverride = true;
+      // Prefer the source with the strongest absolute/manual signal.
+      const prevMag =
+        (acc._overrideManualA ?? 0) + (acc._overrideManualB ?? 0);
+      const nextMag = srcManualA + srcManualB;
+      if (acc._overrideBonusA === null || nextMag >= prevMag) {
+        acc._overrideBonusA = srcBonusA;
+        acc._overrideBonusB = srcBonusB;
+        acc._overrideManualA = srcManualA;
+        acc._overrideManualB = srcManualB;
+      }
+    }
     acc._maxWinsA = Math.max(acc._maxWinsA, srcWinsA);
     acc._maxWinsB = Math.max(acc._maxWinsB, srcWinsB);
   }
@@ -152,8 +184,23 @@ export function mergePairingSummaries(
         acc.playerAWins = Math.max(acc._maxWinsA, acc.playerAAppWins);
         acc.playerBWins = Math.max(acc._maxWinsB, acc.playerBAppWins);
         acc.roundsPlayed = acc.playerAWins + acc.playerBWins + acc.ties;
+        if (acc._overrideBonusA !== null && acc._overrideBonusB !== null) {
+          acc.playerABonusPoints = acc._overrideBonusA;
+          acc.playerBBonusPoints = acc._overrideBonusB;
+          acc.playerAManualBonus = acc._overrideManualA ?? 0;
+          acc.playerBManualBonus = acc._overrideManualB ?? 0;
+        }
       }
-      const { _hasOverride: _, _maxWinsA: __, _maxWinsB: ___, ...rest } = acc;
+      const {
+        _hasOverride: _a,
+        _maxWinsA: _b,
+        _maxWinsB: _c,
+        _overrideBonusA: _d,
+        _overrideBonusB: _e,
+        _overrideManualA: _f,
+        _overrideManualB: _g,
+        ...rest
+      } = acc;
       return rest;
     })
     .sort((a, b) => {
@@ -222,10 +269,9 @@ export type DesiredPairingTotals = {
 
 /**
  * Übersetzt gewünschte Gesamtwerte in Baseline-Schreibaufträge.
- * Speichert ABSOLUTE Siege (isAbsolute), damit alle Geräte denselben Stand
- * sehen — unabhängig vom lokalen Alias-Merge.
- * App-Siege bleiben die UI-Untergrenze. Differenz-Boni bleiben additiv zum App-Netto.
- * Volle Absolute-Siege landen auf einem Repräsentanten-Key; andere Keys der Gruppe → 0.
+ * Speichert ABSOLUTE Siege und ABSOLUTE Punktedifferenz (isAbsolute), damit
+ * alle Geräte denselben Stand sehen — unabhängig vom lokalen Alias-Merge.
+ * Diff wird als einseitiger Vorsprung gespeichert (A oder B), nicht „App-Netto + Extra“.
  */
 export function buildBaselineWrites(
   merged: MergedPairingSummary,
@@ -239,12 +285,9 @@ export function buildBaselineWrites(
   const absoluteWinsA = Math.max(appWinsA, Math.round(desired.totalWinsA));
   const absoluteWinsB = Math.max(appWinsB, Math.round(desired.totalWinsB));
 
-  const currentManualNet = merged.playerAManualBonus - merged.playerBManualBonus;
-  const totalNet = merged.playerABonusPoints - merged.playerBBonusPoints;
-  const appNet = totalNet - currentManualNet;
-  const newManualNet = Math.round(desired.netDiff) - appNet;
-  const manualBonusA = newManualNet > 0 ? newManualNet : 0;
-  const manualBonusB = newManualNet < 0 ? -newManualNet : 0;
+  const targetNet = Math.round(desired.netDiff);
+  const absoluteBonusA = targetNet > 0 ? targetNet : 0;
+  const absoluteBonusB = targetNet < 0 ? -targetNet : 0;
 
   const sortedKeys = [...merged.sourceKeys].sort();
   const repKey = sortedKeys[0];
@@ -273,16 +316,16 @@ export function buildBaselineWrites(
             key,
             extraWinsA: absoluteWinsB,
             extraWinsB: absoluteWinsA,
-            extraBonusA: manualBonusB,
-            extraBonusB: manualBonusA,
+            extraBonusA: absoluteBonusB,
+            extraBonusB: absoluteBonusA,
             isAbsolute: true,
           }
         : {
             key,
             extraWinsA: absoluteWinsA,
             extraWinsB: absoluteWinsB,
-            extraBonusA: manualBonusA,
-            extraBonusB: manualBonusB,
+            extraBonusA: absoluteBonusA,
+            extraBonusB: absoluteBonusB,
             isAbsolute: true,
           },
     );

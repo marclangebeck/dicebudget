@@ -135,7 +135,7 @@ describe("foldManualBaselines", () => {
     assert.equal(result.appRoundsPlayed, 2);
   });
 
-  it("isAbsolute setzt Ziel-Siege statt zu addieren", () => {
+  it("isAbsolute setzt Ziel-Siege und ersetzt Diff statt zu addieren", () => {
     const map = new Map<string, PairingAccumulator>();
     const acc = emptyAccumulator("Marc::Nicole", "Marc", "Nicole");
     acc.roundsPlayed = 5;
@@ -145,6 +145,8 @@ describe("foldManualBaselines", () => {
     acc.playerAAppWins = 2;
     acc.playerBWins = 3;
     acc.playerBAppWins = 3;
+    acc.playerABonusPoints = 400;
+    acc.playerBBonusPoints = 100;
     map.set("Marc::Nicole", acc);
 
     foldManualBaselines(map, [
@@ -152,7 +154,7 @@ describe("foldManualBaselines", () => {
         pairingKey: "Marc::Nicole",
         extraWinsA: 20,
         extraWinsB: 10,
-        extraBonusA: 0,
+        extraBonusA: 237,
         extraBonusB: 0,
         isAbsolute: true,
       },
@@ -164,5 +166,8 @@ describe("foldManualBaselines", () => {
     assert.equal(result.playerAAppWins, 2);
     assert.equal(result.playerBAppWins, 3);
     assert.equal(result.roundsPlayed, 30);
+    assert.equal(result.playerABonusPoints, 237);
+    assert.equal(result.playerBBonusPoints, 0);
+    assert.equal(result.playerABonusPoints - result.playerBBonusPoints, 237);
   });
 });
