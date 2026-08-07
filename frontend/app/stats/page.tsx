@@ -266,6 +266,17 @@ function StatsPageInner() {
     );
     if (!confirmed) return;
 
+    if (isAdmin) {
+      const adminOk = window.confirm(
+        "Admin-Hinweis: Das ist keine globale Korrektur.\n\n" +
+          "Andere Handys behalten die Paarung und die Zahlen unverändert.\n" +
+          "Für gleiche Statistik überall: Abbrechen und „Server bereinigen“ " +
+          "oder die Paarung tippen → Siege/Diff bearbeiten.\n\n" +
+          "Trotzdem nur auf diesem Gerät ausblenden?",
+      );
+      if (!adminOk) return;
+    }
+
     setDeleting(true);
     setError(null);
     setDeleteNotice(null);
@@ -283,7 +294,7 @@ function StatsPageInner() {
     } finally {
       setDeleting(false);
     }
-  }, [ownPairings, selectedKeys, ownPlayerId, aliases, exitSelectMode]);
+  }, [ownPairings, selectedKeys, ownPlayerId, aliases, exitSelectMode, isAdmin]);
 
   const handleServerResetSelected = useCallback(async () => {
     if (!isAdmin) return;
@@ -300,9 +311,10 @@ function StatsPageInner() {
       )
       .join("\n");
     const confirmed = window.confirm(
-      `ADMIN: Paarungen auf dem Server endgültig bereinigen?\n\n${labels}\n\n` +
+      `ADMIN — globale Korrektur für alle Geräte\n\n${labels}\n\n` +
         "Löscht abgeschlossene 2-Spieler-Runden und manuelle Baselines dieser Paarungen. " +
-        "Wirkt auf allen Geräten. Nicht rückgängig.",
+        "Danach sehen alle Handys dieselben Zahlen (nach Aktualisieren/App-Fokus). " +
+        "Nicht rückgängig. „Hier ausblenden“ ersetzt das nicht.",
     );
     if (!confirmed) return;
 
@@ -313,11 +325,11 @@ function StatsPageInner() {
       const keys = chosen.flatMap((pairing) => keysToHideForPairing(pairing));
       const result = await resetPairings(keys);
       setDeleteNotice(
-        `Server bereinigt: ${result.deletedSessions} Session(s) gelöscht` +
+        `Server bereinigt (alle Geräte): ${result.deletedSessions} Session(s) gelöscht` +
           (result.skippedMultiPlayer > 0
             ? `, ${result.skippedMultiPlayer} Mehrspieler-Sessions übersprungen`
             : "") +
-          ".",
+          ". Andere Geräte: Statistik öffnen oder App in den Vordergrund holen.",
       );
       exitSelectMode();
       setOpenKeys(new Set());
@@ -366,6 +378,16 @@ function StatsPageInner() {
           ? "Als Admin: Siege/Diff und „Server bereinigen“ gelten für alle Geräte. „Hier ausblenden“ nur lokal."
           : "Gemeinsame Zahlen kommen vom Server; Bereinigen und Siege nachtragen nur der Admin. „Hier ausblenden“ nur auf diesem Gerät."}
       </p>
+
+      {isAdmin && (
+        <p className="glass-alert-success px-3 py-2 text-xs leading-snug">
+          <strong>Admin-Workflow (Stufe 0):</strong> Globale Korrektur nur über{" "}
+          <strong>Paarung tippen → Siege/Diff</strong> oder{" "}
+          <strong>auswählen → Server bereinigen</strong>. „Hier ausblenden“ nie für
+          Sync nutzen — sonst bleiben andere Handys unverändert. Nach Korrektur:
+          Aktualisieren bzw. App in den Vordergrund.
+        </p>
+      )}
 
       {foreignPairingCount > 0 && (
         <p className="stats-foreign-filter-note">
@@ -433,7 +455,7 @@ function StatsPageInner() {
                         setSelectMode(true);
                       }}
                     >
-                      Paarungen auswählen
+                      {isAdmin ? "Korrigieren / bereinigen" : "Paarungen auswählen"}
                     </button>
                   </>
                 )}
@@ -451,16 +473,6 @@ function StatsPageInner() {
               </>
             ) : (
               <>
-                <button
-                  type="button"
-                  className="btn-chip px-3 py-1 text-xs"
-                  disabled={selectedKeys.size === 0 || deleting}
-                  onClick={handleDeleteSelected}
-                >
-                  {deleting
-                    ? "Wird ausgeblendet …"
-                    : `Hier ausblenden · nur Gerät (${selectedKeys.size})`}
-                </button>
                 {isAdmin && (
                   <button
                     type="button"
@@ -476,6 +488,18 @@ function StatsPageInner() {
                 <button
                   type="button"
                   className="btn-chip px-3 py-1 text-xs"
+                  disabled={selectedKeys.size === 0 || deleting}
+                  onClick={handleDeleteSelected}
+                >
+                  {deleting
+                    ? "Wird ausgeblendet …"
+                    : isAdmin
+                      ? `Nur Gerät ausblenden (${selectedKeys.size})`
+                      : `Hier ausblenden · nur Gerät (${selectedKeys.size})`}
+                </button>
+                <button
+                  type="button"
+                  className="btn-chip px-3 py-1 text-xs"
                   disabled={deleting}
                   onClick={exitSelectMode}
                 >
@@ -486,8 +510,18 @@ function StatsPageInner() {
           </div>
           {selectMode && (
             <p className="stats-foreign-filter-note">
-              „Hier ausblenden“ = nur dieses Handy. Für alle Spieler: Admin →{" "}
-              <strong>Server bereinigen</strong>.
+              {isAdmin ? (
+                <>
+                  Primär: <strong>Server bereinigen</strong> (alle Geräte) oder Paarung
+                  tippen → Siege/Diff. „Nur Gerät ausblenden“ ändert nichts für andere
+                  Handys.
+                </>
+              ) : (
+                <>
+                  „Hier ausblenden“ = nur dieses Handy. Für alle Spieler: Admin →{" "}
+                  <strong>Server bereinigen</strong>.
+                </>
+              )}
             </p>
           )}
         </>

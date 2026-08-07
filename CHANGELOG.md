@@ -17,6 +17,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Statistik:** Paarungen lokal ausblenden (`hiddenPairings`); Wiederherstellen; Startscreen-Bilanz berücksichtigt Hide-Liste
 
 ### Changed
+- **Stats Admin Stufe 0:** Workflow-Banner; Auswahl „Korrigieren / bereinigen“; Server bereinigen primär; lokales Ausblenden nur mit Extra-Admin-Warnung; Baseline-Text ohne Klarname-Anspruch — Stufe A (playerId-Links) bewusst später
 - **Statistik Sync-Klarheit:** „Hier ausblenden · nur Gerät“ vs. „Server bereinigen · alle Geräte“; Baseline-Hinweis wenn App-Siege die Untergrenze sind; Stats/Home laden bei App-Fokus neu + Button „Aktualisieren“
 - **InApp-Käufe (Features):** Wording „Hausregeln“ in Spielregeln/Tour/Overlays durch „InApp-Käufe (Features)“ ersetzt (Vorbereitung Monetarisierung)
 - **Brennt:** Zwei Optionen — Neu würfeln (−1 Pool, nur brennender Würfel; Rest liegen lassen) oder Augenzahl selbst (−2 Pool, daneben legen)

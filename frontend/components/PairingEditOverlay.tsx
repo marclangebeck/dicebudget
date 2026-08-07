@@ -115,8 +115,9 @@ export function PairingEditOverlay({
           <strong className="text-strong">{labelB}</strong>
         </p>
         <p className="text-muted mt-1 text-xs">
-          Globale Korrektur inkl. Runden außerhalb der App. Wird auf dem Server
-          gespeichert und gilt für alle Geräte.
+          Admin-Workflow: Hier Siege/Diff für <strong>alle Geräte</strong> setzen.
+          Unter App-Siege nur nach „Server bereinigen“. Keine Klarnamen — nur
+          Server-Zahlen.
         </p>
         {hasAppWinsFloor && (
           <p className="text-muted mt-2 rounded-lg border border-[color:var(--border-subtle,#d4d4d8)] px-3 py-2 text-xs leading-snug">
