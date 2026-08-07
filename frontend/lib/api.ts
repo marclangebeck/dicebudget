@@ -71,12 +71,17 @@ function translateApiError(message: string | undefined, status: number): string 
   }
   if (
     raw === "Invalid or missing admin API key" ||
-    raw.toLowerCase().includes("admin api key")
+    raw.toLowerCase().includes("admin api key") ||
+    raw.includes("Admin-Schlüssel fehlt") ||
+    raw.includes("App-Admin-Key")
   ) {
-    return "Admin-Schlüssel fehlt oder ist falsch. Paarungen bearbeiten geht ohne Key; Löschen braucht den Web-/Env-Key.";
+    return "Admin-Schlüssel fehlt oder ist falsch. Siege/Diff und Server-Löschen brauchen den Admin-Key (nur Admin-iOS-Build).";
   }
-  if (raw === "Admin API not configured") {
-    return "Admin-API nicht konfiguriert (Server).";
+  if (
+    raw === "Admin API not configured" ||
+    raw.includes("Admin-API nicht konfiguriert")
+  ) {
+    return "Admin-API nicht konfiguriert (Server ADMIN_API_KEY fehlt).";
   }
   return raw || `Anfrage fehlgeschlagen (${status})`;
 }

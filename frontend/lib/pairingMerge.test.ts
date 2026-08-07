@@ -243,4 +243,68 @@ describe("buildBaselineWrites", () => {
     const absoluteRow = raw.find((r) => r.playerAWins === 20 || r.playerBWins === 20);
     assert.ok(absoluteRow);
   });
+
+  it("nach Absolut-Korrektur: weitere App-Runde erhöht Anzeige (Server-Fold-Sim)", () => {
+    // Server hat Absolut 20:10 / Diff 237 bei App-Snap 2:1 gespeichert,
+    // danach eine App-Runde → Wins 21:10, Diff 267.
+    const after = summary({
+      key: "opp::self",
+      playerA: "opp",
+      playerB: "self",
+      playerAAppWins: 3,
+      playerBAppWins: 1,
+      playerAWins: 21,
+      playerBWins: 10,
+      playerABonusPoints: 267,
+      playerBBonusPoints: 0,
+      playerAManualBonus: 237,
+      playerBManualBonus: 0,
+    });
+    const merged = mergePairingSummaries([after], {}, "self")[0];
+    assert.ok(merged);
+    assert.equal(merged.playerAWins, 21);
+    assert.equal(merged.playerBWins, 10);
+    assert.equal(merged.playerABonusPoints - merged.playerBBonusPoints, 267);
+  });
+
+  it("zwei Geräte-Merges mit gleichen Server-Zeilen bleiben konsistent (kein Additiv-Drift)", () => {
+    const folded = [
+      summary({
+        key: "aaa::host",
+        playerA: "aaa",
+        playerB: "host",
+        playerAAppWins: 2,
+        playerBAppWins: 1,
+        playerAWins: 20,
+        playerBWins: 10,
+        playerABonusPoints: 237,
+        playerBBonusPoints: 0,
+        playerAManualBonus: 237,
+        playerBManualBonus: 0,
+      }),
+      summary({
+        key: "bbb::host",
+        playerA: "bbb",
+        playerB: "host",
+        playerAAppWins: 3,
+        playerBAppWins: 2,
+        playerAWins: 3,
+        playerBWins: 2,
+        playerABonusPoints: 400,
+        playerBBonusPoints: 100,
+      }),
+    ];
+    const aliases = { aaa: "Nicole", bbb: "Nicole" };
+    const deviceA = mergePairingSummaries(folded, aliases, "host")[0];
+    const deviceB = mergePairingSummaries(folded, aliases, "host")[0];
+    assert.ok(deviceA && deviceB);
+    assert.equal(deviceA.playerAWins, deviceB.playerAWins);
+    assert.equal(deviceA.playerBWins, deviceB.playerBWins);
+    assert.equal(
+      deviceA.playerABonusPoints - deviceA.playerBBonusPoints,
+      deviceB.playerABonusPoints - deviceB.playerBBonusPoints,
+    );
+    assert.equal(deviceA.playerAWins, 20);
+    assert.equal(deviceA.playerABonusPoints - deviceA.playerBBonusPoints, 237);
+  });
 });

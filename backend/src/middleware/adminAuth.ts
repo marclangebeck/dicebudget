@@ -17,7 +17,7 @@ export function requireAdminKey(
   if (!provided || provided !== key) {
     res.status(401).json({
       error:
-        "Admin-Schlüssel fehlt oder ist falsch. Server-Bereinigung und Siege/Diff brauchen den App-Admin-Key (Web-Build bzw. .env.production).",
+        "Admin-Schlüssel fehlt oder ist falsch. Server-Bereinigung und Siege/Diff brauchen den App-Admin-Key (nur Admin-iOS-Build / Mac-.env.production, nicht öffentliches Web).",
     });
     return;
   }

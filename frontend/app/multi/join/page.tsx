@@ -64,6 +64,14 @@ function MultiJoinInner() {
         lobby.maxPlayers,
         lobby.useStrategyRules,
         lobby.leagueCode,
+        lobby.showOpponentPool,
+        lobby.poolEndgameEnabled,
+        {
+          ruleYatzyStreak2: lobby.ruleYatzyStreak2,
+          ruleYatzyTriple: lobby.ruleYatzyTriple,
+          ruleUpperRace: lobby.ruleUpperRace,
+          ruleColumnPoolBonuses: lobby.ruleColumnPoolBonuses,
+        },
       );
       router.push(`/multi/join?code=${encodeURIComponent(session.inviteCode)}`);
     } catch (err) {

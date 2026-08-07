@@ -2,9 +2,9 @@
 
 **Stand:** 2026-08-07  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `f5c9ae7` (M37–M41; Stats absolut + Verwalten; Footer; Zoom; Brennt 2 Optionen; InApp-Käufe-Wording)  
-**Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de — Frontend Unit-Tests **69** grün  
-**Backend:** Migrationen u. a. `20260731120000_column_pool_bonuses`, `20260807120000_pairing_baseline_absolute` — bei Zweifel `deploy-backend-prod.sh`
+**Produktcode-HEAD:** *(Stabilitäts-Review — Commit-Hash nach Push)*  
+**Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de — Frontend Unit-Tests **71** grün  
+**Backend:** Migrationen u. a. `20260807120000_pairing_baseline_absolute`, `20260807140000_pairing_baseline_app_snapshot` — Deploy nach Stabilitäts-Batch
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
 
@@ -17,8 +17,8 @@ Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones s
 Technische Basis ist erledigt:
 
 - Capacitor 7, Bundle `de.bottletrade.dicebudget`, Native Start `/app`, API Prod.
-- TestFlight **Version 2.0**, Builds bis **~45+**; Release-Kandidat = HEAD `f5c9ae7` + frischer `build:ios`.
-- iOS-UI nur aus `npm run build:ios` auf dem Mac; Admin-UI braucht `NEXT_PUBLIC_ADMIN_API_KEY` im Mac-`.env.production`.
+- TestFlight **Version 2.0**, Builds bis **~45+**; Release-Kandidat = aktueller HEAD + frischer `build:ios`.
+- iOS-UI nur aus `npm run build:ios` auf dem Mac; Admin-UI braucht `NEXT_PUBLIC_ADMIN_API_KEY` im Mac-`.env.production` (nicht im öffentlichen Web-Bundle).
 
 Offen (M30):
 
@@ -45,8 +45,9 @@ Details: `docs/milestone-roadmap-analysis.md`. Code ist umgesetzt; nächster org
 
 ### M38 — Paarungen: Sync vs. Admin-Bereinigung
 
-**Status:** umgesetzt; Stufe 0 + absolute Wins/Diff (`isAbsolute`); UI **Verwalten**.  
-**Rollen:** Spieler = lokal ausblenden + Rivalen; Admin = Siege/Diff + Server-Löschen.  
+**Status:** umgesetzt; Stufe 0 + absolute Wins/Diff (`isAbsolute` + App-Snapshot zum Fortschreiben); UI **Verwalten**.  
+**Rollen:** Spieler = lokal ausblenden + Rivalen; Admin = Siege/Diff + Server-Löschen (**Admin-Key Pflicht**).  
+**Auth:** `POST /stats/pairings/baseline` und `POST /stats/pairings/reset` brauchen `X-Admin-Key`.  
 **Offen optional:** Stufe A — pseudonyme `playerId`-Links nur bei nachgewiesenem Drift.
 
 ### M39 — Versionsnummer im Hamburger-Menü
@@ -78,9 +79,19 @@ Details: `docs/milestone-roadmap-analysis.md` → Abschnitt **M36**.
 
 ## Letzte Abgeschlossene Milestones
 
+### Stabilitäts-Review 2026-08-07
+
+**Status:** implementiert (Commit nach Push); Backend- + Frontend-Tests grün.
+
+- Öffentliches Web **ohne** `NEXT_PUBLIC_ADMIN_API_KEY` im Bundle; Admin nur Mac-Admin-Build.
+- `finalizeSessionStats` atomar (erste Entscheidung gewinnt); Pairing-Cache nach Finalize.
+- Absolute Baseline: Zielstand + App-Snapshot → neue Partien schreiben Siege/Diff fort (kein Additiv-Drift).
+- „Neue Runde“ übernimmt Pool-/House-Rule-Flags; Auth-Fehlermeldungen an Ist angepasst.
+- Migration: `20260807140000_pairing_baseline_app_snapshot`.
+
 ### Stats absolut, Verwalten, UX 2026-08
 
-**Status:** implementiert (HEAD `f5c9ae7`); Frontend Unit-Tests **69** grün.
+**Status:** implementiert (früher HEAD `f5c9ae7`); in aktuellem HEAD enthalten.
 
 - Absolute Paarungs-Baseline (`isAbsolute`): Siege + Diff geräteübergreifend ohne Additiv-Drift.
 - Statistik-Admin: **Verwalten**-Menü; „Löschen · Server, alle Geräte“.
@@ -100,7 +111,7 @@ Details: `docs/milestone-roadmap-analysis.md` → Abschnitt **M36**.
 
 Dateien: `houseRules.ts`, `houseRulesService.ts`, `runProgressFeedback.ts`, `hiddenPairings.ts`, `playField.ts`, `sessionService.ts`, Migration `20260725120000_house_rule_toggles_and_triple`
 
-**Hinweis Tests:** 3 Backend-Tests zu Admin-Auth Baseline erwarten noch den alten Admin-Key-Zwang — anpassen, wenn Stats-Auth-Suite angefasst wird.
+**Hinweis Tests:** Admin-Auth für Baseline/Reset ist Ist-Zustand (`requireAdminKey`); veraltete Texte „ohne Auth“ unten sind Historie (M34/M35) — nicht mehr gültig.
 
 ### UX Politur II — Navigation, Einstellungen, Statistik, Abschluss 2026-06-15
 
@@ -452,25 +463,21 @@ Dateien:
 
 ## Offene Aufgaben
 
-1. **Prod-Backend-Deploy** Bugfix `e198293`: `sudo bash infra/scripts/deploy-backend-prod.sh` (vom Projektroot).
-2. Manueller Multi-Test: Alle Fünfe (50) ab Wurf 23 mit Wuerfelwahl.
-3. **M30** TestFlight-Regression auf HEAD; iOS-Upload naechste Build-Nummer.
-4. App Store Connect: Paid Applications Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
-5. Optional: Auto-Refresh nach Pool-Endspiel fuer Statistik-Toggle.
-6. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
+1. **M30** TestFlight-Regression auf HEAD; iOS-Upload naechste Build-Nummer.
+2. App Store Connect: Paid Applications Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
+3. Optional: Auto-Refresh nach Pool-Endspiel fuer Statistik-Toggle.
+4. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
 
 ## Bekannte Technische Schulden
 
-- Stats-Endpunkte sind durch `X-Admin-Key` geschuetzt (M23); Key nur in Env, kein UI-Prompt.
+- Stats-Endpunkte (Baseline + Reset) sind durch `X-Admin-Key` geschützt; Key nur in Backend-Env + optional Mac-Admin-iOS-Build (nicht öffentliches Web).
 - Frontend transitive `postcss` moderate (via Next.js) — kein sicherer Fix ohne Next-Major.
 - E2E-Abdeckung noch duenn (3 Smoke-Tests); iPad-Tischmodus und iOS-Scroll nicht abgedeckt.
-- Admin-UI fuer manuelle Paarungs-Baselines fehlt.
 
 ## Aktuelle Prioritaeten
 
-1. Prod-Backend-Deploy + Multi-Regression Bugfix `e198293`.
-2. **M30** TestFlight-Regression und App Store Connect.
-3. iOS-Build auf HEAD; Release-Submit.
+1. **M30** TestFlight-Regression und App Store Connect.
+2. iOS-Build auf HEAD (Admin-Key nur auf Admin-Gerät); Release-Submit.
 
 ## Wichtige Dateien Fuer Aktuelle Arbeit
 

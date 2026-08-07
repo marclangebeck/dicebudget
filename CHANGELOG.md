@@ -4,6 +4,19 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
+### Fixed
+- **Web ohne Admin-Key im Bundle:** Öffentlicher Prod-Build bettet `NEXT_PUBLIC_ADMIN_API_KEY` nicht mehr ein; Admin-UI nur in bewussten Admin-iOS-Builds (Mac-`.env.production`)
+- **finalizeSessionStats Race:** Erste Entscheidung (Werten / Nicht werten) gewinnt atomar; kein Überschreiben von Liga-Punkten / `includeInPairingStats`
+- **Absolute Baseline Fortschreiben:** Nach Admin-Zielstand fließen neue App-Partien wieder in Siege und Diff (App-Snapshot); kein Zurück zum Alias-Additiv-Drift
+- **Neue Runde Flags:** Lobby übergibt `showOpponentPool` / Pool-Endspiel / House-Rules an `createGameSession`
+- **Pairing-Cache:** Nach Session-Finalize invalidiert (nicht erst nach 60 s / nur bei Baseline-Reset)
+- **Auth-Fehlermeldung:** Baseline/Reset brauchen Admin-Key (Text an Backend-Ist angepasst)
+
+### Changed
+- **Absolute Baseline:** Speichert zusätzlich App-Snapshot (`app_*_snap`); Semantik = Ziel zum Korrekturzeitpunkt, danach Fortschreiben
+- **Root-Viewport:** `maximumScale: 1` analog Stats/Settings (weniger iOS-Fokus-Zoom)
+- **Doku:** Web öffentlich ohne Key; Admin nur Mac-Env vor `build:ios`
+
 ### Added
 - **Einswurf-Sound:** Kurzer Ping bei Strategy-Eintrag mit genau 1 Wurf und Score &gt; 0 (kein Overlay; nicht bei Achievement/Korrektur/Verkauf)
 - **Spalten-Pool-Boni (M40):** Erster Spieler: Spalte oben mit Bonus / unten voll / gleiche Spalte komplett — je +2 Pool (max. 6); Labs + Session-Flag

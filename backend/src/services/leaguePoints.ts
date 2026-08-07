@@ -66,8 +66,8 @@ export async function getLeagueStandings(leagueId: string) {
 }
 
 /** Vergibt Ligapunkte einmalig, wenn alle Runs einer Session beendet sind. */
-export async function awardSessionLeaguePoints(sessionId: string): Promise<void> {
-  await prisma.$transaction(async (tx) => {
+export async function awardSessionLeaguePoints(sessionId: string): Promise<boolean> {
+  return prisma.$transaction(async (tx) => {
     const session = await tx.gameSession.findUnique({
       where: { id: sessionId },
       include: {
@@ -78,13 +78,20 @@ export async function awardSessionLeaguePoints(sessionId: string): Promise<void>
       },
     });
 
-    if (!session || session.pointsAwarded) return;
+    if (!session || session.pointsAwarded) return false;
 
     const allDone =
       session.players.length >= 2 &&
       session.players.every((p) => isRunTerminal(p.run.status));
 
-    if (!allDone) return;
+    if (!allDone) return false;
+
+    // Atomarer Claim: paralleles „Nicht werten“ darf nicht überschreiben und umgekehrt.
+    const claimed = await tx.gameSession.updateMany({
+      where: { id: session.id, pointsAwarded: false },
+      data: { pointsAwarded: true, includeInPairingStats: true, status: "FINISHED" },
+    });
+    if (claimed.count === 0) return false;
 
     const awards = computeRoundPoints(
       session.players.map((p) => ({
@@ -124,10 +131,7 @@ export async function awardSessionLeaguePoints(sessionId: string): Promise<void>
       }
     }
 
-    await tx.gameSession.update({
-      where: { id: session.id },
-      data: { pointsAwarded: true, includeInPairingStats: true, status: "FINISHED" },
-    });
+    return true;
   });
 }
 

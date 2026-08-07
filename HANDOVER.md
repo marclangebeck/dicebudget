@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `f5c9ae7` (Stats absolut/Verwalten-Menü, Footer aktiv, Zoom-Fix, Brennt 2 Optionen, InApp-Käufe-Wording, M37–M41)  
+**Produktcode-HEAD:** *(nach Stabilitäts-Commit setzen)*  
 **Sprache:** Deutsch  
 **Stand Doku:** 2026-08-07
 
@@ -25,11 +25,17 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M3
 | Bereich | Status |
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
-| Branch | `milestone-22-prep` @ `f5c9ae7` |
+| Branch | `milestone-22-prep` |
 | Roadmap | **M30** App Store Release als Nächstes (Agreement, Preis 1,19 €, Metadaten, Submit) |
 | Entwickler-Vorschau | **InApp-Käufe (Features)** auf `/settings` nach Code (`NEXT_PUBLIC_LABS_PIN`) — früher „Hausregeln“ |
-| iOS/TestFlight | Version `2.0`; Builds bis **~45+** in Connect; Release-Kandidat = aktueller HEAD + `NEXT_PUBLIC_ADMIN_API_KEY` nur auf Admin-Gerät |
-| Backend Prod | Migrationen inkl. `20260731120000_column_pool_bonuses`, `20260807120000_pairing_baseline_absolute` — Deploy bei Zweifel erneut |
+| iOS/TestFlight | Version `2.0`; Builds bis **~45+** in Connect; Admin-UI nur wenn `NEXT_PUBLIC_ADMIN_API_KEY` im **Mac**-Build steckt |
+| Backend Prod | Migrationen inkl. `20260807120000_pairing_baseline_absolute`, `20260807140000_pairing_baseline_app_snapshot` — Deploy nötig nach diesem Stabilitäts-Batch |
+
+## Wichtig: Admin-Key (Web vs. iOS)
+
+- **Öffentliches Web:** `frontend/.env.production` hat **keinen** `NEXT_PUBLIC_ADMIN_API_KEY` → kein Key im static Bundle, keine Admin-Buttons.
+- **Admin-iOS / TestFlight:** Key nur in Mac-`.env.production` **vor** `npm run build:ios` setzen (gleich Backend `ADMIN_API_KEY`).
+- Backend `requireAdminKey` bleibt Pflicht für Baseline + Reset (`X-Admin-Key`).
 
 ## Wichtig: iOS-Bundle ≠ Web-Deploy
 
@@ -37,7 +43,11 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M3
 - Nur **`npm run build:ios`** auf dem Mac befüllt das Bundle und öffnet Xcode.
 - Vor Archive: `git log -1`; in `frontend/.env.production`: `NEXT_PUBLIC_LABS_PIN`, für Admin-UI **`NEXT_PUBLIC_ADMIN_API_KEY`** (gleich Backend), `NEXT_PUBLIC_APP_VERSION=2.0`, `NEXT_PUBLIC_APP_BUILD=<Xcode-Build>`.
 
-## Letzte Produktänderungen (bis HEAD `f5c9ae7`)
+## Letzte Produktänderungen
+
+### Stabilitäts-Review 2026-08-07
+
+- Web ohne eingebetteten Admin-Key; Finalize atomar; Absolute Baseline schreibt nach Korrektur weiter (App-Snapshot); Neue Runde behält Pool/House-Rules; Pairing-Cache nach Finalize; Auth-Texte.
 
 ### Features / Regeln (Labs → „InApp-Käufe (Features)“)
 
@@ -50,14 +60,13 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M3
 ### Statistik / Sync (M38 Stufe 0)
 
 - Admin: **Verwalten**-Menü → Auswählen → **Löschen · Server** oder Paarung tippen → Siege/Diff.
-- Baseline speichert **absolute** Siege + Diff (`isAbsolute`) — geräteübergreifend gleicher Stand nach erneutem Speichern.
+- Baseline speichert **absoluten** Zielstand zum Korrekturzeitpunkt (`isAbsolute` + App-Snapshot) — danach neue App-Partien schreiben Siege/Diff fort; geräteübergreifend ohne Additiv-Drift.
 - Spieler: lokal ausblenden / Rivalen / „Das bin ich“ (kein Klarname zentral).
-- Admin-UI nur wenn `NEXT_PUBLIC_ADMIN_API_KEY` im Bundle steckt (Browser-Server-Env vs. Mac-`.env.production`).
 
 ### UX
 
 - Footer: aktiver Tab (Home / Statistik / Spielregeln) hervorgehoben.
-- Stats/Settings: kein iOS-Fokus-Zoom (`maximumScale: 1`, Inputs ≥ 16px).
+- Stats/Settings/Root: kein iOS-Fokus-Zoom (`maximumScale: 1`, Inputs ≥ 16px).
 - Einswurf-Sound (Strategy, 1 Wurf, Score > 0) unter Sounds-Toggle.
 
 ## Prod-Verifikation & Deploy
@@ -82,10 +91,9 @@ Frontend: `cd frontend && npm run build`.
 ## Offene Prioritäten
 
 1. **M30** — TestFlight-Regression auf HEAD; App Store Connect (Agreement, Bank/Steuer, Preis 1,19 €, Screenshots, Submit).
-2. Stabilitäts-/Fehlerquellen-Review (nach Doku-Update, auf Nutzer-GO).
-3. Optional **Stufe A** Stats (pseudonyme `playerId`-Links) nur bei nachgewiesenem Drift.
-4. **M36** nach M30 (öffentliche Features / Session-UI).
-5. `milestone-22-prep` → `main` nach Release-Freigabe.
+2. Optional **Stufe A** Stats (pseudonyme `playerId`-Links) nur bei nachgewiesenem Drift.
+3. **M36** nach M30 (öffentliche Features / Session-UI).
+4. `milestone-22-prep` → `main` nach Release-Freigabe.
 
 ## Agent-Start (Übergabeprompt)
 
@@ -94,15 +102,12 @@ Du arbeitest an dice.budget (kniffel). Lies zuerst AGENT_RULES.md und HANDOVER.m
 
 Workspace: /home/bottleadmin/projects/kniffel
 Branch: milestone-22-prep
-HEAD: f5c9ae7
 Live: https://dicebudget.bottle-trade.de
 Sprache: Deutsch
 
 Regeln: Keine Commits ohne ausdrückliches GO. Kein sudo. Keine Watcher/Polling/Dauerprozesse. Nach Code-Änderungen nummerierte [Server]/[Mac]-Befehle (AGENT_RULES §9). Frontend-Build: cd frontend && npm run build. Backend-Deploy nur Nutzer: sudo bash infra/scripts/deploy-backend-prod.sh.
 
-Stand: M37–M41 umgesetzt; Stats absolute Baseline + Verwalten-Menü; Footer aktiv; Zoom-Fix; Brennt 2 Optionen; Wording InApp-Käufe (Features); TestFlight 2.0 (Builds 40+).
-
-Offen: M30 App Store Release; Stabilitäts-Review auf GO.
+Stand: Stabilitäts-Review (Admin-Key Web, Finalize, Absolute Baseline Fortschreiben, Neue-Runde-Flags, Cache); M37–M41; M30 offen.
 
 Antworte auf Deutsch. Kleine Inkremente, vor größeren Features GO einholen.
 ```

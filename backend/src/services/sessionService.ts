@@ -21,6 +21,7 @@ import { assertValidScoreForField } from "../domain/fieldScores.js";
 import { ForbiddenRunError } from "./runPlayerAuth.js";
 import { prisma } from "../db/prisma.js";
 import { awardSessionLeaguePoints, getLeagueStandings } from "./leaguePoints.js";
+import { invalidatePairingStatsCache } from "./pairingStats.js";
 
 export const SESSION_STATUS = {
   OPEN: "OPEN",
@@ -519,7 +520,7 @@ function assertSessionReadyForStatsFinalize(session: {
 
 /**
  * Multiplayer-Abschluss: Session in Statistik aufnehmen oder bewusst auslassen.
- * Idempotent – nur die erste Entscheidung pro Session zählt.
+ * Idempotent – nur die erste Entscheidung pro Session zählt (atomarer Claim).
  */
 export async function finalizeSessionStats(
   inviteCode: string,
@@ -553,24 +554,27 @@ export async function finalizeSessionStats(
     includeInPairingStats && session.players.length >= 2;
 
   if (effectiveIncludeInPairingStats) {
-    await awardSessionLeaguePoints(session.id);
-    const afterAward = await prisma.gameSession.findUnique({
-      where: { id: session.id },
-      select: { pointsAwarded: true },
-    });
-    if (!afterAward?.pointsAwarded) {
-      await prisma.gameSession.update({
+    const awarded = await awardSessionLeaguePoints(session.id);
+    if (!awarded) {
+      // Race verloren oder Award nicht möglich — Flags nicht überschreiben.
+      const afterAward = await prisma.gameSession.findUnique({
         where: { id: session.id },
-        data: {
-          pointsAwarded: true,
-          includeInPairingStats: true,
-          status: SESSION_STATUS.FINISHED,
-        },
+        select: { pointsAwarded: true },
       });
+      if (!afterAward?.pointsAwarded) {
+        await prisma.gameSession.updateMany({
+          where: { id: session.id, pointsAwarded: false },
+          data: {
+            pointsAwarded: true,
+            includeInPairingStats: true,
+            status: SESSION_STATUS.FINISHED,
+          },
+        });
+      }
     }
   } else {
-    await prisma.gameSession.update({
-      where: { id: session.id },
+    await prisma.gameSession.updateMany({
+      where: { id: session.id, pointsAwarded: false },
       data: {
         pointsAwarded: true,
         includeInPairingStats: false,
@@ -578,6 +582,8 @@ export async function finalizeSessionStats(
       },
     });
   }
+
+  invalidatePairingStatsCache();
 
   return getSessionRanking(session.inviteCode);
 }

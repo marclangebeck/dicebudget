@@ -16,6 +16,11 @@ model PairingManualBaseline {
   extraBonusB Int      @default(0) @map("extra_bonus_b")
   /// true: extraWins = absoluter Zielstand; false: additiv (Legacy)
   isAbsolute  Boolean  @default(false) @map("is_absolute")
+  /// App-Siege/Diff zum Korrekturzeitpunkt (nur bei isAbsolute); null = Legacy-Freeze
+  appWinsASnap  Int? @map("app_wins_a_snap")
+  appWinsBSnap  Int? @map("app_wins_b_snap")
+  appBonusASnap Int? @map("app_bonus_a_snap")
+  appBonusBSnap Int? @map("app_bonus_b_snap")
   note        String?
   createdAt   DateTime @default(now()) @map("created_at")
 

@@ -131,22 +131,87 @@ async function loadManualBaselines() {
   return prisma.pairingManualBaseline.findMany();
 }
 
+export type ManualBaselineFoldInput = {
+  pairingKey: string;
+  extraWinsA: number;
+  extraWinsB: number;
+  extraBonusA: number;
+  extraBonusB: number;
+  isAbsolute?: boolean;
+  /** App-Stand zum Korrekturzeitpunkt; null/undefined = Legacy (kein Fortschreiben). */
+  appWinsASnap?: number | null;
+  appWinsBSnap?: number | null;
+  appBonusASnap?: number | null;
+  appBonusBSnap?: number | null;
+};
+
+/**
+ * Wendet eine absolute Baseline auf einen Akkumulator an.
+ * Mit Snapshot: Zielstand zum Korrekturzeitpunkt + danach neue App-Partien.
+ * Ohne Snapshot (Legacy): Siege soft-advance via max(absolut, app); Diff eingefroren.
+ */
+export function applyAbsoluteBaselineToAccumulator(
+  acc: PairingAccumulator,
+  absolute: {
+    winsA: number;
+    winsB: number;
+    bonusA: number;
+    bonusB: number;
+  },
+  snap: {
+    winsA: number;
+    winsB: number;
+    bonusA: number;
+    bonusB: number;
+  } | null,
+): void {
+  const appWinsA = acc.playerAAppWins;
+  const appWinsB = acc.playerBAppWins;
+  const appBonusA = acc.playerABonusPoints;
+  const appBonusB = acc.playerBBonusPoints;
+
+  if (snap) {
+    const deltaWinsA = appWinsA - snap.winsA;
+    const deltaWinsB = appWinsB - snap.winsB;
+    acc.playerAWins = Math.max(0, absolute.winsA + deltaWinsA);
+    acc.playerBWins = Math.max(0, absolute.winsB + deltaWinsB);
+
+    const absNet = absolute.bonusA - absolute.bonusB;
+    const snapNet = snap.bonusA - snap.bonusB;
+    const appNet = appBonusA - appBonusB;
+    const displayNet = absNet + (appNet - snapNet);
+    if (displayNet >= 0) {
+      acc.playerABonusPoints = displayNet;
+      acc.playerBBonusPoints = 0;
+    } else {
+      acc.playerABonusPoints = 0;
+      acc.playerBBonusPoints = -displayNet;
+    }
+    acc.playerAManualBonus = absolute.bonusA;
+    acc.playerBManualBonus = absolute.bonusB;
+  } else {
+    // Legacy absolute ohne Snapshot: nicht dauerhaft unter App fallen, Diff bleibt Zielstand.
+    acc.playerAWins = Math.max(absolute.winsA, appWinsA);
+    acc.playerBWins = Math.max(absolute.winsB, appWinsB);
+    acc.playerABonusPoints = absolute.bonusA;
+    acc.playerBBonusPoints = absolute.bonusB;
+    acc.playerAManualBonus = absolute.bonusA;
+    acc.playerBManualBonus = absolute.bonusB;
+  }
+
+  acc.roundsPlayed = acc.playerAWins + acc.playerBWins + acc.ties;
+}
+
 /**
  * Rechnet manuell nachgetragene Werte in die Gesamt-Statistik ein.
  * - Legacy (isAbsolute=false): extraWins werden zu App-Siegen addiert.
- * - Absolut (isAbsolute=true): extraWins sind der Ziel-Gesamtstand der Paarung
- *   (geräteübergreifend stabil, unabhängig vom lokalen Alias-Merge).
+ * - Absolut (isAbsolute=true): extraWins = Ziel-Gesamtstand zum Korrekturzeitpunkt
+ *   (geräteübergreifend stabil). Mit App-Snapshot werden spätere App-Partien
+ *   auf Siege und Diff fortgeschrieben — ohne Alias-Additiv-Drift.
  */
 export function foldManualBaselines(
   map: Map<string, PairingAccumulator>,
-  baselines: {
-    pairingKey: string;
-    extraWinsA: number;
-    extraWinsB: number;
-    extraBonusA: number;
-    extraBonusB: number;
-    isAbsolute?: boolean;
-  }[],
+  baselines: ManualBaselineFoldInput[],
 ): void {
   for (const baseline of baselines) {
     const names = parsePairingKey(baseline.pairingKey);
@@ -167,14 +232,23 @@ export function foldManualBaselines(
     const absolute = Boolean(baseline.isAbsolute);
 
     if (absolute) {
-      acc.playerAWins = winsA;
-      acc.playerBWins = winsB;
-      acc.roundsPlayed = winsA + winsB + acc.ties;
-      // Absolute Diff: Bonus-Punkte ersetzen den Gesamtstand (nicht auf App-Diff addieren).
-      acc.playerABonusPoints = bonusA;
-      acc.playerBBonusPoints = bonusB;
-      acc.playerAManualBonus = bonusA;
-      acc.playerBManualBonus = bonusB;
+      const hasSnap =
+        baseline.appWinsASnap != null &&
+        baseline.appWinsBSnap != null &&
+        baseline.appBonusASnap != null &&
+        baseline.appBonusBSnap != null;
+      applyAbsoluteBaselineToAccumulator(
+        acc,
+        { winsA, winsB, bonusA, bonusB },
+        hasSnap
+          ? {
+              winsA: Math.max(0, Math.trunc(baseline.appWinsASnap!)),
+              winsB: Math.max(0, Math.trunc(baseline.appWinsBSnap!)),
+              bonusA: Math.max(0, Math.trunc(baseline.appBonusASnap!)),
+              bonusB: Math.max(0, Math.trunc(baseline.appBonusBSnap!)),
+            }
+          : null,
+      );
     } else {
       acc.roundsPlayed += winsA + winsB;
       acc.playerAWins += winsA;
@@ -228,12 +302,11 @@ async function getCachedAccumulatedPairings(): Promise<Map<string, PairingAccumu
   return map;
 }
 
-async function accumulatePairings(): Promise<Map<string, PairingAccumulator>> {
-  const [sessions, baselines] = await Promise.all([
-    loadFinishedSessions(),
-    loadManualBaselines(),
-  ]);
-
+/** Nur App-Sessions (ohne manuelle Baselines) — für Absolut-Snapshots beim Speichern. */
+async function accumulatePairingsFromSessionsOnly(): Promise<
+  Map<string, PairingAccumulator>
+> {
+  const sessions = await loadFinishedSessions();
   const map = new Map<string, PairingAccumulator>();
 
   for (const session of sessions) {
@@ -306,6 +379,15 @@ async function accumulatePairings(): Promise<Map<string, PairingAccumulator>> {
       }
     }
   }
+
+  return map;
+}
+
+async function accumulatePairings(): Promise<Map<string, PairingAccumulator>> {
+  const [map, baselines] = await Promise.all([
+    accumulatePairingsFromSessionsOnly(),
+    loadManualBaselines(),
+  ]);
 
   foldManualBaselines(map, baselines);
 
@@ -455,12 +537,16 @@ function clampInt(value: unknown): number {
 
 /**
  * Schreibt manuell nachgetragene Werte für Paarungen.
- * Neue Admin-Korrekturen setzen isAbsolute=true (Zielstand für alle Geräte).
+ * Neue Admin-Korrekturen setzen isAbsolute=true (Zielstand für alle Geräte)
+ * und speichern den aktuellen App-Stand als Snapshot zum Fortschreiben.
  */
 export async function upsertPairingBaselines(
   inputs: PairingBaselineInput[],
 ): Promise<{ written: number; deleted: number }> {
   invalidatePairingStatsCache();
+
+  const needsSnap = inputs.some((i) => Boolean(i.isAbsolute));
+  const appMap = needsSnap ? await accumulatePairingsFromSessionsOnly() : null;
 
   let written = 0;
   let deleted = 0;
@@ -492,9 +578,26 @@ export async function upsertPairingBaselines(
       continue;
     }
 
+    const appAcc = appMap?.get(key);
+    const appWinsASnap = isAbsolute ? (appAcc?.playerAAppWins ?? 0) : null;
+    const appWinsBSnap = isAbsolute ? (appAcc?.playerBAppWins ?? 0) : null;
+    const appBonusASnap = isAbsolute ? (appAcc?.playerABonusPoints ?? 0) : null;
+    const appBonusBSnap = isAbsolute ? (appAcc?.playerBBonusPoints ?? 0) : null;
+
     await prisma.pairingManualBaseline.upsert({
       where: { pairingKey: key },
-      update: { extraWinsA, extraWinsB, extraBonusA, extraBonusB, isAbsolute, note },
+      update: {
+        extraWinsA,
+        extraWinsB,
+        extraBonusA,
+        extraBonusB,
+        isAbsolute,
+        appWinsASnap,
+        appWinsBSnap,
+        appBonusASnap,
+        appBonusBSnap,
+        note,
+      },
       create: {
         pairingKey: key,
         extraWinsA,
@@ -502,6 +605,10 @@ export async function upsertPairingBaselines(
         extraBonusA,
         extraBonusB,
         isAbsolute,
+        appWinsASnap,
+        appWinsBSnap,
+        appBonusASnap,
+        appBonusBSnap,
         note,
       },
     });

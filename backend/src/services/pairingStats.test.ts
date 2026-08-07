@@ -135,7 +135,7 @@ describe("foldManualBaselines", () => {
     assert.equal(result.appRoundsPlayed, 2);
   });
 
-  it("isAbsolute setzt Ziel-Siege und ersetzt Diff statt zu addieren", () => {
+  it("isAbsolute ohne Snapshot: Ziel-Siege (max) und Diff ersetzt", () => {
     const map = new Map<string, PairingAccumulator>();
     const acc = emptyAccumulator("Marc::Nicole", "Marc", "Nicole");
     acc.roundsPlayed = 5;
@@ -168,6 +168,76 @@ describe("foldManualBaselines", () => {
     assert.equal(result.roundsPlayed, 30);
     assert.equal(result.playerABonusPoints, 237);
     assert.equal(result.playerBBonusPoints, 0);
+    assert.equal(result.playerABonusPoints - result.playerBBonusPoints, 237);
+  });
+
+  it("isAbsolute mit Snapshot: nach weiteren App-Siegen steigen Siege und Diff", () => {
+    const map = new Map<string, PairingAccumulator>();
+    const acc = emptyAccumulator("Marc::Nicole", "Marc", "Nicole");
+    // Zum Korrekturzeitpunkt: 2:3, Diff-App 100:50 — Admin setzt 20:10 / Netto 237
+    // Danach eine weitere App-Runde: Marc gewinnt mit Diff 30 → App 3:3, Bonus 130:50
+    acc.roundsPlayed = 6;
+    acc.appRoundsPlayed = 6;
+    acc.playerAWins = 3;
+    acc.playerAAppWins = 3;
+    acc.playerBWins = 3;
+    acc.playerBAppWins = 3;
+    acc.playerABonusPoints = 130;
+    acc.playerBBonusPoints = 50;
+    map.set("Marc::Nicole", acc);
+
+    foldManualBaselines(map, [
+      {
+        pairingKey: "Marc::Nicole",
+        extraWinsA: 20,
+        extraWinsB: 10,
+        extraBonusA: 237,
+        extraBonusB: 0,
+        isAbsolute: true,
+        appWinsASnap: 2,
+        appWinsBSnap: 3,
+        appBonusASnap: 100,
+        appBonusBSnap: 50,
+      },
+    ]);
+
+    const result = map.get("Marc::Nicole")!;
+    assert.equal(result.playerAWins, 21); // 20 + (3-2)
+    assert.equal(result.playerBWins, 10); // 10 + (3-3)
+    assert.equal(result.playerABonusPoints - result.playerBBonusPoints, 267); // 237 + (80-50)
+    assert.equal(result.playerAAppWins, 3);
+    assert.equal(result.playerBAppWins, 3);
+  });
+
+  it("isAbsolute mit Snapshot: am Korrekturzeitpunkt exakt Zielstand", () => {
+    const map = new Map<string, PairingAccumulator>();
+    const acc = emptyAccumulator("Marc::Nicole", "Marc", "Nicole");
+    acc.playerAWins = 2;
+    acc.playerAAppWins = 2;
+    acc.playerBWins = 3;
+    acc.playerBAppWins = 3;
+    acc.playerABonusPoints = 100;
+    acc.playerBBonusPoints = 50;
+    map.set("Marc::Nicole", acc);
+
+    foldManualBaselines(map, [
+      {
+        pairingKey: "Marc::Nicole",
+        extraWinsA: 20,
+        extraWinsB: 10,
+        extraBonusA: 237,
+        extraBonusB: 0,
+        isAbsolute: true,
+        appWinsASnap: 2,
+        appWinsBSnap: 3,
+        appBonusASnap: 100,
+        appBonusBSnap: 50,
+      },
+    ]);
+
+    const result = map.get("Marc::Nicole")!;
+    assert.equal(result.playerAWins, 20);
+    assert.equal(result.playerBWins, 10);
     assert.equal(result.playerABonusPoints - result.playerBBonusPoints, 237);
   });
 });

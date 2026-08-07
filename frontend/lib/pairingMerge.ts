@@ -66,8 +66,9 @@ export function isMergedPairingKey(key: string): boolean {
  * Quell-Paarungen mit vertauschten Seiten korrekt addiert werden.
  *
  * Hat mindestens eine Quelle einen Baseline-Override (Wins ≠ App-Wins), werden
- * Gesamt-Siege per Max zusammengeführt und die absolute Diff vom Override-Key
- * übernommen — sonst würde der Zielstand geräteabhängig zu App-Werten addiert.
+ * Gesamt-Siege per Max zusammengeführt und die Diff vom Override-Key
+ * übernommen (Server liefert bei Absolut+Snapshot bereits fortgeschriebene Werte).
+ * So bleibt der Zielstand geräteübergreifend konsistent — ohne Alias-Additiv-Drift.
  */
 export function mergePairingSummaries(
   summaries: PairingSummaryDto[],
@@ -271,6 +272,8 @@ export type DesiredPairingTotals = {
  * Übersetzt gewünschte Gesamtwerte in Baseline-Schreibaufträge.
  * Speichert ABSOLUTE Siege und ABSOLUTE Punktedifferenz (isAbsolute), damit
  * alle Geräte denselben Stand sehen — unabhängig vom lokalen Alias-Merge.
+ * Das Backend speichert zusätzlich einen App-Snapshot und schreibt danach
+ * neue App-Partien auf Siege und Diff fort (kein permanentes Einfrieren).
  * Diff wird als einseitiger Vorsprung gespeichert (A oder B), nicht „App-Netto + Extra“.
  */
 export function buildBaselineWrites(
