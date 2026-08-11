@@ -1,4 +1,4 @@
-import { ROLLS_PER_FIELD, maxRollsForGameCount } from "../config.js";
+import { ROLLS_PER_FIELD } from "../config.js";
 import { poolDeltaForComplete } from "../domain/gameRules.js";
 import { isValidRollSaleScore } from "../domain/houseRules.js";
 import { assertExtraYatzyDieValue, appendExtraYatzyDieValue } from "../domain/extraYatzyDieValues.js";
@@ -187,12 +187,8 @@ export async function recordRoll(
     if (rollCount >= ROLLS_PER_FIELD) {
       throw new RollLimitError(`At most ${ROLLS_PER_FIELD} rolls per field in classic mode`);
     }
-  } else {
-    const maxRolls = maxRollsForGameCount(run.gameCount);
-    if (run.totalRollsUsed >= maxRolls) {
-      throw new RollLimitError(`Run roll limit reached (${maxRolls})`);
-    }
   }
+  // Strategy: Extra-Würfe nur aus dem Pool — kein globales Restbudget-Cap.
 
   const rollNumber = rollCount + 1;
   const usePoolRoll = run.useStrategyRules && rollCount >= ROLLS_PER_FIELD;
@@ -378,18 +374,12 @@ export async function completeField(
     : { spareToPool: 0, poolCost: 0 };
   const newDelta = poolDeltaForComplete(rollsUsed, run.useStrategyRules);
 
+  // Strategy: nur Pool begrenzt Extra-Würfe — kein globales Restbudget-Cap.
   if (run.useStrategyRules) {
-    const maxRolls = maxRollsForGameCount(run.gameCount);
-    const nextTotalRolls = run.totalRollsUsed - oldRollsUsed + rollsUsed;
-    if (nextTotalRolls > maxRolls) {
-      throw new RollLimitError(
-        `Not enough rolls left (need ${rollsUsed}, remaining ${maxRolls - run.totalRollsUsed + oldRollsUsed})`,
-      );
-    }
     const poolAfterUndo = run.rollsInPool - oldDelta.spareToPool + oldDelta.poolCost;
     if (newDelta.poolCost > poolAfterUndo) {
       throw new RollLimitError(
-        `Not enough rolls in pool (need ${newDelta.poolCost}, have ${poolAfterUndo})`,
+        `Nicht genug Würfe im Pool (benötigt ${newDelta.poolCost}, vorhanden ${poolAfterUndo})`,
       );
     }
   }

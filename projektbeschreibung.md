@@ -11,7 +11,7 @@ Die App unterstützt zwei **Spielmodi**:
 
 | Modus | `useStrategyRules` | Beschreibung |
 |--------|-------------------|--------------|
-| **DiceBudget Strategy Edition** | `true` (Standard) | Wurf-Pool, globales Würfelbudget `Spielanzahl × 39`, Eintrag mit Punkte + Würfe |
+| **DiceBudget Strategy Edition** | `true` (Standard) | Wurf-Pool, Eintrag mit Punkte + Würfe (Limit: 3 + Pool) |
 | **DiceBudget Klassisch** | `false` | Kein Pool, kein Gesamtwürfel-Limit; Eintrag nur **Punkte** (Backend: `rollsUsed = 1`) |
 
 - **Singleplayer:** `/solo` → Spielanzahl und Modus → `/play`
@@ -27,13 +27,13 @@ Die App unterstützt zwei **Spielmodi**:
 
 - **Spielanzahl:** 1–6 (fest vor Start)
 - Felder pro Run: `Spielanzahl × 13`
-- 3 Würfe pro Feld → theoretisch `Spielanzahl × 39` Würfe pro Run
-- Nicht genutzte Würfe (bei 1–3 Würfen pro Feld) → **Wurf-Pool**
-- Extra-Würfe (4+) verbrauchen Pool
-- Backend validiert: `total_rolls_used ≤ Spielanzahl × 39`
+- Pro Feld: bis zu **3 Würfe ohne Pool**; Extra-Würfe (4+) verbrauchen den **Wurf-Pool**
+- Nicht genutzte Würfe (bei 1–2 Würfen) → Pool; Hausregeln können Pool zusätzlich ändern
+- Backend validiert: Extra-Würfe nur wenn genug Pool — **kein** hartes `×39`-Cap mehr beim Eintrag
+- `total_rolls_used` / `rollsRemaining` bleiben als Statistik (Referenz `Spielanzahl × 39`)
 
-| Spielanzahl | Felder | Max. Würfe (Strategy) |
-|-------------|--------|------------------------|
+| Spielanzahl | Felder | Referenz-Budget (Statistik) |
+|-------------|--------|------------------------------|
 | 1 | 13 | 39 |
 | 3 | 39 | 117 |
 | 6 | 78 | 234 |

@@ -14,8 +14,9 @@ describe("strategyRollChipOptions", () => {
     ]);
   });
 
-  it("begrenzt durch verbleibendes Gesamtbudget", () => {
+  it("optionale Obergrenze kann weiter einschränken (ohne Fake-Minimum 1)", () => {
     assert.deepEqual(strategyRollChipOptions(20, 10), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     assert.deepEqual(strategyRollChipOptions(5, 23), [1, 2, 3, 4, 5, 6, 7, 8]);
+    assert.deepEqual(strategyRollChipOptions(5, 0), []);
   });
 });

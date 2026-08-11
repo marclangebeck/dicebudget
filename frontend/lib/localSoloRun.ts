@@ -244,15 +244,7 @@ export function completeLocalSoloField(
         })();
     const newDelta = poolDeltaForComplete(rollsUsed, true);
     if (newDelta.poolCost > currentPoolBeforeCorrection) {
-      throw new Error("Not enough rolls in pool");
-    }
-    const oldRollsUsed = field.score !== null ? field.rollsUsed : 0;
-    const nextTotalRolls = run.totalRollsUsed - oldRollsUsed + rollsUsed;
-    const maxRolls = maxRollsForGameCount(run.gameCount);
-    if (nextTotalRolls > maxRolls) {
-      throw new Error(
-        `Not enough rolls left (need ${rollsUsed}, remaining ${maxRolls - run.totalRollsUsed + oldRollsUsed})`,
-      );
+      throw new Error("Nicht genug Würfe im Pool");
     }
     const oldDelta = field.score === null
       ? { spareToPool: 0, poolCost: 0 }

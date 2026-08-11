@@ -82,12 +82,9 @@ export function ScoreEntryPanel({
 
   const strategy = run.useStrategyRules && !rollSaleMode;
   const maxExtraRolls = rollsInPoolOverride ?? run.rollsInPool;
-  const maxRollsAllowed =
-    strategy && run.rollsRemaining != null
-      ? run.rollsRemaining + (isCorrection ? field.rollsUsed : 0)
-      : undefined;
+  // Strategy: nur Pool begrenzt die Würfe (Pool 0 → 1–3; sonst 1…3+Pool).
   const rollOptions = strategy
-    ? strategyRollChipOptions(maxExtraRolls, maxRollsAllowed)
+    ? strategyRollChipOptions(maxExtraRolls)
     : [1, 2, 3];
 
   const parsedScore = scoreInput === "" ? null : Number(scoreInput);
@@ -224,8 +221,7 @@ export function ScoreEntryPanel({
                 ))}
               </div>
               <p className="play-entry-hint">
-                Anzahl Würfe auf diesem Feld (nicht die Gesamtwurfsnummer) · 1–3 → Pool · ab 4. aus
-                Pool
+                Anzahl Würfe auf diesem Feld · 1–3 bei leerem Pool · ab 4. aus dem Pool
               </p>
             </div>
           )}

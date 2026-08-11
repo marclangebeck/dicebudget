@@ -14,8 +14,8 @@ export function poolDeltaForComplete(
 }
 
 /**
- * Wurf-Chips fürs Eintrag-Panel (Strategy): 1 … min(3+Pool, verbleibendes Gesamtbudget).
- * Kein fixes Obergrenze pro Feld — Limit kommt aus Pool und Spielanzahl×39.
+ * Wurf-Chips fürs Eintrag-Panel (Strategy): 1 … (3 + Pool).
+ * Limit kommt nur aus dem Pool — kein globales Restbudget-Cap.
  */
 export function strategyRollChipOptions(
   rollsInPool: number,
@@ -23,8 +23,7 @@ export function strategyRollChipOptions(
 ): number[] {
   const poolCap = ROLLS_PER_FIELD + Math.max(0, rollsInPool);
   const maxRoll =
-    maxRollsAllowed != null
-      ? Math.min(poolCap, Math.max(1, maxRollsAllowed))
-      : poolCap;
+    maxRollsAllowed != null ? Math.min(poolCap, Math.max(0, maxRollsAllowed)) : poolCap;
+  if (maxRoll < 1) return [];
   return Array.from({ length: maxRoll }, (_, i) => i + 1);
 }

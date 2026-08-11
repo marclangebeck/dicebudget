@@ -162,8 +162,8 @@ Dateien: `labsAccess.ts`, `LabsUnlockDialog.tsx`, `app/settings/labs/page.tsx`
 **Status:** abgenommen (`e198293`); Prod deployed.
 
 - Kein fixes 20-Wuerfe-Limit pro Feld mehr (Backend + Frontend + Solo lokal).
-- Grenzen nur noch: Pool + Gesamtbudget (`Spielanzahl × 39`).
-- Wurf-Chips bis `rollsRemaining`; Hinweis wenn bei Alle Fünfe (50) kein Wuerfel 1–6 gewaehlt.
+- Grenzen nur noch: **Pool** (1–3 bei Pool 0, sonst 1…3+Pool). Globales `×39`-Budget blockiert Einträge nicht mehr (nur noch Statistik).
+- Wurf-Chips aus dem Pool; Hinweis wenn bei Alle Fünfe (50) kein Wuerfel 1–6 gewaehlt.
 - Fehler statt stillem `return` bei ungueltigem Eintrag.
 
 Dateien: `backend/src/domain/gameRules.ts`, `backend/src/services/playField.ts`, `frontend/lib/gameRules.ts`, `frontend/lib/gameRules.test.ts`, `frontend/lib/localSoloRun.ts`, `ScoreEntryPanel.tsx`, `PlayBoard.tsx`, `TableModePlayBoard.tsx`

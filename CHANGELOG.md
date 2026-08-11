@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Fixed
+- **Strategy-Würfe nur Pool:** Eintrag-Chips und Backend prüfen nicht mehr das globale Restbudget (`×39`) — bei Pool 0 immer 1–3 Würfe; mit Pool entsprechend mehr. Behebt blockierte Endfelder (nur Chip „1“ / Fehler trotz erwarteter Feldwürfe).
 - **Web ohne Admin-Key im Bundle:** Öffentlicher Prod-Build bettet `NEXT_PUBLIC_ADMIN_API_KEY` nicht mehr ein; Admin-UI nur in bewussten Admin-iOS-Builds (Mac-`.env.production`)
 - **finalizeSessionStats Race:** Erste Entscheidung (Werten / Nicht werten) gewinnt atomar; kein Überschreiben von Liga-Punkten / `includeInPairingStats`
 - **Absolute Baseline Fortschreiben:** Nach Admin-Zielstand fließen neue App-Partien wieder in Siege und Diff (App-Snapshot); kein Zurück zum Alias-Additiv-Drift
@@ -13,6 +14,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Auth-Fehlermeldung:** Baseline/Reset brauchen Admin-Key (Text an Backend-Ist angepasst)
 
 ### Changed
+- **Strategy-Wurfregel:** Limit pro Feld = 3 + aktueller Pool (kein hartes Gesamtbudget mehr als Eintragssperre); `totalRollsUsed`/`rollsRemaining` bleiben Statistik
 - **Absolute Baseline:** Speichert zusätzlich App-Snapshot (`app_*_snap`); Semantik = Ziel zum Korrekturzeitpunkt, danach Fortschreiben
 - **Root-Viewport:** `maximumScale: 1` analog Stats/Settings (weniger iOS-Fokus-Zoom)
 - **Doku:** Web öffentlich ohne Key; Admin nur Mac-Env vor `build:ios`
