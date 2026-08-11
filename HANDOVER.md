@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `f3a1ed0` (Stabilitäts-Review: Admin-Key Web, Finalize, Baseline-Fortschreiben)  
+**Produktcode-HEAD:** `a00eda9` (Strategy-Würfe nur Pool; kein ×39-Eintrags-Cap)  
 **Sprache:** Deutsch  
 **Stand Doku:** 2026-08-07
 
