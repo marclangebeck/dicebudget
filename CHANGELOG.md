@@ -4,7 +4,22 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
+### Added
+- **Zettel-Lauffeuer:** Kurzes umlaufendes Highlight (~1,2 s) wenn eine Feld-Zeile (über alle Spiele) oder eine Spiel-Spalte (13 Felder) voll wird — rein visuell, blockiert nicht; an Erfolgsanimationen-Toggle gekoppelt
+- **Visuelle Einblendungen:** Info-„i“ und Settings-Text um Zeilen-/Spalten-Lauffeuer ergänzt
+- **Einswurf-Sound:** Kurzer Ping bei Strategy-Eintrag mit genau 1 Wurf und Score &gt; 0 (kein Overlay; nicht bei Achievement/Korrektur/Verkauf)
+- **Spalten-Pool-Boni (M40):** Erster Spieler: Spalte oben mit Bonus / unten voll / gleiche Spalte komplett — je +2 Pool (max. 6); Labs + Session-Flag
+- **Menü-Version (M39):** Hamburger zeigt `Version 2.0 (…)` aus `NEXT_PUBLIC_APP_VERSION` / `NEXT_PUBLIC_APP_BUILD`
+- **Fortschritt 25/50/75 %:** Punktdifferenz zum Gegner im Overlay („X Punkte voraus/zurück“)
+- **Hausregel auto (2 Spieler, Strategy):** 2× Alle Fünfe ≤3 Würfe → Gegner-Pool **halbiert** + Overlay
+- **Hausregel auto (2 Spieler, Strategy):** 3× Alle Fünfe ≤3 Würfe → Gegner-Pool **0** + Overlay (Vorrang vor 2×)
+- **Hausregel auto (2 Spieler, Strategy):** Wer zuerst den gesamten oberen Bereich (Spiele × 6) voll hat, erhält die offenen oberen Felder des Rivalen als Pool + Overlay
+- **Hausregeln-Toggles / Info-„i“:** Labs-Toggles inkl. Oberer-Bereich und 3×; Info-Overlay pro Regel und unter Visuelle Einblendungen
+- **Session-Flags:** Host-Toggles (`ruleYatzyStreak2`, `ruleYatzyTriple`, `ruleUpperRace`) beim Raum-Erstellen
+- **Statistik:** Paarungen lokal ausblenden (`hiddenPairings`); Wiederherstellen; Startscreen-Bilanz berücksichtigt Hide-Liste
+
 ### Fixed
+- **Achievement-/Einswurf-Sounds intermittierend:** Ursache war `AudioContext` oft noch `suspended` nach async Feldeintrag (iOS/WebView) plus unnötige Mute über `prefers-reduced-motion`. Fix: Unlock/Resume synchron im Tap-Handler, `await resume()` vor dem Abspielen, Sounds nur noch am Sounds-Toggle
 - **Strategy-Würfe nur Pool:** Eintrag-Chips und Backend prüfen nicht mehr das globale Restbudget (`×39`) — bei Pool 0 immer 1–3 Würfe; mit Pool entsprechend mehr. Behebt blockierte Endfelder (nur Chip „1“ / Fehler trotz erwarteter Feldwürfe).
 - **Web ohne Admin-Key im Bundle:** Öffentlicher Prod-Build bettet `NEXT_PUBLIC_ADMIN_API_KEY` nicht mehr ein; Admin-UI nur in bewussten Admin-iOS-Builds (Mac-`.env.production`)
 - **finalizeSessionStats Race:** Erste Entscheidung (Werten / Nicht werten) gewinnt atomar; kein Überschreiben von Liga-Punkten / `includeInPairingStats`
@@ -18,18 +33,6 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Absolute Baseline:** Speichert zusätzlich App-Snapshot (`app_*_snap`); Semantik = Ziel zum Korrekturzeitpunkt, danach Fortschreiben
 - **Root-Viewport:** `maximumScale: 1` analog Stats/Settings (weniger iOS-Fokus-Zoom)
 - **Doku:** Web öffentlich ohne Key; Admin nur Mac-Env vor `build:ios`
-
-### Added
-- **Einswurf-Sound:** Kurzer Ping bei Strategy-Eintrag mit genau 1 Wurf und Score &gt; 0 (kein Overlay; nicht bei Achievement/Korrektur/Verkauf)
-- **Spalten-Pool-Boni (M40):** Erster Spieler: Spalte oben mit Bonus / unten voll / gleiche Spalte komplett — je +2 Pool (max. 6); Labs + Session-Flag
-- **Menü-Version (M39):** Hamburger zeigt `Version 2.0 (…)` aus `NEXT_PUBLIC_APP_VERSION` / `NEXT_PUBLIC_APP_BUILD`
-- **Fortschritt 25/50/75 %:** Punktdifferenz zum Gegner im Overlay („X Punkte voraus/zurück“)
-- **Hausregel auto (2 Spieler, Strategy):** 2× Alle Fünfe ≤3 Würfe → Gegner-Pool **halbiert** + Overlay
-- **Hausregel auto (2 Spieler, Strategy):** 3× Alle Fünfe ≤3 Würfe → Gegner-Pool **0** + Overlay (Vorrang vor 2×)
-- **Hausregel auto (2 Spieler, Strategy):** Wer zuerst den gesamten oberen Bereich (Spiele × 6) voll hat, erhält die offenen oberen Felder des Rivalen als Pool + Overlay
-- **Hausregeln-Toggles / Info-„i“:** Labs-Toggles inkl. Oberer-Bereich und 3×; Info-Overlay pro Regel und unter Visuelle Einblendungen
-- **Session-Flags:** Host-Toggles (`ruleYatzyStreak2`, `ruleYatzyTriple`, `ruleUpperRace`) beim Raum-Erstellen
-- **Statistik:** Paarungen lokal ausblenden (`hiddenPairings`); Wiederherstellen; Startscreen-Bilanz berücksichtigt Hide-Liste
 
 ### Changed
 - **Doku 2026-08-07:** HANDOVER / ios_current / milestones_active / GOiOS / milestones auf HEAD `f5c9ae7`, TestFlight 2.0 (~45+), M30, absolute Stats, Verwalten-Menü

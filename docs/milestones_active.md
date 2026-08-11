@@ -1,9 +1,9 @@
 # Aktive Milestones - dice.budget
 
-**Stand:** 2026-08-07  
+**Stand:** 2026-08-11  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `a00eda9` (Stabilitäts-Review)  
-**Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de — Frontend Unit-Tests **71** grün  
+**Produktcode-HEAD:** UX-Batch Lauffeuer + Sound-Fix (nach Commit)  
+**Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de — Frontend Unit-Tests **79** grün  
 **Backend:** Migrationen u. a. `20260807120000_pairing_baseline_absolute`, `20260807140000_pairing_baseline_app_snapshot` — Deploy nach Stabilitäts-Batch
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -478,6 +478,12 @@ Dateien:
 
 1. **M30** TestFlight-Regression und App Store Connect.
 2. iOS-Build auf HEAD (Admin-Key nur auf Admin-Gerät); Release-Submit.
+
+## Letzte UX (2026-08-11)
+
+- **Zettel-Lauffeuer:** Zeile/Spalte komplett → kurzes umlaufendes Highlight (`sheetFuseHighlight.ts`, `ScoreSheetTable`, `globals.css`).
+- **Sounds:** intermittierende Ausfälle behoben (`achievementSound.ts`: Unlock im Tap, `await resume`, kein Mute über reduced-motion).
+- **Settings:** `visualFeedbackInfo` + Toggle-Beschreibung ergänzt.
 
 ## Wichtige Dateien Fuer Aktuelle Arbeit
 

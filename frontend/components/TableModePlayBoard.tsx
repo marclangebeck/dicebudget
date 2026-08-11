@@ -33,10 +33,17 @@ import { buildProgressMilestoneAfterField } from "@/lib/runProgressFeedback";
 import {
   playFirstRollRewardSound,
   shouldPlayFirstRollReward,
+  unlockAchievementAudio,
 } from "@/lib/achievementSound";
+import { getAchievementAnimationsEnabled } from "@/lib/gameFeedbackPrefs";
 import type { SessionMatchAnalysisDto } from "@/lib/matchAnalysisTypes";
 import { allFieldsScored, getLastScoredFieldId, isRunEnded } from "@/lib/runUtils";
 import { loadDisplayNames } from "@/lib/rivalProfiles";
+import {
+  detectSheetFuseHighlight,
+  FUSE_HIGHLIGHT_MS,
+  type SheetFuseHighlight,
+} from "@/lib/sheetFuseHighlight";
 import {
   loadTableModeSession,
   type TableModePlayer,
@@ -95,6 +102,27 @@ export function TableModePlayBoard({ inviteCode }: Props) {
   const [showMatchAnalysis, setShowMatchAnalysis] = useState(false);
   const [matchAnalysis, setMatchAnalysis] = useState<SessionMatchAnalysisDto | null>(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [fuseBySide, setFuseBySide] = useState<
+    Partial<Record<TableModeSide, SheetFuseHighlight | null>>
+  >({});
+  const fuseHighlightTimerRef = useRef<Partial<Record<TableModeSide, number>>>({});
+
+  function flashSheetFuse(
+    side: TableModeSide,
+    gamesBefore: RunDto["games"],
+    gamesAfter: RunDto["games"],
+  ) {
+    if (!getAchievementAnimationsEnabled()) return;
+    const next = detectSheetFuseHighlight(gamesBefore, gamesAfter);
+    if (!next) return;
+    setFuseBySide((current) => ({ ...current, [side]: next }));
+    const prevTimer = fuseHighlightTimerRef.current[side];
+    if (prevTimer != null) window.clearTimeout(prevTimer);
+    fuseHighlightTimerRef.current[side] = window.setTimeout(() => {
+      setFuseBySide((current) => ({ ...current, [side]: null }));
+      fuseHighlightTimerRef.current[side] = undefined;
+    }, FUSE_HIGHLIGHT_MS);
+  }
 
   const load = useCallback(async () => {
     const stored = loadTableModeSession(inviteCode);
@@ -224,6 +252,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
 
   async function handleSubmit() {
     if (!activeSide || !activePlayer || !activeRun || !activeFieldId || scoreInput === "") return;
+    unlockAchievementAudio();
     const rollSaleEntry = !!activeRun.rollSaleFreeFillActive && !isCorrection;
     const effectiveRolls: number = rollSaleEntry
       ? 0
@@ -306,6 +335,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
       ) {
         playFirstRollRewardSound();
       }
+      flashSheetFuse(activeSide, activeRun.games, updated.games);
       setRuns((current) => ({ ...current, [activeSide]: updated }));
       if (progress) {
         shownSet.add(progress.percent);
@@ -690,6 +720,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
                       }
                       extraYatzyBusy={busy}
                       allowSelectWhenFinished={poolEndgamePending && endgameSide === player.side}
+                      fuseHighlight={fuseBySide[player.side] ?? null}
                     />
                   </FitScoreSheet>
                 ) : (

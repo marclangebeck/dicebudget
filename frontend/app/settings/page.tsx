@@ -154,7 +154,7 @@ function SettingsPageInner() {
         >
           <SettingsToggleCard
             title="Erfolgsanimationen"
-            description="Overlays bei Bonus, unterer Spalte, Große Straße und Alle Fünfe."
+            description="Overlays bei Bonus, unterer Spalte, Große Straße und Alle Fünfe; kurzes Lauffeuer bei fertiger Zeile oder Spiel-Spalte."
             checked={feedbackPrefs.animationsEnabled}
             onChange={(value) => updateFeedback({ animationsEnabled: value })}
             onInfo={() => setRuleInfo(getVisualFeedbackInfo("animations"))}

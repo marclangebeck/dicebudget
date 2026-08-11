@@ -45,9 +45,17 @@ import {
 import {
   playFirstRollRewardSound,
   shouldPlayFirstRollReward,
+  unlockAchievementAudio,
 } from "@/lib/achievementSound";
+import { getAchievementAnimationsEnabled } from "@/lib/gameFeedbackPrefs";
 import { ruleEventFromDto } from "@/lib/ruleEventFeedback";
 import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
+import {
+  detectSheetFuseHighlight,
+  FUSE_HIGHLIGHT_MS,
+  type SheetFuseHighlight,
+} from "@/lib/sheetFuseHighlight";
+
 import { APP_HOME_PATH } from "@/lib/branding";
 import {
   abandonLocalSoloRun,
@@ -115,7 +123,23 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   >(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [lobbyRefreshing, setLobbyRefreshing] = useState(false);
+  const [fuseHighlight, setFuseHighlight] = useState<SheetFuseHighlight | null>(null);
+  const fuseHighlightTimerRef = useRef<number | null>(null);
   const poolEndgamePendingRef = useRef(false);
+
+  function flashSheetFuse(gamesBefore: RunDto["games"], gamesAfter: RunDto["games"]) {
+    if (!getAchievementAnimationsEnabled()) return;
+    const next = detectSheetFuseHighlight(gamesBefore, gamesAfter);
+    if (!next) return;
+    setFuseHighlight(next);
+    if (fuseHighlightTimerRef.current != null) {
+      window.clearTimeout(fuseHighlightTimerRef.current);
+    }
+    fuseHighlightTimerRef.current = window.setTimeout(() => {
+      setFuseHighlight(null);
+      fuseHighlightTimerRef.current = null;
+    }, FUSE_HIGHLIGHT_MS);
+  }
 
   const resetEntry = useCallback(() => {
     setScoreInput("");
@@ -357,6 +381,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
 
   async function handleSubmit() {
     if (!activeFieldId || !run || scoreInput === "") return;
+    unlockAchievementAudio();
     const rollSaleEntry = !!run.rollSaleFreeFillActive && !isCorrection;
     const effectiveRolls: number = rollSaleEntry
       ? 0
@@ -450,6 +475,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
       ) {
         playFirstRollRewardSound();
       }
+      flashSheetFuse(run.games, updated.games);
       setRun(updated);
       resetEntry();
       setActiveFieldId(null);
@@ -967,6 +993,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
               onSelectField={selectField}
               onIncrementExtraYatzy={(yatzyDieValue) => void handleExtraYatzy(yatzyDieValue)}
               extraYatzyBusy={busy}
+              fuseHighlight={fuseHighlight}
             />
           </FitScoreSheet>
         </div>

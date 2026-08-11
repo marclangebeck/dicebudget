@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { DiceFace } from "@/components/DiceFace";
 import { ExtraYatzyPickerOverlay } from "@/components/ExtraYatzyPickerOverlay";
 import { upperBonusDelta } from "@/lib/gameScoring";
@@ -13,6 +13,7 @@ import {
 } from "@/lib/labels";
 import type { SheetRow, SummaryRowKey } from "@/lib/labels";
 import type { FieldPreview } from "@/lib/scoreFromDice";
+import type { SheetFuseHighlight } from "@/lib/sheetFuseHighlight";
 import type { FieldDto, FieldTypeId, GameDto, RunDto } from "@/lib/types";
 
 type Props = {
@@ -24,6 +25,16 @@ type Props = {
   extraYatzyBusy?: boolean;
   /** Pool-Endspiel: bereits eingetragene Felder trotz beendetem Run antippbar. */
   allowSelectWhenFinished?: boolean;
+  /** Kurzes Lauffeuer um fertige Zeile/Spalte (rein visuell). */
+  fuseHighlight?: SheetFuseHighlight | null;
+};
+
+type FuseOverlayBox = {
+  key: string;
+  top: number;
+  left: number;
+  width: number;
+  height: number;
 };
 
 function fieldForGame(game: GameDto, fieldType: FieldTypeId): FieldDto | undefined {
@@ -355,6 +366,7 @@ export function ScoreSheetTable({
   onIncrementExtraYatzy,
   extraYatzyBusy,
   allowSelectWhenFinished,
+  fuseHighlight = null,
 }: Props) {
   const runActive = run.status === "ACTIVE";
   const tilesSelectable = runActive || !!allowSelectWhenFinished;
@@ -363,9 +375,78 @@ export function ScoreSheetTable({
   const gameColCount = games.length;
   const labelColPct = gameColCount <= 2 ? 30 : gameColCount <= 4 ? 26 : 22;
   const gameColPct = (100 - labelColPct) / gameColCount;
+  const boardRef = useRef<HTMLDivElement>(null);
+  const [fuseOverlays, setFuseOverlays] = useState<FuseOverlayBox[]>([]);
+
+  useLayoutEffect(() => {
+    const board = boardRef.current;
+    if (!board || !fuseHighlight || (fuseHighlight.rows.length === 0 && fuseHighlight.columns.length === 0)) {
+      setFuseOverlays([]);
+      return;
+    }
+
+    const boardRect = board.getBoundingClientRect();
+    const next: FuseOverlayBox[] = [];
+
+    for (const fieldType of fuseHighlight.rows) {
+      const rowEl = board.querySelector(`tr[data-fuse-row="${fieldType}"]`);
+      if (!(rowEl instanceof HTMLElement)) continue;
+      const r = rowEl.getBoundingClientRect();
+      next.push({
+        key: `row-${fieldType}`,
+        top: r.top - boardRect.top,
+        left: r.left - boardRect.left,
+        width: r.width,
+        height: r.height,
+      });
+    }
+
+    for (const gameIndex of fuseHighlight.columns) {
+      const cells = board.querySelectorAll(`[data-fuse-col="${gameIndex}"]`);
+      if (cells.length === 0) continue;
+      let top = Infinity;
+      let left = Infinity;
+      let right = -Infinity;
+      let bottom = -Infinity;
+      cells.forEach((node) => {
+        if (!(node instanceof HTMLElement)) return;
+        const r = node.getBoundingClientRect();
+        top = Math.min(top, r.top);
+        left = Math.min(left, r.left);
+        right = Math.max(right, r.right);
+        bottom = Math.max(bottom, r.bottom);
+      });
+      if (!Number.isFinite(top)) continue;
+      next.push({
+        key: `col-${gameIndex}`,
+        top: top - boardRect.top,
+        left: left - boardRect.left,
+        width: right - left,
+        height: bottom - top,
+      });
+    }
+
+    setFuseOverlays(next);
+  }, [fuseHighlight, run]);
 
   return (
-    <div className="play-score-board score-sheet-fixed h-full w-full max-w-full overflow-hidden">
+    <div
+      ref={boardRef}
+      className="play-score-board score-sheet-fixed h-full w-full max-w-full overflow-hidden"
+    >
+      {fuseOverlays.map((box) => (
+        <div
+          key={box.key}
+          className="play-fuse-overlay"
+          style={{
+            top: box.top,
+            left: box.left,
+            width: box.width,
+            height: box.height,
+          }}
+          aria-hidden
+        />
+      ))}
       <table className="play-score-table h-full w-full table-fixed border-collapse text-[11px] md:text-[10px]">
         <colgroup>
           <col style={{ width: `${labelColPct}%` }} />
@@ -381,6 +462,7 @@ export function ScoreSheetTable({
             {games.map((game) => (
               <th
                 key={game.id}
+                data-fuse-col={game.index}
                 className="play-table-head-game px-0 py-1 text-center text-[10px] font-bold"
               >
                 Sp{game.index}
@@ -391,11 +473,16 @@ export function ScoreSheetTable({
         <tbody>
           {SHEET_ROWS.map((row) => {
             const isSummary = row.kind === "summary";
+            const rowFuse =
+              row.kind === "field" && fuseHighlight?.rows.includes(row.fieldType)
+                ? "play-row--fuse"
+                : "";
 
             return (
               <tr
                 key={row.kind === "field" ? row.fieldType : row.key}
-                className={`${rowSectionClass(row)} ${rowBgClass(row)}`}
+                data-fuse-row={row.kind === "field" ? row.fieldType : undefined}
+                className={`${rowSectionClass(row)} ${rowBgClass(row)} ${rowFuse}`}
               >
                 <th
                   scope="row"
@@ -421,7 +508,13 @@ export function ScoreSheetTable({
                   )}
                 </th>
                 {games.map((game) => (
-                  <td key={game.id} className="px-0.5 py-px">
+                  <td
+                    key={game.id}
+                    data-fuse-col={game.index}
+                    className={`px-0.5 py-px ${
+                      fuseHighlight?.columns.includes(game.index) ? "play-col--fuse" : ""
+                    }`}
+                  >
                     {row.kind === "field" ? (
                       (() => {
                         const field = fieldForGame(game, row.fieldType);

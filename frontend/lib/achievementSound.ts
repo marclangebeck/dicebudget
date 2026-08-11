@@ -2,6 +2,7 @@ import type { AchievementType } from "@/lib/achievementTypes";
 import { getFeedbackSoundsEnabled } from "@/lib/gameFeedbackPrefs";
 
 let audioCtx: AudioContext | null = null;
+let unlockListenersBound = false;
 
 function getAudioContext(): AudioContext | null {
   if (typeof window === "undefined") return null;
@@ -10,15 +11,62 @@ function getAudioContext(): AudioContext | null {
     (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!Ctx) return null;
   if (!audioCtx) audioCtx = new Ctx();
-  if (audioCtx.state === "suspended") {
-    void audioCtx.resume();
-  }
   return audioCtx;
 }
 
-function prefersReducedFeedback(): boolean {
-  if (typeof window === "undefined") return true;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+/**
+ * iOS/WebView: AudioContext nur nach User-Gesture zuverlässig „running“.
+ * Synchron im Tap-Handler aufrufen (vor await completeField), sonst fallen Töne aus.
+ * Sounds hängen bewusst nicht an prefers-reduced-motion — nur am Sounds-Toggle.
+ */
+export function unlockAchievementAudio(): void {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  if (ctx.state === "suspended") {
+    void ctx.resume();
+  }
+  try {
+    const buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(ctx.destination);
+    source.start(0);
+  } catch {
+    /* ignore unlock failures */
+  }
+}
+
+function bindAudioUnlockListeners(): void {
+  if (typeof window === "undefined" || unlockListenersBound) return;
+  unlockListenersBound = true;
+  const unlock = () => unlockAchievementAudio();
+  window.addEventListener("pointerdown", unlock, { passive: true });
+  window.addEventListener("touchstart", unlock, { passive: true });
+  window.addEventListener("keydown", unlock);
+}
+
+async function withRunningAudioContext(
+  play: (ctx: AudioContext) => void,
+): Promise<void> {
+  bindAudioUnlockListeners();
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  if (ctx.state === "suspended") {
+    try {
+      await ctx.resume();
+    } catch {
+      return;
+    }
+  }
+  if (ctx.state !== "running") {
+    try {
+      await ctx.resume();
+    } catch {
+      return;
+    }
+  }
+  if (ctx.state !== "running") return;
+  play(ctx);
 }
 
 type ToneOptions = {
@@ -293,15 +341,14 @@ function playYatzySound(ctx: AudioContext, t0: number) {
 }
 
 export function playProgressMilestoneSound(percent: 25 | 50 | 75): void {
-  if (!getFeedbackSoundsEnabled() || prefersReducedFeedback()) return;
-  const ctx = getAudioContext();
-  if (!ctx) return;
-
-  const t0 = ctx.currentTime + 0.02;
-  const base = percent === 25 ? 392 : percent === 50 ? 523.25 : 659.25;
-  playTone(ctx, base, t0, 0.22, { type: "triangle", gain: 0.14, pan: -0.15 });
-  playTone(ctx, base * 1.25, t0 + 0.12, 0.28, { type: "sine", gain: 0.1, pan: 0.2 });
-  playChord(ctx, t0 + 0.22, [base, base * 1.5], 0.35, { gain: 0.12, type: "triangle" });
+  if (!getFeedbackSoundsEnabled()) return;
+  void withRunningAudioContext((ctx) => {
+    const t0 = ctx.currentTime + 0.02;
+    const base = percent === 25 ? 392 : percent === 50 ? 523.25 : 659.25;
+    playTone(ctx, base, t0, 0.22, { type: "triangle", gain: 0.14, pan: -0.15 });
+    playTone(ctx, base * 1.25, t0 + 0.12, 0.28, { type: "sine", gain: 0.1, pan: 0.2 });
+    playChord(ctx, t0 + 0.22, [base, base * 1.5], 0.35, { gain: 0.12, type: "triangle" });
+  });
 }
 
 /**
@@ -309,13 +356,12 @@ export function playProgressMilestoneSound(percent: 25 | 50 | 75): void {
  * Leiser und kürzer als Achievement-Sounds.
  */
 export function playFirstRollRewardSound(): void {
-  if (!getFeedbackSoundsEnabled() || prefersReducedFeedback()) return;
-  const ctx = getAudioContext();
-  if (!ctx) return;
-
-  const t0 = ctx.currentTime + 0.015;
-  playTone(ctx, 1046.5, t0, 0.12, { type: "sine", gain: 0.09, pan: -0.12, attack: 0.01 });
-  playTone(ctx, 1318.5, t0 + 0.08, 0.18, { type: "triangle", gain: 0.07, pan: 0.15, attack: 0.012 });
+  if (!getFeedbackSoundsEnabled()) return;
+  void withRunningAudioContext((ctx) => {
+    const t0 = ctx.currentTime + 0.015;
+    playTone(ctx, 1046.5, t0, 0.12, { type: "sine", gain: 0.09, pan: -0.12, attack: 0.01 });
+    playTone(ctx, 1318.5, t0 + 0.08, 0.18, { type: "triangle", gain: 0.07, pan: 0.15, attack: 0.012 });
+  });
 }
 
 /** Ob der Einswurf-Ping gespielt werden soll (ohne Parallel-Lärm zu Achievements). */
@@ -338,23 +384,22 @@ export function shouldPlayFirstRollReward(input: {
 }
 
 export function playAchievementSound(type: AchievementType): void {
-  if (!getFeedbackSoundsEnabled() || prefersReducedFeedback()) return;
-  const ctx = getAudioContext();
-  if (!ctx) return;
-
-  const t0 = ctx.currentTime + 0.02;
-  switch (type) {
-    case "bonus":
-      playBonusSound(ctx, t0);
-      break;
-    case "lower_complete":
-      playLowerCompleteSound(ctx, t0);
-      break;
-    case "large_straight":
-      playLargeStraightSound(ctx, t0);
-      break;
-    case "yatzy":
-      playYatzySound(ctx, t0);
-      break;
-  }
+  if (!getFeedbackSoundsEnabled()) return;
+  void withRunningAudioContext((ctx) => {
+    const t0 = ctx.currentTime + 0.02;
+    switch (type) {
+      case "bonus":
+        playBonusSound(ctx, t0);
+        break;
+      case "lower_complete":
+        playLowerCompleteSound(ctx, t0);
+        break;
+      case "large_straight":
+        playLargeStraightSound(ctx, t0);
+        break;
+      case "yatzy":
+        playYatzySound(ctx, t0);
+        break;
+    }
+  });
 }

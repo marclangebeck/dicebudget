@@ -3,9 +3,9 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `a00eda9` (Strategy-Würfe nur Pool; kein ×39-Eintrags-Cap)  
+**Produktcode-HEAD:** _(nach Commit dieses UX-Batches)_  
 **Sprache:** Deutsch  
-**Stand Doku:** 2026-08-07
+**Stand Doku:** 2026-08-11
 
 Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M30** App Store Release). Aktiver Milestone-Stand: `docs/milestones_active.md`. iOS/TestFlight: `docs/ios_current.md`. Architektur/Betrieb: `docs/decisions.md` nur bei Bedarf.
 
@@ -25,7 +25,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M3
 | Bereich | Status |
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
-| Branch | `milestone-22-prep` @ `a00eda9` |
+| Branch | `milestone-22-prep` |
 | Roadmap | **M30** App Store Release als Nächstes (Agreement, Preis 1,19 €, Metadaten, Submit) |
 | Entwickler-Vorschau | **InApp-Käufe (Features)** auf `/settings` nach Code (`NEXT_PUBLIC_LABS_PIN`) — früher „Hausregeln“ |
 | iOS/TestFlight | Version `2.0`; Builds bis **~45+** in Connect; Admin-UI nur wenn `NEXT_PUBLIC_ADMIN_API_KEY` im **Mac**-Build steckt |
@@ -44,6 +44,14 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M3
 - Vor Archive: `git log -1`; in `frontend/.env.production`: `NEXT_PUBLIC_LABS_PIN`, für Admin-UI **`NEXT_PUBLIC_ADMIN_API_KEY`** (gleich Backend), `NEXT_PUBLIC_APP_VERSION=2.0`, `NEXT_PUBLIC_APP_BUILD=<Xcode-Build>`.
 
 ## Letzte Produktänderungen
+
+### UX-Batch 2026-08-11 — Zettel-Lauffeuer + Sound-Fix
+
+- **Zeilen-Highlight:** Wenn eine Feld-Zeile über alle Spiele voll ist → kurzes Lauffeuer (~1,2 s) um die Zeile.
+- **Spalten-Highlight:** Fertige Spiel-Spalte (13 Felder) → gleiches Lauffeuer um die Spalte.
+- **Sounds:** Achievement-/Einswurf-Töne zuverlässiger (AudioContext Unlock im Tap + `await resume`; nicht mehr über `prefers-reduced-motion` stumm).
+- Settings „Visuelle Einblendungen“ / Info-„i“ um Zeilen-/Spalten-Lauffeuer ergänzt.
+- Dateien: `sheetFuseHighlight.ts`, `ScoreSheetTable.tsx`, `PlayBoard.tsx`, `TableModePlayBoard.tsx`, `achievementSound.ts`, `visualFeedbackInfo.ts`, `globals.css`
 
 ### Stabilitäts-Review 2026-08-07
 
@@ -68,6 +76,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M3
 - Footer: aktiver Tab (Home / Statistik / Spielregeln) hervorgehoben.
 - Stats/Settings/Root: kein iOS-Fokus-Zoom (`maximumScale: 1`, Inputs ≥ 16px).
 - Einswurf-Sound (Strategy, 1 Wurf, Score > 0) unter Sounds-Toggle.
+- Zettel-Lauffeuer bei fertiger Zeile/Spalte (Erfolgsanimationen-Toggle).
 
 ## Prod-Verifikation & Deploy
 
@@ -86,6 +95,7 @@ Frontend: `cd frontend && npm run build`.
 - Features: `featureFlags.ts`, `houseRules.ts` / Service, `houseRuleInfo.ts`
 - Statistik: `app/stats/page.tsx`, `pairingMerge.ts`, `pairingStats.ts`, `hiddenPairings.ts`
 - Footer: `AppLegalFooter.tsx`
+- Feedback: `sheetFuseHighlight.ts`, `achievementSound.ts`, `visualFeedbackInfo.ts`
 - iOS: `docs/ios_current.md`, `GOiOS.md`, `docs/testflight-app-store.md`
 
 ## Offene Prioritäten
@@ -107,7 +117,7 @@ Sprache: Deutsch
 
 Regeln: Keine Commits ohne ausdrückliches GO. Kein sudo. Keine Watcher/Polling/Dauerprozesse. Nach Code-Änderungen nummerierte [Server]/[Mac]-Befehle (AGENT_RULES §9). Frontend-Build: cd frontend && npm run build. Backend-Deploy nur Nutzer: sudo bash infra/scripts/deploy-backend-prod.sh.
 
-Stand: Stabilitäts-Review HEAD `f3a1ed0` (Admin-Key Web, Finalize, Baseline-Fortschreiben); M37–M41; M30 offen.
+Stand: UX-Batch Lauffeuer + Sound-Fix erledigt; Strategy-Würfe nur Pool; M37–M41; M30 offen.
 
 Antworte auf Deutsch. Kleine Inkremente, vor größeren Features GO einholen.
 ```
