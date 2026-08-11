@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** _(nach Commit dieses UX-Batches)_  
+**Produktcode-HEAD:** `d013b8e` (Zettel-Lauffeuer + Sound-Fix)  
 **Sprache:** Deutsch  
 **Stand Doku:** 2026-08-11
 
