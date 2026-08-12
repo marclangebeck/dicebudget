@@ -181,6 +181,14 @@ function SettingsPageInner() {
             onChange={(value) => updateFeedback({ progressHintsEnabled: value })}
             onInfo={() => setRuleInfo(getVisualFeedbackInfo("progress"))}
           />
+          <SettingsToggleCard
+            title="Heller Spielzettel"
+            description="Nur der Zettel hell (Zellen/Hintergrund) — Rest der App bleibt dunkel."
+            checked={settings.scoreSheetTheme === "light"}
+            onChange={(value) =>
+              updateSettings({ scoreSheetTheme: value ? "light" : "dark" })
+            }
+          />
         </SettingsSection>
 
         <SettingsSection

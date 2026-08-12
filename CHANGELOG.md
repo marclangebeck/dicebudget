@@ -4,6 +4,10 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
+### Added
+- **Heller Spielzettel:** Toggle unter Visuelle Einblendungen — nur der Zettel hell (`scoreSheetTheme`), Rest der App unverändert
+- **Rivalen-Share-Karte:** Teilen aus Paarungs-Detail (Duell-Balken, Punktedifferenz, Form der letzten Runden)
+
 ### Docs
 - **HANDOVER / milestones_active / ios_current / GOiOS / milestones / CHANGELOG:** Stand 2026-08-12, HEAD `2140090` / Produkt `75f5228`, Tests 87, TestFlight ~51+, Gold-Aufleuchten, native Menü-Version
 

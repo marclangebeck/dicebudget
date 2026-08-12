@@ -3711,6 +3711,71 @@ html.zoomable-route.legal-route .legal-page-scroll {
   );
 }
 
+/* Heller Spielzettel (nur Zettel, Rest der App unverändert). */
+.play-score-board--light {
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 52%, #e2e8f0 100%);
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.06);
+}
+
+.play-score-board--light .play-table-head-row {
+  background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+  border-bottom-color: rgba(15, 23, 42, 0.1);
+}
+
+.play-score-board--light .play-table-head-label {
+  color: #0f172a;
+}
+
+.play-score-board--light .play-table-head-game {
+  color: #047857;
+}
+
+.play-score-board--light .play-row-label {
+  background: #ffffff;
+  color: #1e293b;
+  border-right-color: rgba(15, 23, 42, 0.08);
+}
+
+.play-score-board--light .play-row-label--summary-standard {
+  border-color: rgba(100, 116, 139, 0.35);
+  background: #334155;
+  color: #f1f5f9;
+}
+
+.play-score-board--light .play-row-label--summary-highlight {
+  border-color: rgba(16, 185, 129, 0.45);
+  background: #065f46;
+  color: #d1fae5;
+}
+
+.play-score-board--light .play-cell {
+  border-color: #94a3b8;
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.play-score-board--light .play-cell--done {
+  border-color: #64748b;
+  background: #cbd5e1;
+}
+
+.play-score-board--light .play-cell--active {
+  border-color: #0f172a;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.16);
+}
+
+.play-score-board--light .play-summary {
+  border-color: rgba(100, 116, 139, 0.35);
+  background: #334155;
+  color: #f1f5f9;
+}
+
+.play-score-board--light .play-summary--highlight {
+  border-color: rgba(16, 185, 129, 0.45);
+  background: #065f46;
+  color: #d1fae5;
+}
+
 /* Gold-Aufleuchten: betroffene Felder 3× gleichzeitig vollflächig (~1,4 s). */
 .play-cell.play-cell--gold-flash {
   animation: play-gold-flash 1.4s ease-in-out;

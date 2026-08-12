@@ -20,6 +20,8 @@ export type AppSettings = {
   tableModeEnabled: boolean;
   tableLeftName: string;
   tableRightName: string;
+  /** Nur Spielzettel: dunkel (Ist) oder hell. */
+  scoreSheetTheme: "dark" | "light";
 };
 
 export const DEFAULT_APP_SETTINGS: AppSettings = {
@@ -32,6 +34,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   tableModeEnabled: false,
   tableLeftName: "",
   tableRightName: "",
+  scoreSheetTheme: "dark",
 };
 
 function clampInt(value: unknown, min: number, max: number, fallback: number): number {
@@ -74,6 +77,7 @@ function normalizeSettings(value: unknown): AppSettings {
       typeof source.tableRightName === "string"
         ? source.tableRightName.slice(0, 24)
         : DEFAULT_APP_SETTINGS.tableRightName,
+    scoreSheetTheme: source.scoreSheetTheme === "light" ? "light" : "dark",
   };
 }
 

@@ -1,6 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { ShareActionBar } from "@/components/ShareActionBar";
+import {
+  buildPairingShareText,
+  recentPairingForm,
+  renderPairingShareImage,
+} from "@/lib/matchResultShare";
 import type { PairingDetailDto } from "@/lib/pairingTypes";
 import type { PlayerAliasMap } from "@/lib/playerAliases";
 import { playerLabel } from "@/lib/playerIdentity";
@@ -42,22 +48,40 @@ export function PairingDetailPanel({
   onEditPairing,
 }: Props) {
   const netDiff = pairing.playerABonusPoints - pairing.playerBBonusPoints;
+  const nameA = playerLabel(pairing.playerA, ownPlayerId, aliases);
+  const nameB = playerLabel(pairing.playerB, ownPlayerId, aliases);
+  const shareParams = {
+    playerAName: nameA,
+    playerBName: nameB,
+    playerAWins: pairing.playerAWins,
+    playerBWins: pairing.playerBWins,
+    ties: pairing.ties,
+    roundsPlayed: pairing.roundsPlayed,
+    netDiff,
+    form: recentPairingForm(pairing.rounds, 5),
+  };
 
   return (
     <div className="stats-pairing-detail">
-      {onEditPairing && (
-        <div className="flex justify-end">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <ShareActionBar
+          label="Rivalen-Karte teilen"
+          shareSuffix="Rivalen"
+          filename="dicebudget-rivalen.png"
+          compact
+          buildText={() => buildPairingShareText(shareParams)}
+          buildImage={() => renderPairingShareImage(shareParams)}
+        />
+        {onEditPairing && (
           <button type="button" className="btn-chip px-3 py-1 text-xs" onClick={onEditPairing}>
             Siege/Diff (Admin)
           </button>
-        </div>
-      )}
+        )}
+      </div>
 
       <section className="stats-detail-scores">
         <div className="stats-detail-player-card">
-          <p className="stats-detail-player-name">
-            {playerLabel(pairing.playerA, ownPlayerId, aliases)}
-          </p>
+          <p className="stats-detail-player-name">{nameA}</p>
           <button
             type="button"
             className="btn-chip mt-2 px-2 py-0.5 text-xs"
@@ -72,9 +96,7 @@ export function PairingDetailPanel({
           </p>
         </div>
         <div className="stats-detail-player-card stats-detail-player-card--b">
-          <p className="stats-detail-player-name">
-            {playerLabel(pairing.playerB, ownPlayerId, aliases)}
-          </p>
+          <p className="stats-detail-player-name">{nameB}</p>
           <button
             type="button"
             className="btn-chip mt-2 px-2 py-0.5 text-xs"

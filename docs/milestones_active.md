@@ -228,7 +228,7 @@ Dateien: `ScoreSheetTable.tsx`, `globals.css`, `multi/page.tsx`, `shareSocial.ts
 **Status:** erledigt im Produktcode (`de0f8f2`), Frontend gebaut; noch nicht in iOS `2.0 (21)`.
 
 - Teilen **nur** bei Spielende (`RunFinishScreen`) und Startscreen-Bilanz (kompakter Button in Bilanz-Zeile).
-- Kein Share in Erfolgs-Overlays, Spielanalyse, iPad-Duell, Paarungs-Detail.
+- Kein Share in Erfolgs-Overlays, Spielanalyse, iPad-Duell; Paarungs-Detail hat Rivalen-Share-Karte.
 - Ein **Teilen**-Button → System-Share mit PNG-Karte (Fallback: Download).
 
 Dateien: `ShareActionBar.tsx`, `shareSocial.ts`, `HomeBentoGrid.tsx`, `RunFinishScreen.tsx`

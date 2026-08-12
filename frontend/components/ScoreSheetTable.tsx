@@ -18,6 +18,7 @@ import {
   type SheetFuseHighlight,
 } from "@/lib/sheetFuseHighlight";
 import type { FieldDto, FieldTypeId, GameDto, RunDto } from "@/lib/types";
+import { getAppSettings } from "@/lib/uiPrefs";
 
 type Props = {
   run: RunDto;
@@ -372,9 +373,14 @@ export function ScoreSheetTable({
   const gameColCount = games.length;
   const labelColPct = gameColCount <= 2 ? 30 : gameColCount <= 4 ? 26 : 22;
   const gameColPct = (100 - labelColPct) / gameColCount;
+  const sheetTheme = getAppSettings().scoreSheetTheme;
 
   return (
-    <div className="play-score-board score-sheet-fixed h-full w-full max-w-full overflow-hidden">
+    <div
+      className={`play-score-board score-sheet-fixed h-full w-full max-w-full overflow-hidden ${
+        sheetTheme === "light" ? "play-score-board--light" : "play-score-board--dark"
+      }`}
+    >
       <table className="play-score-table h-full w-full table-fixed border-collapse text-[11px] md:text-[10px]">
         <colgroup>
           <col style={{ width: `${labelColPct}%` }} />
