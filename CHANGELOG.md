@@ -7,6 +7,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ### Fixed
 - **Admin-PIN-Tastatur:** kein `inputMode=numeric` mehr — Buchstaben und Zahlen eingebar
 - **Rivalen-Share-Karte:** lokale Profilbilder (oder Initialen) auf der Duell-Karte
+- **Paarungs-Detail-Karten:** Bild oben volle Breite / halbe Höhe, Infos darunter — persönlichere Rivalen-Ansicht
 
 ### Added
 - **M42 Rivalen-Bilder:** Foto pro Rival nur lokal (IndexedDB), verwalten unter Rivalen; Anzeige in Liste/Paarungen

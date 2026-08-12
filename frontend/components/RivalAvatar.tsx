@@ -7,7 +7,7 @@ import {
 } from "@/lib/rivalAvatarStore";
 import { findRivalByPlayerId } from "@/lib/rivalProfiles";
 
-type Size = "sm" | "md";
+type Size = "sm" | "md" | "banner";
 
 function initialsFromName(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -58,7 +58,8 @@ export function RivalAvatar({ rivalId, name, size = "md", className = "" }: Riva
     };
   }, [rivalId]);
 
-  const sizeClass = size === "sm" ? "rival-avatar--sm" : "rival-avatar--md";
+  const sizeClass =
+    size === "banner" ? "rival-avatar--banner" : size === "sm" ? "rival-avatar--sm" : "rival-avatar--md";
 
   return (
     <span

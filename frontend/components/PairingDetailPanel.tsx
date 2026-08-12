@@ -87,40 +87,44 @@ export function PairingDetailPanel({
 
       <section className="stats-detail-scores">
         <div className="stats-detail-player-card">
-          <div className="stats-detail-player-head">
-            <RivalAvatar rivalId={rivalA?.id} name={nameA} size="md" />
-            <p className="stats-detail-player-name">{nameA}</p>
+          <div className="stats-detail-player-media">
+            <RivalAvatar rivalId={rivalA?.id} name={nameA} size="banner" />
           </div>
-          <button
-            type="button"
-            className="btn-chip mt-2 px-2 py-0.5 text-xs"
-            onClick={() => onEditPlayerAlias(pairing.playerA)}
-          >
-            ✏️ Alias
-          </button>
-          <p className="stats-detail-wins tabular-nums">{pairing.playerAWins}</p>
-          <p className="stats-detail-metric-label">Siege</p>
-          <p className="stats-detail-diff tabular-nums">
-            {netDiff > 0 ? `+${netDiff} Differenz` : "\u00a0"}
-          </p>
+          <div className="stats-detail-player-body">
+            <p className="stats-detail-player-name">{nameA}</p>
+            <button
+              type="button"
+              className="btn-chip mt-1.5 px-2 py-0.5 text-xs"
+              onClick={() => onEditPlayerAlias(pairing.playerA)}
+            >
+              ✏️ Alias
+            </button>
+            <p className="stats-detail-wins tabular-nums">{pairing.playerAWins}</p>
+            <p className="stats-detail-metric-label">Siege</p>
+            <p className="stats-detail-diff tabular-nums">
+              {netDiff > 0 ? `+${netDiff} Differenz` : "\u00a0"}
+            </p>
+          </div>
         </div>
         <div className="stats-detail-player-card stats-detail-player-card--b">
-          <div className="stats-detail-player-head">
-            <RivalAvatar rivalId={rivalB?.id} name={nameB} size="md" />
-            <p className="stats-detail-player-name">{nameB}</p>
+          <div className="stats-detail-player-media">
+            <RivalAvatar rivalId={rivalB?.id} name={nameB} size="banner" />
           </div>
-          <button
-            type="button"
-            className="btn-chip mt-2 px-2 py-0.5 text-xs"
-            onClick={() => onEditPlayerAlias(pairing.playerB)}
-          >
-            ✏️ Alias
-          </button>
-          <p className="stats-detail-wins tabular-nums">{pairing.playerBWins}</p>
-          <p className="stats-detail-metric-label">Siege</p>
-          <p className="stats-detail-diff tabular-nums">
-            {netDiff < 0 ? `+${-netDiff} Differenz` : "\u00a0"}
-          </p>
+          <div className="stats-detail-player-body">
+            <p className="stats-detail-player-name">{nameB}</p>
+            <button
+              type="button"
+              className="btn-chip mt-1.5 px-2 py-0.5 text-xs"
+              onClick={() => onEditPlayerAlias(pairing.playerB)}
+            >
+              ✏️ Alias
+            </button>
+            <p className="stats-detail-wins tabular-nums">{pairing.playerBWins}</p>
+            <p className="stats-detail-metric-label">Siege</p>
+            <p className="stats-detail-diff tabular-nums">
+              {netDiff < 0 ? `+${-netDiff} Differenz` : "\u00a0"}
+            </p>
+          </div>
         </div>
       </section>
 
