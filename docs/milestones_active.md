@@ -1,9 +1,9 @@
 # Aktive Milestones - dice.budget
 
-**Stand:** 2026-08-11  
+**Stand:** 2026-08-12  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `40977d1` (Menü-Version native iOS)  
-**Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de — Frontend Unit-Tests **79** grün  
+**Produktcode-HEAD:** `75f5228` (Gold-Aufleuchten Zeile/Spalte) · Tip `2140090`  
+**Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de — Frontend Unit-Tests **87** grün  
 **Backend:** Migrationen u. a. `20260807120000_pairing_baseline_absolute`, `20260807140000_pairing_baseline_app_snapshot` — Deploy nach Stabilitäts-Batch
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -17,7 +17,7 @@ Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones s
 Technische Basis ist erledigt:
 
 - Capacitor 7, Bundle `de.bottletrade.dicebudget`, Native Start `/app`, API Prod.
-- TestFlight **Version 2.0**, Builds bis **~45+**; Release-Kandidat = aktueller HEAD + frischer `build:ios`.
+- TestFlight **Version 2.0**, Builds bis **~51+**; Release-Kandidat = aktueller HEAD + frischer `build:ios`.
 - iOS-UI nur aus `npm run build:ios` auf dem Mac; Admin-UI braucht `NEXT_PUBLIC_ADMIN_API_KEY` im Mac-`.env.production` (nicht im öffentlichen Web-Bundle).
 
 Offen (M30):
@@ -53,7 +53,7 @@ Details: `docs/milestone-roadmap-analysis.md`. Code ist umgesetzt; nächster org
 ### M39 — Versionsnummer im Hamburger-Menü
 
 **Status:** umgesetzt.  
-**Anzeige:** iOS `Version 2.0 (<Xcode-Build>)` zur Laufzeit; Web `Version 2.0 (web)` bzw. Env-Fallback.
+**Anzeige:** iOS zur Laufzeit aus dem nativen Bundle (`@capacitor/app` `App.getInfo`) → `Version 2.0 (<Xcode-Build>)`; Web `Version 2.0 (web)` bzw. Env-Fallback (`NEXT_PUBLIC_APP_*`).
 
 ### M40 — Hausregel: Spalten-Pool-Boni (oben / unten / Kombi)
 
@@ -479,11 +479,12 @@ Dateien:
 1. **M30** TestFlight-Regression und App Store Connect.
 2. iOS-Build auf HEAD (Admin-Key nur auf Admin-Gerät); Release-Submit.
 
-## Letzte UX (2026-08-11)
+## Letzte UX (2026-08-12)
 
-- **Zettel-Lauffeuer:** Zeile/Spalte komplett → kurzes umlaufendes Highlight (`sheetFuseHighlight.ts`, `ScoreSheetTable`, `globals.css`).
+- **Gold-Aufleuchten:** Zeile oder Spalte komplett → betroffene Felder 3× gleichzeitig vollflächig gold + Fanfare (`sheetFuseHighlight.ts`, `ScoreSheetTable`, `achievementSound.ts`, `globals.css`).
+- **Toggle** „Gold-Aufleuchten“ unter Visuelle Einblendungen (`gameFeedbackPrefs.sheetFuseHighlightEnabled`, `visualFeedbackInfo`).
 - **Sounds:** intermittierende Ausfälle behoben (`achievementSound.ts`: Unlock im Tap, `await resume`, kein Mute über reduced-motion).
-- **Settings:** `visualFeedbackInfo` + Toggle-Beschreibung ergänzt.
+- **Menü-Version:** iOS native (`appVersion.ts` / `AppFooterMenu.tsx`).
 
 ## Wichtige Dateien Fuer Aktuelle Arbeit
 

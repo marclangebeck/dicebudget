@@ -3,9 +3,9 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `40977d1` (Menü-Version native iOS)  
+**Produktcode-HEAD:** `75f5228` (Gold-Aufleuchten Zeile/Spalte) · Tip `2140090`  
 **Sprache:** Deutsch  
-**Stand Doku:** 2026-08-11
+**Stand Doku:** 2026-08-12
 
 Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M30** App Store Release). Aktiver Milestone-Stand: `docs/milestones_active.md`. iOS/TestFlight: `docs/ios_current.md`. Architektur/Betrieb: `docs/decisions.md` nur bei Bedarf.
 
@@ -25,11 +25,12 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M3
 | Bereich | Status |
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
-| Branch | `milestone-22-prep` |
+| Branch | `milestone-22-prep` @ Tip `2140090` |
+| Frontend-Tests | **87** grün |
 | Roadmap | **M30** App Store Release als Nächstes (Agreement, Preis 1,19 €, Metadaten, Submit) |
 | Entwickler-Vorschau | **InApp-Käufe (Features)** auf `/settings` nach Code (`NEXT_PUBLIC_LABS_PIN`) — früher „Hausregeln“ |
-| iOS/TestFlight | Version `2.0`; Builds bis **~45+** in Connect; Admin-UI nur wenn `NEXT_PUBLIC_ADMIN_API_KEY` im **Mac**-Build steckt |
-| Backend Prod | Migrationen inkl. `20260807120000_pairing_baseline_absolute`, `20260807140000_pairing_baseline_app_snapshot` — Deploy nötig nach diesem Stabilitäts-Batch |
+| iOS/TestFlight | Version `2.0`; Builds bis **~51+**; Menü-Version = natives Bundle (`App.getInfo`); Admin-UI nur mit `NEXT_PUBLIC_ADMIN_API_KEY` im **Mac**-Build |
+| Backend Prod | Migrationen inkl. `20260807120000_pairing_baseline_absolute`, `20260807140000_pairing_baseline_app_snapshot` — Deploy nötig nach Stabilitäts-Batch |
 
 ## Wichtig: Admin-Key (Web vs. iOS)
 
@@ -42,16 +43,17 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M3
 - UI in der App aus `frontend/ios/App/App/public/` (gitignored).
 - Nur **`npm run build:ios`** auf dem Mac befüllt das Bundle und öffnet Xcode.
 - Vor Archive: `git log -1`; in `frontend/.env.production`: `NEXT_PUBLIC_LABS_PIN`, für Admin-UI **`NEXT_PUBLIC_ADMIN_API_KEY`** (gleich Backend), `NEXT_PUBLIC_APP_VERSION=2.0`. Menü-Build auf iOS kommt aus Xcode (`App.getInfo`); Web-Fallback `NEXT_PUBLIC_APP_BUILD=web`.
+- Bei Pull-Konflikt oft: `git restore frontend/package-lock.json` vor `git pull`.
 
 ## Letzte Produktänderungen
 
-### UX-Batch 2026-08-11 — Zettel-Lauffeuer + Sound-Fix
+### UX 2026-08-12 — Gold-Aufleuchten + Menü-Version
 
-- **Zeilen-Highlight:** Wenn eine Feld-Zeile über alle Spiele voll ist → kurzes Lauffeuer (~1,2 s) um die Zeile.
-- **Spalten-Highlight:** Fertige Spiel-Spalte (13 Felder) → gleiches Lauffeuer um die Spalte.
-- **Sounds:** Achievement-/Einswurf-Töne zuverlässiger (AudioContext Unlock im Tap + `await resume`; nicht mehr über `prefers-reduced-motion` stumm).
-- Settings „Visuelle Einblendungen“ / Info-„i“ um Zeilen-/Spalten-Lauffeuer ergänzt.
-- Dateien: `sheetFuseHighlight.ts`, `ScoreSheetTable.tsx`, `PlayBoard.tsx`, `TableModePlayBoard.tsx`, `achievementSound.ts`, `visualFeedbackInfo.ts`, `globals.css`
+- **Gold-Aufleuchten:** Bei fertiger Feld-Zeile oder Spiel-Spalte leuchten die betroffenen Felder **3× gleichzeitig vollflächig gold**; kurze Fanfare (Sounds-Toggle). Kein Extra-Trigger für den gesamten Zettel.
+- **Toggle** unter Visuelle Einblendungen: „Gold-Aufleuchten“ (unabhängig von Erfolgsanimationen), inkl. Info-„i“.
+- **Menü-Version (iOS):** `App.getInfo()` → z. B. `Version 2.0 (51)`; Web: `Version 2.0 (web)`.
+- **Achievement-Sounds:** AudioContext Unlock im Tap + `await resume`; nicht mehr über `prefers-reduced-motion` stumm.
+- Dateien: `sheetFuseHighlight.ts`, `ScoreSheetTable.tsx`, `PlayBoard.tsx`, `TableModePlayBoard.tsx`, `achievementSound.ts`, `gameFeedbackPrefs.ts`, `visualFeedbackInfo.ts`, `appVersion.ts`, `AppFooterMenu.tsx`, `globals.css`
 
 ### Stabilitäts-Review 2026-08-07
 
@@ -76,7 +78,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M3
 - Footer: aktiver Tab (Home / Statistik / Spielregeln) hervorgehoben.
 - Stats/Settings/Root: kein iOS-Fokus-Zoom (`maximumScale: 1`, Inputs ≥ 16px).
 - Einswurf-Sound (Strategy, 1 Wurf, Score > 0) unter Sounds-Toggle.
-- Zettel-Lauffeuer bei fertiger Zeile/Spalte (Erfolgsanimationen-Toggle).
+- Gold-Aufleuchten bei fertiger Zeile/Spalte (eigener Toggle).
 
 ## Prod-Verifikation & Deploy
 
@@ -95,7 +97,7 @@ Frontend: `cd frontend && npm run build`.
 - Features: `featureFlags.ts`, `houseRules.ts` / Service, `houseRuleInfo.ts`
 - Statistik: `app/stats/page.tsx`, `pairingMerge.ts`, `pairingStats.ts`, `hiddenPairings.ts`
 - Footer: `AppLegalFooter.tsx`
-- Feedback: `sheetFuseHighlight.ts`, `achievementSound.ts`, `visualFeedbackInfo.ts`
+- Feedback: `sheetFuseHighlight.ts`, `achievementSound.ts`, `visualFeedbackInfo.ts`, `gameFeedbackPrefs.ts`, `appVersion.ts`
 - iOS: `docs/ios_current.md`, `GOiOS.md`, `docs/testflight-app-store.md`
 
 ## Offene Prioritäten
@@ -112,12 +114,13 @@ Du arbeitest an dice.budget (kniffel). Lies zuerst AGENT_RULES.md und HANDOVER.m
 
 Workspace: /home/bottleadmin/projects/kniffel
 Branch: milestone-22-prep
+HEAD: 2140090 / Produkt 75f5228 (Gold-Aufleuchten Zeile/Spalte)
 Live: https://dicebudget.bottle-trade.de
 Sprache: Deutsch
 
 Regeln: Keine Commits ohne ausdrückliches GO. Kein sudo. Keine Watcher/Polling/Dauerprozesse. Nach Code-Änderungen nummerierte [Server]/[Mac]-Befehle (AGENT_RULES §9). Frontend-Build: cd frontend && npm run build. Backend-Deploy nur Nutzer: sudo bash infra/scripts/deploy-backend-prod.sh.
 
-Stand: UX-Batch Lauffeuer + Sound-Fix erledigt; Strategy-Würfe nur Pool; M37–M41; M30 offen.
+Stand: Gold-Aufleuchten + Sound-Fix + native Menü-Version; Strategy-Würfe nur Pool; M37–M41; M30 offen.
 
 Antworte auf Deutsch. Kleine Inkremente, vor größeren Features GO einholen.
 ```

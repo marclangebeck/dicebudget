@@ -23,7 +23,7 @@ Nur bei Bedarf zusätzlich:
 
 Frontend-Details: `frontend/README.md`. Fachliche Spezifikation: `projektbeschreibung.md`. Bei Widersprüchen gilt **`AGENT_RULES.md`**.
 
-**Aktiver Git-Branch (Mai 2026):** `milestone-22-prep` auf `github.com/marclangebeck/dicebudget`
+**Aktiver Git-Branch:** `milestone-22-prep` auf `github.com/marclangebeck/dicebudget`
 
 ---
 

@@ -1,11 +1,11 @@
 # Milestone-Roadmap — Umsetzung Projektanalyse
 
 **Erstellt:** 2026-06-11  
-**Aktualisiert:** 2026-07-31 (M37–M41 spezifiziert; kein Produktcode ohne GO)  
+**Aktualisiert:** 2026-08-12 (Doku-Sync Gold-Aufleuchten / Menü-Version; M30 nächstes)  
 **Basis:** Vollständige Projektanalyse (Backend, Frontend, Release)  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** siehe `git log -1`  
-**Nächster Milestone:** **M30** oder nach Nutzer-Prio **M37**  
+**Produktcode-HEAD:** siehe `git log -1` (aktuell Tip `2140090` / Produkt `75f5228`)  
+**Nächster Milestone:** **M30** App Store Release  
 **Arbeitsweise:** Pro Milestone ein **GO** vom Nutzer, danach Umsetzung in Sprints, dann Abnahme. **Kein Produktcode ohne GO.**
 
 **Vor M30 umgesetzt (nicht nummeriert):** Feature-Labor (`5e621ac`), Hausregeln Strategy (Brennt / Verkauf / 2× Alle Fünfe) hinter Labor-Toggles — **bis M36:** jeder Spieler schaltet lokal per Code frei (Labor-Zwischenstand, bewusst OK).

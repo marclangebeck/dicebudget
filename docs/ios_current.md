@@ -1,8 +1,8 @@
 # iOS Aktuell - dice.budget
 
-**Stand:** 2026-08-07  
+**Stand:** 2026-08-12  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD (Web):** `a00eda9`  
+**Produktcode-HEAD (Web):** `75f5228` · Tip `2140090`  
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
@@ -10,7 +10,7 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 ## Aktueller Stand
 
 - App Store Connect: **Version 2.0**.
-- TestFlight: Builds bis **2.0 (45+)** wurden hochgeladen (Stand Nutzer 2026-08-07); Installationen können hinterherhinken — immer **Menü → Version 2.0 (xx)** prüfen.
+- TestFlight: Builds bis **~51+** (Nutzer-Stand 2026-08-12); Installationen können hinterherhinken — immer **Menü → Version 2.0 (xx)** prüfen (native Bundle-Build).
 - **Release-Kandidat für M30:** aktueller HEAD mit frischem `npm run build:ios`.
 - Web/API live: https://dicebudget.bottle-trade.de
 - **Web öffentlich:** ohne eingebetteten Admin-Key (keine Admin-Buttons im Browser).
@@ -24,7 +24,6 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 | `NEXT_PUBLIC_ADMIN_API_KEY` | Stats-Admin-UI (**Löschen · Server**, Siege/Diff) — muss Backend `ADMIN_API_KEY` entsprechen; **nur auf Admin-Gerät**; Spieler-Builds ohne Key |
 | `NEXT_PUBLIC_APP_VERSION` | z. B. `2.0` (Web-Fallback; iOS-Menü liest native Version) |
 | `NEXT_PUBLIC_APP_BUILD` | Web: typisch `web`. iOS-Menü zeigt **Xcode Build** zur Laufzeit (`App.getInfo`) — Env muss nicht mehr bei jedem Archive mitgezählt werden |
-
 | `NEXT_PUBLIC_SITE_URL` | empfohlen `https://dicebudget.bottle-trade.de` |
 
 Server-`frontend/.env.production` für den öffentlichen Web-Build: Admin-Key **leer**. Backend `ADMIN_API_KEY` unverändert.
@@ -68,7 +67,6 @@ npm run build:ios
 
 1. **Product → Clean Build Folder** (⇧⌘K)
 2. Target **App** → **General** → **Build** erhöhen (Menü zeigt diese Nummer automatisch nach `build:ios`)
-
 3. Scheme **App**, Ziel **Any iOS Device (arm64)**
 4. **Product → Archive**
 5. Organizer → **Distribute App** → **App Store Connect** → **Upload**
@@ -78,20 +76,14 @@ Ausführlich: `docs/testflight-app-store.md`, Einsteiger: `docs/ios-xcode-anleit
 
 ## TestFlight-Checkliste (aktueller HEAD+)
 
-- **Menü:** Version 2.0 (Build-Nr.); aktiver Footer-Tab sichtbar
-- **Spielregeln:** Bereich **InApp-Käufe (Features)** nach Labs-Code
-- **Brennt:** zwei Optionen (−1 / −2 Pool)
-- **Statistik:** **Verwalten**-Menü; Admin: Löschen · Server / Siege-Diff; absolute Diff nach Speichern gerätegleich; **danach** neue Partie erhöht Siege/Diff
-- **Neue Runde:** Pool / Pool-Endspiel / House-Rules bleiben
-- **Zoom:** Fokus in Namens-/Siege-Feldern darf die Seite nicht dauerhaft vergrößern
+- **Menü:** Version 2.0 (Build-Nr. = Xcode); aktiver Footer-Tab sichtbar
+- **Spielregeln:** Visuelle Einblendungen inkl. Toggle **Gold-Aufleuchten**; Bereich **InApp-Käufe (Features)** nach Labs-Code
 - Fortschritt 25/50/75 %, Multi, Solo, Screenshot „Bild“
-- Spalten-Pool-Boni / Auto-Alle-Fünfe nur mit Labs + Strategy-Duell
+- Gold-Aufleuchten bei fertiger Zeile/Spalte (3× gold + Fanfare bei Sounds an)
+- Achievement-Sounds zuverlässig (Gr. Straße, Alle Fünfe, Bonus, unten voll, Einswurf)
+- Statistik / Paarungen / Admin nur mit Key-Build
 
-## Typische Fehler
+## Bekannte Hinweise
 
-- **UI alt trotz Pull** → `npm run build:ios` fehlte vor Archive
-- **Kein Admin in TestFlight** → `NEXT_PUBLIC_ADMIN_API_KEY` fehlte in Mac-`.env.production` vor dem Build
-- **Admin im öffentlichen Web** → darf nicht vorkommen (Server-Env ohne Key)
-- **Labor-Code ungültig** → PIN fehlt oder Build nach PIN-Änderung nicht wiederholt
-- **Build-Nummer nicht erhöht** → Upload abgelehnt / alte Version bleibt aktiv
-- **Intern nicht sichtbar** → Build neu hochladen oder **Freunde** zuweisen; TestFlight aktualisieren
+- Web-Menü zeigt `Version 2.0 (web)` — das ist Absicht.
+- `package-lock.json`-Konflikt beim Pull: `git restore frontend/package-lock.json` dann erneut pullen.
