@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `d013b8e` (Zettel-Lauffeuer + Sound-Fix)  
+**Produktcode-HEAD:** `40977d1` (Menü-Version native iOS)  
 **Sprache:** Deutsch  
 **Stand Doku:** 2026-08-11
 
