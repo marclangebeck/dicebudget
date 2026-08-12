@@ -2,7 +2,7 @@
 
 **Stand:** 2026-08-11  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `d013b8e` (Zettel-Lauffeuer + Sound-Fix)  
+**Produktcode-HEAD:** `40977d1` (Menü-Version native iOS)  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de — Frontend Unit-Tests **79** grün  
 **Backend:** Migrationen u. a. `20260807120000_pairing_baseline_absolute`, `20260807140000_pairing_baseline_app_snapshot` — Deploy nach Stabilitäts-Batch
 
