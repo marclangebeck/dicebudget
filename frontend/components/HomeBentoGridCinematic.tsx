@@ -3,9 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, type CSSProperties } from "react";
 import { APP_SHORT } from "@/lib/branding";
-import { HomeHeroBanner } from "@/components/HomeHeroBanner";
 import { JoinByCodeForm } from "@/components/JoinByCodeForm";
-import { useHomeHeroData } from "@/lib/useHomeHeroData";
 
 type CinematicDoorProps = {
   href: string;
@@ -59,10 +57,8 @@ function CinematicDoor({
   );
 }
 
-/** Cinematic Doors — Editorial-Poster für Multi/Solo; Bilanz per Toggle. */
+/** Cinematic Doors — Editorial-Poster für Multi/Solo; Beitreten-Code in der Mitte. */
 export function HomeBentoGridCinematic() {
-  const hero = useHomeHeroData();
-  const [statsOpen, setStatsOpen] = useState(false);
   const [entered, setEntered] = useState(false);
 
   useEffect(() => {
@@ -72,28 +68,10 @@ export function HomeBentoGridCinematic() {
 
   return (
     <div
-      className={`home-cinematic flex min-h-0 flex-1 flex-col overflow-hidden ${entered ? "home-cinematic--entered" : ""} ${statsOpen ? "home-cinematic--stats-open" : ""}`}
+      className={`home-cinematic flex min-h-0 flex-1 flex-col overflow-hidden ${entered ? "home-cinematic--entered" : ""}`}
     >
       <div className="home-cinematic-top shrink-0">
         <p className="home-cinematic-kicker">{APP_SHORT} · Strategy Edition</p>
-        <button
-          type="button"
-          className={`home-cinematic-stats-toggle ${statsOpen ? "is-open" : ""}`}
-          aria-expanded={statsOpen}
-          onClick={() => setStatsOpen((open) => !open)}
-        >
-          <span className="home-cinematic-stats-toggle-label">
-            {hero.recordTitle} · <strong className="tabular-nums">{hero.recordSummaryLabel}</strong>
-          </span>
-          <span className="home-cinematic-stats-toggle-chevron" aria-hidden />
-        </button>
-      </div>
-
-      <div
-        className={`home-cinematic-stats-panel ${statsOpen ? "is-open" : ""}`}
-        aria-hidden={!statsOpen}
-      >
-        <HomeHeroBanner {...hero} compact />
       </div>
 
       <div className="home-cinematic-doors min-h-0 flex-1">

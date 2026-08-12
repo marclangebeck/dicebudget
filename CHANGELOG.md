@@ -16,6 +16,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Rivalen-Share-Karte:** Teilen aus Paarungs-Detail (Duell-Balken, Punktedifferenz, Form der letzten Runden)
 
 ### Changed
+- **Startscreen:** „Deine Bilanz“-Toggle oben entfernt; freier Raum für größeren Code-Beitreten-Container
 - **Admin-Zugang:** kein separater Admin-Build mehr nötig; Stats-Admin nur nach PIN + Key (Legacy-Env-Key nur mit PIN, falls PIN gesetzt)
 
 ### Docs
