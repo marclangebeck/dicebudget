@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ShareActionBar } from "@/components/ShareActionBar";
+import { RivalAvatar } from "@/components/RivalAvatar";
 import {
   buildPairingShareText,
   recentPairingForm,
@@ -10,6 +11,7 @@ import {
 import type { PairingDetailDto } from "@/lib/pairingTypes";
 import type { PlayerAliasMap } from "@/lib/playerAliases";
 import { playerLabel } from "@/lib/playerIdentity";
+import { findRivalByPlayerId } from "@/lib/rivalProfiles";
 
 function formatDateTime(iso: string | null): string {
   if (!iso) return "—";
@@ -50,6 +52,8 @@ export function PairingDetailPanel({
   const netDiff = pairing.playerABonusPoints - pairing.playerBBonusPoints;
   const nameA = playerLabel(pairing.playerA, ownPlayerId, aliases);
   const nameB = playerLabel(pairing.playerB, ownPlayerId, aliases);
+  const rivalA = findRivalByPlayerId(pairing.playerA);
+  const rivalB = findRivalByPlayerId(pairing.playerB);
   const shareParams = {
     playerAName: nameA,
     playerBName: nameB,
@@ -81,7 +85,10 @@ export function PairingDetailPanel({
 
       <section className="stats-detail-scores">
         <div className="stats-detail-player-card">
-          <p className="stats-detail-player-name">{nameA}</p>
+          <div className="stats-detail-player-head">
+            <RivalAvatar rivalId={rivalA?.id} name={nameA} size="md" />
+            <p className="stats-detail-player-name">{nameA}</p>
+          </div>
           <button
             type="button"
             className="btn-chip mt-2 px-2 py-0.5 text-xs"
@@ -96,7 +103,10 @@ export function PairingDetailPanel({
           </p>
         </div>
         <div className="stats-detail-player-card stats-detail-player-card--b">
-          <p className="stats-detail-player-name">{nameB}</p>
+          <div className="stats-detail-player-head">
+            <RivalAvatar rivalId={rivalB?.id} name={nameB} size="md" />
+            <p className="stats-detail-player-name">{nameB}</p>
+          </div>
           <button
             type="button"
             className="btn-chip mt-2 px-2 py-0.5 text-xs"

@@ -377,6 +377,20 @@ function SettingsPageInner() {
 
       <SettingsGameActions settings={settings} />
 
+      <div className="settings-compact-card settings-compact-card--wide settings-compact-card--slim mx-1 mt-2">
+        <p className="settings-compact-title settings-compact-title--sm">Admin</p>
+        <p className="settings-compact-text settings-compact-text--sm">
+          PIN-Freischaltung und lokaler API-Key für Stats-Admin / spätere Config.
+        </p>
+        <button
+          type="button"
+          className="glass-button mt-2 min-h-10 w-full px-4 text-sm font-semibold"
+          onClick={() => router.push("/settings/admin")}
+        >
+          Admin öffnen
+        </button>
+      </div>
+
       <LabsUnlockDialog
         open={showLabsUnlock}
         onClose={() => setShowLabsUnlock(false)}

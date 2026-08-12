@@ -8,6 +8,7 @@ import type { PairingSummaryDto } from "@/lib/pairingTypes";
 import type { PlayerAliasMap } from "@/lib/playerAliases";
 import { playerLabel } from "@/lib/playerIdentity";
 import type { PairingHighlightTone } from "@/lib/statsPairingInsights";
+import { RivalAvatarByPlayer } from "@/components/RivalAvatar";
 
 type Props = {
   pairing: PairingSummaryDto;
@@ -137,9 +138,19 @@ export function PairingAccordionItem({
           )}
           <span className="stats-section-trigger-body">
             <span className="stats-section-trigger-head">
-              <span className="stats-section-trigger-title">
+              <span className="stats-section-trigger-title stats-section-trigger-title--avatars">
+                <RivalAvatarByPlayer
+                  playerId={pairing.playerA}
+                  name={playerLabel(pairing.playerA, ownPlayerId, aliases)}
+                  size="sm"
+                />
                 {playerLabel(pairing.playerA, ownPlayerId, aliases)}
                 <span className="stats-section-trigger-vs"> vs. </span>
+                <RivalAvatarByPlayer
+                  playerId={pairing.playerB}
+                  name={playerLabel(pairing.playerB, ownPlayerId, aliases)}
+                  size="sm"
+                />
                 {playerLabel(pairing.playerB, ownPlayerId, aliases)}
               </span>
               <span className="stats-section-trigger-summary">{summaryParts.join(" · ")}</span>

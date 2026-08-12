@@ -27,22 +27,23 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M3
 | Web/API | Live: https://dicebudget.bottle-trade.de |
 | Branch | `milestone-22-prep` @ Tip `2140090` |
 | Frontend-Tests | **87** grün |
-| Roadmap | **M30** App Store Release als Nächstes (Agreement, Preis 1,19 €, Metadaten, Submit) |
+| Roadmap | **M42/M43** vor M30: Rival-Avatare lokal + Admin-PIN (ein Build) |
 | Entwickler-Vorschau | **InApp-Käufe (Features)** auf `/settings` nach Code (`NEXT_PUBLIC_LABS_PIN`) — früher „Hausregeln“ |
-| iOS/TestFlight | Version `2.0`; Builds bis **~51+**; Menü-Version = natives Bundle (`App.getInfo`); Admin-UI nur mit `NEXT_PUBLIC_ADMIN_API_KEY` im **Mac**-Build |
+| iOS/TestFlight | Version `2.0`; Builds bis **~51+**; Menü-Version = natives Bundle (`App.getInfo`); Admin per **PIN** + lokalem Key (M43) |
 | Backend Prod | Migrationen inkl. `20260807120000_pairing_baseline_absolute`, `20260807140000_pairing_baseline_app_snapshot` — Deploy nötig nach Stabilitäts-Batch |
 
-## Wichtig: Admin-Key (Web vs. iOS)
+## Wichtig: Admin (ein Build, M43)
 
-- **Öffentliches Web:** `frontend/.env.production` hat **keinen** `NEXT_PUBLIC_ADMIN_API_KEY` → kein Key im static Bundle, keine Admin-Buttons.
-- **Admin-iOS / TestFlight:** Key nur in Mac-`.env.production` **vor** `npm run build:ios` setzen (gleich Backend `ADMIN_API_KEY`).
+- **Ein App-Build:** `NEXT_PUBLIC_ADMIN_PIN` setzen; `NEXT_PUBLIC_ADMIN_API_KEY` im öffentlichen Bundle **leer** lassen.
+- Nach PIN unter Menü/Einstellungen → **Admin** den Server-`ADMIN_API_KEY` lokal hinterlegen.
 - Backend `requireAdminKey` bleibt Pflicht für Baseline + Reset (`X-Admin-Key`).
+- Legacy: Env-Key im Bundle funktioniert nur noch mit PIN (falls PIN gesetzt).
 
 ## Wichtig: iOS-Bundle ≠ Web-Deploy
 
 - UI in der App aus `frontend/ios/App/App/public/` (gitignored).
 - Nur **`npm run build:ios`** auf dem Mac befüllt das Bundle und öffnet Xcode.
-- Vor Archive: `git log -1`; in `frontend/.env.production`: `NEXT_PUBLIC_LABS_PIN`, für Admin-UI **`NEXT_PUBLIC_ADMIN_API_KEY`** (gleich Backend), `NEXT_PUBLIC_APP_VERSION=2.0`. Menü-Build auf iOS kommt aus Xcode (`App.getInfo`); Web-Fallback `NEXT_PUBLIC_APP_BUILD=web`.
+- Vor Archive: `git log -1`; in `frontend/.env.production`: `NEXT_PUBLIC_LABS_PIN`, **`NEXT_PUBLIC_ADMIN_PIN`**, `NEXT_PUBLIC_APP_VERSION=2.0` (Admin-API-Key lieber lokal nach PIN). Menü-Build auf iOS kommt aus Xcode (`App.getInfo`); Web-Fallback `NEXT_PUBLIC_APP_BUILD=web`.
 - Bei Pull-Konflikt oft: `git restore frontend/package-lock.json` vor `git pull`.
 
 ## Letzte Produktänderungen
@@ -102,10 +103,11 @@ Frontend: `cd frontend && npm run build`.
 
 ## Offene Prioritäten
 
-1. **M30** — TestFlight-Regression auf HEAD; App Store Connect (Agreement, Bank/Steuer, Preis 1,19 €, Screenshots, Submit).
-2. Optional **Stufe A** Stats (pseudonyme `playerId`-Links) nur bei nachgewiesenem Drift.
-3. **M36** nach M30 (öffentliche Features / Session-UI).
-4. `milestone-22-prep` → `main` nach Release-Freigabe.
+1. **M42 / M43** — Rivalen-Bilder lokal; Admin-PIN + Key; manuell prüfen.
+2. **M30** danach — TestFlight-Regression; App Store Connect (Agreement, Bank/Steuer, Preis 1,19 €, Screenshots, Submit).
+3. Optional **Stufe A** Stats (pseudonyme `playerId`-Links) nur bei nachgewiesenem Drift.
+4. **M36** nach M30 (öffentliche Features / Session-UI).
+5. `milestone-22-prep` → `main` nach Release-Freigabe.
 
 ## Agent-Start (Übergabeprompt)
 
@@ -120,7 +122,7 @@ Sprache: Deutsch
 
 Regeln: Keine Commits ohne ausdrückliches GO. Kein sudo. Keine Watcher/Polling/Dauerprozesse. Nach Code-Änderungen nummerierte [Server]/[Mac]-Befehle (AGENT_RULES §9). Frontend-Build: cd frontend && npm run build. Backend-Deploy nur Nutzer: sudo bash infra/scripts/deploy-backend-prod.sh.
 
-Stand: Gold-Aufleuchten + Sound-Fix + native Menü-Version; Strategy-Würfe nur Pool; M37–M41; M30 offen.
+Stand: M42 Rival-Avatare + M43 Admin-PIN (ein Build); Gold-Aufleuchten; M37–M41; M30 bewusst danach.
 
 Antworte auf Deutsch. Kleine Inkremente, vor größeren Features GO einholen.
 ```

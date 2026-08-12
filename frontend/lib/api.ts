@@ -9,6 +9,7 @@ import type { RunDto } from "./types";
 import type { SessionLobbyDto, SessionRankingDto } from "./sessionTypes";
 import type { HouseRuleAutoEventDto } from "@/lib/ruleEventFeedback";
 import { getApiBase } from "@/lib/apiBase";
+import { resolveAdminApiKeyForRequest } from "@/lib/adminAccess";
 
 type ApiRequestInit = Omit<RequestInit, "headers"> & {
   headers?: HeadersInit;
@@ -17,11 +18,10 @@ type ApiRequestInit = Omit<RequestInit, "headers"> & {
 };
 
 function getAdminApiKey(): string | undefined {
-  const key = process.env.NEXT_PUBLIC_ADMIN_API_KEY?.trim();
-  return key || undefined;
+  return resolveAdminApiKeyForRequest();
 }
 
-/** True, wenn der Build einen Admin-Key für Stats-Korrekturen mitbringt (M38). */
+/** True, wenn Admin freigeschaltet und API-Key verfügbar (M43). */
 export function hasAdminApiKey(): boolean {
   return Boolean(getAdminApiKey());
 }
@@ -75,7 +75,7 @@ function translateApiError(message: string | undefined, status: number): string 
     raw.includes("Admin-Schlüssel fehlt") ||
     raw.includes("App-Admin-Key")
   ) {
-    return "Admin-Schlüssel fehlt oder ist falsch. Siege/Diff und Server-Löschen brauchen den Admin-Key (nur Admin-iOS-Build).";
+    return "Admin-Schlüssel fehlt oder ist falsch. Unter Einstellungen → Admin freischalten und Key hinterlegen.";
   }
   if (
     raw === "Admin API not configured" ||

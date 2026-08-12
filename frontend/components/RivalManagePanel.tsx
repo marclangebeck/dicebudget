@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { RivalAvatar } from "@/components/RivalAvatar";
 import {
   createRival,
   deleteRival,
@@ -11,6 +12,12 @@ import {
   subscribeRivalProfiles,
   type RivalProfile,
 } from "@/lib/rivalProfiles";
+import {
+  compressRivalAvatarFile,
+  deleteRivalAvatar,
+  setRivalAvatarBlob,
+  subscribeRivalAvatars,
+} from "@/lib/rivalAvatarStore";
 import {
   loadSelfRivalProfileId,
   setSelfRivalProfileId,
@@ -25,6 +32,10 @@ export function RivalManagePanel() {
   const [editName, setEditName] = useState("");
   const [mergeSourceId, setMergeSourceId] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [avatarBusyId, setAvatarBusyId] = useState<string | null>(null);
+  const [avatarTick, setAvatarTick] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const pendingAvatarRivalId = useRef<string | null>(null);
 
   function refresh() {
     setProfiles(loadRivalProfiles());
@@ -35,9 +46,11 @@ export function RivalManagePanel() {
     refresh();
     const unsubRivals = subscribeRivalProfiles(refresh);
     const unsubSelf = subscribeSelfIdentity(refresh);
+    const unsubAvatars = subscribeRivalAvatars(() => setAvatarTick((n) => n + 1));
     return () => {
       unsubRivals();
       unsubSelf();
+      unsubAvatars();
     };
   }, []);
 
@@ -74,7 +87,7 @@ export function RivalManagePanel() {
 
   function handleDelete(profile: RivalProfile) {
     const ok = window.confirm(
-      `Rival „${profile.name}“ wirklich löschen?\n\nNur der lokale Name wird entfernt — Spielstände bleiben.`,
+      `Rival „${profile.name}“ wirklich löschen?\n\nNur der lokale Name und das Bild werden entfernt — Spielstände bleiben.`,
     );
     if (!ok) return;
     deleteRival(profile.id);
@@ -112,14 +125,63 @@ export function RivalManagePanel() {
     refresh();
   }
 
+  function pickAvatar(profile: RivalProfile) {
+    pendingAvatarRivalId.current = profile.id;
+    setError(null);
+    fileInputRef.current?.click();
+  }
+
+  async function onAvatarFileChange(fileList: FileList | null) {
+    const rivalId = pendingAvatarRivalId.current;
+    pendingAvatarRivalId.current = null;
+    const file = fileList?.[0];
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (!rivalId || !file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("Bitte eine Bilddatei wählen.");
+      return;
+    }
+    setAvatarBusyId(rivalId);
+    setError(null);
+    try {
+      const compressed = await compressRivalAvatarFile(file);
+      await setRivalAvatarBlob(rivalId, compressed);
+    } catch {
+      setError("Bild konnte nicht gespeichert werden.");
+    } finally {
+      setAvatarBusyId(null);
+    }
+  }
+
+  async function removeAvatar(profile: RivalProfile) {
+    const ok = window.confirm(`Bild von „${profile.name}“ entfernen?`);
+    if (!ok) return;
+    setAvatarBusyId(profile.id);
+    try {
+      await deleteRivalAvatar(profile.id);
+    } finally {
+      setAvatarBusyId(null);
+    }
+  }
+
   return (
     <div className="rival-manage">
       <p className="rival-manage-hint">
-        Namen gelten nur auf diesem Gerät. Tippe bei dir selbst „Das bin ich“, damit fremde
-        Paarungen in der Statistik ausgeblendet werden. Doppelte Einträge: bei einem
-        „Zusammenführen“, beim anderen „Hier zusammenführen“. Unbekannte Gegner verknüpfst du
-        in der Statistik.
+        Namen und Bilder gelten nur auf diesem Gerät. Tippe bei dir selbst „Das bin ich“, damit
+        fremde Paarungen in der Statistik ausgeblendet werden. Doppelte Einträge: bei einem
+        „Zusammenführen“, beim anderen „Hier zusammenführen“. Unbekannte Gegner verknüpfst du in der
+        Statistik.
       </p>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="sr-only"
+        aria-hidden
+        tabIndex={-1}
+        onChange={(e) => void onAvatarFileChange(e.target.files)}
+      />
 
       <form onSubmit={handleCreate} className="rival-manage-create">
         <input
@@ -147,7 +209,7 @@ export function RivalManagePanel() {
       ) : (
         <ul className="rival-manage-list">
           {profiles.map((profile) => (
-            <li key={profile.id} className="rival-manage-item">
+            <li key={`${profile.id}-${avatarTick}`} className="rival-manage-item">
               {editingId === profile.id ? (
                 <div className="rival-manage-edit">
                   <input
@@ -174,14 +236,33 @@ export function RivalManagePanel() {
                 </div>
               ) : (
                 <>
-                  <div className="rival-manage-item-main">
-                    <p className="rival-manage-name">
-                      {profile.name}
-                      {selfProfileId === profile.id ? " · Das bist du" : ""}
-                    </p>
-                    <p className="rival-manage-meta">{rivalLinkedIdsLabel(profile)}</p>
+                  <div className="rival-manage-item-main rival-manage-item-main--with-avatar">
+                    <RivalAvatar rivalId={profile.id} name={profile.name} size="md" />
+                    <div className="rival-manage-item-text">
+                      <p className="rival-manage-name">
+                        {profile.name}
+                        {selfProfileId === profile.id ? " · Das bist du" : ""}
+                      </p>
+                      <p className="rival-manage-meta">{rivalLinkedIdsLabel(profile)}</p>
+                    </div>
                   </div>
                   <div className="rival-manage-item-actions">
+                    <button
+                      type="button"
+                      className="rival-manage-btn"
+                      disabled={avatarBusyId === profile.id}
+                      onClick={() => pickAvatar(profile)}
+                    >
+                      {avatarBusyId === profile.id ? "Bild…" : "Bild"}
+                    </button>
+                    <button
+                      type="button"
+                      className="rival-manage-btn"
+                      disabled={avatarBusyId === profile.id}
+                      onClick={() => void removeAvatar(profile)}
+                    >
+                      Bild weg
+                    </button>
                     <button
                       type="button"
                       className={`rival-manage-btn${selfProfileId === profile.id ? " is-active" : ""}`}

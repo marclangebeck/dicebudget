@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getPairingSummaries, getStats, hasAdminApiKey, resetPairings } from "@/lib/api";
+import { subscribeAdminAccess } from "@/lib/adminAccess";
 import type { PairingSummaryDto } from "@/lib/pairingTypes";
 import { mergePairingSummaries, type MergedPairingSummary } from "@/lib/pairingMerge";
 import { playerLabel } from "@/lib/playerIdentity";
@@ -78,7 +79,12 @@ function StatsPageInner() {
   const [sortMode, setSortMode] = useState<PairingSortMode>("recent");
   const [detailReloadToken, setDetailReloadToken] = useState(0);
   const [toolsOpen, setToolsOpen] = useState(false);
-  const isAdmin = hasAdminApiKey();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    setIsAdmin(hasAdminApiKey());
+    return subscribeAdminAccess(() => setIsAdmin(hasAdminApiKey()));
+  }, []);
 
   const refreshPairings = useCallback(async (opts?: { quiet?: boolean }) => {
     if (!opts?.quiet) setLoading(true);

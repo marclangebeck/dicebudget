@@ -34,6 +34,7 @@ type MenuEntry = {
 };
 
 const RIVALS_PATH = "/settings/rivals";
+const ADMIN_PATH = "/settings/admin";
 
 function TourIcon() {
   return (
@@ -58,6 +59,16 @@ function RivalsIcon() {
       <circle cx="16.5" cy="9.5" r="2.5" />
       <path d="M3.5 18.5c.8-2.8 2.9-4.5 5.5-4.5s4.7 1.7 5.5 4.5" />
       <path d="M13.2 18.5c.4-1.6 1.4-2.8 2.9-3.3 1.8-.6 3.7.2 4.9 1.8" />
+    </svg>
+  );
+}
+
+function AdminIcon() {
+  return (
+    <svg className="app-footer-menu-icon" viewBox="0 0 24 24" aria-hidden fill="none">
+      <path d="M12 3 5 6.2v5.1c0 4.1 2.7 7.7 7 9.7 4.3-2 7-5.6 7-9.7V6.2L12 3Z" />
+      <path d="M12 11v4" />
+      <path d="M12 8.2h.01" />
     </svg>
   );
 }
@@ -192,6 +203,13 @@ export function AppFooterMenu({ open, onClose }: Props) {
       hint: "Anlegen, umbenennen, zusammenführen",
       icon: <RivalsIcon />,
       onSelect: () => goApp(RIVALS_PATH),
+    },
+    {
+      key: "admin",
+      label: "Admin",
+      hint: "PIN, Key, spätere Config",
+      icon: <AdminIcon />,
+      onSelect: () => goApp(ADMIN_PATH),
     },
     {
       key: "support",

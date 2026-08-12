@@ -18,7 +18,8 @@ Technische Basis ist erledigt:
 
 - Capacitor 7, Bundle `de.bottletrade.dicebudget`, Native Start `/app`, API Prod.
 - TestFlight **Version 2.0**, Builds bis **~51+**; Release-Kandidat = aktueller HEAD + frischer `build:ios`.
-- iOS-UI nur aus `npm run build:ios` auf dem Mac; Admin-UI braucht `NEXT_PUBLIC_ADMIN_API_KEY` im Mac-`.env.production` (nicht im öffentlichen Web-Bundle).
+- iOS-UI nur aus `npm run build:ios` auf dem Mac.
+- **Admin (M43):** ein Build — `NEXT_PUBLIC_ADMIN_PIN` + lokal hinterlegter Admin-API-Key; öffentliches Bundle ohne eingebetteten `NEXT_PUBLIC_ADMIN_API_KEY`.
 
 Offen (M30):
 
@@ -26,9 +27,38 @@ Offen (M30):
 - App Store Connect: Paid Agreement, Bank/Steuer, Preis **1,19 €**, Screenshots/Metadaten, Build wählen, Submit for Review.
 - Details: `docs/ios_current.md`, `docs/testflight-app-store.md` Phase 7.
 
+## Aktive Feature-Milestones (vor M30)
+
+**Priorität:** **M42** und **M43** vor organisatorischem **M30** (App Store). Ein App-Build; Admin per PIN + lokal hinterlegtem API-Key (kein separater Admin-Build nötig).
+
+| Prio | Milestone | Status |
+|------|-----------|--------|
+| 1 | **M42** Rivalen-Bilder nur lokal | umgesetzt |
+| 2 | **M43** Admin-Shell (PIN, ein Build) | umgesetzt |
+| — | **M30** App Store Release | bewusst zurückgestellt |
+
+### M42 — Rivalen-Bilder nur lokal
+
+**Ziel:** Pro Rivalen-Profil ein Bild nur auf dem Gerät (nie Server/API).
+
+- Speicherung: IndexedDB (Blob), Profil-ID als Schlüssel; nicht `localStorage` für Binärdaten.
+- UI: Rivalen verwalten — Foto wählen/entfernen, Kompression (~256 px).
+- Anzeige: Avatar in Rivalen-Liste und Paarungs-Karten; Fallback Initialen.
+- Löschen/Zusammenführen entfernt zugehörige Blobs.
+
+### M43 — Admin-Oberfläche (ein Build, PIN)
+
+**Ziel:** Dieselbe App; Admin nach PIN freischalten; Server-Aktionen weiter mit `X-Admin-Key`.
+
+- `NEXT_PUBLIC_ADMIN_PIN` im Build (UX-Gate, analog Labor).
+- Nach Freischaltung: Admin-API-Key **einmal lokal** hinterlegen (nicht im öffentlichen Bundle).
+- Route `/settings/admin`: Status, Key, Sperren; Platzhalter InApp-Käufe/Remote-Config.
+- Stats-Admin (Siege/Diff, Server-Löschen) nur wenn freigeschaltet **und** Key vorhanden.
+- Legacy: eingebetteter `NEXT_PUBLIC_ADMIN_API_KEY` weiter nutzbar, aber nur nach PIN wenn PIN gesetzt.
+
 ## Geplante / umgesetzte Nutzer-Wunschliste (M37–M41)
 
-Details: `docs/milestone-roadmap-analysis.md`. Code ist umgesetzt; nächster organisatorischer Schritt ist **M30**.
+Details: `docs/milestone-roadmap-analysis.md`. Code ist umgesetzt; organisatorisch **M30** nach M42/M43.
 
 | Prio | Milestone | Status |
 |------|-----------|--------|
@@ -83,7 +113,7 @@ Details: `docs/milestone-roadmap-analysis.md` → Abschnitt **M36**.
 
 **Status:** implementiert (HEAD `f3a1ed0`); Backend- + Frontend-Tests grün.
 
-- Öffentliches Web **ohne** `NEXT_PUBLIC_ADMIN_API_KEY` im Bundle; Admin nur Mac-Admin-Build.
+- Öffentliches Web **ohne** eingebetteten `NEXT_PUBLIC_ADMIN_API_KEY`; Admin per PIN + lokalem Key (M43).
 - `finalizeSessionStats` atomar (erste Entscheidung gewinnt); Pairing-Cache nach Finalize.
 - Absolute Baseline: Zielstand + App-Snapshot → neue Partien schreiben Siege/Diff fort (kein Additiv-Drift).
 - „Neue Runde“ übernimmt Pool-/House-Rule-Flags; Auth-Fehlermeldungen an Ist angepasst.
@@ -463,20 +493,22 @@ Dateien:
 
 ## Offene Aufgaben
 
-1. **M30** TestFlight-Regression auf HEAD; iOS-Upload naechste Build-Nummer.
-2. App Store Connect: Paid Applications Agreement, Bank/Steuer, Preis `1,19 EUR`, Metadaten.
+1. **M42 / M43** abschließen und manuell prüfen (Avatare, Admin-PIN + Key, Stats-Admin).
+2. **M30** danach: TestFlight-Regression; iOS-Upload; App Store Connect.
 3. Optional: Auto-Refresh nach Pool-Endspiel fuer Statistik-Toggle.
 4. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
 
 ## Bekannte Technische Schulden
 
-- Stats-Endpunkte (Baseline + Reset) sind durch `X-Admin-Key` geschützt; Key nur in Backend-Env + optional Mac-Admin-iOS-Build (nicht öffentliches Web).
+- Stats-Endpunkte (Baseline + Reset) durch `X-Admin-Key`; Client: PIN + lokal hinterlegter Key (M43), kein öffentlicher Bundle-Key.
 - Frontend transitive `postcss` moderate (via Next.js) — kein sicherer Fix ohne Next-Major.
 - E2E-Abdeckung noch duenn (3 Smoke-Tests); iPad-Tischmodus und iOS-Scroll nicht abgedeckt.
 
 ## Aktuelle Prioritaeten
 
-1. **M30** TestFlight-Regression und App Store Connect.
+1. **M42** Rivalen-Bilder lokal + **M43** Admin-PIN (ein Build).
+2. **M30** TestFlight / App Store Connect (danach).
+3. Optional M36 nach M30.
 2. iOS-Build auf HEAD (Admin-Key nur auf Admin-Gerät); Release-Submit.
 
 ## Letzte UX (2026-08-12)

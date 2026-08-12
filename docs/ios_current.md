@@ -13,20 +13,21 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 - TestFlight: Builds bis **~51+** (Nutzer-Stand 2026-08-12); Installationen können hinterherhinken — immer **Menü → Version 2.0 (xx)** prüfen (native Bundle-Build).
 - **Release-Kandidat für M30:** aktueller HEAD mit frischem `npm run build:ios`.
 - Web/API live: https://dicebudget.bottle-trade.de
-- **Web öffentlich:** ohne eingebetteten Admin-Key (keine Admin-Buttons im Browser).
-- **Admin nur Mac-Build:** `NEXT_PUBLIC_ADMIN_API_KEY` in Mac-`.env.production` vor `build:ios`.
+- **Web/iOS ein Build (M43):** Admin per `NEXT_PUBLIC_ADMIN_PIN`; API-Key lokal nach Freischaltung (nicht im Bundle).
+- Öffentliches Bundle: `NEXT_PUBLIC_ADMIN_API_KEY` leer lassen.
 
 ### Mac `.env.production` (kritisch)
 
 | Variable | Zweck |
 |----------|--------|
 | `NEXT_PUBLIC_LABS_PIN` | InApp-Käufe (Features) freischalten |
-| `NEXT_PUBLIC_ADMIN_API_KEY` | Stats-Admin-UI (**Löschen · Server**, Siege/Diff) — muss Backend `ADMIN_API_KEY` entsprechen; **nur auf Admin-Gerät**; Spieler-Builds ohne Key |
+| `NEXT_PUBLIC_ADMIN_PIN` | Admin-Oberfläche freischalten (ein Build; Key danach lokal) |
+| `NEXT_PUBLIC_ADMIN_API_KEY` | Optional/Legacy — lieber leer; Key lokal unter Einstellungen → Admin |
 | `NEXT_PUBLIC_APP_VERSION` | z. B. `2.0` (Web-Fallback; iOS-Menü liest native Version) |
 | `NEXT_PUBLIC_APP_BUILD` | Web: typisch `web`. iOS-Menü zeigt **Xcode Build** zur Laufzeit (`App.getInfo`) — Env muss nicht mehr bei jedem Archive mitgezählt werden |
 | `NEXT_PUBLIC_SITE_URL` | empfohlen `https://dicebudget.bottle-trade.de` |
 
-Server-`frontend/.env.production` für den öffentlichen Web-Build: Admin-Key **leer**. Backend `ADMIN_API_KEY` unverändert.
+Server-`frontend/.env.production`: Admin-API-Key **leer**, Admin-PIN gesetzt. Backend `ADMIN_API_KEY` unverändert.
 
 ## iOS-Bundle (kritisch)
 
@@ -51,10 +52,10 @@ git log -1 --oneline
 
 ```bash
 cd ~/projects/kniffel/frontend
-grep -E 'NEXT_PUBLIC_LABS_PIN|NEXT_PUBLIC_ADMIN_API_KEY|NEXT_PUBLIC_APP_VERSION|NEXT_PUBLIC_APP_BUILD' .env.production
+grep -E 'NEXT_PUBLIC_LABS_PIN|NEXT_PUBLIC_ADMIN_PIN|NEXT_PUBLIC_ADMIN_API_KEY|NEXT_PUBLIC_APP_VERSION|NEXT_PUBLIC_APP_BUILD' .env.production
 ```
 
-Admin-Gerät: Key gesetzt. Spieler-Gerät: Key-Zeile leer.
+Ein Build: `NEXT_PUBLIC_ADMIN_PIN` gesetzt, `NEXT_PUBLIC_ADMIN_API_KEY` leer; Key nach PIN lokal hinterlegen.
 
 ```bash
 npm install

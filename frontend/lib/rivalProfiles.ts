@@ -5,6 +5,7 @@
 
 import { loadPlayerAliases, setPlayerAlias } from "@/lib/playerAliases";
 import { normalizePublicPlayerId, shortPlayerId } from "@/lib/playerIdentity";
+import { deleteRivalAvatar } from "@/lib/rivalAvatarStore";
 
 const STORAGE_KEY = "dicebudget.rivalProfiles.v1";
 const MIGRATED_KEY = "dicebudget.rivalProfiles.migratedFromAliases.v1";
@@ -243,6 +244,7 @@ export function deleteRival(rivalId: string): RivalProfile[] {
   }
   const next = profiles.filter((profile) => profile.id !== rivalId);
   writeProfiles(next);
+  void deleteRivalAvatar(rivalId);
   return loadRivalProfiles();
 }
 
@@ -261,7 +263,17 @@ export function mergeRivals(targetId: string, sourceId: string): RivalProfile[] 
     .filter((profile) => profile.id !== sourceId)
     .map((profile) => (profile.id === targetId ? merged : profile));
   writeProfiles(next);
+  void deleteRivalAvatar(sourceId);
   return loadRivalProfiles();
+}
+
+/** Rivalen-Profil zu einer playerId (oder null). */
+export function findRivalByPlayerId(playerId: string): RivalProfile | null {
+  const normalizedId = normalizePublicPlayerId(playerId);
+  if (!normalizedId) return null;
+  return (
+    loadRivalProfiles().find((profile) => profile.playerIds.includes(normalizedId)) ?? null
+  );
 }
 
 export function rivalLinkedIdsLabel(profile: RivalProfile): string {

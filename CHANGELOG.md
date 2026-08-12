@@ -5,8 +5,13 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **M42 Rivalen-Bilder:** Foto pro Rival nur lokal (IndexedDB), verwalten unter Rivalen; Anzeige in Liste/Paarungen
+- **M43 Admin (ein Build):** PIN-Freischaltung (`NEXT_PUBLIC_ADMIN_PIN`), Admin-API-Key lokal hinterlegen, Shell unter Einstellungen → Admin
 - **Heller Spielzettel:** Toggle unter Visuelle Einblendungen — nur der Zettel hell (`scoreSheetTheme`), Rest der App unverändert
 - **Rivalen-Share-Karte:** Teilen aus Paarungs-Detail (Duell-Balken, Punktedifferenz, Form der letzten Runden)
+
+### Changed
+- **Admin-Zugang:** kein separater Admin-Build mehr nötig; Stats-Admin nur nach PIN + Key (Legacy-Env-Key nur mit PIN, falls PIN gesetzt)
 
 ### Docs
 - **HANDOVER / milestones_active / ios_current / GOiOS / milestones / CHANGELOG:** Stand 2026-08-12, HEAD `2140090` / Produkt `75f5228`, Tests 87, TestFlight ~51+, Gold-Aufleuchten, native Menü-Version

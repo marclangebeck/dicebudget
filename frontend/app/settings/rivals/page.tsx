@@ -9,7 +9,7 @@ export default function RivalsSettingsPage() {
       <AppScreenHeader
         section="Rivalen"
         title="Rivalen verwalten"
-        subtitle="Anlegen, umbenennen, zusammenführen oder löschen — nur auf diesem Gerät."
+        subtitle="Anlegen, Bilder, umbenennen, zusammenführen oder löschen — nur auf diesem Gerät."
         backHref="/stats"
         backLabel="Zurück zur Statistik"
       />
