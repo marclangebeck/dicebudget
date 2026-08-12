@@ -4,12 +4,15 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
+### Changed
+- **Menü-Version (iOS):** zeigt die echte Xcode-/Bundle-Build-Nummer zur Laufzeit (`@capacitor/app` `App.getInfo`); Web bleibt bei `NEXT_PUBLIC_APP_*` (Fallback typisch `web`)
+
 ### Added
 - **Zettel-Lauffeuer:** Kurzes umlaufendes Highlight (~1,2 s) wenn eine Feld-Zeile (über alle Spiele) oder eine Spiel-Spalte (13 Felder) voll wird — rein visuell, blockiert nicht; an Erfolgsanimationen-Toggle gekoppelt
 - **Visuelle Einblendungen:** Info-„i“ und Settings-Text um Zeilen-/Spalten-Lauffeuer ergänzt
 - **Einswurf-Sound:** Kurzer Ping bei Strategy-Eintrag mit genau 1 Wurf und Score &gt; 0 (kein Overlay; nicht bei Achievement/Korrektur/Verkauf)
 - **Spalten-Pool-Boni (M40):** Erster Spieler: Spalte oben mit Bonus / unten voll / gleiche Spalte komplett — je +2 Pool (max. 6); Labs + Session-Flag
-- **Menü-Version (M39):** Hamburger zeigt `Version 2.0 (…)` aus `NEXT_PUBLIC_APP_VERSION` / `NEXT_PUBLIC_APP_BUILD`
+- **Menü-Version (M39):** Hamburger zeigt `Version 2.0 (…)`; iOS native Bundle-Build, Web aus `NEXT_PUBLIC_APP_*`
 - **Fortschritt 25/50/75 %:** Punktdifferenz zum Gegner im Overlay („X Punkte voraus/zurück“)
 - **Hausregel auto (2 Spieler, Strategy):** 2× Alle Fünfe ≤3 Würfe → Gegner-Pool **halbiert** + Overlay
 - **Hausregel auto (2 Spieler, Strategy):** 3× Alle Fünfe ≤3 Würfe → Gegner-Pool **0** + Overlay (Vorrang vor 2×)

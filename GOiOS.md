@@ -21,7 +21,7 @@ Diese Datei ist ein Kompatibilitaets-Index. Fuer aktuellen iOS-/TestFlight-/App-
 
 - Web-Deploy und iOS-Release sind getrennt; `ios/App/App/public/` ist gitignored.
 - Nach UI-Aenderungen: Mac `git reset --hard origin/milestone-22-prep`, Env setzen, `npm run build:ios`, Archive/Upload.
-- **Menü-Version:** `NEXT_PUBLIC_APP_VERSION` + `NEXT_PUBLIC_APP_BUILD` = Xcode-Build.
+- **Menü-Version:** iOS = Xcode Build zur Laufzeit (`App.getInfo`); Web = `NEXT_PUBLIC_APP_VERSION` + `NEXT_PUBLIC_APP_BUILD` (typisch `web`).
 - **Admin-Stats:** `NEXT_PUBLIC_ADMIN_API_KEY` muss vor `build:ios` in Mac-`.env.production` stehen.
 - Bei `git pull`-Fehler: `git restore frontend/package-lock.json` vor Pull (vom Projektroot).
 - Der verbindliche Sync-Workflow steht in `AGENT_RULES.md` Sektion 9.

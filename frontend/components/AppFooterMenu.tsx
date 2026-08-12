@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import {
   APP_HOME_PATH,
   APP_NAME,
@@ -11,7 +11,7 @@ import {
   IMPRESSUM_PATH,
   PRIVACY_PATH,
 } from "@/lib/branding";
-import { formatAppVersionLabel } from "@/lib/appVersion";
+import { formatAppVersionLabel, resolveAppVersionLabel } from "@/lib/appVersion";
 import { requestAppTour } from "@/lib/appTourPrefs";
 import { useFocusTrap } from "@/lib/useFocusTrap";
 
@@ -138,7 +138,18 @@ export function AppFooterMenu({ open, onClose }: Props) {
   const panelRef = useRef<HTMLElement>(null);
   const router = useRouter();
   const pathname = usePathname();
+  const [versionLabel, setVersionLabel] = useState(() => formatAppVersionLabel());
   useFocusTrap(panelRef, open);
+
+  useEffect(() => {
+    let cancelled = false;
+    void resolveAppVersionLabel().then((label) => {
+      if (!cancelled) setVersionLabel(label);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -303,7 +314,7 @@ export function AppFooterMenu({ open, onClose }: Props) {
 
         <p className="app-footer-menu-foot">Würfel. Strategie. Bilanz.</p>
         <p className="app-footer-menu-version" aria-label="App-Version">
-          {formatAppVersionLabel()}
+          {versionLabel}
         </p>
       </nav>
     </div>

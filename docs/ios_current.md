@@ -22,8 +22,9 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 |----------|--------|
 | `NEXT_PUBLIC_LABS_PIN` | InApp-Käufe (Features) freischalten |
 | `NEXT_PUBLIC_ADMIN_API_KEY` | Stats-Admin-UI (**Löschen · Server**, Siege/Diff) — muss Backend `ADMIN_API_KEY` entsprechen; **nur auf Admin-Gerät**; Spieler-Builds ohne Key |
-| `NEXT_PUBLIC_APP_VERSION` | z. B. `2.0` |
-| `NEXT_PUBLIC_APP_BUILD` | muss **Xcode Build** entsprechen (z. B. `46`) |
+| `NEXT_PUBLIC_APP_VERSION` | z. B. `2.0` (Web-Fallback; iOS-Menü liest native Version) |
+| `NEXT_PUBLIC_APP_BUILD` | Web: typisch `web`. iOS-Menü zeigt **Xcode Build** zur Laufzeit (`App.getInfo`) — Env muss nicht mehr bei jedem Archive mitgezählt werden |
+
 | `NEXT_PUBLIC_SITE_URL` | empfohlen `https://dicebudget.bottle-trade.de` |
 
 Server-`frontend/.env.production` für den öffentlichen Web-Build: Admin-Key **leer**. Backend `ADMIN_API_KEY` unverändert.
@@ -66,7 +67,8 @@ npm run build:ios
 ### In Xcode (Archive → App Store Connect)
 
 1. **Product → Clean Build Folder** (⇧⌘K)
-2. Target **App** → **General** → **Build** = Wert aus `NEXT_PUBLIC_APP_BUILD`
+2. Target **App** → **General** → **Build** erhöhen (Menü zeigt diese Nummer automatisch nach `build:ios`)
+
 3. Scheme **App**, Ziel **Any iOS Device (arm64)**
 4. **Product → Archive**
 5. Organizer → **Distribute App** → **App Store Connect** → **Upload**

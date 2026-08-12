@@ -53,7 +53,7 @@ Details: `docs/milestone-roadmap-analysis.md`. Code ist umgesetzt; nächster org
 ### M39 — Versionsnummer im Hamburger-Menü
 
 **Status:** umgesetzt.  
-**Anzeige:** `Version 2.0 (web)` bzw. `Version 2.0 (<NEXT_PUBLIC_APP_BUILD>)`.
+**Anzeige:** iOS `Version 2.0 (<Xcode-Build>)` zur Laufzeit; Web `Version 2.0 (web)` bzw. Env-Fallback.
 
 ### M40 — Hausregel: Spalten-Pool-Boni (oben / unten / Kombi)
 

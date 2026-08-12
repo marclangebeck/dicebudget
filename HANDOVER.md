@@ -41,7 +41,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md` (**M3
 
 - UI in der App aus `frontend/ios/App/App/public/` (gitignored).
 - Nur **`npm run build:ios`** auf dem Mac befüllt das Bundle und öffnet Xcode.
-- Vor Archive: `git log -1`; in `frontend/.env.production`: `NEXT_PUBLIC_LABS_PIN`, für Admin-UI **`NEXT_PUBLIC_ADMIN_API_KEY`** (gleich Backend), `NEXT_PUBLIC_APP_VERSION=2.0`, `NEXT_PUBLIC_APP_BUILD=<Xcode-Build>`.
+- Vor Archive: `git log -1`; in `frontend/.env.production`: `NEXT_PUBLIC_LABS_PIN`, für Admin-UI **`NEXT_PUBLIC_ADMIN_API_KEY`** (gleich Backend), `NEXT_PUBLIC_APP_VERSION=2.0`. Menü-Build auf iOS kommt aus Xcode (`App.getInfo`); Web-Fallback `NEXT_PUBLIC_APP_BUILD=web`.
 
 ## Letzte Produktänderungen
 
