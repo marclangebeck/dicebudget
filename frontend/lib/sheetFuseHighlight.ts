@@ -24,8 +24,6 @@ export type SheetFuseHighlight = {
   rows: FieldTypeId[];
   /** `game.index` (1-basiert wie auf dem Zettel). */
   columns: number[];
-  /** Gesamter Zettel (alle Spiele × 13 Felder) gerade fertig geworden. */
-  fullRun: boolean;
 };
 
 export function isGameColumnComplete(game: GameRow): boolean {
@@ -34,10 +32,6 @@ export function isGameColumnComplete(game: GameRow): boolean {
     if (!field || field.score === null) return false;
   }
   return true;
-}
-
-export function isRunSheetComplete(games: GameRow[]): boolean {
-  return games.length > 0 && games.every(isGameColumnComplete);
 }
 
 export function detectNewlyCompletedFieldRows(
@@ -72,9 +66,8 @@ export function detectSheetFuseHighlight(
 ): SheetFuseHighlight | null {
   const rows = detectNewlyCompletedFieldRows(gamesBefore, gamesAfter);
   const columns = detectNewlyCompletedGameColumns(gamesBefore, gamesAfter);
-  const fullRun = !isRunSheetComplete(gamesBefore) && isRunSheetComplete(gamesAfter);
-  if (!fullRun && rows.length === 0 && columns.length === 0) return null;
-  return { rows, columns, fullRun };
+  if (rows.length === 0 && columns.length === 0) return null;
+  return { rows, columns };
 }
 
 export function fieldShouldGoldFlash(
@@ -83,7 +76,6 @@ export function fieldShouldGoldFlash(
   gameIndex: number,
 ): boolean {
   if (!highlight) return false;
-  if (highlight.fullRun) return true;
   if (highlight.rows.includes(fieldType)) return true;
   if (highlight.columns.includes(gameIndex)) return true;
   return false;

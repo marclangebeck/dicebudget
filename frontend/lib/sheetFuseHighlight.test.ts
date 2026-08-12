@@ -7,7 +7,6 @@ import {
   detectSheetFuseHighlight,
   fieldShouldGoldFlash,
   isGameColumnComplete,
-  isRunSheetComplete,
 } from "./sheetFuseHighlight.js";
 
 const ALL: FieldTypeId[] = [
@@ -55,16 +54,6 @@ describe("isGameColumnComplete", () => {
 
   it("true wenn alle 13 Felder gesetzt", () => {
     assert.equal(isGameColumnComplete(gameWith(1, fullScores())), true);
-  });
-});
-
-describe("isRunSheetComplete", () => {
-  it("true nur wenn alle Spiele voll", () => {
-    assert.equal(isRunSheetComplete([gameWith(1, fullScores())]), true);
-    assert.equal(
-      isRunSheetComplete([gameWith(1, fullScores()), gameWith(2, fullScores("CHANCE"))]),
-      false,
-    );
   });
 });
 
@@ -117,10 +106,9 @@ describe("detectSheetFuseHighlight", () => {
     assert.ok(hit);
     assert.deepEqual(hit!.rows, ["ONES"]);
     assert.deepEqual(hit!.columns, [1]);
-    assert.equal(hit!.fullRun, false);
   });
 
-  it("erkennt gesamtes Spiel / Zettel", () => {
+  it("kein Extra-Trigger nur weil der Zettel fertig ist", () => {
     const before = [
       gameWith(1, fullScores()),
       gameWith(2, fullScores("CHANCE")),
@@ -131,7 +119,7 @@ describe("detectSheetFuseHighlight", () => {
     ];
     const hit = detectSheetFuseHighlight(before, after);
     assert.ok(hit);
-    assert.equal(hit!.fullRun, true);
+    assert.deepEqual(hit!.rows, []);
     assert.deepEqual(hit!.columns, [2]);
   });
 
@@ -142,21 +130,17 @@ describe("detectSheetFuseHighlight", () => {
 });
 
 describe("fieldShouldGoldFlash", () => {
-  it("trifft Zeile, Spalte und fullRun", () => {
+  it("trifft Zeile und Spalte", () => {
     assert.equal(
-      fieldShouldGoldFlash({ rows: ["ONES"], columns: [], fullRun: false }, "ONES", 1),
+      fieldShouldGoldFlash({ rows: ["ONES"], columns: [] }, "ONES", 1),
       true,
     );
     assert.equal(
-      fieldShouldGoldFlash({ rows: [], columns: [2], fullRun: false }, "CHANCE", 2),
+      fieldShouldGoldFlash({ rows: [], columns: [2] }, "CHANCE", 2),
       true,
     );
     assert.equal(
-      fieldShouldGoldFlash({ rows: [], columns: [], fullRun: true }, "ONES", 1),
-      true,
-    );
-    assert.equal(
-      fieldShouldGoldFlash({ rows: ["TWOS"], columns: [], fullRun: false }, "ONES", 1),
+      fieldShouldGoldFlash({ rows: ["TWOS"], columns: [] }, "ONES", 1),
       false,
     );
   });

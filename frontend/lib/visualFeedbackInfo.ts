@@ -21,7 +21,7 @@ export const VISUAL_FEEDBACK_INFO: Record<VisualFeedbackInfoKey, VisualFeedbackI
     key: "sheetFuse",
     title: "Gold-Aufleuchten",
     body:
-      "Wenn eine Feld-Zeile über alle Spiele voll ist (z. B. alle Full-House-Felder), eine Spiel-Spalte (13 Felder) oder der gesamte Zettel fertig ist, leuchten die betroffenen Felder dreimal gleichzeitig vollflächig gold auf — mit kurzer Fanfare (falls Sounds an). Ohne den Spielablauf zu blockieren.",
+      "Wenn eine Feld-Zeile über alle Spiele voll ist (z. B. alle Full-House-Felder) oder eine Spiel-Spalte (13 Felder) fertig ist, leuchten die betroffenen Felder dreimal gleichzeitig vollflächig gold auf — mit kurzer Fanfare (falls Sounds an). Ohne den Spielablauf zu blockieren.",
   },
   sounds: {
     key: "sounds",

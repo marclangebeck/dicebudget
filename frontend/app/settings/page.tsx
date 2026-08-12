@@ -162,7 +162,7 @@ function SettingsPageInner() {
           />
           <SettingsToggleCard
             title="Gold-Aufleuchten"
-            description="Betroffene Felder leuchten 3× gold auf (Zeile, Spalte oder gesamter Zettel), plus Fanfare."
+            description="Betroffene Felder leuchten 3× gold auf (Zeile oder Spalte), plus Fanfare."
             checked={feedbackPrefs.sheetFuseHighlightEnabled}
             onChange={(value) => updateFeedback({ sheetFuseHighlightEnabled: value })}
             onInfo={() => setRuleInfo(getVisualFeedbackInfo("sheetFuse"))}

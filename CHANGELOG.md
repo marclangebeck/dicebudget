@@ -5,7 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
-- **Gold-Aufleuchten statt Lauffeuer:** betroffene Felder (Zeile / Spalte / gesamter Zettel) leuchten 3× gleichzeitig vollflächig gold; kurze Fanfare (Sounds-Toggle)
+- **Gold-Aufleuchten statt Lauffeuer:** betroffene Felder (Zeile oder Spalte) leuchten 3× gleichzeitig vollflächig gold; kurze Fanfare (Sounds-Toggle)
 
 ### Added
 - **Toggle Gold-Aufleuchten:** eigener Schalter unter Visuelle Einblendungen (unabhängig von Erfolgsanimationen), inkl. Info-„i“
