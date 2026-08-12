@@ -63,6 +63,8 @@ export function PairingDetailPanel({
     roundsPlayed: pairing.roundsPlayed,
     netDiff,
     form: recentPairingForm(pairing.rounds, 5),
+    playerARivalId: rivalA?.id ?? null,
+    playerBRivalId: rivalB?.id ?? null,
   };
 
   return (

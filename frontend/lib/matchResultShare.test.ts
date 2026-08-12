@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildPairingShareText, recentPairingForm } from "./matchResultShare.js";
+import { buildPairingShareText, recentPairingForm, shareAvatarInitials } from "./matchResultShare.js";
 
 describe("recentPairingForm", () => {
   it("nimmt die neuesten Runden (API newest-first) und kehrt für Form um", () => {
@@ -17,6 +17,16 @@ describe("recentPairingForm", () => {
 
   it("liefert leeres Array ohne Runden", () => {
     assert.deepEqual(recentPairingForm([], 5), []);
+  });
+});
+
+describe("shareAvatarInitials", () => {
+  it("bildet Initialen aus Vor- und Nachname", () => {
+    assert.equal(shareAvatarInitials("Alex Sam"), "AS");
+  });
+
+  it("nimmt zwei Buchstaben bei einem Wort", () => {
+    assert.equal(shareAvatarInitials("Alex"), "AL");
   });
 });
 

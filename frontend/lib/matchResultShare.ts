@@ -1,5 +1,6 @@
 import { APP_NAME } from "@/lib/branding";
 import type { HeadToHeadAnalysisDto, MatchAnalysisDto } from "@/lib/matchAnalysisTypes";
+import { getRivalAvatarBlob } from "@/lib/rivalAvatarStore";
 import {
   SHARE_CARD_SIZE,
   canvasToPngBlob,
@@ -270,6 +271,9 @@ export type PairingShareParams = {
   netDiff?: number;
   /** Letzte Ergebnisse chronologisch (älteste zuerst), max. ~5. */
   form?: Array<"A" | "B" | "tie">;
+  /** Lokale Rivalen-IDs für Avatare (IndexedDB, optional). */
+  playerARivalId?: string | null;
+  playerBRivalId?: string | null;
 };
 
 export type HomeRecordShareParams = {
@@ -309,6 +313,69 @@ function pairingLeadLabel(params: PairingShareParams): string {
   return `${leader} führt (+${lead})`;
 }
 
+/** Initialen für Avatar-Fallback auf Share-Karten. */
+export function shareAvatarInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0]!.slice(0, 2).toUpperCase();
+  return `${parts[0]!.slice(0, 1)}${parts[1]!.slice(0, 1)}`.toUpperCase();
+}
+
+async function drawShareRivalAvatar(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  radius: number,
+  blob: Blob | null,
+  name: string,
+  ringColor: string,
+): Promise<void> {
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.clip();
+
+  let drewPhoto = false;
+  if (blob) {
+    try {
+      const bitmap = await createImageBitmap(blob);
+      try {
+        const size = radius * 2;
+        const scale = Math.max(size / bitmap.width, size / bitmap.height);
+        const dw = bitmap.width * scale;
+        const dh = bitmap.height * scale;
+        ctx.drawImage(bitmap, cx - dw / 2, cy - dh / 2, dw, dh);
+        drewPhoto = true;
+      } finally {
+        bitmap.close();
+      }
+    } catch {
+      drewPhoto = false;
+    }
+  }
+
+  if (!drewPhoto) {
+    const gradient = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
+    gradient.addColorStop(0, "#334155");
+    gradient.addColorStop(1, "#1e293b");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
+    ctx.fillStyle = "#e2e8f0";
+    ctx.font = `700 ${Math.round(radius * 0.72)}px system-ui, sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(shareAvatarInitials(name), cx, cy + 1);
+  }
+  ctx.restore();
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.strokeStyle = ringColor;
+  ctx.lineWidth = Math.max(4, Math.round(radius * 0.08));
+  ctx.stroke();
+}
+
 export function buildPairingShareText(params: PairingShareParams): string {
   const tiePart = params.ties > 0 ? ` · ${params.ties} Remis` : "";
   const diff =
@@ -343,91 +410,109 @@ export async function renderPairingShareImage(params: PairingShareParams): Promi
         ? "rgba(16, 185, 129, 0.24)"
         : "rgba(56, 189, 248, 0.22)";
 
+  const [avatarA, avatarB] = await Promise.all([
+    params.playerARivalId ? getRivalAvatarBlob(params.playerARivalId) : Promise.resolve(null),
+    params.playerBRivalId ? getRivalAvatarBlob(params.playerBRivalId) : Promise.resolve(null),
+  ]);
+
   drawShareBackground(ctx);
   drawShareAccentGlow(ctx, accent);
   await drawShareBrandHeader(ctx);
 
   ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
   ctx.fillStyle = "#e5c07b";
   ctx.font = "700 28px system-ui, sans-serif";
-  ctx.fillText("RIVALEN-DUELL", SHARE_CARD_SIZE / 2, 210);
+  ctx.fillText("RIVALEN-DUELL", SHARE_CARD_SIZE / 2, 200);
 
+  const avatarR = 72;
+  const avatarCy = 300;
+  const leftCx = SHARE_CARD_SIZE / 2 - 200;
+  const rightCx = SHARE_CARD_SIZE / 2 + 200;
+  await drawShareRivalAvatar(ctx, leftCx, avatarCy, avatarR, avatarA, params.playerAName, "#10b981");
+  await drawShareRivalAvatar(ctx, rightCx, avatarCy, avatarR, avatarB, params.playerBName, "#38bdf8");
+
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
   ctx.fillStyle = "#f8fafc";
-  ctx.font = "700 38px system-ui, sans-serif";
-  const titleLines = wrapShareText(
-    ctx,
-    `${params.playerAName} vs. ${params.playerBName}`,
-    SHARE_CARD_SIZE - 160,
-  );
-  let titleY = 275;
-  for (const line of titleLines.slice(0, 2)) {
-    ctx.fillText(line, SHARE_CARD_SIZE / 2, titleY);
-    titleY += 44;
-  }
+  ctx.font = "700 28px system-ui, sans-serif";
+  const nameMax = 280;
+  const nameALines = wrapShareText(ctx, params.playerAName, nameMax);
+  const nameBLines = wrapShareText(ctx, params.playerBName, nameMax);
+  ctx.fillText(nameALines[0] ?? params.playerAName, leftCx, avatarCy + avatarR + 36);
+  ctx.fillText(nameBLines[0] ?? params.playerBName, rightCx, avatarCy + avatarR + 36);
 
-  const scoreY = 400;
-  ctx.font = "800 100px system-ui, sans-serif";
+  ctx.fillStyle = "#94a3b8";
+  ctx.font = "700 26px system-ui, sans-serif";
+  ctx.fillText("vs.", SHARE_CARD_SIZE / 2, avatarCy + 8);
+
+  const scoreY = 470;
+  ctx.font = "800 96px system-ui, sans-serif";
   ctx.fillStyle = "#6ee7b7";
-  ctx.fillText(String(params.playerAWins), SHARE_CARD_SIZE / 2 - 180, scoreY);
+  ctx.fillText(String(params.playerAWins), leftCx, scoreY);
   ctx.fillStyle = "#94a3b8";
   ctx.fillText(":", SHARE_CARD_SIZE / 2, scoreY);
   ctx.fillStyle = "#7dd3fc";
-  ctx.fillText(String(params.playerBWins), SHARE_CARD_SIZE / 2 + 180, scoreY);
+  ctx.fillText(String(params.playerBWins), rightCx, scoreY);
 
-  ctx.font = "600 26px system-ui, sans-serif";
+  ctx.font = "600 24px system-ui, sans-serif";
   ctx.fillStyle = "#cbd5e1";
-  ctx.fillText("Siege", SHARE_CARD_SIZE / 2 - 180, scoreY + 40);
-  ctx.fillText("Siege", SHARE_CARD_SIZE / 2 + 180, scoreY + 40);
+  ctx.fillText("Siege", leftCx, scoreY + 36);
+  ctx.fillText("Siege", rightCx, scoreY + 36);
 
   // Duell-Balken
   const barX = 160;
-  const barY = 480;
+  const barY = 540;
   const barW = SHARE_CARD_SIZE - 320;
-  const barH = 36;
-  roundShareRect(ctx, barX, barY, barW, barH, 18);
+  const barH = 34;
+  roundShareRect(ctx, barX, barY, barW, barH, 17);
   ctx.fillStyle = "rgba(15, 23, 42, 0.55)";
   ctx.fill();
   const aW = Math.max(barH, Math.round(barW * shareA));
-  roundShareRect(ctx, barX, barY, aW, barH, 18);
+  roundShareRect(ctx, barX, barY, aW, barH, 17);
   ctx.fillStyle = "#10b981";
   ctx.fill();
   if (shareA < 0.98) {
-    roundShareRect(ctx, barX + aW - 8, barY, barW - aW + 8, barH, 18);
+    roundShareRect(ctx, barX + aW - 8, barY, barW - aW + 8, barH, 17);
     ctx.fillStyle = "#38bdf8";
     ctx.fill();
   }
   ctx.fillStyle = "#e2e8f0";
   ctx.font = "700 22px system-ui, sans-serif";
-  ctx.fillText(`${Math.round(shareA * 100)}% · ${Math.round((1 - shareA) * 100)}%`, SHARE_CARD_SIZE / 2, barY + 26);
+  ctx.fillText(
+    `${Math.round(shareA * 100)}% · ${Math.round((1 - shareA) * 100)}%`,
+    SHARE_CARD_SIZE / 2,
+    barY + 24,
+  );
 
   ctx.fillStyle = "#94a3b8";
-  ctx.font = "500 28px system-ui, sans-serif";
-  ctx.fillText(pairingLeadLabel(params), SHARE_CARD_SIZE / 2, 560);
+  ctx.font = "500 26px system-ui, sans-serif";
+  ctx.fillText(pairingLeadLabel(params), SHARE_CARD_SIZE / 2, 610);
 
-  let metaY = 608;
+  let metaY = 652;
   if (params.netDiff != null && params.netDiff !== 0) {
     ctx.fillStyle = "#e5c07b";
-    ctx.font = "600 28px system-ui, sans-serif";
+    ctx.font = "600 26px system-ui, sans-serif";
     ctx.fillText(`Punktedifferenz ${formatSigned(params.netDiff)}`, SHARE_CARD_SIZE / 2, metaY);
-    metaY += 40;
+    metaY += 36;
   }
   if (params.ties > 0) {
     ctx.fillStyle = "#94a3b8";
-    ctx.font = "500 26px system-ui, sans-serif";
+    ctx.font = "500 24px system-ui, sans-serif";
     ctx.fillText(`${params.ties} Remis`, SHARE_CARD_SIZE / 2, metaY);
-    metaY += 36;
+    metaY += 32;
   }
 
   // Form / Trend
   if (params.form && params.form.length > 0) {
     ctx.fillStyle = "#64748b";
-    ctx.font = "600 22px system-ui, sans-serif";
-    ctx.fillText("FORM (LETZTE RUNDEN)", SHARE_CARD_SIZE / 2, metaY + 8);
-    const dotR = 16;
-    const gap = 44;
+    ctx.font = "600 20px system-ui, sans-serif";
+    ctx.fillText("FORM (LETZTE RUNDEN)", SHARE_CARD_SIZE / 2, metaY + 6);
+    const dotR = 14;
+    const gap = 40;
     const totalW = (params.form.length - 1) * gap;
     let dx = SHARE_CARD_SIZE / 2 - totalW / 2;
-    const dy = metaY + 48;
+    const dy = metaY + 42;
     for (const w of params.form) {
       ctx.beginPath();
       ctx.arc(dx, dy, dotR, 0, Math.PI * 2);
@@ -435,15 +520,15 @@ export async function renderPairingShareImage(params: PairingShareParams): Promi
       ctx.fill();
       dx += gap;
     }
-    metaY = dy + 40;
+    metaY = dy + 34;
   }
 
   ctx.fillStyle = "#64748b";
-  ctx.font = "500 26px system-ui, sans-serif";
+  ctx.font = "500 24px system-ui, sans-serif";
   ctx.fillText(
     `${params.roundsPlayed} ${params.roundsPlayed === 1 ? "Runde" : "Runden"} gesamt`,
     SHARE_CARD_SIZE / 2,
-    Math.max(metaY + 8, SHARE_CARD_SIZE - 190),
+    Math.max(metaY + 6, SHARE_CARD_SIZE - 190),
   );
 
   drawShareBrandFooter(ctx);
