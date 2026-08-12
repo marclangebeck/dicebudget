@@ -161,8 +161,8 @@ function SettingsPageInner() {
             onInfo={() => setRuleInfo(getVisualFeedbackInfo("animations"))}
           />
           <SettingsToggleCard
-            title="Zeilen-/Spalten-Lauffeuer"
-            description="Kurzes umlaufendes Highlight, wenn eine Feld-Zeile oder Spiel-Spalte voll ist."
+            title="Gold-Aufleuchten"
+            description="Betroffene Felder leuchten 3× gold auf (Zeile, Spalte oder gesamter Zettel), plus Fanfare."
             checked={feedbackPrefs.sheetFuseHighlightEnabled}
             onChange={(value) => updateFeedback({ sheetFuseHighlightEnabled: value })}
             onInfo={() => setRuleInfo(getVisualFeedbackInfo("sheetFuse"))}

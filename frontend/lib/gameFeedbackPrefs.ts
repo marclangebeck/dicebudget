@@ -105,7 +105,7 @@ export function getProgressHintsEnabled(): boolean {
 export function feedbackPrefsSummary(prefs: GameFeedbackPrefs): string {
   const parts: string[] = [];
   if (prefs.animationsEnabled) parts.push("Animationen");
-  if (prefs.sheetFuseHighlightEnabled) parts.push("Lauffeuer");
+  if (prefs.sheetFuseHighlightEnabled) parts.push("Gold-Aufleuchten");
   if (prefs.soundsEnabled) parts.push("Sounds");
   if (prefs.progressHintsEnabled) parts.push("Fortschritt");
   return parts.length > 0 ? parts.join(" · ") : "Alles aus";

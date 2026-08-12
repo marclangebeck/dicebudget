@@ -19,9 +19,9 @@ export const VISUAL_FEEDBACK_INFO: Record<VisualFeedbackInfoKey, VisualFeedbackI
   },
   sheetFuse: {
     key: "sheetFuse",
-    title: "Zeilen-/Spalten-Lauffeuer",
+    title: "Gold-Aufleuchten",
     body:
-      "Wenn eine Feld-Zeile über alle Spiele voll ist (z. B. alle Full-House-Felder) oder eine Spiel-Spalte (13 Felder) fertig ist, umrundet kurz ein Lauffeuer (Zündschnur) die Zeile bzw. Spalte — etwa 1 s, ohne den Spielablauf zu blockieren. Rein optisch.",
+      "Wenn eine Feld-Zeile über alle Spiele voll ist (z. B. alle Full-House-Felder), eine Spiel-Spalte (13 Felder) oder der gesamte Zettel fertig ist, leuchten die betroffenen Felder dreimal gleichzeitig vollflächig gold auf — mit kurzer Fanfare (falls Sounds an). Ohne den Spielablauf zu blockieren.",
   },
   sounds: {
     key: "sounds",

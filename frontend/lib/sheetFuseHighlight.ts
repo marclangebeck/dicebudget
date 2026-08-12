@@ -2,8 +2,11 @@ import { listFullFieldTypeRows } from "@/lib/houseRules";
 import { LOWER_FIELD_TYPES, UPPER_FIELD_TYPES } from "@/lib/labels";
 import type { FieldTypeId } from "@/lib/types";
 
-/** Kurz, damit man sofort weiterspielen kann (~0,8–1,5 s, max. ~2 s). */
-export const FUSE_HIGHLIGHT_MS = 1200;
+/** Dauer für 3× goldenes Aufleuchten (~1,4 s). */
+export const SHEET_GOLD_FLASH_MS = 1400;
+
+/** @deprecated Alias — gleiche Dauer. */
+export const FUSE_HIGHLIGHT_MS = SHEET_GOLD_FLASH_MS;
 
 const ALL_FIELD_TYPES: FieldTypeId[] = [...UPPER_FIELD_TYPES, ...LOWER_FIELD_TYPES];
 
@@ -21,6 +24,8 @@ export type SheetFuseHighlight = {
   rows: FieldTypeId[];
   /** `game.index` (1-basiert wie auf dem Zettel). */
   columns: number[];
+  /** Gesamter Zettel (alle Spiele × 13 Felder) gerade fertig geworden. */
+  fullRun: boolean;
 };
 
 export function isGameColumnComplete(game: GameRow): boolean {
@@ -29,6 +34,10 @@ export function isGameColumnComplete(game: GameRow): boolean {
     if (!field || field.score === null) return false;
   }
   return true;
+}
+
+export function isRunSheetComplete(games: GameRow[]): boolean {
+  return games.length > 0 && games.every(isGameColumnComplete);
 }
 
 export function detectNewlyCompletedFieldRows(
@@ -63,6 +72,19 @@ export function detectSheetFuseHighlight(
 ): SheetFuseHighlight | null {
   const rows = detectNewlyCompletedFieldRows(gamesBefore, gamesAfter);
   const columns = detectNewlyCompletedGameColumns(gamesBefore, gamesAfter);
-  if (rows.length === 0 && columns.length === 0) return null;
-  return { rows, columns };
+  const fullRun = !isRunSheetComplete(gamesBefore) && isRunSheetComplete(gamesAfter);
+  if (!fullRun && rows.length === 0 && columns.length === 0) return null;
+  return { rows, columns, fullRun };
+}
+
+export function fieldShouldGoldFlash(
+  highlight: SheetFuseHighlight | null | undefined,
+  fieldType: FieldTypeId,
+  gameIndex: number,
+): boolean {
+  if (!highlight) return false;
+  if (highlight.fullRun) return true;
+  if (highlight.rows.includes(fieldType)) return true;
+  if (highlight.columns.includes(gameIndex)) return true;
+  return false;
 }

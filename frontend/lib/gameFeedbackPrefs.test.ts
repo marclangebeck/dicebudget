@@ -11,14 +11,14 @@ describe("gameFeedbackPrefs sheetFuse", () => {
     assert.equal(DEFAULT_GAME_FEEDBACK_PREFS.sheetFuseHighlightEnabled, true);
   });
 
-  it("Summary listet Lauffeuer", () => {
+  it("Summary listet Gold-Aufleuchten", () => {
     const label = feedbackPrefsSummary({
       animationsEnabled: true,
       sheetFuseHighlightEnabled: true,
       soundsEnabled: false,
       progressHintsEnabled: false,
     });
-    assert.equal(label, "Animationen · Lauffeuer");
+    assert.equal(label, "Animationen · Gold-Aufleuchten");
   });
 
   it("setGameFeedbackPrefs behält sheetFuse", () => {

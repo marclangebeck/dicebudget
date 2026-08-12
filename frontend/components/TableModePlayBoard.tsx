@@ -32,6 +32,7 @@ import { useQueuedFeedbackOverlays } from "@/lib/feedbackOverlayQueue";
 import { buildProgressMilestoneAfterField } from "@/lib/runProgressFeedback";
 import {
   playFirstRollRewardSound,
+  playSheetGoldFanfareSound,
   shouldPlayFirstRollReward,
   unlockAchievementAudio,
 } from "@/lib/achievementSound";
@@ -41,7 +42,7 @@ import { allFieldsScored, getLastScoredFieldId, isRunEnded } from "@/lib/runUtil
 import { loadDisplayNames } from "@/lib/rivalProfiles";
 import {
   detectSheetFuseHighlight,
-  FUSE_HIGHLIGHT_MS,
+  SHEET_GOLD_FLASH_MS,
   type SheetFuseHighlight,
 } from "@/lib/sheetFuseHighlight";
 import {
@@ -115,13 +116,14 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     if (!getSheetFuseHighlightEnabled()) return;
     const next = detectSheetFuseHighlight(gamesBefore, gamesAfter);
     if (!next) return;
+    playSheetGoldFanfareSound();
     setFuseBySide((current) => ({ ...current, [side]: next }));
     const prevTimer = fuseHighlightTimerRef.current[side];
     if (prevTimer != null) window.clearTimeout(prevTimer);
     fuseHighlightTimerRef.current[side] = window.setTimeout(() => {
       setFuseBySide((current) => ({ ...current, [side]: null }));
       fuseHighlightTimerRef.current[side] = undefined;
-    }, FUSE_HIGHLIGHT_MS);
+    }, SHEET_GOLD_FLASH_MS);
   }
 
   const load = useCallback(async () => {

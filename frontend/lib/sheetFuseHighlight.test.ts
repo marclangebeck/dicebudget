@@ -5,7 +5,9 @@ import {
   detectNewlyCompletedFieldRows,
   detectNewlyCompletedGameColumns,
   detectSheetFuseHighlight,
+  fieldShouldGoldFlash,
   isGameColumnComplete,
+  isRunSheetComplete,
 } from "./sheetFuseHighlight.js";
 
 const ALL: FieldTypeId[] = [
@@ -56,6 +58,16 @@ describe("isGameColumnComplete", () => {
   });
 });
 
+describe("isRunSheetComplete", () => {
+  it("true nur wenn alle Spiele voll", () => {
+    assert.equal(isRunSheetComplete([gameWith(1, fullScores())]), true);
+    assert.equal(
+      isRunSheetComplete([gameWith(1, fullScores()), gameWith(2, fullScores("CHANCE"))]),
+      false,
+    );
+  });
+});
+
 describe("detectNewlyCompletedFieldRows", () => {
   it("erkennt Full-House-Zeile über alle Spiele", () => {
     const before = [
@@ -97,7 +109,6 @@ describe("detectSheetFuseHighlight", () => {
       gameWith(1, { ...fullScores("ONES"), ONES: null }),
       gameWith(2, { ONES: 2 }),
     ];
-    // Spalte 1 wird voll und ONES-Zeile wird voll
     const after = [
       gameWith(1, fullScores()),
       gameWith(2, { ONES: 2 }),
@@ -106,10 +117,47 @@ describe("detectSheetFuseHighlight", () => {
     assert.ok(hit);
     assert.deepEqual(hit!.rows, ["ONES"]);
     assert.deepEqual(hit!.columns, [1]);
+    assert.equal(hit!.fullRun, false);
+  });
+
+  it("erkennt gesamtes Spiel / Zettel", () => {
+    const before = [
+      gameWith(1, fullScores()),
+      gameWith(2, fullScores("CHANCE")),
+    ];
+    const after = [
+      gameWith(1, fullScores()),
+      gameWith(2, fullScores()),
+    ];
+    const hit = detectSheetFuseHighlight(before, after);
+    assert.ok(hit);
+    assert.equal(hit!.fullRun, true);
+    assert.deepEqual(hit!.columns, [2]);
   });
 
   it("null wenn nichts neu voll", () => {
     const games = [gameWith(1, { ONES: 1 })];
     assert.equal(detectSheetFuseHighlight(games, games), null);
+  });
+});
+
+describe("fieldShouldGoldFlash", () => {
+  it("trifft Zeile, Spalte und fullRun", () => {
+    assert.equal(
+      fieldShouldGoldFlash({ rows: ["ONES"], columns: [], fullRun: false }, "ONES", 1),
+      true,
+    );
+    assert.equal(
+      fieldShouldGoldFlash({ rows: [], columns: [2], fullRun: false }, "CHANCE", 2),
+      true,
+    );
+    assert.equal(
+      fieldShouldGoldFlash({ rows: [], columns: [], fullRun: true }, "ONES", 1),
+      true,
+    );
+    assert.equal(
+      fieldShouldGoldFlash({ rows: ["TWOS"], columns: [], fullRun: false }, "ONES", 1),
+      false,
+    );
   });
 });

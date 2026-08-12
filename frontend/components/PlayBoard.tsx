@@ -44,6 +44,7 @@ import {
 } from "@/lib/runProgressFeedback";
 import {
   playFirstRollRewardSound,
+  playSheetGoldFanfareSound,
   shouldPlayFirstRollReward,
   unlockAchievementAudio,
 } from "@/lib/achievementSound";
@@ -52,7 +53,7 @@ import { ruleEventFromDto } from "@/lib/ruleEventFeedback";
 import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
 import {
   detectSheetFuseHighlight,
-  FUSE_HIGHLIGHT_MS,
+  SHEET_GOLD_FLASH_MS,
   type SheetFuseHighlight,
 } from "@/lib/sheetFuseHighlight";
 
@@ -131,6 +132,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     if (!getSheetFuseHighlightEnabled()) return;
     const next = detectSheetFuseHighlight(gamesBefore, gamesAfter);
     if (!next) return;
+    playSheetGoldFanfareSound();
     setFuseHighlight(next);
     if (fuseHighlightTimerRef.current != null) {
       window.clearTimeout(fuseHighlightTimerRef.current);
@@ -138,7 +140,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     fuseHighlightTimerRef.current = window.setTimeout(() => {
       setFuseHighlight(null);
       fuseHighlightTimerRef.current = null;
-    }, FUSE_HIGHLIGHT_MS);
+    }, SHEET_GOLD_FLASH_MS);
   }
 
   const resetEntry = useCallback(() => {

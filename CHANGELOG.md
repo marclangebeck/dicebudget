@@ -4,8 +4,11 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
+### Changed
+- **Gold-Aufleuchten statt Lauffeuer:** betroffene Felder (Zeile / Spalte / gesamter Zettel) leuchten 3× gleichzeitig vollflächig gold; kurze Fanfare (Sounds-Toggle)
+
 ### Added
-- **Toggle Zeilen-/Spalten-Lauffeuer:** eigener Schalter unter Visuelle Einblendungen (unabhängig von Erfolgsanimationen), inkl. Info-„i“
+- **Toggle Gold-Aufleuchten:** eigener Schalter unter Visuelle Einblendungen (unabhängig von Erfolgsanimationen), inkl. Info-„i“
 
 ### Changed
 - **Menü-Version (iOS):** zeigt die echte Xcode-/Bundle-Build-Nummer zur Laufzeit (`@capacitor/app` `App.getInfo`); Web bleibt bei `NEXT_PUBLIC_APP_*` (Fallback typisch `web`)

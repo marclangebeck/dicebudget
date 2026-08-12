@@ -364,6 +364,29 @@ export function playFirstRollRewardSound(): void {
   });
 }
 
+/**
+ * Kurze Fanfare zum Gold-Aufleuchten (Zeile / Spalte / gesamter Zettel).
+ * Respektiert den Sounds-Toggle.
+ */
+export function playSheetGoldFanfareSound(): void {
+  if (!getFeedbackSoundsEnabled()) return;
+  void withRunningAudioContext((ctx) => {
+    const t0 = ctx.currentTime + 0.02;
+    playKick(ctx, t0, { gain: 0.2, pitch: 100 });
+    playArpeggio(ctx, t0 + 0.04, [392.0, 523.25, 659.25, 783.99], 0.07, {
+      gain: 0.08,
+      type: "square",
+    });
+    playChord(ctx, t0 + 0.36, [523.25, 659.25, 783.99, 1046.5], 0.55, {
+      gain: 0.22,
+      type: "triangle",
+    });
+    playSnare(ctx, t0 + 0.38, { gain: 0.12, pan: 0.2 });
+    playTone(ctx, 1318.5, t0 + 0.48, 0.35, { type: "sine", gain: 0.09, pan: -0.2 });
+    playShimmer(ctx, t0 + 0.5, 660, 4, 0.05, { gain: 0.07 });
+  });
+}
+
 /** Ob der Einswurf-Ping gespielt werden soll (ohne Parallel-Lärm zu Achievements). */
 export function shouldPlayFirstRollReward(input: {
   useStrategyRules: boolean;

@@ -30,7 +30,7 @@ export function BonusCelebrationToggle({ disabled, feedbackHref = "/settings/fee
         <div className="min-w-0 flex-1">
           <p className="text-strong text-sm font-semibold">Visuelle Einblendungen</p>
           <p className="text-muted mt-0.5 text-xs leading-snug">
-            Erfolgsanimationen, Lauffeuer, Sounds und Fortschrittshinweise einzeln steuern
+            Erfolgsanimationen, Gold-Aufleuchten, Sounds und Fortschrittshinweise einzeln steuern
           </p>
           <p className="text-muted mt-1 text-[11px] leading-snug">Aktiv: {summary}</p>
         </div>
