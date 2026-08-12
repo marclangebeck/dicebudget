@@ -4,6 +4,9 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
+### Docs
+- **HANDOVER / milestones_active / ios_current / GOiOS / milestones / CHANGELOG:** Stand 2026-08-12, HEAD `2140090` / Produkt `75f5228`, Tests 87, TestFlight ~51+, Gold-Aufleuchten, native Menü-Version
+
 ### Changed
 - **Gold-Aufleuchten statt Lauffeuer:** bei fertiger Zeile oder Spalte leuchten betroffene Felder 3× gleichzeitig vollflächig gold; kurze Fanfare (Sounds-Toggle); kein Extra-Trigger für den gesamten Zettel
 - **Menü-Version (iOS):** zeigt die echte Xcode-/Bundle-Build-Nummer zur Laufzeit (`@capacitor/app` `App.getInfo`); Web bleibt bei `NEXT_PUBLIC_APP_*` (Fallback typisch `web`)
