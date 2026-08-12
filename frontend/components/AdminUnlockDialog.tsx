@@ -81,7 +81,6 @@ export function AdminUnlockDialog({ open, onClose, onUnlocked }: Props) {
             <input
               ref={inputRef}
               type="password"
-              inputMode="numeric"
               autoComplete="off"
               autoCorrect="off"
               spellCheck={false}
