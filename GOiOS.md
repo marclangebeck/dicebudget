@@ -13,15 +13,15 @@ Diese Datei ist ein Kompatibilitaets-Index. Fuer aktuellen iOS-/TestFlight-/App-
 
 - Bundle ID: `de.bottletrade.dicebudget`
 - Version in App Store Connect: `2.0`
-- TestFlight: Builds bis **~51+** (Stand 2026-08-12); Release-Kandidat = HEAD `2140090` / Produkt `75f5228` + `build:ios`
+- TestFlight: Builds bis **~51+** (Stand 2026-08-12); Release-Kandidat = HEAD `3e9d9a8` (M42/M43) + `build:ios`
 - Details und Checkliste: `docs/ios_current.md`
-- Nächster organisatorischer Schritt: **M30** Store-Submit (Phase 7)
+- Nächster organisatorischer Schritt: **M42/M43** manuell prüfen, danach **M30** Store-Submit
 
 ## Wichtig
 
 - Web-Deploy und iOS-Release sind getrennt; `ios/App/App/public/` ist gitignored.
 - Nach UI-Aenderungen: Mac `git reset --hard origin/milestone-22-prep`, Env setzen, `npm run build:ios`, Archive/Upload.
 - **Menü-Version:** iOS = Xcode Build zur Laufzeit (`App.getInfo`); Web = `NEXT_PUBLIC_APP_VERSION` + `NEXT_PUBLIC_APP_BUILD` (typisch `web`).
-- **Admin-Stats:** `NEXT_PUBLIC_ADMIN_API_KEY` muss vor `build:ios` in Mac-`.env.production` stehen.
+- **Admin (M43):** `NEXT_PUBLIC_ADMIN_PIN` vor `build:ios` setzen; `NEXT_PUBLIC_ADMIN_API_KEY` leer lassen — Key nach PIN lokal in der App.
 - Bei `git pull`-Fehler: `git restore frontend/package-lock.json` vor Pull (vom Projektroot).
 - Der verbindliche Sync-Workflow steht in `AGENT_RULES.md` Sektion 9.
