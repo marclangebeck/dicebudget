@@ -119,7 +119,8 @@ describe("detectSheetFuseHighlight", () => {
     ];
     const hit = detectSheetFuseHighlight(before, after);
     assert.ok(hit);
-    assert.deepEqual(hit!.rows, []);
+    // Spalte 2 + Chance-Zeile (über beide Spiele) — aber kein extra „gesamter Zettel“
+    assert.deepEqual(hit!.rows, ["CHANCE"]);
     assert.deepEqual(hit!.columns, [2]);
   });
 
