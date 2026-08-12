@@ -35,7 +35,7 @@ import {
   shouldPlayFirstRollReward,
   unlockAchievementAudio,
 } from "@/lib/achievementSound";
-import { getAchievementAnimationsEnabled } from "@/lib/gameFeedbackPrefs";
+import { getSheetFuseHighlightEnabled } from "@/lib/gameFeedbackPrefs";
 import type { SessionMatchAnalysisDto } from "@/lib/matchAnalysisTypes";
 import { allFieldsScored, getLastScoredFieldId, isRunEnded } from "@/lib/runUtils";
 import { loadDisplayNames } from "@/lib/rivalProfiles";
@@ -112,7 +112,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     gamesBefore: RunDto["games"],
     gamesAfter: RunDto["games"],
   ) {
-    if (!getAchievementAnimationsEnabled()) return;
+    if (!getSheetFuseHighlightEnabled()) return;
     const next = detectSheetFuseHighlight(gamesBefore, gamesAfter);
     if (!next) return;
     setFuseBySide((current) => ({ ...current, [side]: next }));

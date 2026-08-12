@@ -7,12 +7,15 @@ const PREFS_KEY = "dicebudget.feedbackPrefs.v1";
 
 export type GameFeedbackPrefs = {
   animationsEnabled: boolean;
+  /** Zeilen-/Spalten-Lauffeuer auf dem Zettel. */
+  sheetFuseHighlightEnabled: boolean;
   soundsEnabled: boolean;
   progressHintsEnabled: boolean;
 };
 
 export const DEFAULT_GAME_FEEDBACK_PREFS: GameFeedbackPrefs = {
   animationsEnabled: true,
+  sheetFuseHighlightEnabled: true,
   soundsEnabled: true,
   progressHintsEnabled: true,
 };
@@ -20,11 +23,17 @@ export const DEFAULT_GAME_FEEDBACK_PREFS: GameFeedbackPrefs = {
 function normalizePrefs(value: unknown): GameFeedbackPrefs {
   const source =
     typeof value === "object" && value !== null ? (value as Partial<GameFeedbackPrefs>) : {};
+  const animationsEnabled =
+    typeof source.animationsEnabled === "boolean"
+      ? source.animationsEnabled
+      : DEFAULT_GAME_FEEDBACK_PREFS.animationsEnabled;
   return {
-    animationsEnabled:
-      typeof source.animationsEnabled === "boolean"
-        ? source.animationsEnabled
-        : DEFAULT_GAME_FEEDBACK_PREFS.animationsEnabled,
+    animationsEnabled,
+    // Altstände ohne Key: wie bisher an Erfolgsanimationen gekoppelt
+    sheetFuseHighlightEnabled:
+      typeof source.sheetFuseHighlightEnabled === "boolean"
+        ? source.sheetFuseHighlightEnabled
+        : animationsEnabled,
     soundsEnabled:
       typeof source.soundsEnabled === "boolean"
         ? source.soundsEnabled
@@ -42,6 +51,7 @@ function migrateFromLegacy(): GameFeedbackPrefs {
   const allOn = legacy !== "0";
   return {
     animationsEnabled: allOn,
+    sheetFuseHighlightEnabled: allOn,
     soundsEnabled: allOn,
     progressHintsEnabled: allOn,
   };
@@ -64,6 +74,7 @@ export function setGameFeedbackPrefs(prefs: GameFeedbackPrefs): GameFeedbackPref
     window.localStorage.setItem(PREFS_KEY, JSON.stringify(normalized));
     const anyOn =
       normalized.animationsEnabled ||
+      normalized.sheetFuseHighlightEnabled ||
       normalized.soundsEnabled ||
       normalized.progressHintsEnabled;
     window.localStorage.setItem(LEGACY_KEY, anyOn ? "1" : "0");
@@ -79,6 +90,10 @@ export function getAchievementAnimationsEnabled(): boolean {
   return getGameFeedbackPrefs().animationsEnabled;
 }
 
+export function getSheetFuseHighlightEnabled(): boolean {
+  return getGameFeedbackPrefs().sheetFuseHighlightEnabled;
+}
+
 export function getFeedbackSoundsEnabled(): boolean {
   return getGameFeedbackPrefs().soundsEnabled;
 }
@@ -90,6 +105,7 @@ export function getProgressHintsEnabled(): boolean {
 export function feedbackPrefsSummary(prefs: GameFeedbackPrefs): string {
   const parts: string[] = [];
   if (prefs.animationsEnabled) parts.push("Animationen");
+  if (prefs.sheetFuseHighlightEnabled) parts.push("Lauffeuer");
   if (prefs.soundsEnabled) parts.push("Sounds");
   if (prefs.progressHintsEnabled) parts.push("Fortschritt");
   return parts.length > 0 ? parts.join(" · ") : "Alles aus";

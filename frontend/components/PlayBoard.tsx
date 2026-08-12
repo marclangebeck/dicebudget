@@ -47,7 +47,7 @@ import {
   shouldPlayFirstRollReward,
   unlockAchievementAudio,
 } from "@/lib/achievementSound";
-import { getAchievementAnimationsEnabled } from "@/lib/gameFeedbackPrefs";
+import { getSheetFuseHighlightEnabled } from "@/lib/gameFeedbackPrefs";
 import { ruleEventFromDto } from "@/lib/ruleEventFeedback";
 import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
 import {
@@ -128,7 +128,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   const poolEndgamePendingRef = useRef(false);
 
   function flashSheetFuse(gamesBefore: RunDto["games"], gamesAfter: RunDto["games"]) {
-    if (!getAchievementAnimationsEnabled()) return;
+    if (!getSheetFuseHighlightEnabled()) return;
     const next = detectSheetFuseHighlight(gamesBefore, gamesAfter);
     if (!next) return;
     setFuseHighlight(next);

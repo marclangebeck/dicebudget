@@ -80,13 +80,28 @@ function normalizeSettings(value: unknown): AppSettings {
 /** Default: an, wenn mindestens eine Feedback-Option aktiv ist. */
 export function getBonusCelebrationEnabled(): boolean {
   const prefs = getGameFeedbackPrefs();
-  return prefs.animationsEnabled || prefs.soundsEnabled || prefs.progressHintsEnabled;
+  return (
+    prefs.animationsEnabled ||
+    prefs.sheetFuseHighlightEnabled ||
+    prefs.soundsEnabled ||
+    prefs.progressHintsEnabled
+  );
 }
 
 export function setBonusCelebrationEnabled(enabled: boolean): void {
   const next: GameFeedbackPrefs = enabled
-    ? { animationsEnabled: true, soundsEnabled: true, progressHintsEnabled: true }
-    : { animationsEnabled: false, soundsEnabled: false, progressHintsEnabled: false };
+    ? {
+        animationsEnabled: true,
+        sheetFuseHighlightEnabled: true,
+        soundsEnabled: true,
+        progressHintsEnabled: true,
+      }
+    : {
+        animationsEnabled: false,
+        sheetFuseHighlightEnabled: false,
+        soundsEnabled: false,
+        progressHintsEnabled: false,
+      };
   setGameFeedbackPrefs(next);
 }
 

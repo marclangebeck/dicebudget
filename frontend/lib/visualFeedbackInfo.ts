@@ -1,4 +1,8 @@
-export type VisualFeedbackInfoKey = "animations" | "sounds" | "progress";
+export type VisualFeedbackInfoKey =
+  | "animations"
+  | "sheetFuse"
+  | "sounds"
+  | "progress";
 
 export type VisualFeedbackInfo = {
   key: VisualFeedbackInfoKey;
@@ -11,7 +15,13 @@ export const VISUAL_FEEDBACK_INFO: Record<VisualFeedbackInfoKey, VisualFeedbackI
     key: "animations",
     title: "Erfolgsanimationen",
     body:
-      "Nach besonderen Einträgen erscheint kurz ein Overlay: oberer Bonus, komplette untere Spalte, Große Straße oder Alle Fünfe. Zusätzlich umrundet ein kurzes Lauffeuer (Zündschnur) eine fertige Feld-Zeile (z. B. alle Full-House-Felder) oder eine fertige Spiel-Spalte (13 Felder) — etwa 1 s, rein optisch, ohne den Spielablauf zu blockieren. Am Spielstand ändert sich nichts.",
+      "Nach besonderen Einträgen erscheint kurz ein Overlay: oberer Bonus, komplette untere Spalte, Große Straße oder Alle Fünfe. Rein optisch — am Spielstand ändert sich nichts.",
+  },
+  sheetFuse: {
+    key: "sheetFuse",
+    title: "Zeilen-/Spalten-Lauffeuer",
+    body:
+      "Wenn eine Feld-Zeile über alle Spiele voll ist (z. B. alle Full-House-Felder) oder eine Spiel-Spalte (13 Felder) fertig ist, umrundet kurz ein Lauffeuer (Zündschnur) die Zeile bzw. Spalte — etwa 1 s, ohne den Spielablauf zu blockieren. Rein optisch.",
   },
   sounds: {
     key: "sounds",

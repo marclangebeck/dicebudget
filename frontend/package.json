@@ -12,7 +12,7 @@
     "icons": "node --input-type=module -e \"import sharp from 'sharp'; await sharp('public/logo-source.png').resize(512,512,{fit:'cover',position:'centre'}).png().toFile('public/icon-512.png'); await sharp('public/icon-512.png').resize(180,180).toFile('public/apple-touch-icon.png'); await sharp('public/icon-512.png').resize(32,32).toFile('app/icon.png');\"",
     "start": "next start -p 3021",
     "lint": "eslint",
-    "test": "node --import tsx --test lib/gameScoring.test.ts lib/pairingMerge.test.ts lib/localSoloRun.test.ts lib/gameRules.test.ts lib/labsAccess.test.ts lib/featureFlags.test.ts lib/houseRules.test.ts lib/statsPairingInsights.test.ts lib/scoreProgressionChart.test.ts lib/appTourPrefs.test.ts lib/rivalProfiles.test.ts lib/hiddenPairings.test.ts lib/runProgressFeedback.test.ts lib/appVersion.test.ts lib/achievementSound.test.ts lib/sheetFuseHighlight.test.ts",
+    "test": "node --import tsx --test lib/gameScoring.test.ts lib/pairingMerge.test.ts lib/localSoloRun.test.ts lib/gameRules.test.ts lib/labsAccess.test.ts lib/featureFlags.test.ts lib/houseRules.test.ts lib/statsPairingInsights.test.ts lib/scoreProgressionChart.test.ts lib/appTourPrefs.test.ts lib/rivalProfiles.test.ts lib/hiddenPairings.test.ts lib/runProgressFeedback.test.ts lib/appVersion.test.ts lib/achievementSound.test.ts lib/sheetFuseHighlight.test.ts lib/gameFeedbackPrefs.test.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

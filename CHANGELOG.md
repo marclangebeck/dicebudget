@@ -4,6 +4,9 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
+### Added
+- **Toggle Zeilen-/Spalten-Lauffeuer:** eigener Schalter unter Visuelle Einblendungen (unabhängig von Erfolgsanimationen), inkl. Info-„i“
+
 ### Changed
 - **Menü-Version (iOS):** zeigt die echte Xcode-/Bundle-Build-Nummer zur Laufzeit (`@capacitor/app` `App.getInfo`); Web bleibt bei `NEXT_PUBLIC_APP_*` (Fallback typisch `web`)
 

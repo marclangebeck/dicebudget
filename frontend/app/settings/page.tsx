@@ -107,6 +107,7 @@ function SettingsPageInner() {
 
   const visualsEnabledCount = [
     feedbackPrefs.animationsEnabled,
+    feedbackPrefs.sheetFuseHighlightEnabled,
     feedbackPrefs.soundsEnabled,
     feedbackPrefs.progressHintsEnabled,
   ].filter(Boolean).length;
@@ -148,16 +149,23 @@ function SettingsPageInner() {
         <SettingsSection
           id="visuals"
           title="Visuelle Einblendungen"
-          summary={`${visualsEnabledCount} von 3 aktiv`}
+          summary={`${visualsEnabledCount} von 4 aktiv`}
           open={openSections.visuals}
           onToggle={() => toggleSection("visuals")}
         >
           <SettingsToggleCard
             title="Erfolgsanimationen"
-            description="Overlays bei Bonus, unterer Spalte, Große Straße und Alle Fünfe; kurzes Lauffeuer bei fertiger Zeile oder Spiel-Spalte."
+            description="Overlays bei Bonus, unterer Spalte, Große Straße und Alle Fünfe."
             checked={feedbackPrefs.animationsEnabled}
             onChange={(value) => updateFeedback({ animationsEnabled: value })}
             onInfo={() => setRuleInfo(getVisualFeedbackInfo("animations"))}
+          />
+          <SettingsToggleCard
+            title="Zeilen-/Spalten-Lauffeuer"
+            description="Kurzes umlaufendes Highlight, wenn eine Feld-Zeile oder Spiel-Spalte voll ist."
+            checked={feedbackPrefs.sheetFuseHighlightEnabled}
+            onChange={(value) => updateFeedback({ sheetFuseHighlightEnabled: value })}
+            onInfo={() => setRuleInfo(getVisualFeedbackInfo("sheetFuse"))}
           />
           <SettingsToggleCard
             title="Sounds"
