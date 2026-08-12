@@ -82,7 +82,7 @@ npm run build
 
 ## Bekannte Risikoentscheidungen
 
-- `POST /stats/pairings/reset` und `POST /stats/pairings/baseline` erfordern den Header `X-Admin-Key` (Backend `ADMIN_API_KEY`, Frontend `NEXT_PUBLIC_ADMIN_API_KEY`). **M38:** Baseline wieder admin-only (gemeinsame Bilanz); Spieler blenden lokal aus und pflegen Namen/„Das bin ich“ gerätebezogen. Ohne konfigurierten Key → **503**.
+- `POST /stats/pairings/reset` und `POST /stats/pairings/baseline` erfordern den Header `X-Admin-Key` (Backend `ADMIN_API_KEY`). **M43:** Client liefert den Key nach Admin-PIN aus lokalem Speicher (oder Legacy-Env); öffentliches Bundle ohne `NEXT_PUBLIC_ADMIN_API_KEY`. **M38:** Baseline admin-only (gemeinsame Bilanz); Spieler blenden lokal aus und pflegen Namen/„Das bin ich“ gerätebezogen. Ohne konfigurierten Server-Key → **503**.
 - API-erstellte Singleplayer-Runs (`POST /runs`) erhalten `soloSecretToken`; Schreibzugriffe brauchen `X-Player-Secret`. Legacy-Runs ohne Token bleiben offen.
 - Rate-Limit: max. 30 Requests/min/IP auf `POST /runs`, `POST /sessions`, `POST .../join`.
 - `LeagueStanding` wird nach Stats-Reset aus verbleibenden Sessions neu berechnet (M29, `rebuildLeagueStandings`).

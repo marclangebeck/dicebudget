@@ -23,15 +23,16 @@ Nur bei Bedarf:
 ## Aktueller Kurzstand
 
 - Branch: `milestone-22-prep`
-- Produktcode-HEAD: `75f5228` · Tip `2140090`
+- Produktcode-HEAD: `3e9d9a8` (M42/M43) · Tip `b8a9d79`
 - Web/API live: https://dicebudget.bottle-trade.de
-- Frontend-Tests: **87** grün
-- iOS: TestFlight **2.0** (Builds ~51+); Menü-Version native; Release-Kandidat = aktueller HEAD
-- Letzte Features: Gold-Aufleuchten (Zeile/Spalte) + Fanfare; Sound-Fix; M37–M41; Stats absolut + Verwalten
-- Nächstes: **M30** App Store Release
+- Frontend-Tests: **98** grün
+- iOS: TestFlight **2.0** (Builds ~51+); Admin = PIN + lokaler Key (ein Build)
+- Letzte Features: M42 Rival-Avatare; M43 Admin-PIN; heller Spielzettel; Rivalen-Share; Gold-Aufleuchten; M37–M41
+- Nächstes: M42/M43 Abnahme / iOS-Build, dann **M30** App Store Release
 
 ## Offene Prioritaeten
 
-1. **M30** TestFlight-Regression + App Store Connect (Agreement, 1,19 €, Submit).
-2. Optional M38 Stufe A nur bei Drift; **M36** nach M30.
-3. `milestone-22-prep` → `main` nach Release-Freigabe.
+1. M42/M43 Abnahme; frischer `build:ios` mit `NEXT_PUBLIC_ADMIN_PIN`.
+2. **M30** TestFlight-Regression + App Store Connect (Agreement, 1,19 €, Submit).
+3. Optional M38 Stufe A nur bei Drift; **M36** nach M30.
+4. `milestone-22-prep` → `main` nach Release-Freigabe.

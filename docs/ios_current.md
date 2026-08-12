@@ -2,7 +2,7 @@
 
 **Stand:** 2026-08-12  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD (Web):** `75f5228` · Tip `2140090`  
+**Produktcode-HEAD (Web):** `3e9d9a8` (M42/M43) · Tip `b8a9d79`  
 **Bundle ID:** `de.bottletrade.dicebudget`  
 
 Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
@@ -11,17 +11,18 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 
 - App Store Connect: **Version 2.0**.
 - TestFlight: Builds bis **~51+** (Nutzer-Stand 2026-08-12); Installationen können hinterherhinken — immer **Menü → Version 2.0 (xx)** prüfen (native Bundle-Build).
-- **Release-Kandidat für M30:** aktueller HEAD mit frischem `npm run build:ios`.
+- **Release-Kandidat für M30:** aktueller HEAD mit frischem `npm run build:ios` (nach M42/M43).
 - Web/API live: https://dicebudget.bottle-trade.de
-- **Web/iOS ein Build (M43):** Admin per `NEXT_PUBLIC_ADMIN_PIN`; API-Key lokal nach Freischaltung (nicht im Bundle).
+- **Web/iOS ein Build (M43):** Admin per `NEXT_PUBLIC_ADMIN_PIN` (alphanumerisch, volle Tastatur); API-Key lokal nach Freischaltung.
 - Öffentliches Bundle: `NEXT_PUBLIC_ADMIN_API_KEY` leer lassen.
+- Labs (`NEXT_PUBLIC_LABS_PIN`) = InApp-Käufe Features — **getrennt** von Admin.
 
 ### Mac `.env.production` (kritisch)
 
 | Variable | Zweck |
 |----------|--------|
 | `NEXT_PUBLIC_LABS_PIN` | InApp-Käufe (Features) freischalten |
-| `NEXT_PUBLIC_ADMIN_PIN` | Admin-Oberfläche freischalten (ein Build; Key danach lokal) |
+| `NEXT_PUBLIC_ADMIN_PIN` | Admin-Oberfläche freischalten (alphanumerisch; Key danach lokal) |
 | `NEXT_PUBLIC_ADMIN_API_KEY` | Optional/Legacy — lieber leer; Key lokal unter Einstellungen → Admin |
 | `NEXT_PUBLIC_APP_VERSION` | z. B. `2.0` (Web-Fallback; iOS-Menü liest native Version) |
 | `NEXT_PUBLIC_APP_BUILD` | Web: typisch `web`. iOS-Menü zeigt **Xcode Build** zur Laufzeit (`App.getInfo`) — Env muss nicht mehr bei jedem Archive mitgezählt werden |

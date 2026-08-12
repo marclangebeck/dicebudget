@@ -1,16 +1,16 @@
 # Milestone-Roadmap — Umsetzung Projektanalyse
 
 **Erstellt:** 2026-06-11  
-**Aktualisiert:** 2026-08-12 (Doku-Sync Gold-Aufleuchten / Menü-Version; M30 nächstes)  
+**Aktualisiert:** 2026-08-12 (M42/M43 vor M30; Admin-PIN ein Build; Tip `b8a9d79`)  
 **Basis:** Vollständige Projektanalyse (Backend, Frontend, Release)  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** siehe `git log -1` (aktuell Tip `2140090` / Produkt `75f5228`)  
-**Nächster Milestone:** **M30** App Store Release  
+**Produktcode-HEAD:** siehe `git log -1` (aktuell Tip `b8a9d79` / Produkt `3e9d9a8`)  
+**Nächster Milestone:** **M30** App Store Release (nach M42/M43-Abnahme)  
 **Arbeitsweise:** Pro Milestone ein **GO** vom Nutzer, danach Umsetzung in Sprints, dann Abnahme. **Kein Produktcode ohne GO.**
 
-**Vor M30 umgesetzt (nicht nummeriert):** Feature-Labor (`5e621ac`), Hausregeln Strategy (Brennt / Verkauf / 2× Alle Fünfe) hinter Labor-Toggles — **bis M36:** jeder Spieler schaltet lokal per Code frei (Labor-Zwischenstand, bewusst OK).
+**Vor M30 umgesetzt (nicht nummeriert):** Feature-Labor (`5e621ac`), Hausregeln Strategy hinter Labor-Toggles — **bis M36:** jeder Spieler schaltet lokal per Code frei (Labor-Zwischenstand, bewusst OK). **M42** Rival-Avatare lokal; **M43** Admin-PIN + lokaler API-Key (ein Build).
 
-**Geplant:** **M36** nach M30; **M37–M41** laut Nutzer-Wunschliste (Details unten).
+**Geplant:** **M36** nach M30; **M37–M41** umgesetzt (Details unten).
 
 Dieses Dokument ergänzt `docs/milestones_active.md`. Nach Abschluss eines Milestones: Eintrag in `CHANGELOG.md`, Update `HANDOVER.md`, optional Archivierung hier.
 
@@ -85,7 +85,7 @@ Nummerierte `[Server]`/`[Mac]`-Befehle gemäß `AGENT_RULES.md` Sektion 9 ausgeb
 | 1 | Env `ADMIN_API_KEY` in `.env.example` + Backend-Config | `backend/.env.example`, `backend/src/config.ts` |
 | 2 | Middleware `adminAuth.ts` prüft Header `X-Admin-Key` | `backend/src/middleware/adminAuth.ts` |
 | 3 | Schutz `POST /stats/pairings/reset` und `POST /stats/pairings/baseline` | `backend/src/routes/stats.ts` |
-| 4 | Frontend sendet Key aus `NEXT_PUBLIC_ADMIN_API_KEY` oder nur in Settings (Entscheidung: Key nur serverseitig, Frontend ruft über geschützten Flow — **empfohlen:** Key in Frontend `.env.production`, da Stats-UI es braucht) | `frontend/lib/api.ts`, `frontend/.env.production.example` |
+| 4 | Frontend: Admin-Key nach PIN lokal (M43); Bundle ohne `NEXT_PUBLIC_ADMIN_API_KEY` — historisch war Env-Key empfohlen | `frontend/lib/adminAccess.ts`, `frontend/lib/api.ts` |
 | 5 | Tests für 401/403 ohne Key | `backend/src/routes/stats.test.ts` (neu) |
 | 6 | `CHANGELOG.md`, `docs/decisions.md` aktualisieren | Doku |
 

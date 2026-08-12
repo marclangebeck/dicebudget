@@ -2,8 +2,8 @@
 
 **Stand:** 2026-08-12  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `75f5228` (Gold-Aufleuchten Zeile/Spalte) · Tip `2140090`  
-**Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de — Frontend Unit-Tests **87** grün  
+**Produktcode-HEAD:** `3e9d9a8` (M42/M43) · Tip `b8a9d79` (Admin-PIN volle Tastatur)  
+**Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de — Frontend Unit-Tests **98** grün  
 **Backend:** Migrationen u. a. `20260807120000_pairing_baseline_absolute`, `20260807140000_pairing_baseline_app_snapshot` — Deploy nach Stabilitäts-Batch
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -12,14 +12,14 @@ Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones s
 
 ### Milestone 21 / M30 - iOS-App / App Store Release
 
-**Status:** in Arbeit — technisch Feature-fertig für Release-Kandidat; organisatorisch **M30** offen.
+**Status:** bewusst zurückgestellt — technisch Feature-fertig; organisatorisch **nach M42/M43**.
 
 Technische Basis ist erledigt:
 
 - Capacitor 7, Bundle `de.bottletrade.dicebudget`, Native Start `/app`, API Prod.
 - TestFlight **Version 2.0**, Builds bis **~51+**; Release-Kandidat = aktueller HEAD + frischer `build:ios`.
 - iOS-UI nur aus `npm run build:ios` auf dem Mac.
-- **Admin (M43):** ein Build — `NEXT_PUBLIC_ADMIN_PIN` + lokal hinterlegter Admin-API-Key; öffentliches Bundle ohne eingebetteten `NEXT_PUBLIC_ADMIN_API_KEY`.
+- **Admin (M43):** ein Build — `NEXT_PUBLIC_ADMIN_PIN` + lokal hinterlegter Admin-API-Key; Bundle ohne `NEXT_PUBLIC_ADMIN_API_KEY`; PIN-Feld mit voller Tastatur.
 
 Offen (M30):
 
@@ -29,7 +29,7 @@ Offen (M30):
 
 ## Aktive Feature-Milestones (vor M30)
 
-**Priorität:** **M42** und **M43** vor organisatorischem **M30** (App Store). Ein App-Build; Admin per PIN + lokal hinterlegtem API-Key (kein separater Admin-Build nötig).
+**Status:** **M42** und **M43** umgesetzt und manuell nutzbar; **M30** danach.
 
 | Prio | Milestone | Status |
 |------|-----------|--------|
@@ -39,6 +39,7 @@ Offen (M30):
 
 ### M42 — Rivalen-Bilder nur lokal
 
+**Status:** umgesetzt.  
 **Ziel:** Pro Rivalen-Profil ein Bild nur auf dem Gerät (nie Server/API).
 
 - Speicherung: IndexedDB (Blob), Profil-ID als Schlüssel; nicht `localStorage` für Binärdaten.
@@ -48,12 +49,14 @@ Offen (M30):
 
 ### M43 — Admin-Oberfläche (ein Build, PIN)
 
+**Status:** umgesetzt (PIN-Tastatur-Fix Tip `b8a9d79`).  
 **Ziel:** Dieselbe App; Admin nach PIN freischalten; Server-Aktionen weiter mit `X-Admin-Key`.
 
-- `NEXT_PUBLIC_ADMIN_PIN` im Build (UX-Gate, analog Labor).
+- `NEXT_PUBLIC_ADMIN_PIN` im Build (UX-Gate, analog Labor); alphanumerisch (volle Tastatur).
 - Nach Freischaltung: Admin-API-Key **einmal lokal** hinterlegen (nicht im öffentlichen Bundle).
-- Route `/settings/admin`: Status, Key, Sperren; Platzhalter InApp-Käufe/Remote-Config.
+- Route `/settings/admin` (+ Menü „Admin“): Status, Key, Sperren; Platzhalter InApp-Käufe/Remote-Config.
 - Stats-Admin (Siege/Diff, Server-Löschen) nur wenn freigeschaltet **und** Key vorhanden.
+- **Getrennt von** Labs/`NEXT_PUBLIC_LABS_PIN` (InApp-Käufe Features testen).
 - Legacy: eingebetteter `NEXT_PUBLIC_ADMIN_API_KEY` weiter nutzbar, aber nur nach PIN wenn PIN gesetzt.
 
 ## Geplante / umgesetzte Nutzer-Wunschliste (M37–M41)
@@ -113,7 +116,7 @@ Details: `docs/milestone-roadmap-analysis.md` → Abschnitt **M36**.
 
 **Status:** implementiert (HEAD `f3a1ed0`); Backend- + Frontend-Tests grün.
 
-- Öffentliches Web **ohne** eingebetteten `NEXT_PUBLIC_ADMIN_API_KEY`; Admin per PIN + lokalem Key (M43).
+- Öffentliches Web **ohne** eingebetteten `NEXT_PUBLIC_ADMIN_API_KEY` (damals Admin-Mac-Build; **heute M43:** PIN + lokaler Key).
 - `finalizeSessionStats` atomar (erste Entscheidung gewinnt); Pairing-Cache nach Finalize.
 - Absolute Baseline: Zielstand + App-Snapshot → neue Partien schreiben Siege/Diff fort (kein Additiv-Drift).
 - „Neue Runde“ übernimmt Pool-/House-Rule-Flags; Auth-Fehlermeldungen an Ist angepasst.
@@ -493,7 +496,7 @@ Dateien:
 
 ## Offene Aufgaben
 
-1. **M42 / M43** abschließen und manuell prüfen (Avatare, Admin-PIN + Key, Stats-Admin).
+1. **M42 / M43** manuell weiter prüfen (Avatare, Admin-PIN alphanumerisch + Key, Stats-Admin); dann freigeben.
 2. **M30** danach: TestFlight-Regression; iOS-Upload; App Store Connect.
 3. Optional: Auto-Refresh nach Pool-Endspiel fuer Statistik-Toggle.
 4. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
@@ -506,49 +509,24 @@ Dateien:
 
 ## Aktuelle Prioritaeten
 
-1. **M42** Rivalen-Bilder lokal + **M43** Admin-PIN (ein Build).
-2. **M30** TestFlight / App Store Connect (danach).
-3. Optional M36 nach M30.
-2. iOS-Build auf HEAD (Admin-Key nur auf Admin-Gerät); Release-Submit.
+1. M42/M43 Abnahme / iOS-Build mit Admin-PIN; dann **M30**.
+2. Optional M36 nach M30.
+3. `milestone-22-prep` → `main` nach Release-Freigabe.
 
 ## Letzte UX (2026-08-12)
 
-- **Gold-Aufleuchten:** Zeile oder Spalte komplett → betroffene Felder 3× gleichzeitig vollflächig gold + Fanfare (`sheetFuseHighlight.ts`, `ScoreSheetTable`, `achievementSound.ts`, `globals.css`).
-- **Toggle** „Gold-Aufleuchten“ unter Visuelle Einblendungen (`gameFeedbackPrefs.sheetFuseHighlightEnabled`, `visualFeedbackInfo`).
-- **Sounds:** intermittierende Ausfälle behoben (`achievementSound.ts`: Unlock im Tap, `await resume`, kein Mute über reduced-motion).
-- **Menü-Version:** iOS native (`appVersion.ts` / `AppFooterMenu.tsx`).
+- **M42/M43:** Rival-Avatare lokal; Admin-PIN (alphanumerisch) + lokaler API-Key; heller Spielzettel; Rivalen-Share.
+- **Gold-Aufleuchten:** Zeile oder Spalte komplett → betroffene Felder 3× gleichzeitig vollflächig gold + Fanfare.
+- **Toggle** „Gold-Aufleuchten“ unter Visuelle Einblendungen.
+- **Sounds:** AudioContext Unlock/Resume; Menü-Version iOS native.
 
 ## Wichtige Dateien Fuer Aktuelle Arbeit
 
-- `AGENT_RULES.md`
-- `HANDOVER.md`
-- `docs/ios_current.md`
-- `docs/decisions.md`
-- `frontend/lib/gameRules.ts`, `frontend/lib/gameRules.test.ts`
-- `frontend/e2e/`, `frontend/components/AppErrorBoundary.tsx`
-- `frontend/lib/shareCanvasUtils.ts`, `frontend/lib/achievementShare.ts`, `frontend/lib/matchResultShare.ts`
-- `frontend/components/RunProgressOverlay.tsx`, `frontend/app/settings/feedback/page.tsx`
-- `frontend/components/ShareActionBar.tsx`, `frontend/components/AchievementShareBar.tsx`
-- `frontend/lib/labels.ts`
-- `frontend/components/MatchAnalysisView.tsx`
-- `backend/src/domain/matchAnalysis.ts`
-- `backend/src/services/matchAnalysisService.ts`
-- `frontend/components/StatsRatingToggle.tsx`
-- `backend/src/services/sessionService.ts`
-- `backend/src/routes/sessions.ts`
-- `backend/src/services/playField.ts`
-- `frontend/components/RunFinishScreen.tsx`
-- `frontend/components/PlayBoard.tsx`
-- `frontend/components/ScoreEntryPanel.tsx`
-- `frontend/components/FieldScoreChoiceGrid.tsx`
-- `frontend/components/ScoreSheetTable.tsx`
-- `frontend/components/DiceFace.tsx`
-- `frontend/components/YatzyDiePicker.tsx`
-- `frontend/components/ExtraYatzyPickerOverlay.tsx`
-- `frontend/components/FitScoreSheet.tsx`
-- `frontend/components/TableModePlayBoard.tsx`
-- `frontend/components/HomeBentoGrid.tsx`
-- `frontend/public/home-icons/*.png`
+- `AGENT_RULES.md`, `HANDOVER.md`, `docs/ios_current.md`, `docs/decisions.md`
+- `frontend/lib/adminAccess.ts`, `frontend/app/settings/admin/page.tsx`, `frontend/components/AdminUnlockDialog.tsx`
+- `frontend/lib/rivalAvatarStore.ts`, `frontend/components/RivalAvatar.tsx`, `frontend/components/RivalManagePanel.tsx`
+- `frontend/lib/sheetFuseHighlight.ts`, `frontend/lib/matchResultShare.ts`, `frontend/lib/appVersion.ts`
+- `frontend/components/ScoreSheetTable.tsx`, `frontend/components/ShareActionBar.tsx`, `frontend/components/AppFooterMenu.tsx`
 - `frontend/components/HomeScreenShell.tsx`
 - `frontend/components/FixedScreenShell.tsx`
 - `frontend/components/AppLegalFooter.tsx`

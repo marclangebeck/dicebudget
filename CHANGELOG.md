@@ -4,6 +4,9 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
+### Fixed
+- **Admin-PIN-Tastatur:** kein `inputMode=numeric` mehr — Buchstaben und Zahlen eingebar
+
 ### Added
 - **M42 Rivalen-Bilder:** Foto pro Rival nur lokal (IndexedDB), verwalten unter Rivalen; Anzeige in Liste/Paarungen
 - **M43 Admin (ein Build):** PIN-Freischaltung (`NEXT_PUBLIC_ADMIN_PIN`), Admin-API-Key lokal hinterlegen, Shell unter Einstellungen → Admin
@@ -14,7 +17,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Admin-Zugang:** kein separater Admin-Build mehr nötig; Stats-Admin nur nach PIN + Key (Legacy-Env-Key nur mit PIN, falls PIN gesetzt)
 
 ### Docs
-- **HANDOVER / milestones_active / ios_current / GOiOS / milestones / CHANGELOG:** Stand 2026-08-12, HEAD `2140090` / Produkt `75f5228`, Tests 87, TestFlight ~51+, Gold-Aufleuchten, native Menü-Version
+- **HANDOVER / milestones_active / ios_current / GOiOS / milestones / decisions / roadmap:** Stand 2026-08-12, HEAD Tip `b8a9d79` / Produkt `3e9d9a8`, Tests 98, M42/M43, Admin-PIN alphanumerisch, M30 danach
 
 ### Changed
 - **Gold-Aufleuchten statt Lauffeuer:** bei fertiger Zeile oder Spalte leuchten betroffene Felder 3× gleichzeitig vollflächig gold; kurze Fanfare (Sounds-Toggle); kein Extra-Trigger für den gesamten Zettel
