@@ -13,16 +13,16 @@ Diese Datei ist ein Kompatibilitaets-Index. Fuer aktuellen iOS-/TestFlight-/App-
 
 - Bundle ID: `de.bottletrade.dicebudget`
 - Version in App Store Connect: `2.0`
-- TestFlight: Builds bis **~51+** (Stand 2026-08-12); Release-Kandidat = HEAD `b8a9d79` / Produkt `3e9d9a8` (M42/M43) + `build:ios`
+- Deployment Target: **15.0**
+- TestFlight: Archive **2026-08-15** (HEAD `faf721b` — Multi-QR / Scan / Host-Overlay)
 - Details und Checkliste: `docs/ios_current.md`
-- Nächster Schritt: M42/M43 Abnahme, danach **M30** Store-Submit
+- Nächster großer Schritt: Abnahme QR-Build, danach **M30** Store-Submit (GO)
 
 ## Wichtig
 
 - Web-Deploy und iOS-Release sind getrennt; `ios/App/App/public/` ist gitignored.
-- Nach UI-Aenderungen: Mac `git reset --hard origin/milestone-22-prep`, Env setzen, `npm run build:ios`, Archive/Upload.
-- **Menü-Version:** iOS = Xcode Build zur Laufzeit (`App.getInfo`); Web = `NEXT_PUBLIC_APP_VERSION` + `NEXT_PUBLIC_APP_BUILD` (typisch `web`).
-- **Admin (M43):** `NEXT_PUBLIC_ADMIN_PIN` (alphanumerisch) vor `build:ios`; `NEXT_PUBLIC_ADMIN_API_KEY` leer — Key nach PIN lokal.
-- **Universal Links:** Associated Domains `applinks:dicebudget.bottle-trade.de` (Entitlement im Repo); nach Pull in Xcode Signing prüfen.
-- Bei `git pull`-Fehler: `git restore frontend/package-lock.json` vor Pull (vom Projektroot).
+- Nach UI-Aenderungen: Mac pull (ggf. `git restore` pbxproj/Podfile/lock), `npm install`, `npm run build:ios`, Archive/Upload.
+- **Menü-Version:** iOS = Xcode Build zur Laufzeit (`App.getInfo`); Web = `NEXT_PUBLIC_APP_*`.
+- **Admin (M43):** `NEXT_PUBLIC_ADMIN_PIN` vor `build:ios`; `NEXT_PUBLIC_ADMIN_API_KEY` leer.
+- **Multi-QR:** Associated Domains `applinks:dicebudget.bottle-trade.de`; Kamera-Permission für In-App-Scan.
 - Der verbindliche Sync-Workflow steht in `AGENT_RULES.md` Sektion 9.

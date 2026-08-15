@@ -1,9 +1,9 @@
 # Aktive Milestones - dice.budget
 
-**Stand:** 2026-08-12  
+**Stand:** 2026-08-15  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD:** `3e9d9a8` (M42/M43) · Tip `b8a9d79` (Admin-PIN volle Tastatur)  
-**Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de — Frontend Unit-Tests **98** grün  
+**HEAD:** `faf721b` (Multi-QR, Host-Einladung vereinfacht)  
+**Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de — Frontend Unit-Tests **105** grün  
 **Backend:** Migrationen u. a. `20260807120000_pairing_baseline_absolute`, `20260807140000_pairing_baseline_app_snapshot` — Deploy nach Stabilitäts-Batch
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`.
@@ -12,29 +12,43 @@ Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones s
 
 ### Milestone 21 / M30 - iOS-App / App Store Release
 
-**Status:** bewusst zurückgestellt — technisch Feature-fertig; organisatorisch **nach M42/M43**.
+**Status:** bewusst zurückgestellt — technisch Feature-fertig; organisatorisch **nach** Abnahme Multi-QR / aktuellem TestFlight-Build.
 
 Technische Basis ist erledigt:
 
 - Capacitor 7, Bundle `de.bottletrade.dicebudget`, Native Start `/app`, API Prod.
-- TestFlight **Version 2.0**, Builds bis **~51+**; Release-Kandidat = aktueller HEAD + frischer `build:ios`.
+- TestFlight **Version 2.0**; Deployment Target **15.0**; Archive 2026-08-15 enthält QR-Scan + Host-QR.
 - iOS-UI nur aus `npm run build:ios` auf dem Mac.
 - **Admin (M43):** ein Build — `NEXT_PUBLIC_ADMIN_PIN` + lokal hinterlegter Admin-API-Key; Bundle ohne `NEXT_PUBLIC_ADMIN_API_KEY`; PIN-Feld mit voller Tastatur.
+- **Multi-QR:** Universal Links + In-App-Scan; keine Code-Eingabe mehr.
 
 Offen (M30):
 
-- TestFlight-Regression auf aktuellem HEAD (Checkliste `docs/ios_current.md`).
+- TestFlight-Regression auf aktuellem HEAD (Checkliste `docs/ios_current.md`, inkl. Kamera/QR).
 - App Store Connect: Paid Agreement, Bank/Steuer, Preis **1,19 €**, Screenshots/Metadaten, Build wählen, Submit for Review.
 - Details: `docs/ios_current.md`, `docs/testflight-app-store.md` Phase 7.
 
+## Zuletzt abgeschlossen (Produkt, nicht Milestone-Nummer)
+
+### Multi-QR + Scan-only Beitritt — 2026-08-15
+
+**Status:** umgesetzt (`9bbd3b3` … `faf721b`).
+
+- Host: QR mit Join-URL; Erfolg-UI nur Titel + QR + Lobby-Link.
+- Gast: Startscreen **QR-Code scannen** (`JoinByQrScan` / `jsqr`); alternativ System-Kamera → Universal Link.
+- `JoinByCodeForm` entfernt; Join ohne `?code=` zeigt Scanner.
+- AASA, Associated Domains, `DeepLinkRouter`, `NSCameraUsageDescription`.
+- iOS Minimum **15.0**.
+
 ## Aktive Feature-Milestones (vor M30)
 
-**Status:** **M42** und **M43** umgesetzt und manuell nutzbar; **M30** danach.
+**Status:** **M42** und **M43** umgesetzt; Multi-QR umgesetzt; **M30** danach.
 
 | Prio | Milestone | Status |
 |------|-----------|--------|
 | 1 | **M42** Rivalen-Bilder nur lokal | umgesetzt |
 | 2 | **M43** Admin-Shell (PIN, ein Build) | umgesetzt |
+| — | Multi-QR / Scan-Beitritt | umgesetzt (2026-08-15) |
 | — | **M30** App Store Release | bewusst zurückgestellt |
 
 ### M42 — Rivalen-Bilder nur lokal

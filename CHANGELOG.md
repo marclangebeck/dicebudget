@@ -25,6 +25,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Admin-Zugang:** kein separater Admin-Build mehr nötig; Stats-Admin nur nach PIN + Key (Legacy-Env-Key nur mit PIN, falls PIN gesetzt)
 
 ### Docs
+- **HANDOVER / milestones_active / ios_current / GOiOS:** Stand 2026-08-15 — Multi-QR, iOS 15, HEAD `faf721b`
 - **ios_current / CHANGELOG:** Universal Links + Multi-QR (Team ID `5QGGV8N5ZD`), Stand 2026-08-15
 
 ### Changed
