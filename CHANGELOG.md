@@ -24,6 +24,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Paarungs-Detail-Karten:** Bild oben volle Breite / halbe Höhe, Infos darunter — persönlichere Rivalen-Ansicht
 
 ### Changed
+- **Tournament Host Setup (Schritt 1):** Startscreen nur Turniername + „Weiter“ → `/setup` (Platzhalter); Create erst später; Draft lokal
 - **Agent-Workflow:** Nach abgeschlossenem Auftrag automatisch commit + push (kein extra Git-GO); Regel in `.cursor/rules/auto-commit-push.mdc`, `AGENT_RULES` §9, `HANDOVER`
 - **DiceBudget Tournament:** Positionierung allgemein (jeder Host); Host-UI an DiceBudget Startscreen (kühles Navy/Slate/Teal, Gold nur Akzent) — nicht braun-gold
 - **iOS Deployment Target:** Minimum von 14.0 auf **15.0** (Xcode-/Pod-Hinweise)

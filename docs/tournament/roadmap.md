@@ -49,5 +49,6 @@ T7/T8 können nach dem Kern parallel oder nacheinander kommen; weitere Modi dana
 
 ## Nächster Schritt
 
-**T3** (nach GO): Spieler-App „Turnier beitreten“ an `POST /tournaments/invite/:code/join` anbinden.  
-iOS Host: auf dem Mac `cd apps/tournament && npx cap add ios && npm run build:ios`.
+**Host-Setup-Wizard** (schrittweise): Start = Name → Turniereinstellungen; weitere Schritte folgen einzeln.  
+**T3** (wenn an der Reihe): Spieler-App „Turnier beitreten“ an Join-API.  
+iOS Host: auf dem Mac `cd apps/tournament && npm run build:ios`.
