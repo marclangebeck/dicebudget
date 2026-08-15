@@ -98,7 +98,10 @@ export default function SetupReviewPage() {
       </section>
 
       <div className="t-row" style={{ marginTop: "1rem" }}>
-        <Link href="/setup/size" className="t-btn t-btn--ghost">
+        <Link
+          href={modeKey === "turnier" ? "/setup/turnier" : "/setup/league"}
+          className="t-btn t-btn--ghost"
+        >
           Zurück
         </Link>
         <button

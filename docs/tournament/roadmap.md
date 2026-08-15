@@ -49,6 +49,6 @@ T7/T8 können nach dem Kern parallel oder nacheinander kommen; weitere Modi dana
 
 ## Nächster Schritt
 
-**Host-Setup-Wizard:** Name → Format → Größe → Kurzcheck → **Anlegen** → Lobby/QR.  
-Spieler-Join (T3) und Abrechnung am Beitritt folgen später.  
+**Host-Setup:** Name → Format (**Liga** | **Turnier**) → Größe → format-Zweig → Kurzcheck → Anlegen → Lobby/QR.  
+Beide Formate werden in **DiceBudget Tournament** ausgebaut; die Spieler-App nur Beitritt (T3).  
 iOS Host: auf dem Mac bei Bedarf `cd apps/tournament && npm run build:ios`.

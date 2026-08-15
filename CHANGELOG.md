@@ -24,6 +24,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Paarungs-Detail-Karten:** Bild oben volle Breite / halbe Höhe, Infos darunter — persönlichere Rivalen-Ansicht
 
 ### Changed
+- **Tournament Host:** Liga und Turnier beide wählbar; nach Größe getrennte Zweige (`/setup/league` · `/setup/turnier`); Spieler-App bleibt nur Join
 - **Tournament Host Setup (Anlegen):** Kurzcheck legt Ereignis per API an → Lobby mit QR; Draft wird geleert
 - **Tournament Host Setup (Schritt 3):** Größe (max. Spieler, Presets 8–64) → Kurzcheck `/setup/review`; Format-Texte Liga/Turnier geschärft
 - **Tournament Host Setup (Schritt 2):** Format wählen (**Liga** / **Turnier**; nur Liga aktiv) → `/setup/size`-Platzhalter; Draft speichert `modeKey`

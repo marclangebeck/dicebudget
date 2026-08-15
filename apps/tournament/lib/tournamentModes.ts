@@ -4,28 +4,33 @@ export type TournamentModeOption = {
   key: TournamentModeKey;
   label: string;
   description: string;
-  available: boolean;
 };
 
-/** Host-Setup: Ereignis-Format — Liga oder Turnier. */
+/**
+ * Formate nur in DiceBudget Tournament (Host).
+ * Die Spieler-App tritt nur per QR bei — ohne Format-Setup.
+ */
 export const TOURNAMENT_MODE_OPTIONS: TournamentModeOption[] = [
   {
     key: "league",
     label: "Liga",
     description: "Jeder gegen jeden — Runden und Tabelle.",
-    available: true,
   },
   {
     key: "turnier",
     label: "Turnier",
     description:
-      "Gruppen-Vorrunde, Qualifikation, dann K.O. in der Hauptrunde — folgt später.",
-    available: false,
+      "Gruppen-Vorrunde, Qualifikation, dann K.O. in der Hauptrunde.",
   },
 ];
 
 export function isTournamentModeKey(value: unknown): value is TournamentModeKey {
   return value === "league" || value === "turnier";
+}
+
+/** Nächster Wizard-Schritt nach Größe — formatabhängig. */
+export function setupPathAfterSize(modeKey: TournamentModeKey): string {
+  return modeKey === "turnier" ? "/setup/turnier" : "/setup/league";
 }
 
 export const MIN_MAX_ENTRIES = 2;

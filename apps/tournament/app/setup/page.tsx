@@ -14,7 +14,6 @@ export default function SetupFormatPage() {
   const router = useRouter();
   const [name, setName] = useState<string | null>(null);
   const [modeKey, setModeKey] = useState<TournamentModeKey>("league");
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const draft = loadSetupDraft();
@@ -27,11 +26,6 @@ export default function SetupFormatPage() {
   }, [router]);
 
   function onContinue() {
-    const option = TOURNAMENT_MODE_OPTIONS.find((o) => o.key === modeKey);
-    if (!option?.available) {
-      setError("Dieses Format ist noch nicht verfügbar.");
-      return;
-    }
     const next = patchSetupDraft({ modeKey });
     if (!next) {
       router.replace("/");
@@ -55,10 +49,14 @@ export default function SetupFormatPage() {
         Format
       </h1>
       <p className="t-meta">
-        Turnier: <strong style={{ color: "var(--ink)" }}>{name}</strong>
+        Ereignis: <strong style={{ color: "var(--ink)" }}>{name}</strong>
+      </p>
+      <p className="t-meta">
+        Liga und Turnier werden hier im Host eingerichtet. Spieler treten später
+        nur per QR bei.
       </p>
 
-      <section className="t-card" aria-label="Turnierformat wählen">
+      <section className="t-card" aria-label="Ereignis-Format wählen">
         <p className="t-label" style={{ marginBottom: "0.65rem" }}>
           Wie soll gespielt werden?
         </p>
@@ -70,19 +68,10 @@ export default function SetupFormatPage() {
                 key={option.key}
                 type="button"
                 className={`t-choice${selected ? " t-choice--selected" : ""}`}
-                disabled={!option.available}
                 aria-pressed={selected}
-                onClick={() => {
-                  if (option.available) {
-                    setModeKey(option.key);
-                    setError(null);
-                  }
-                }}
+                onClick={() => setModeKey(option.key)}
               >
-                <span className="t-choice-title">
-                  {option.label}
-                  {!option.available ? " · folgt" : ""}
-                </span>
+                <span className="t-choice-title">{option.label}</span>
                 <span className="t-choice-desc">{option.description}</span>
               </button>
             );
@@ -98,12 +87,6 @@ export default function SetupFormatPage() {
           Weiter
         </button>
       </div>
-
-      {error && (
-        <p className="t-error" role="alert">
-          {error}
-        </p>
-      )}
     </main>
   );
 }

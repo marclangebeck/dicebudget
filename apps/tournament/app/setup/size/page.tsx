@@ -12,11 +12,14 @@ import {
   MIN_MAX_ENTRIES,
   TOURNAMENT_MODE_OPTIONS,
   clampMaxEntries,
+  setupPathAfterSize,
+  type TournamentModeKey,
 } from "@/lib/tournamentModes";
 
 export default function SetupSizePage() {
   const router = useRouter();
   const [name, setName] = useState<string | null>(null);
+  const [modeKey, setModeKey] = useState<TournamentModeKey | null>(null);
   const [modeLabel, setModeLabel] = useState("");
   const [maxEntries, setMaxEntries] = useState(DEFAULT_MAX_ENTRIES);
   const [error, setError] = useState<string | null>(null);
@@ -28,12 +31,14 @@ export default function SetupSizePage() {
       return;
     }
     setName(draft.name.trim());
+    setModeKey(draft.modeKey);
     const mode = TOURNAMENT_MODE_OPTIONS.find((o) => o.key === draft.modeKey);
     setModeLabel(mode?.label ?? draft.modeKey);
     setMaxEntries(draft.maxEntries ?? DEFAULT_MAX_ENTRIES);
   }, [router]);
 
   function onContinue() {
+    if (!modeKey) return;
     const n = clampMaxEntries(maxEntries);
     if (n < MIN_MAX_ENTRIES || n > MAX_MAX_ENTRIES) {
       setError(`Spielerzahl zwischen ${MIN_MAX_ENTRIES} und ${MAX_MAX_ENTRIES}.`);
@@ -44,7 +49,7 @@ export default function SetupSizePage() {
       router.replace("/");
       return;
     }
-    router.push("/setup/review");
+    router.push(setupPathAfterSize(modeKey));
   }
 
   if (!name) {
