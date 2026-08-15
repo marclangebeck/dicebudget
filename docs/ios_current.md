@@ -101,7 +101,7 @@ Ausführlich: `docs/testflight-app-store.md`, Einsteiger: `docs/ios-xcode-anleit
 ## TestFlight-Checkliste (aktueller HEAD+)
 
 - **Menü:** Version 2.0 (Build-Nr. = Xcode); aktiver Footer-Tab sichtbar
-- **Startscreen:** Mitte „QR-Code scannen“ (kein Code-Feld); Kamera-Permission
+- **Startscreen:** Mitte zwei Buttons nebeneinander — Multi-Raum-QR (aktiv) und Turnier-QR (Demnächst); Kamera-Permission für Multi
 - **Host:** Raum anlegen → nur Titel + QR + Zur Lobby
 - **Gast:** Scan öffnet Join/Lobby; Universal Link aus System-Kamera optional
 - **Spielregeln / Labs / Admin** wie bisher (Labs vs. Admin-PIN)

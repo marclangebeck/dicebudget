@@ -18,7 +18,14 @@ Eine Kneipe (o. Ä.) richtet ein DiceBudget-Turnier aus. Spieler laden die **D
 
 Kommunikation: **iPad-Host ↔ Server ↔ Spieler-Apps** (kein Peer-to-Peer).
 
-## Architektur-Annahme (Start)
+## Beitritt in der Spieler-App (UI)
+
+Startscreen-Mitte (zwischen Multi und Solo): **zwei Halbbreiten-Buttons** nebeneinander, jeweils gesamter Container = Aktion:
+
+1. **Multi-Spiel / Gegner-Raum beitreten** — QR-Scan (bestehend, aktiv)
+2. **Turnier beitreten** — QR-Scan (Platzhalter `disabled` / „Demnächst“, Funktion folgt mit T3)
+
+Umsetzung: `HomeJoinButtons` in `JoinByQrScan.tsx`.
 
 - **Monorepo-Light** in diesem Repo: Doku jetzt; später z. B. `apps/host` neben `frontend/`
 - **Zwei iOS-Apps / zwei Builds / zwei TestFlight-Einträge** (eigene Bundle-IDs)

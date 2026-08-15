@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { HomeHeroBanner } from "@/components/HomeHeroBanner";
-import { JoinByQrScan } from "@/components/JoinByQrScan";
+import { HomeJoinButtons } from "@/components/JoinByQrScan";
 import { useHomeHeroData } from "@/lib/useHomeHeroData";
 
 type ArenaPaneProps = {
@@ -60,7 +60,7 @@ export function HomeBentoGridClassic() {
           cta="Als Host starten"
           iconSrc="/home-icons/multiplayer.png"
         />
-        <JoinByQrScan variant="home" />
+        <HomeJoinButtons />
         <ArenaPane
           href="/solo"
           tone="solo"

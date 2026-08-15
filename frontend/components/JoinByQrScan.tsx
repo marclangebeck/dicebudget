@@ -25,6 +25,7 @@ function resolveJoinPathFromScan(raw: string): string | null {
 /**
  * Beitritt nur per QR: öffnet die Gerätekamera in der App und leitet zur Lobby.
  * (System-Kamera + Universal Link bleibt parallel nutzbar.)
+ * Home: gesamter Container = ein Button (Multi-Raum).
  */
 export function JoinByQrScan({ variant = "home" }: Props) {
   const router = useRouter();
@@ -111,7 +112,6 @@ export function JoinByQrScan({ variant = "home" }: Props) {
       });
       streamRef.current = stream;
       setScanning(true);
-      // Video nach Render binden
       window.setTimeout(() => {
         const video = videoRef.current;
         if (!video) return;
@@ -128,67 +128,112 @@ export function JoinByQrScan({ variant = "home" }: Props) {
     }
   }
 
-  const panel = (
-    <section
-      className={variant === "home" ? "home-cinematic-join home-cinematic-join--qr" : "join-qr-panel"}
-      aria-label="Multi-Spiel per QR beitreten"
-      data-tour-anchor="join"
-    >
-      <div className={variant === "home" ? "home-cinematic-join-copy" : "join-qr-panel-copy"}>
-        <p className={variant === "home" ? "home-cinematic-join-kicker" : "join-qr-panel-kicker"}>
-          Multi-Spiel
+  const overlay = scanning ? (
+    <div className="qr-scan-overlay" role="dialog" aria-modal="true" aria-label="QR-Code scannen">
+      <div className="qr-scan-overlay-inner">
+        <p className="qr-scan-overlay-title">QR anvisieren</p>
+        <div className="qr-scan-frame">
+          <video ref={videoRef} className="qr-scan-video" playsInline muted autoPlay />
+          <div className="qr-scan-reticle" aria-hidden />
+        </div>
+        <p className="qr-scan-overlay-hint">
+          Halte den QR des Hosts in den Rahmen. Alternativ: System-Kamera öffnen und scannen.
         </p>
-        <p className={variant === "home" ? "home-cinematic-join-title" : "join-qr-panel-title"}>
-          Gegner-Raum beitreten
-        </p>
-        <p className={variant === "home" ? "home-cinematic-join-hint" : "join-qr-panel-hint"}>
-          QR vom Host scannen — direkt in die Lobby
-        </p>
+        <button type="button" className="qr-scan-cancel" onClick={stopScanner}>
+          Abbrechen
+        </button>
       </div>
-      <button
-        type="button"
-        className={
-          variant === "home"
-            ? "home-cinematic-join-scan"
-            : "glass-button glass-button--primary min-h-12 w-full px-4 text-sm font-semibold"
-        }
-        onClick={() => void startScanner()}
-      >
-        <ScanIcon />
-        <span>QR-Code scannen</span>
-      </button>
-      {error && (
-        <p
-          className={variant === "home" ? "home-cinematic-join-error" : "glass-alert-error mt-2 text-sm"}
-          role="alert"
-        >
-          {error}
-        </p>
-      )}
-    </section>
-  );
+    </div>
+  ) : null;
+
+  if (variant === "home") {
+    return (
+      <>
+        <div className="home-cinematic-join-slot">
+          <button
+            type="button"
+            className="home-cinematic-join home-cinematic-join--multi home-cinematic-join--hit"
+            aria-label="Multi-Spiel: Gegner-Raum beitreten, QR-Code scannen"
+            data-tour-anchor="join"
+            onClick={() => void startScanner()}
+          >
+            <span className="home-cinematic-join-copy">
+              <span className="home-cinematic-join-kicker">Multi-Spiel</span>
+              <span className="home-cinematic-join-title">Gegner-Raum beitreten</span>
+              <span className="home-cinematic-join-cta">
+                <ScanIcon />
+                <span>QR-Code scannen</span>
+              </span>
+            </span>
+          </button>
+          {error && (
+            <p className="home-cinematic-join-error" role="alert">
+              {error}
+            </p>
+          )}
+        </div>
+        {overlay}
+      </>
+    );
+  }
 
   return (
     <>
-      {panel}
-      {scanning && (
-        <div className="qr-scan-overlay" role="dialog" aria-modal="true" aria-label="QR-Code scannen">
-          <div className="qr-scan-overlay-inner">
-            <p className="qr-scan-overlay-title">QR anvisieren</p>
-            <div className="qr-scan-frame">
-              <video ref={videoRef} className="qr-scan-video" playsInline muted autoPlay />
-              <div className="qr-scan-reticle" aria-hidden />
-            </div>
-            <p className="qr-scan-overlay-hint">
-              Halte den QR des Hosts in den Rahmen. Alternativ: System-Kamera öffnen und scannen.
-            </p>
-            <button type="button" className="qr-scan-cancel" onClick={stopScanner}>
-              Abbrechen
-            </button>
-          </div>
+      <section className="join-qr-panel" aria-label="Multi-Spiel per QR beitreten" data-tour-anchor="join">
+        <div className="join-qr-panel-copy">
+          <p className="join-qr-panel-kicker">Multi-Spiel</p>
+          <p className="join-qr-panel-title">Gegner-Raum beitreten</p>
+          <p className="join-qr-panel-hint">QR vom Host scannen — direkt in die Lobby</p>
         </div>
-      )}
+        <button
+          type="button"
+          className="glass-button glass-button--primary min-h-12 w-full px-4 text-sm font-semibold"
+          onClick={() => void startScanner()}
+        >
+          <ScanIcon />
+          <span>QR-Code scannen</span>
+        </button>
+        {error && (
+          <p className="glass-alert-error mt-2 text-sm" role="alert">
+            {error}
+          </p>
+        )}
+      </section>
+      {overlay}
     </>
+  );
+}
+
+/** Platzhalter: Turnier-QR später; gesamter Container = Button, ohne Aktion. */
+export function TournamentJoinPlaceholder() {
+  return (
+    <div className="home-cinematic-join-slot">
+      <button
+        type="button"
+        className="home-cinematic-join home-cinematic-join--tournament home-cinematic-join--hit"
+        aria-label="Turnier beitreten, QR-Code scannen — demnächst"
+        disabled
+      >
+        <span className="home-cinematic-join-copy">
+          <span className="home-cinematic-join-kicker">Turnier</span>
+          <span className="home-cinematic-join-title">Turnier beitreten</span>
+          <span className="home-cinematic-join-cta">
+            <ScanIcon />
+            <span>QR-Code scannen</span>
+          </span>
+          <span className="home-cinematic-join-soon">Demnächst</span>
+        </span>
+      </button>
+    </div>
+  );
+}
+
+export function HomeJoinButtons() {
+  return (
+    <div className="home-cinematic-join-row" aria-label="Beitreten per QR">
+      <JoinByQrScan variant="home" />
+      <TournamentJoinPlaceholder />
+    </div>
   );
 }
 

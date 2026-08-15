@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, type CSSProperties } from "react";
 import { APP_SHORT } from "@/lib/branding";
-import { JoinByQrScan } from "@/components/JoinByQrScan";
+import { HomeJoinButtons } from "@/components/JoinByQrScan";
 
 type CinematicDoorProps = {
   href: string;
@@ -86,7 +86,7 @@ export function HomeBentoGridCinematic() {
           enterDelayMs={80}
           labelClassName="home-cinematic-door-label--host"
         />
-        <JoinByQrScan variant="home" />
+        <HomeJoinButtons />
         <CinematicDoor
           href="/solo"
           tone="solo"
