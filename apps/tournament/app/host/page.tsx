@@ -77,16 +77,20 @@ function HostInner() {
 
   return (
     <main className="t-shell">
-      <p className="t-meta">{APP_NAME} · Host</p>
+      <p className="t-meta">{APP_NAME} · Lobby</p>
       <h1 className="t-brand" style={{ fontSize: "1.55rem" }}>
-        {tournament?.name?.trim() || "Turnier-Lobby"}
+        {tournament?.name?.trim() || "Ereignis-Lobby"}
       </h1>
       <p className="t-code">{code || "—"}</p>
 
       {qrDataUrl && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img className="t-qr" src={qrDataUrl} alt={`QR für Turnier ${code}`} />
+        <img className="t-qr" src={qrDataUrl} alt={`QR für Ereignis ${code}`} />
       )}
+
+      <p className="t-meta">
+        Teilnehmer scannen den QR in der DiceBudget-App (Join folgt mit T3).
+      </p>
 
       <p className="t-meta">
         Status: <strong>{tournament?.status ?? "…"}</strong>
@@ -112,7 +116,8 @@ function HostInner() {
           </ul>
         ) : (
           <p className="t-meta" style={{ margin: 0 }}>
-            Noch keine Spieler — QR in der DiceBudget-App scannen (Join folgt mit T3).
+            Noch keine Anmeldungen — QR bereit halten und Liste per „Aktualisieren“
+            prüfen.
           </p>
         )}
       </section>
@@ -127,7 +132,7 @@ function HostInner() {
           disabled={busy || !hostToken || tournament?.status !== "OPEN"}
           onClick={() => void onStart()}
         >
-          Turnier starten
+          Ereignis starten
         </button>
         <Link href="/" className="t-btn t-btn--ghost">
           Zur Startseite

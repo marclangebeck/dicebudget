@@ -49,6 +49,6 @@ T7/T8 können nach dem Kern parallel oder nacheinander kommen; weitere Modi dana
 
 ## Nächster Schritt
 
-**Host-Setup-Wizard** (schrittweise): Name → Format (Liga/Turnier) → Größe → Kurzcheck; Anlegen folgt.  
-Spieler-App-Button später ggf. „Turnier/Liga beitreten“ (T3).  
+**Host-Setup-Wizard:** Name → Format → Größe → Kurzcheck → **Anlegen** → Lobby/QR.  
+Spieler-Join (T3) und Abrechnung am Beitritt folgen später.  
 iOS Host: auf dem Mac bei Bedarf `cd apps/tournament && npm run build:ios`.
