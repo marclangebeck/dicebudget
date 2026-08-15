@@ -5,7 +5,6 @@ import type { SessionLobbyDto } from "@/lib/sessionTypes";
 import type { RunDto } from "@/lib/types";
 import { isFeatureEnabled } from "@/lib/featureFlags";
 import { getHouseRuleInfo, type HouseRuleInfo } from "@/lib/houseRuleInfo";
-import { qualifiesYatzyStreakPenalty } from "@/lib/houseRules";
 import { HouseRuleInfoOverlay } from "@/components/HouseRuleInfoOverlay";
 import { RollSaleOverlay } from "@/components/RollSaleOverlay";
 
@@ -71,11 +70,10 @@ export function HouseRulesTableActions({
   ownPlayerDbId,
   busy,
   onRollSale,
-  onYatzyStreak,
+  onYatzyStreak: _onYatzyStreak,
   variant = "popover",
 }: HouseRulesTableActionsProps) {
   const [rollSaleOpen, setRollSaleOpen] = useState(false);
-  const [yatzyVictimId, setYatzyVictimId] = useState("");
   const [ruleInfo, setRuleInfo] = useState<HouseRuleInfo | null>(null);
 
   const rollSaleEnabled = isFeatureEnabled("houseRulesRollSale");
@@ -94,11 +92,6 @@ export function HouseRulesTableActions({
   const canRollSale =
     rollSaleEnabled && run.status === "ACTIVE" && !run.rollSaleFreeFillActive;
 
-  const allFields = run.games.flatMap((g) => g.fields);
-  const canYatzyStreak =
-    yatzyEnabled && run.status === "ACTIVE" && qualifiesYatzyStreakPenalty(allFields);
-
-  const opponents = lobby?.players.filter((p) => p.id !== ownPlayerDbId) ?? [];
   const rootClass =
     variant === "entry" ? "house-rules-actions house-rules-actions--entry" : "house-rules-actions";
 
@@ -147,20 +140,22 @@ export function HouseRulesTableActions({
           </button>
         )}
 
-        {yatzyEnabled && lobby && lobby.playerCount === 2 && (
+        {yatzyEnabled && lobby && lobby.playerCount >= 2 && (
           <div className="house-rules-subpanel rounded-lg border p-2">
             <RuleTitle title="2× Alle Fünfe" infoKey="yatzyStreak2" onInfo={setRuleInfo} />
             <p className="house-rules-action-hint mt-0.5 text-[0.65rem]">
-              ≤3 Würfe: Pool-Strafe wird automatisch angewendet.
+              ≤3 Würfe: Mitspieler verlieren je 1/{lobby.playerCount} Pool (automatisch)
+              {lobby.ruleYatzyStreak2Credit ? "; Abzug wird dir gutgeschrieben" : ""}.
             </p>
           </div>
         )}
 
-        {yatzyTripleEnabled && lobby && lobby.playerCount === 2 && (
+        {yatzyTripleEnabled && lobby && lobby.playerCount >= 2 && (
           <div className="house-rules-subpanel rounded-lg border p-2">
             <RuleTitle title="3× Alle Fünfe" infoKey="yatzyStreak3" onInfo={setRuleInfo} />
             <p className="house-rules-action-hint mt-0.5 text-[0.65rem]">
-              ≤3 Würfe: Gegner verliert den gesamten Pool (automatisch).
+              ≤3 Würfe: Mitspieler verlieren den gesamten Pool (automatisch)
+              {lobby.ruleYatzyTripleCredit ? "; Abzug wird dir gutgeschrieben" : ""}.
             </p>
           </div>
         )}
@@ -180,45 +175,6 @@ export function HouseRulesTableActions({
             <p className="house-rules-action-hint mt-0.5 text-[0.65rem]">
               Erster: Spalte oben mit Bonus / unten voll / durchgängig — je +2 Pool (auto).
             </p>
-          </div>
-        )}
-
-        {yatzyEnabled && lobby && lobby.playerCount > 2 && (
-          <div className="house-rules-subpanel rounded-lg border p-2">
-            <RuleTitle title="2× Alle Fünfe (≤3 Würfe)" infoKey="yatzyStreak2" onInfo={setRuleInfo} />
-            <p className="house-rules-action-hint mt-0.5 text-[0.65rem]">
-              Gegner verliert die Hälfte des Pools (abrunden).
-            </p>
-            {canYatzyStreak ? (
-              <div className="mt-2 flex gap-2">
-                <select
-                  value={yatzyVictimId || opponents[0]?.id || ""}
-                  onChange={(e) => setYatzyVictimId(e.target.value)}
-                  className="glass-input min-h-9 flex-1 px-2 text-xs"
-                >
-                  {opponents.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      Spieler {p.orderIndex + 1}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  disabled={busy || opponents.length === 0}
-                  onClick={() => {
-                    const id = yatzyVictimId || opponents[0]?.id;
-                    if (id) onYatzyStreak(id);
-                  }}
-                  className="house-rules-action house-rules-action--primary min-h-9 shrink-0 px-3 text-xs font-semibold"
-                >
-                  Anwenden
-                </button>
-              </div>
-            ) : (
-              <p className="house-rules-action-hint mt-1 text-[0.65rem]">
-                Letzte zwei Einträge müssen Alle Fünfe mit ≤3 Würfen sein.
-              </p>
-            )}
           </div>
         )}
       </div>

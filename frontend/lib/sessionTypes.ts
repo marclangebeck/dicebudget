@@ -22,6 +22,8 @@ export type SessionLobbyDto = {
   poolEndgameImproverPlayerId: string | null;
   ruleYatzyStreak2?: boolean;
   ruleYatzyTriple?: boolean;
+  ruleYatzyStreak2Credit?: boolean;
+  ruleYatzyTripleCredit?: boolean;
   ruleUpperRace?: boolean;
   ruleColumnPoolBonuses?: boolean;
   status: string;

@@ -2,7 +2,9 @@ export type HouseRuleInfoKey =
   | "burn"
   | "rollSale"
   | "yatzyStreak2"
+  | "yatzyStreak2Credit"
   | "yatzyStreak3"
+  | "yatzyStreak3Credit"
   | "upperRace"
   | "columnPoolBonuses";
 
@@ -29,13 +31,25 @@ export const HOUSE_RULE_INFO: Record<HouseRuleInfoKey, HouseRuleInfo> = {
     key: "yatzyStreak2",
     title: "2× Alle Fünfe",
     body:
-      "Trägst du zwei echte Alle Fünfe (je 50 Punkte) hintereinander mit höchstens 3 Würfen ein, verliert der Gegner die Hälfte seines Pools (abgerundet). Null-Einträge zählen nicht. Im Duell (2 Spieler) automatisch; bei mehr Spielern manuell.",
+      "Trägst du zwei echte Alle Fünfe (je 50 Punkte) hintereinander mit höchstens 3 Würfen ein, verlieren alle Mitspieler ohne diesen Streak 1/n ihres Pools (n = Spielerzahl; zu zweit die Hälfte, zu dritt ein Drittel, …; abgerundet). Null-Einträge zählen nicht. Im Multi automatisch. Optional: Pool-Gutschrift an dich.",
+  },
+  yatzyStreak2Credit: {
+    key: "yatzyStreak2Credit",
+    title: "2× Alle Fünfe — Pool-Gutschrift",
+    body:
+      "Wenn aktiv: Die Pools, die den Mitspielern durch 2× Alle Fünfe abgezogen werden, erhält der Erfolgreiche gutgeschrieben (Transfer). Standard aus — dann bleibt es bei der reinen Strafe.",
   },
   yatzyStreak3: {
     key: "yatzyStreak3",
     title: "3× Alle Fünfe",
     body:
-      "Trägst du drei echte Alle Fünfe (je 50 Punkte) hintereinander mit höchstens 3 Würfen ein, verliert der Gegner seinen gesamten Pool. Null-Einträge zählen nicht. Im Duell automatisch. Hat Vorrang vor der 2×-Strafe.",
+      "Trägst du drei echte Alle Fünfe (je 50 Punkte) hintereinander mit höchstens 3 Würfen ein, verlieren alle Mitspieler ihren gesamten Pool. Null-Einträge zählen nicht. Im Multi automatisch. Hat Vorrang vor der 2×-Strafe. Optional: Pool-Gutschrift an dich.",
+  },
+  yatzyStreak3Credit: {
+    key: "yatzyStreak3Credit",
+    title: "3× Alle Fünfe — Pool-Gutschrift",
+    body:
+      "Wenn aktiv: Die Pools, die den Mitspielern durch 3× Alle Fünfe abgezogen werden, erhält der Erfolgreiche gutgeschrieben (Transfer). Standard aus — dann bleibt es bei der reinen Strafe.",
   },
   upperRace: {
     key: "upperRace",

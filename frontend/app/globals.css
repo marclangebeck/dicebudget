@@ -8514,6 +8514,16 @@ html.zoomable-route.legal-route .legal-page-scroll {
   column-gap: 0.7rem;
 }
 
+.settings-compact-card--nested {
+  margin-left: 0.85rem;
+  min-height: 5.4rem;
+  border-left: 2px solid rgba(214, 168, 90, 0.35);
+}
+
+.settings-labs-feature-group {
+  display: contents;
+}
+
 .settings-compact-card--range {
   text-align: center;
 }

@@ -69,6 +69,8 @@ function MultiJoinInner() {
         {
           ruleYatzyStreak2: lobby.ruleYatzyStreak2,
           ruleYatzyTriple: lobby.ruleYatzyTriple,
+          ruleYatzyStreak2Credit: lobby.ruleYatzyStreak2Credit,
+          ruleYatzyTripleCredit: lobby.ruleYatzyTripleCredit,
           ruleUpperRace: lobby.ruleUpperRace,
           ruleColumnPoolBonuses: lobby.ruleColumnPoolBonuses,
         },

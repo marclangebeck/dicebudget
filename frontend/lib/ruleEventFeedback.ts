@@ -4,12 +4,16 @@ export type HouseRuleAutoEventDto =
       poolsLost: number;
       victimPlayerId: string;
       victimPlayerName: string;
+      victimCount?: number;
+      poolsGained?: number;
     }
   | {
       type: "yatzy_triple_penalty";
       poolsLost: number;
       victimPlayerId: string;
       victimPlayerName: string;
+      victimCount?: number;
+      poolsGained?: number;
     }
   | {
       type: "upper_race_pool";
@@ -41,37 +45,58 @@ export type RuleEventOverlayState = {
   badge: string;
 };
 
+function yatzyCreditSuffix(poolsGained: number | undefined): string {
+  if (!poolsGained || poolsGained <= 0) return "";
+  return ` · dir +${poolsGained}`;
+}
+
 export function ruleEventFromDto(event: HouseRuleAutoEventDto): RuleEventOverlayState | null {
   if (event.type === "yatzy_triple_penalty") {
+    const credit = yatzyCreditSuffix(event.poolsGained);
+    const many = (event.victimCount ?? 1) > 1;
     if (event.poolsLost <= 0) {
       return {
         kind: "yatzy_triple_penalty",
         title: "3× Alle Fünfe",
-        subtitle: "Gegner-Pool bereits 0 — keine Strafe nötig",
+        subtitle: many
+          ? "Mitspieler-Pools bereits 0 — keine Strafe nötig"
+          : "Gegner-Pool bereits 0 — keine Strafe nötig",
         badge: "±0",
       };
     }
     return {
       kind: "yatzy_triple_penalty",
       title: "3× Alle Fünfe!",
-      subtitle: `Gegner verliert den gesamten Pool (−${event.poolsLost})`,
-      badge: `−${event.poolsLost}`,
+      subtitle: many
+        ? `Mitspieler verlieren den gesamten Pool (−${event.poolsLost})${credit}`
+        : `Gegner verliert den gesamten Pool (−${event.poolsLost})${credit}`,
+      badge: event.poolsGained && event.poolsGained > 0
+        ? `+${event.poolsGained}`
+        : `−${event.poolsLost}`,
     };
   }
   if (event.type === "yatzy_streak_penalty") {
+    const credit = yatzyCreditSuffix(event.poolsGained);
+    const many = (event.victimCount ?? 1) > 1;
     if (event.poolsLost <= 0) {
       return {
         kind: "yatzy_streak_penalty",
         title: "2× Alle Fünfe",
-        subtitle: "Gegner-Pool bereits 0 — keine Strafe nötig",
+        subtitle: many
+          ? "Mitspieler-Pools bereits 0 — keine Strafe nötig"
+          : "Gegner-Pool bereits 0 — keine Strafe nötig",
         badge: "±0",
       };
     }
     return {
       kind: "yatzy_streak_penalty",
       title: "2× Alle Fünfe!",
-      subtitle: `Gegner-Pool halbiert (−${event.poolsLost})`,
-      badge: `−${event.poolsLost}`,
+      subtitle: many
+        ? `Mitspieler verlieren je 1/n Pool (−${event.poolsLost})${credit}`
+        : `Gegner-Pool halbiert (−${event.poolsLost})${credit}`,
+      badge: event.poolsGained && event.poolsGained > 0
+        ? `+${event.poolsGained}`
+        : `−${event.poolsLost}`,
     };
   }
   if (event.type === "upper_race_pool") {

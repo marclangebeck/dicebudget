@@ -121,8 +121,30 @@ export function qualifiesYatzyTriplePenalty(fields: ScoredHistoryField[]): boole
   return scored.slice(-3).every(isFastYatzy);
 }
 
+/**
+ * Pool-Abzug von 1/n der Spielerzahl: Rest = floor(pool × (n−1) / n).
+ * Bei n=2 identisch zum bisherigen Halbieren (floor(pool/2) bleibt).
+ */
+export function poolAfterPlayerShareLoss(
+  pool: number,
+  playerCount: number,
+): { newPool: number; poolsLost: number } {
+  const safePool = Number.isFinite(pool) ? Math.max(0, Math.floor(pool)) : 0;
+  if (!Number.isInteger(playerCount) || playerCount < 2 || safePool <= 0) {
+    return { newPool: safePool, poolsLost: 0 };
+  }
+  const newPool = Math.floor((safePool * (playerCount - 1)) / playerCount);
+  return { newPool, poolsLost: safePool - newPool };
+}
+
+/** Gesamter Pool weg (3× Alle Fünfe). */
+export function poolAfterFullLoss(pool: number): { newPool: number; poolsLost: number } {
+  const safePool = Number.isFinite(pool) ? Math.max(0, Math.floor(pool)) : 0;
+  return { newPool: 0, poolsLost: safePool };
+}
+
 export function halvePoolRoundedDown(pool: number): number {
-  return Math.floor(pool / 2);
+  return poolAfterPlayerShareLoss(pool, 2).newPool;
 }
 
 const UPPER_FIELD_TYPE_SET = new Set(["ONES", "TWOS", "THREES", "FOURS", "FIVES", "SIXES"]);

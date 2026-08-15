@@ -75,4 +75,28 @@ describe("isFeatureEnabled", () => {
     };
     assert.equal(isFeatureEnabled(TEST_FEATURE_ID), true);
   });
+
+  it("Unter-Toggle nur aktiv wenn Parent an", () => {
+    window.localStorage.setItem("dicebudget.labsUnlocked.v1", "1");
+    const childId = "__testLabsChild";
+    (FEATURE_REGISTRY as Record<string, unknown>)[TEST_FEATURE_ID] = {
+      id: TEST_FEATURE_ID,
+      title: "Parent",
+      description: "Parent",
+      stage: "labs",
+      defaultLabsOn: false,
+    };
+    (FEATURE_REGISTRY as Record<string, unknown>)[childId] = {
+      id: childId,
+      title: "Child",
+      description: "Child",
+      stage: "labs",
+      defaultLabsOn: true,
+      parentId: TEST_FEATURE_ID,
+    };
+    setLabsFeaturePref(childId, true);
+    assert.equal(isFeatureEnabled(childId), false);
+    setLabsFeaturePref(TEST_FEATURE_ID, true);
+    assert.equal(isFeatureEnabled(childId), true);
+  });
 });

@@ -16,6 +16,7 @@ import {
   FEATURE_FLAGS_CHANGED_EVENT,
   isFeatureEnabled,
   listLabsFeatures,
+  listLabsChildFeatures,
   setLabsFeaturePref,
 } from "@/lib/featureFlags";
 import {
@@ -345,18 +346,35 @@ function SettingsPageInner() {
           ) : (
             <>
               {labsFeatures.map((feature) => (
-                <SettingsToggleCard
-                  key={feature.id}
-                  title={feature.title}
-                  description={feature.description}
-                  checked={isFeatureEnabled(feature.id)}
-                  onChange={(value) => setLabsFeaturePref(feature.id, value)}
-                  onInfo={
-                    feature.infoKey
-                      ? () => setRuleInfo(getHouseRuleInfo(feature.infoKey))
-                      : undefined
-                  }
-                />
+                <div key={feature.id} className="settings-labs-feature-group">
+                  <SettingsToggleCard
+                    title={feature.title}
+                    description={feature.description}
+                    checked={isFeatureEnabled(feature.id)}
+                    onChange={(value) => setLabsFeaturePref(feature.id, value)}
+                    onInfo={
+                      feature.infoKey
+                        ? () => setRuleInfo(getHouseRuleInfo(feature.infoKey))
+                        : undefined
+                    }
+                  />
+                  {isFeatureEnabled(feature.id) &&
+                    listLabsChildFeatures(feature.id).map((child) => (
+                      <SettingsToggleCard
+                        key={child.id}
+                        title={child.title}
+                        description={child.description}
+                        checked={isFeatureEnabled(child.id)}
+                        onChange={(value) => setLabsFeaturePref(child.id, value)}
+                        nested
+                        onInfo={
+                          child.infoKey
+                            ? () => setRuleInfo(getHouseRuleInfo(child.infoKey))
+                            : undefined
+                        }
+                      />
+                    ))}
+                </div>
               ))}
               <div className="settings-compact-card settings-compact-card--wide settings-compact-card--slim settings-compact-card--labs">
                 <p className="settings-compact-text settings-compact-text--sm">

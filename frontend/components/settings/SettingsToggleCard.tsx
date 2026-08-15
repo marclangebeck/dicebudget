@@ -6,6 +6,7 @@ type Props = {
   checked: boolean;
   onChange: (checked: boolean) => void;
   disabled?: boolean;
+  nested?: boolean;
   onInfo?: () => void;
 };
 
@@ -15,11 +16,14 @@ export function SettingsToggleCard({
   checked,
   onChange,
   disabled,
+  nested,
   onInfo,
 }: Props) {
   return (
     <div
-      className={`settings-compact-card settings-compact-card--toggle settings-compact-card--slim${disabled ? " settings-compact-card--disabled" : ""}`}
+      className={`settings-compact-card settings-compact-card--toggle settings-compact-card--slim${
+        nested ? " settings-compact-card--nested" : ""
+      }${disabled ? " settings-compact-card--disabled" : ""}`}
     >
       <div className="min-w-0">
         <p className="settings-compact-title settings-compact-title--sm settings-rule-title-row">

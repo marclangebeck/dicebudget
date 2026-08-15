@@ -8,9 +8,12 @@ import {
   gameColumnHasLowerComplete,
   gameColumnHasUpperBonus,
   hasAnyFullFieldTypeRow,
+  halvePoolRoundedDown,
   isFieldTypeRowFull,
   isValidRollSaleScore,
   newlyAchievedColumnGoal,
+  poolAfterFullLoss,
+  poolAfterPlayerShareLoss,
   qualifiesYatzyStreakPenalty,
   qualifiesYatzyTriplePenalty,
   rollSaleAllowedScores,
@@ -166,5 +169,19 @@ describe("houseRules", () => {
     assert.equal(BURN_POOL_COST, 1);
     assert.equal(burnPoolCost("reroll"), 1);
     assert.equal(burnPoolCost("set_face"), BURN_POOL_COST_SET_FACE);
+  });
+
+  it("poolAfterPlayerShareLoss: n=2 bleibt Halbieren", () => {
+    assert.equal(poolAfterPlayerShareLoss(10, 2).newPool, 5);
+    assert.equal(poolAfterPlayerShareLoss(10, 2).poolsLost, 5);
+    assert.equal(poolAfterPlayerShareLoss(5, 2).newPool, 2);
+    assert.equal(poolAfterPlayerShareLoss(5, 2).poolsLost, 3);
+    assert.equal(halvePoolRoundedDown(5), 2);
+    assert.equal(poolAfterPlayerShareLoss(12, 3).poolsLost, 4);
+    assert.equal(poolAfterPlayerShareLoss(12, 3).newPool, 8);
+    assert.equal(poolAfterPlayerShareLoss(10, 4).poolsLost, 3);
+    assert.equal(poolAfterPlayerShareLoss(10, 4).newPool, 7);
+    assert.equal(poolAfterFullLoss(9).poolsLost, 9);
+    assert.equal(poolAfterFullLoss(9).newPool, 0);
   });
 });

@@ -301,6 +301,8 @@ export function createGameSession(
   houseRules?: {
     ruleYatzyStreak2?: boolean;
     ruleYatzyTriple?: boolean;
+    ruleYatzyStreak2Credit?: boolean;
+    ruleYatzyTripleCredit?: boolean;
     ruleUpperRace?: boolean;
     ruleColumnPoolBonuses?: boolean;
   },

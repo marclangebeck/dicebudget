@@ -181,6 +181,8 @@ export function assertValidSessionPlayers(count: number): void {
 export type SessionHouseRuleFlags = {
   ruleYatzyStreak2?: boolean;
   ruleYatzyTriple?: boolean;
+  ruleYatzyStreak2Credit?: boolean;
+  ruleYatzyTripleCredit?: boolean;
   ruleUpperRace?: boolean;
   ruleColumnPoolBonuses?: boolean;
 };
@@ -211,6 +213,9 @@ export async function createGameSession(
 
   const ruleYatzyStreak2 = houseRules.ruleYatzyStreak2 !== false;
   const ruleYatzyTriple = houseRules.ruleYatzyTriple !== false;
+  // Gutschrift nur bei explizitem true (Default aus = bisheriges Verhalten)
+  const ruleYatzyStreak2Credit = houseRules.ruleYatzyStreak2Credit === true;
+  const ruleYatzyTripleCredit = houseRules.ruleYatzyTripleCredit === true;
   const ruleUpperRace = houseRules.ruleUpperRace !== false;
   const ruleColumnPoolBonuses = houseRules.ruleColumnPoolBonuses !== false;
 
@@ -252,6 +257,10 @@ export async function createGameSession(
         poolEndgameEnabled: poolEndgameEnabled && useStrategyRules,
         ruleYatzyStreak2: useStrategyRules && ruleYatzyStreak2,
         ruleYatzyTriple: useStrategyRules && ruleYatzyTriple,
+        ruleYatzyStreak2Credit:
+          useStrategyRules && ruleYatzyStreak2 && ruleYatzyStreak2Credit,
+        ruleYatzyTripleCredit:
+          useStrategyRules && ruleYatzyTriple && ruleYatzyTripleCredit,
         ruleUpperRace: useStrategyRules && ruleUpperRace,
         ruleColumnPoolBonuses: useStrategyRules && ruleColumnPoolBonuses,
         status: SESSION_STATUS.OPEN,
@@ -274,6 +283,8 @@ export async function createGameSession(
     poolEndgameEnabled: session.poolEndgameEnabled,
     ruleYatzyStreak2: session.ruleYatzyStreak2,
     ruleYatzyTriple: session.ruleYatzyTriple,
+    ruleYatzyStreak2Credit: session.ruleYatzyStreak2Credit,
+    ruleYatzyTripleCredit: session.ruleYatzyTripleCredit,
     ruleUpperRace: session.ruleUpperRace,
     ruleColumnPoolBonuses: session.ruleColumnPoolBonuses,
     status: session.status,
@@ -333,6 +344,8 @@ export async function getSessionLobbyByInvite(
       : null,
     ruleYatzyStreak2: session.ruleYatzyStreak2,
     ruleYatzyTriple: session.ruleYatzyTriple,
+    ruleYatzyStreak2Credit: session.ruleYatzyStreak2Credit,
+    ruleYatzyTripleCredit: session.ruleYatzyTripleCredit,
     ruleUpperRace: session.ruleUpperRace,
     ruleColumnPoolBonuses: session.ruleColumnPoolBonuses,
     status: session.status,

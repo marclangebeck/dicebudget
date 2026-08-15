@@ -20,6 +20,8 @@ export type FeatureDefinition = {
   defaultLabsOn?: boolean;
   /** Key für Info-Overlay (houseRuleInfo). */
   infoKey?: string;
+  /** Optionaler Unter-Toggle: nur sichtbar/aktiv wenn Parent an. */
+  parentId?: string;
 };
 
 /**
@@ -47,18 +49,40 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
   houseRulesYatzyStreak: {
     id: "houseRulesYatzyStreak",
     title: "2× Alle Fünfe",
-    description: "Zwei echte Alle Fünfe (50, ≤3 Würfe) hintereinander: Gegner verliert halben Pool.",
+    description:
+      "Zwei echte Alle Fünfe (50, ≤3 Würfe) hintereinander: Mitspieler verlieren 1/n Pool (zu zweit Hälfte).",
     stage: "labs",
     defaultLabsOn: true,
     infoKey: "yatzyStreak2",
   },
+  houseRulesYatzyStreakCredit: {
+    id: "houseRulesYatzyStreakCredit",
+    title: "Pool-Gutschrift",
+    description:
+      "Abgezogene Pools der Mitspieler dem Erfolgreichen gutschreiben (Transfer statt nur Strafe).",
+    stage: "labs",
+    defaultLabsOn: false,
+    parentId: "houseRulesYatzyStreak",
+    infoKey: "yatzyStreak2Credit",
+  },
   houseRulesYatzyTriple: {
     id: "houseRulesYatzyTriple",
     title: "3× Alle Fünfe",
-    description: "Drei echte Alle Fünfe (50, ≤3 Würfe) hintereinander: Gegner verliert den gesamten Pool.",
+    description:
+      "Drei echte Alle Fünfe (50, ≤3 Würfe) hintereinander: Mitspieler verlieren den gesamten Pool.",
     stage: "labs",
     defaultLabsOn: true,
     infoKey: "yatzyStreak3",
+  },
+  houseRulesYatzyTripleCredit: {
+    id: "houseRulesYatzyTripleCredit",
+    title: "Pool-Gutschrift",
+    description:
+      "Abgezogene Pools der Mitspieler dem Erfolgreichen gutschreiben (Transfer statt nur Strafe).",
+    stage: "labs",
+    defaultLabsOn: false,
+    parentId: "houseRulesYatzyTriple",
+    infoKey: "yatzyStreak3Credit",
   },
   houseRulesUpperRace: {
     id: "houseRulesUpperRace",
@@ -116,13 +140,23 @@ export function setLabsFeaturePref(featureId: string, enabled: boolean): void {
   writeLabsPrefs(prefs);
 }
 
+/** Top-Level Labs-Features (ohne Unter-Toggles). */
 export function listLabsFeatures(): FeatureDefinition[] {
-  return Object.values(FEATURE_REGISTRY).filter((feature) => feature.stage === "labs");
+  return Object.values(FEATURE_REGISTRY).filter(
+    (feature) => feature.stage === "labs" && !feature.parentId,
+  );
+}
+
+export function listLabsChildFeatures(parentId: string): FeatureDefinition[] {
+  return Object.values(FEATURE_REGISTRY).filter(
+    (feature) => feature.stage === "labs" && feature.parentId === parentId,
+  );
 }
 
 export function isFeatureEnabled(featureId: string): boolean {
   const feature = FEATURE_REGISTRY[featureId];
   if (!feature) return false;
+  if (feature.parentId && !isFeatureEnabled(feature.parentId)) return false;
   if (feature.stage === "released") return true;
   if (!isLabsUnlocked()) return false;
   const pref = getLabsFeaturePref(featureId);
@@ -130,10 +164,12 @@ export function isFeatureEnabled(featureId: string): boolean {
   return Boolean(feature.defaultLabsOn);
 }
 
-/** Session-Flags für Auto-Hausregeln: ohne Labs-Unlock Standard an (wie bisher). */
+/** Session-Flags für Auto-Hausregeln: ohne Labs-Unlock Standard an (wie bisher); Gutschrift aus. */
 export function sessionHouseRuleFlagsFromPrefs(): {
   ruleYatzyStreak2: boolean;
   ruleYatzyTriple: boolean;
+  ruleYatzyStreak2Credit: boolean;
+  ruleYatzyTripleCredit: boolean;
   ruleUpperRace: boolean;
   ruleColumnPoolBonuses: boolean;
 } {
@@ -141,6 +177,8 @@ export function sessionHouseRuleFlagsFromPrefs(): {
     return {
       ruleYatzyStreak2: true,
       ruleYatzyTriple: true,
+      ruleYatzyStreak2Credit: false,
+      ruleYatzyTripleCredit: false,
       ruleUpperRace: true,
       ruleColumnPoolBonuses: true,
     };
@@ -148,6 +186,8 @@ export function sessionHouseRuleFlagsFromPrefs(): {
   return {
     ruleYatzyStreak2: isFeatureEnabled("houseRulesYatzyStreak"),
     ruleYatzyTriple: isFeatureEnabled("houseRulesYatzyTriple"),
+    ruleYatzyStreak2Credit: isFeatureEnabled("houseRulesYatzyStreakCredit"),
+    ruleYatzyTripleCredit: isFeatureEnabled("houseRulesYatzyTripleCredit"),
     ruleUpperRace: isFeatureEnabled("houseRulesUpperRace"),
     ruleColumnPoolBonuses: isFeatureEnabled("houseRulesColumnPoolBonuses"),
   };

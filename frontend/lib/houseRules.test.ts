@@ -6,6 +6,8 @@ import {
   burnPoolCost,
   canBurnHouseRule,
   isFieldTypeRowFull,
+  poolAfterFullLoss,
+  poolAfterPlayerShareLoss,
   qualifiesYatzyStreakPenalty,
   qualifiesYatzyTriplePenalty,
   rollSaleAllowedScores,
@@ -97,5 +99,11 @@ describe("houseRules (frontend)", () => {
       ]),
       false,
     );
+  });
+
+  it("poolAfterPlayerShareLoss skaliert mit Spielerzahl", () => {
+    assert.deepEqual(poolAfterPlayerShareLoss(10, 2), { newPool: 5, poolsLost: 5 });
+    assert.deepEqual(poolAfterPlayerShareLoss(12, 3), { newPool: 8, poolsLost: 4 });
+    assert.deepEqual(poolAfterFullLoss(7), { newPool: 0, poolsLost: 7 });
   });
 });

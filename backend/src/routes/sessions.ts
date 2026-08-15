@@ -59,6 +59,14 @@ sessionsRouter.post("/", createSessionLimiter, async (req, res, next) => {
           houseRulesBody.ruleYatzyTriple === undefined
             ? undefined
             : Boolean(houseRulesBody.ruleYatzyTriple),
+        ruleYatzyStreak2Credit:
+          houseRulesBody.ruleYatzyStreak2Credit === undefined
+            ? undefined
+            : Boolean(houseRulesBody.ruleYatzyStreak2Credit),
+        ruleYatzyTripleCredit:
+          houseRulesBody.ruleYatzyTripleCredit === undefined
+            ? undefined
+            : Boolean(houseRulesBody.ruleYatzyTripleCredit),
         ruleUpperRace:
           houseRulesBody.ruleUpperRace === undefined
             ? undefined

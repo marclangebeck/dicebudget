@@ -7,6 +7,8 @@ import {
   isBurnMode,
   isRunUpperComplete,
   newlyAchievedColumnGoal,
+  poolAfterFullLoss,
+  poolAfterPlayerShareLoss,
   qualifiesYatzyStreakPenalty,
   qualifiesYatzyTriplePenalty,
   runHasAnyColumnFullCombo,
@@ -46,12 +48,16 @@ export type HouseRuleAutoEvent =
       poolsLost: number;
       victimPlayerId: string;
       victimPlayerName: string;
+      victimCount: number;
+      poolsGained: number;
     }
   | {
       type: "yatzy_triple_penalty";
       poolsLost: number;
       victimPlayerId: string;
       victimPlayerName: string;
+      victimCount: number;
+      poolsGained: number;
     }
   | {
       type: "upper_race_pool";
@@ -125,7 +131,7 @@ export async function applyBurnRoll(
   return getRunById(runId);
 }
 
-/** 2× Alle Fünfe (≤3 Würfe): Gegner verliert die Hälfte des Pools (abrunden). */
+/** 2× Alle Fünfe (≤3 Würfe): Opfer verliert 1/n Pool; optional Gutschrift an den Auslöser. */
 export async function applyYatzyStreakPenalty(
   runId: string,
   victimPlayerId: string,
@@ -161,8 +167,13 @@ export async function applyYatzyStreakPenalty(
     );
   }
 
+  const playerCount = beneficiary.session.players.length;
+  const credit = beneficiary.session.ruleYatzyStreak2Credit === true;
   const victimRun = await loadActiveRun(victim.runId);
-  const newPool = Math.floor(victimRun.rollsInPool / 2);
+  const { newPool, poolsLost } = poolAfterPlayerShareLoss(
+    victimRun.rollsInPool,
+    playerCount,
+  );
   const marker = yatzyStreakPenaltyMarker(allFields);
 
   await prisma.$transaction(async (tx) => {
@@ -173,7 +184,17 @@ export async function applyYatzyStreakPenalty(
     if (marker != null) {
       await tx.run.update({
         where: { id: runId },
-        data: { yatzyStreakPenaltyAtSequence: marker },
+        data: {
+          yatzyStreakPenaltyAtSequence: marker,
+          ...(credit && poolsLost > 0
+            ? { rollsInPool: { increment: poolsLost } }
+            : {}),
+        },
+      });
+    } else if (credit && poolsLost > 0) {
+      await tx.run.update({
+        where: { id: runId },
+        data: { rollsInPool: { increment: poolsLost } },
       });
     }
   });
@@ -183,7 +204,8 @@ export async function applyYatzyStreakPenalty(
     victimRun: await getRunById(victim.runId),
     victimPlayerId: victim.id,
     victimPlayerName: victim.name,
-    poolsLost: victimRun.rollsInPool - newPool,
+    poolsLost,
+    poolsGained: credit ? poolsLost : 0,
   };
 }
 
@@ -288,9 +310,20 @@ type RunSnapshotForAuto = {
   games: { fields: { fieldType: string; score: number | null; rollsUsed: number; scoredSequence: number | null }[] }[];
 };
 
+type SessionPlayerWithRun = {
+  id: string;
+  name: string;
+  run: {
+    id: string;
+    rollsInPool: number;
+    games: { fields: { fieldType: string; score: number | null }[] }[];
+  };
+};
+
 /**
  * Nach Feldeintrag: automatische Hausregeln (Strategy + Session).
- * Duell (2 Spieler): 2×/3× Alle Fünfe, Oberer-Bereich-Race.
+ * Multi (≥2 Spieler): 2×/3× Alle Fünfe (1/n bzw. voll; optional Gutschrift).
+ * Duell (2 Spieler): zusätzlich Oberer-Bereich-Race.
  * Beliebige Spielerzahl: Spalten-Pool-Boni (M40), nur Erster in der Session.
  */
 export async function applyAutoHouseRulesAfterComplete(
@@ -337,76 +370,111 @@ export async function applyAutoHouseRulesAfterComplete(
   const afterRun = beneficiary.run;
   const fieldsBefore = before.games.flatMap((g) => g.fields);
   const fieldsAfter = afterRun.games.flatMap((g) => g.fields);
+  const playerCount = session.players.length;
+  const opponents = session.players.filter(
+    (p) => p.id !== beneficiary.id,
+  ) as SessionPlayerWithRun[];
 
-  if (session.players.length === 2) {
-    const opponent = session.players.find((p) => p.id !== beneficiary.id);
-    if (opponent) {
-      let appliedYatzyPenalty = false;
+  if (playerCount >= 2 && opponents.length > 0) {
+    let appliedYatzyPenalty = false;
 
-      if (session.ruleYatzyTriple) {
-        const tripleMarker = yatzyTriplePenaltyMarker(fieldsAfter);
-        const tripleBefore = qualifiesYatzyTriplePenalty(fieldsBefore);
-        const tripleAlready =
-          tripleMarker != null &&
-          before.yatzyTriplePenaltyAtSequence != null &&
-          before.yatzyTriplePenaltyAtSequence >= tripleMarker;
+    if (session.ruleYatzyTriple) {
+      const tripleMarker = yatzyTriplePenaltyMarker(fieldsAfter);
+      const tripleBefore = qualifiesYatzyTriplePenalty(fieldsBefore);
+      const tripleAlready =
+        tripleMarker != null &&
+        before.yatzyTriplePenaltyAtSequence != null &&
+        before.yatzyTriplePenaltyAtSequence >= tripleMarker;
 
-        if (!tripleBefore && tripleMarker != null && !tripleAlready) {
-          const victimRun = opponent.run;
-          const poolsLost = victimRun.rollsInPool;
-          await prisma.$transaction(async (tx) => {
+      if (!tripleBefore && tripleMarker != null && !tripleAlready) {
+        const credit = session.ruleYatzyTripleCredit === true;
+        const losses = opponents.map((opponent) => {
+          const { poolsLost } = poolAfterFullLoss(opponent.run.rollsInPool);
+          return { opponent, poolsLost };
+        });
+        const totalLost = losses.reduce((sum, row) => sum + row.poolsLost, 0);
+        const firstVictim = losses[0]!.opponent;
+
+        await prisma.$transaction(async (tx) => {
+          for (const { opponent } of losses) {
             await tx.run.update({
-              where: { id: victimRun.id },
+              where: { id: opponent.run.id },
               data: { rollsInPool: 0 },
             });
-            await tx.run.update({
-              where: { id: runId },
-              data: { yatzyTriplePenaltyAtSequence: tripleMarker },
-            });
+          }
+          await tx.run.update({
+            where: { id: runId },
+            data: {
+              yatzyTriplePenaltyAtSequence: tripleMarker,
+              ...(credit && totalLost > 0
+                ? { rollsInPool: { increment: totalLost } }
+                : {}),
+            },
           });
-          events.push({
-            type: "yatzy_triple_penalty",
-            poolsLost,
-            victimPlayerId: opponent.id,
-            victimPlayerName: opponent.name,
-          });
-          appliedYatzyPenalty = true;
-        }
+        });
+        events.push({
+          type: "yatzy_triple_penalty",
+          poolsLost: totalLost,
+          victimPlayerId: firstVictim.id,
+          victimPlayerName: firstVictim.name,
+          victimCount: opponents.length,
+          poolsGained: credit ? totalLost : 0,
+        });
+        appliedYatzyPenalty = true;
       }
+    }
 
-      if (session.ruleYatzyStreak2 && !appliedYatzyPenalty) {
-        const markerAfter = yatzyStreakPenaltyMarker(fieldsAfter);
-        const qualifiedBefore = qualifiesYatzyStreakPenalty(fieldsBefore);
-        const alreadyApplied =
-          markerAfter != null &&
-          before.yatzyStreakPenaltyAtSequence != null &&
-          before.yatzyStreakPenaltyAtSequence >= markerAfter;
+    if (session.ruleYatzyStreak2 && !appliedYatzyPenalty) {
+      const markerAfter = yatzyStreakPenaltyMarker(fieldsAfter);
+      const qualifiedBefore = qualifiesYatzyStreakPenalty(fieldsBefore);
+      const alreadyApplied =
+        markerAfter != null &&
+        before.yatzyStreakPenaltyAtSequence != null &&
+        before.yatzyStreakPenaltyAtSequence >= markerAfter;
 
-        if (!qualifiedBefore && markerAfter != null && !alreadyApplied) {
-          const victimRun = opponent.run;
-          const oldPool = victimRun.rollsInPool;
-          const newPool = Math.floor(oldPool / 2);
-          const poolsLost = oldPool - newPool;
-          await prisma.$transaction(async (tx) => {
+      if (!qualifiedBefore && markerAfter != null && !alreadyApplied) {
+        const credit = session.ruleYatzyStreak2Credit === true;
+        const losses = opponents.map((opponent) => {
+          const { newPool, poolsLost } = poolAfterPlayerShareLoss(
+            opponent.run.rollsInPool,
+            playerCount,
+          );
+          return { opponent, newPool, poolsLost };
+        });
+        const totalLost = losses.reduce((sum, row) => sum + row.poolsLost, 0);
+        const firstVictim = losses[0]!.opponent;
+
+        await prisma.$transaction(async (tx) => {
+          for (const { opponent, newPool } of losses) {
             await tx.run.update({
-              where: { id: victimRun.id },
+              where: { id: opponent.run.id },
               data: { rollsInPool: newPool },
             });
-            await tx.run.update({
-              where: { id: runId },
-              data: { yatzyStreakPenaltyAtSequence: markerAfter },
-            });
+          }
+          await tx.run.update({
+            where: { id: runId },
+            data: {
+              yatzyStreakPenaltyAtSequence: markerAfter,
+              ...(credit && totalLost > 0
+                ? { rollsInPool: { increment: totalLost } }
+                : {}),
+            },
           });
-          events.push({
-            type: "yatzy_streak_penalty",
-            poolsLost,
-            victimPlayerId: opponent.id,
-            victimPlayerName: opponent.name,
-          });
-        }
+        });
+        events.push({
+          type: "yatzy_streak_penalty",
+          poolsLost: totalLost,
+          victimPlayerId: firstVictim.id,
+          victimPlayerName: firstVictim.name,
+          victimCount: opponents.length,
+          poolsGained: credit ? totalLost : 0,
+        });
       }
+    }
 
-      if (session.ruleUpperRace) {
+    if (session.ruleUpperRace && playerCount === 2) {
+      const opponent = opponents[0];
+      if (opponent) {
         const upperBefore = isRunUpperComplete(before.games);
         const upperAfter = isRunUpperComplete(afterRun.games);
         if (!upperBefore && upperAfter && !before.upperRacePoolCredited) {
