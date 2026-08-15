@@ -29,7 +29,7 @@ Dieses Dokument sammelt weiterhin gueltige Architektur-, Betriebs- und Projekten
 - Befehle werden mit `[Server]` oder `[Mac]` markiert.
 - Sudo-Schritte sind immer Nutzer-Aufgabe.
 - Keine Inline-Kommentare in kopierbaren Befehlen.
-- Keine Commits ohne ausdrueckliche Nutzer-Anweisung.
+- Nach abgeschlossenem Auftrag: Agent committed und pusht automatisch (kein extra Git-GO); Ausnahme nur bei „nicht pushen“.
 
 ## Deployment Und Betrieb
 
