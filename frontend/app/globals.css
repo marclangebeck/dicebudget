@@ -1001,13 +1001,20 @@ html.zoomable-route.legal-route .legal-page-scroll {
   height: 100%;
   min-height: 0;
   flex-direction: column;
-  gap: 0.22rem;
-  padding: 0.68rem 0.72rem 0.62rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.72rem 0.85rem 0.7rem;
 }
 
 .home-cinematic--entered .home-cinematic-door {
   opacity: 1;
   transform: translateY(0) scale(1);
+}
+
+.home-cinematic-door--hit {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .home-cinematic-door:active {
@@ -1022,20 +1029,24 @@ html.zoomable-route.legal-route .legal-page-scroll {
   position: relative;
   z-index: 3;
   display: flex;
-  max-width: 68%;
+  width: 100%;
+  max-width: 22rem;
   flex-direction: column;
-  gap: 0.38rem;
+  align-items: center;
+  gap: 0.32rem;
+  text-align: center;
 }
 
 .home-cinematic-door-chip {
   display: inline-flex;
   width: fit-content;
   align-items: center;
+  justify-content: center;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.22);
   background: rgba(255, 255, 255, 0.1);
-  padding: 0.22rem 0.52rem;
-  font-size: 0.5rem;
+  padding: 0.22rem 0.58rem;
+  font-size: 0.56rem;
   font-weight: 800;
   letter-spacing: 0.09em;
   line-height: 1;
@@ -1055,18 +1066,19 @@ html.zoomable-route.legal-route .legal-page-scroll {
 }
 
 .home-cinematic-door-label {
-  font-size: clamp(1.85rem, 7.5vw, 2.35rem);
+  font-size: clamp(1.35rem, 5.2vw, 1.85rem);
   font-weight: 900;
-  letter-spacing: 0.12em;
-  line-height: 0.92;
+  letter-spacing: 0.06em;
+  line-height: 1.08;
   text-transform: uppercase;
+  text-align: center;
 }
 
 .home-cinematic-door-label--host {
-  font-size: clamp(0.92rem, 3.6vw, 1.12rem);
-  letter-spacing: 0.045em;
-  line-height: 1.18;
-  max-width: 11.5rem;
+  font-size: clamp(1.05rem, 4.2vw, 1.35rem);
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  max-width: none;
 }
 
 .home-cinematic-door--multi .home-cinematic-door-label {
@@ -1085,24 +1097,24 @@ html.zoomable-route.legal-route .legal-page-scroll {
 
 .home-cinematic-door-tagline {
   margin: 0;
-  max-width: 11.5rem;
-  font-size: 0.68rem;
+  max-width: 18rem;
+  font-size: 0.78rem;
   font-weight: 600;
   line-height: 1.38;
   color: rgba(241, 245, 249, 0.88);
+  text-align: center;
 }
 
 .home-cinematic-door-stage {
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 1;
   display: flex;
-  min-height: 0;
-  flex: 1 1 0;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  margin-bottom: 0.08rem;
-  padding: 0.15rem 0.35rem;
+  pointer-events: none;
+  opacity: 0.38;
 }
 
 .home-cinematic-door-hero {
@@ -1122,8 +1134,8 @@ html.zoomable-route.legal-route .legal-page-scroll {
   display: block;
   width: auto;
   height: auto;
-  max-width: min(78%, 11.5rem);
-  max-height: 100%;
+  max-width: min(52%, 9.5rem);
+  max-height: 72%;
   object-fit: contain;
   object-position: center;
   transform: rotate(-4deg);
@@ -1145,39 +1157,36 @@ html.zoomable-route.legal-route .legal-page-scroll {
 .home-cinematic-door-cta {
   position: relative;
   z-index: 4;
-  display: flex;
+  display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: min(58%, 11.25rem);
-  min-height: 2.15rem;
-  margin-top: auto;
-  border-radius: 0.75rem;
-  font-size: 0.64rem;
+  width: auto;
+  min-height: 0;
+  margin-top: 0.28rem;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  font-size: 0.88rem;
   font-weight: 800;
-  letter-spacing: 0.07em;
-  line-height: 1;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
   text-transform: uppercase;
-  backdrop-filter: blur(12px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 10px 22px -14px rgba(0, 0, 0, 0.72);
 }
 
 .home-cinematic-door--multi .home-cinematic-door-cta {
-  border: 1px solid rgba(125, 211, 252, 0.28);
-  background:
-    linear-gradient(135deg, rgba(56, 189, 248, 0.18) 0%, rgba(214, 168, 90, 0.26) 100%),
-    rgba(255, 255, 255, 0.06);
+  border: none;
+  background: none;
   color: #fde68a;
 }
 
 .home-cinematic-door--solo .home-cinematic-door-cta {
-  border: 1px solid rgba(110, 231, 183, 0.28);
-  background:
-    linear-gradient(135deg, rgba(45, 212, 191, 0.18) 0%, rgba(16, 185, 129, 0.26) 100%),
-    rgba(255, 255, 255, 0.06);
-  color: #ecfdf5;
+  border: none;
+  background: none;
+  color: #a7f3d0;
 }
 
 .home-cinematic-join-row {
@@ -1288,13 +1297,15 @@ html.zoomable-route.legal-route .legal-page-scroll {
   min-width: 0;
   flex: 1;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.28rem;
+  align-items: center;
   justify-content: center;
+  text-align: center;
 }
 
 .home-cinematic-join-kicker {
   margin: 0;
-  font-size: 0.52rem;
+  font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1307,10 +1318,10 @@ html.zoomable-route.legal-route .legal-page-scroll {
 
 .home-cinematic-join-title {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: 1.05rem;
   font-weight: 850;
   letter-spacing: -0.02em;
-  line-height: 1.15;
+  line-height: 1.2;
   color: #f0f9ff;
   text-shadow: 0 1px 10px rgba(8, 47, 73, 0.35);
 }
@@ -1323,9 +1334,10 @@ html.zoomable-route.legal-route .legal-page-scroll {
 .home-cinematic-join-cta {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.35rem;
-  margin-top: 0.28rem;
-  font-size: 0.72rem;
+  margin-top: 0.32rem;
+  font-size: 0.84rem;
   font-weight: 800;
   letter-spacing: 0.01em;
   color: #ecfeff;
@@ -1336,8 +1348,8 @@ html.zoomable-route.legal-route .legal-page-scroll {
 }
 
 .home-cinematic-join-soon {
-  margin-top: 0.12rem;
-  font-size: 0.58rem;
+  margin-top: 0.14rem;
+  font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -1345,8 +1357,8 @@ html.zoomable-route.legal-route .legal-page-scroll {
 }
 
 .home-cinematic-join-scan-icon {
-  width: 1rem;
-  height: 1rem;
+  width: 1.1rem;
+  height: 1.1rem;
   flex-shrink: 0;
 }
 
@@ -3248,43 +3260,38 @@ html.zoomable-route.legal-route .legal-page-scroll {
   }
 
   .home-cinematic-door-poster {
-    padding: 0.62rem 0.58rem 0.58rem;
+    padding: 0.58rem 0.62rem;
   }
 
   .home-cinematic-door-copy {
-    max-width: 62%;
-    gap: 0.28rem;
+    max-width: 100%;
+    gap: 0.24rem;
   }
 
   .home-cinematic-door-label {
-    font-size: 1.62rem;
-    letter-spacing: 0.1em;
+    font-size: 1.28rem;
+    letter-spacing: 0.05em;
   }
 
   .home-cinematic-door-label--host {
-    font-size: 0.82rem;
+    font-size: 1.02rem;
     letter-spacing: 0.035em;
-    max-width: 10.5rem;
+    max-width: none;
   }
 
   .home-cinematic-door-tagline {
-    font-size: 0.56rem;
-    max-width: 9.5rem;
-  }
-
-  .home-cinematic-door-stage {
-    min-height: 0;
-    padding: 0.1rem 0.25rem;
+    font-size: 0.68rem;
+    max-width: 16rem;
   }
 
   .home-cinematic-door-hero .home-bento-motif {
-    max-width: min(72%, 10rem);
+    max-width: min(48%, 8rem);
   }
 
   .home-cinematic-door-cta {
-    width: min(56%, 10rem);
-    min-height: 1.95rem;
-    font-size: 0.58rem;
+    width: auto;
+    min-height: 0;
+    font-size: 0.78rem;
   }
 
   .home-cinematic-join-row {
@@ -3297,19 +3304,18 @@ html.zoomable-route.legal-route .legal-page-scroll {
   }
 
   .home-cinematic-join-title {
-    font-size: 0.78rem;
+    font-size: 0.92rem;
   }
 
   .home-cinematic-join-cta {
-    font-size: 0.64rem;
-    margin-top: 0.2rem;
+    font-size: 0.74rem;
+    margin-top: 0.24rem;
   }
 
   .home-cinematic-join-kicker {
-    font-size: 0.48rem;
+    font-size: 0.56rem;
   }
-}
-.setup-screen-body {
+}.setup-screen-body {
   -webkit-overflow-scrolling: touch;
 }
 

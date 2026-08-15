@@ -8,6 +8,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **2×/3× Alle Fünfe — Pool-Gutschrift:** Unter-Toggle unter InApp-Käufe; abgezogene Pools optional dem Erfolgreichen gutgeschrieben (Session-Flags, Default aus)
 - **2× Alle Fünfe Multi n Spieler:** Mitspieler verlieren je 1/n Pool (zu zweit Hälfte wie bisher); Auto auch bei 3+; 3× weiter gesamter Pool
 - **Startscreen Beitritt zweigeteilt:** Multi-Raum-QR und „Turnier beitreten“ (Platzhalter, noch ohne Funktion) nebeneinander; Multi-Scan unverändert
+- **Startscreen Multi/Solo:** Text zentriert, CTA ohne separaten Chip — gesamter Container wirkt als ein Button (Link unverändert)
 - **QR-Scan Beitritt:** Startscreen-Mitte und Join ohne `?code=` — Button „QR-Code scannen“ (In-App-Kamera); Code-Eingabe entfernt
 - **Multi-QR + Universal Links:** Host zeigt QR mit Join-URL; AASA (`5QGGV8N5ZD.de.bottletrade.dicebudget`); iOS Associated Domains; Deep-Link öffnet Join in TestFlight/Store, sonst Web
 - **M42 Rivalen-Bilder:** Foto pro Rival nur lokal (IndexedDB), verwalten unter Rivalen; Anzeige in Liste/Paarungen

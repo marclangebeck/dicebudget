@@ -31,19 +31,13 @@ function CinematicDoor({
   return (
     <Link
       href={href}
-      className={`home-cinematic-door home-cinematic-door--${tone} home-cinematic-door--editorial home-bento-tile home-bento-tile--arena home-bento-tile--${tone} no-underline`}
+      className={`home-cinematic-door home-cinematic-door--${tone} home-cinematic-door--editorial home-cinematic-door--hit home-bento-tile home-bento-tile--arena home-bento-tile--${tone} no-underline`}
       style={{ "--home-cinematic-enter-delay": `${enterDelayMs}ms` } as CSSProperties}
       data-tour-anchor={tone === "multi" ? "host" : tone === "solo" ? "solo" : undefined}
+      aria-label={`${label}. ${cta}`}
     >
       <div className="home-bento-scene home-cinematic-door-scene" aria-hidden />
       <div className="home-cinematic-door-poster">
-        <div className="home-cinematic-door-copy">
-          <span className="home-cinematic-door-chip">{chip}</span>
-          <span className={`home-cinematic-door-label${labelClassName ? ` ${labelClassName}` : ""}`}>
-            {label}
-          </span>
-          <p className="home-cinematic-door-tagline">{tagline}</p>
-        </div>
         <div className="home-cinematic-door-stage" aria-hidden>
           <div className="home-cinematic-door-hero">
             <div className="home-cinematic-door-motif-wrap">
@@ -51,7 +45,14 @@ function CinematicDoor({
             </div>
           </div>
         </div>
-        <span className="home-cinematic-door-cta">{cta}</span>
+        <div className="home-cinematic-door-copy">
+          <span className="home-cinematic-door-chip">{chip}</span>
+          <span className={`home-cinematic-door-label${labelClassName ? ` ${labelClassName}` : ""}`}>
+            {label}
+          </span>
+          <p className="home-cinematic-door-tagline">{tagline}</p>
+          <span className="home-cinematic-door-cta">{cta}</span>
+        </div>
       </div>
     </Link>
   );
