@@ -49,7 +49,7 @@ export default function SetupFormatPage() {
         Format
       </h1>
       <p className="t-meta">
-        Ereignis: <strong style={{ color: "var(--ink)" }}>{name}</strong>
+        Event: <strong style={{ color: "var(--ink)" }}>{name}</strong>
       </p>
       <p className="t-meta">
         Liga und Turnier werden hier im Host eingerichtet. Spieler treten später

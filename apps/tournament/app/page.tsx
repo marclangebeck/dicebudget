@@ -21,7 +21,7 @@ export default function TournamentHomePage() {
   function onContinue() {
     const trimmed = name.trim();
     if (!trimmed) {
-      setError("Bitte einen Turniernamen eingeben.");
+      setError("Bitte einen Event-Namen eingeben.");
       return;
     }
     setError(null);
@@ -37,7 +37,7 @@ export default function TournamentHomePage() {
   function onOpenSaved() {
     const saved = loadHostSession();
     if (!saved) {
-      setError("Kein gespeichertes Host-Turnier auf diesem Gerät.");
+      setError("Kein gespeichertes Host-Event auf diesem Gerät.");
       return;
     }
     router.push(`/host?code=${encodeURIComponent(saved.inviteCode)}`);
@@ -48,9 +48,9 @@ export default function TournamentHomePage() {
       <h1 className="t-brand">{APP_NAME}</h1>
       <p className="t-tagline">{APP_TAGLINE}</p>
 
-      <section className="t-card" aria-label="Turnier benennen">
+      <section className="t-card" aria-label="Event benennen">
         <label className="t-label">
-          Name des Turniers
+          Name des Events
           <input
             className="t-input"
             value={name}
@@ -70,7 +70,7 @@ export default function TournamentHomePage() {
           </button>
           {hasSaved && (
             <button type="button" className="t-btn t-btn--ghost" onClick={onOpenSaved}>
-              Letztes Turnier öffnen
+              Letztes Event öffnen
             </button>
           )}
         </div>
