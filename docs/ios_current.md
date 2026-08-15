@@ -15,6 +15,11 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 - **Web/iOS ein Build (M43):** Admin per `NEXT_PUBLIC_ADMIN_PIN`; API-Key lokal.
 - Labs (`NEXT_PUBLIC_LABS_PIN`) getrennt von Admin.
 
+## Deployment Target
+
+- Mindest-iOS: **15.0** (`Podfile`, Xcode `IPHONEOS_DEPLOYMENT_TARGET`, `capacitor.config.ts` `ios.minVersion`)
+- Behebt die wiederkehrenden Xcode-Hinweise zu veraltetem iOS-14-Target
+
 ## Universal Links / Multi-QR
 
 - QR nach Raum-Erstellung: `https://dicebudget.bottle-trade.de/multi/join?code=…`
