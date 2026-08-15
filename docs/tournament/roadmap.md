@@ -25,7 +25,7 @@ Konkrete Modus-Liste und Regeldetails kommen **pro Milestone**, nicht als Startb
 | **T7** | Erster Tabellen-Modus | z. B. Liga über mehrere Runden | erster Modus-Plugin-Beweis |
 | **T8** | Erster KO-Modus | Bracket, Weiterkommen, Freilose | zweiter Modus-Beweis |
 | **T9** | iOS Host Release | Eigenes TestFlight, Checkliste, getrennt von DiceBudget | zwei Uploads / zwei Apps |
-| **T10** | Kneipen-Pilot | Echtes Turnier, Feedback, Härten | danach weitere Modi |
+| **T10** | Feld-Pilot | Echtes Turnier (beliebiger Host), Feedback, Härten | danach weitere Modi |
 
 ## Reihenfolge
 

@@ -41,7 +41,7 @@ function HostInner() {
       const dataUrl = await QRCode.toDataURL(joinUrl, {
         margin: 1,
         width: 320,
-        color: { dark: "#1a1510", light: "#ffffff" },
+        color: { dark: "#0c1a2e", light: "#ffffff" },
       });
       setQrDataUrl(dataUrl);
     } catch (e) {

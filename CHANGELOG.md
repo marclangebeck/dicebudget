@@ -24,6 +24,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Paarungs-Detail-Karten:** Bild oben volle Breite / halbe Höhe, Infos darunter — persönlichere Rivalen-Ansicht
 
 ### Changed
+- **DiceBudget Tournament:** Positionierung allgemein (jeder Host); Host-UI an DiceBudget Startscreen (kühles Navy/Slate/Teal, Gold nur Akzent) — nicht braun-gold
 - **iOS Deployment Target:** Minimum von 14.0 auf **15.0** (Xcode-/Pod-Hinweise)
 - **Host nach Raum anlegen:** nur Überschrift „Spiel beitreten“, QR und „Zur Lobby“ — kein Code/Link-Teilen mehr
 - **Multi-Beitritt:** nur noch QR (In-App oder System-Kamera/Universal Link); Gäste tippen keinen Raum-Code mehr

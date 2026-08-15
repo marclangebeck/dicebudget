@@ -76,7 +76,7 @@ export default function TournamentHomePage() {
             className="t-input"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="z. B. Freitag Kneipe"
+            placeholder="z. B. Freitagabend"
             maxLength={48}
             style={{ textTransform: "none", letterSpacing: "normal" }}
           />

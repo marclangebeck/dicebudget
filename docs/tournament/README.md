@@ -2,20 +2,20 @@
 
 **Produktname:** DiceBudget Tournament  
 **Stand:** 2026-08-15  
-**Status:** Vision / Planung (noch kein Host-Produktcode)  
+**Status:** T0–T2 umgesetzt (API + Host-Skelett); weitere Milestones offen  
 **Bezug:** Spieler-App = dieses Repo (`frontend/`, Bundle `de.bottletrade.dicebudget`)
 
 ## Vision (kurz)
 
-Eine Kneipe (o. Ä.) richtet ein **DiceBudget Tournament** aus. Spieler laden die **DiceBudget**-App, melden sich per **QR** am Turnier an und spielen z. B. Liga- oder KO-Runden. **Live-Stand** (Rankings, Auslosung, Spielplan, Ergebnisse) läuft in der App und ist **beamer-tauglich** an die Wand projizierbar. Alles konfigurierbar.
+Jeder mit **DiceBudget Tournament** kann ein Turnier eröffnen — privat, Verein, Event, Betrieb, Freundeskreis. Spieler nutzen die **DiceBudget**-App, melden sich per **QR** an und spielen z. B. Liga- oder KO-Runden. **Live-Stand** (Rankings, Auslosung, Spielplan, Ergebnisse) läuft in der App und ist **anzeigetauglich** (Tablet, TV, Beamer). Alles konfigurierbar.
 
 ## Rollen
 
 | Rolle | Gerät / App | Aufgabe |
 |-------|-------------|---------|
-| Organizer | **DiceBudget Tournament** (eigene iPad-App, getrenntes Bundle / TestFlight) | Turnier anlegen, Modi/Parameter, Auslosung, Spielplan, Live/Beamer, Steuerung |
+| Host / Organizer | **DiceBudget Tournament** (eigene App, getrenntes Bundle / TestFlight) | Turnier anlegen, Modi/Parameter, Auslosung, Spielplan, Live-Anzeige, Steuerung |
 | Spieler | **DiceBudget** (bestehende App) | per QR beitreten, Partien spielen, eigenen Kontext sehen |
-| Zuschauer / Wand | Host-Display oder Beamer-Ansicht | Rankings, Pairings, nächste Runde — ohne Spieleingabe |
+| Zuschauer / Wand | Host-Display oder Anzeige-Ansicht | Rankings, Pairings, nächste Runde — ohne Spieleingabe |
 
 Kommunikation: **iPad-Host ↔ Server ↔ Spieler-Apps** (kein Peer-to-Peer).
 
@@ -46,7 +46,7 @@ Details: [`roadmap.md`](./roadmap.md) · API-Skizze: [`api-sketch.md`](./api-ske
 1. **DiceBudget darf seine Funktionalität unter keinen Umständen verlieren.**  
    Solo, Multi (QR), Stats, Labs/Hausregeln, Admin, iOS-Spieler-App bleiben vollwertig und nutzbar **ohne** Turnier.
 2. **Turnier nur additiv.** Neue Routen, Flags, APIs, optionale UI. Bestehende Flows nicht umbauen oder als Pflichtpfad umleiten.
-3. **Getrennte Produkte auf dem Gerät.** Organizer = **DiceBudget Tournament**; Spieler-App erhält höchstens einen optionalen Einstieg („Turnier beitreten“).
+3. **Getrennte Produkte auf dem Gerät.** Host = **DiceBudget Tournament**; Spieler-App erhält höchstens einen optionalen Einstieg („Turnier beitreten“).
 4. **Regression vor Merge.** Bestehende Backend-/Frontend-Tests grün; bei riskanten Änderungen Smoke: Solo, Multi-QR, Stats.
 5. **Kein Feature-Tausch.** Turnier-Milestones ersetzen keine DiceBudget-Roadmap (z. B. M30 App Store).
 6. **AGENT_RULES gelten weiter.** Kein Polling-/Abuse-Risiko; Live-Updates nur mit klarem, sparsamen Design und GO.
