@@ -17,7 +17,7 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 
 ## Deployment Target
 
-- Mindest-iOS: **15.0** (`Podfile`, Xcode `IPHONEOS_DEPLOYMENT_TARGET`, `capacitor.config.ts` `ios.minVersion`)
+- Mindest-iOS: **15.0** (`Podfile`, Xcode `IPHONEOS_DEPLOYMENT_TARGET`)
 - Behebt die wiederkehrenden Xcode-Hinweise zu veraltetem iOS-14-Target
 
 ## Universal Links / Multi-QR
