@@ -204,19 +204,19 @@ export function JoinByQrScan({ variant = "home" }: Props) {
   );
 }
 
-/** Platzhalter: Turnier-QR später; gesamter Container = Button, ohne Aktion. */
+/** Platzhalter: Ereignis-QR später; gesamter Container = Button, ohne Aktion. */
 export function TournamentJoinPlaceholder() {
   return (
     <div className="home-cinematic-join-slot">
       <button
         type="button"
         className="home-cinematic-join home-cinematic-join--tournament home-cinematic-join--hit"
-        aria-label="Turnier beitreten, QR-Code scannen — demnächst"
+        aria-label="Turnier/Liga beitreten, QR-Code scannen — demnächst"
         disabled
       >
         <span className="home-cinematic-join-copy">
-          <span className="home-cinematic-join-kicker">Turnier</span>
-          <span className="home-cinematic-join-title">Turnier beitreten</span>
+          <span className="home-cinematic-join-kicker">Ereignis</span>
+          <span className="home-cinematic-join-title">Turnier/Liga beitreten</span>
           <span className="home-cinematic-join-cta">
             <ScanIcon />
             <span>QR-Code scannen</span>
