@@ -39,7 +39,7 @@ QR-Payload (Idee): URL auf DiceBudget-Domain, z. B.
 ## Modus als Strategie
 
 ```
-modeKey: "league" | "knockout" | …   // erweiterbar
+modeKey: "league" | "turnier" | …   // erweiterbar (UI: Liga / Turnier)
 config:  { … }                        // modus-spezifisch, validiert serverseitig
 ```
 

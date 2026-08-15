@@ -1,4 +1,4 @@
-export type TournamentModeKey = "league" | "knockout";
+export type TournamentModeKey = "league" | "turnier";
 
 export type TournamentModeOption = {
   key: TournamentModeKey;
@@ -16,13 +16,13 @@ export const TOURNAMENT_MODE_OPTIONS: TournamentModeOption[] = [
     available: true,
   },
   {
-    key: "knockout",
-    label: "K.O.",
-    description: "Bracket mit Ausscheiden — folgt in einem späteren Schritt.",
+    key: "turnier",
+    label: "Turnier",
+    description: "Ausscheidungsverfahren mit Bracket — folgt später.",
     available: false,
   },
 ];
 
 export function isTournamentModeKey(value: unknown): value is TournamentModeKey {
-  return value === "league" || value === "knockout";
+  return value === "league" || value === "turnier";
 }

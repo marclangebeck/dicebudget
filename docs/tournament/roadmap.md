@@ -8,7 +8,7 @@ DiceBudget-Spieler-App bleibt unangetastet in der Kernfunktion; **DiceBudget Tou
 
 ## Modi (breit, später konkret)
 
-Der Kern soll **viele Turnierformate** tragen können (Liga, KO, später z. B. Schweizer System, Gruppen+KO, feste Tische, …).  
+Der Kern soll **viele Formate** tragen können (**Liga**, **Turnier**, später z. B. Schweizer System, Gruppen+Finale, feste Tische, …).  
 Konkrete Modus-Liste und Regeldetails kommen **pro Milestone**, nicht als Startblocker. Architektur: Turnier-Container + austauschbare Modus-Strategie.
 
 ## Milestones
@@ -23,7 +23,7 @@ Konkrete Modus-Liste und Regeldetails kommen **pro Milestone**, nicht als Startb
 | **T5** | Partie-Link | Host startet Tisch → bestehende Multi-Session; Ergebnis zurück ins Turnier | Multi-Kern wiederverwenden, nicht forken |
 | **T6** | Live & Beamer | Ranking/Spielplan-Ansicht; sparsame Updates | kein Polling-Spam (AGENT_RULES) |
 | **T7** | Erster Tabellen-Modus | z. B. Liga über mehrere Runden | erster Modus-Plugin-Beweis |
-| **T8** | Erster KO-Modus | Bracket, Weiterkommen, Freilose | zweiter Modus-Beweis |
+| **T8** | Erster Turnier-Modus | Bracket, Weiterkommen, Freilose | zweiter Modus-Beweis (`modeKey: turnier`) |
 | **T9** | iOS Host Release | Eigenes TestFlight, Checkliste, getrennt von DiceBudget | zwei Uploads / zwei Apps |
 | **T10** | Feld-Pilot | Echtes Turnier (beliebiger Host), Feedback, Härten | danach weitere Modi |
 

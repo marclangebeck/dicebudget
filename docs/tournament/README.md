@@ -7,7 +7,7 @@
 
 ## Vision (kurz)
 
-Jeder mit **DiceBudget Tournament** kann ein Turnier eröffnen — privat, Verein, Event, Betrieb, Freundeskreis. Spieler nutzen die **DiceBudget**-App, melden sich per **QR** an und spielen z. B. Liga- oder KO-Runden. **Live-Stand** (Rankings, Auslosung, Spielplan, Ergebnisse) läuft in der App und ist **anzeigetauglich** (Tablet, TV, Beamer). Alles konfigurierbar.
+Jeder mit **DiceBudget Tournament** kann ein Turnier eröffnen — privat, Verein, Event, Betrieb, Freundeskreis. Spieler nutzen die **DiceBudget**-App, melden sich per **QR** an und spielen z. B. **Liga**- oder **Turnier**-Runden. **Live-Stand** (Rankings, Auslosung, Spielplan, Ergebnisse) läuft in der App und ist **anzeigetauglich** (Tablet, TV, Beamer). Alles konfigurierbar.
 
 ## Rollen
 
