@@ -10,6 +10,8 @@ import { saveActiveGame } from "@/lib/activeGame";
 import { sessionHouseRuleFlagsFromPrefs } from "@/lib/featureFlags";
 import { upsertRivalName } from "@/lib/rivalProfiles";
 import { shareInviteCode } from "@/lib/shareSocial";
+import { buildInviteJoinUrl } from "@/lib/inviteJoinUrl";
+import { InviteQrCode } from "@/components/InviteQrCode";
 import { settingsHrefWithReturn } from "@/lib/settingsReturn";
 import { DEFAULT_APP_SETTINGS, getAppSettings, type AppSettings } from "@/lib/uiPrefs";
 import {
@@ -173,6 +175,20 @@ export default function MultiHostPage() {
               </strong>
             </p>
 
+            <div className="setup-host-qr-block">
+              <p className="setup-host-code-label">QR für Gäste scannen</p>
+              <div className="setup-host-qr-frame">
+                <InviteQrCode
+                  value={buildInviteJoinUrl(inviteCode)}
+                  label={`QR-Code Raum ${inviteCode}`}
+                  size={228}
+                />
+              </div>
+              <p className="setup-host-success-hint">
+                Öffnet die App (TestFlight/Store) oder die Website — gleicher Beitritt wie mit Code.
+              </p>
+            </div>
+
             <div>
               <p className="setup-host-code-label">Raum-Code für Gäste</p>
               <p className="setup-host-code">{inviteCode}</p>
@@ -198,7 +214,7 @@ export default function MultiHostPage() {
             </button>
 
             <p className="setup-host-success-hint">
-              Gäste: Multiplayer → Code eingeben.
+              Gäste: QR scannen oder Code unter Multiplayer eingeben.
             </p>
 
             <Link

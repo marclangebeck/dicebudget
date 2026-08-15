@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { DeepLinkRouter } from "@/components/DeepLinkRouter";
 import { APP_DESCRIPTION, APP_TITLE } from "@/lib/branding";
 import "./globals.css";
 
@@ -50,7 +51,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <DeepLinkRouter>{children}</DeepLinkRouter>
       </body>
     </html>
   );

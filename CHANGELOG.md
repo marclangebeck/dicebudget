@@ -4,23 +4,24 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
-### Fixed
-- **Admin-PIN-Tastatur:** kein `inputMode=numeric` mehr — Buchstaben und Zahlen eingebar
-- **Rivalen-Share-Karte:** lokale Profilbilder (oder Initialen) auf der Duell-Karte
-- **Paarungs-Detail-Karten:** Bild oben volle Breite / halbe Höhe, Infos darunter — persönlichere Rivalen-Ansicht
-
 ### Added
+- **Multi-QR + Universal Links:** Host zeigt QR mit Join-URL; AASA (`5QGGV8N5ZD.de.bottletrade.dicebudget`); iOS Associated Domains; Deep-Link öffnet Join in TestFlight/Store, sonst Web
 - **M42 Rivalen-Bilder:** Foto pro Rival nur lokal (IndexedDB), verwalten unter Rivalen; Anzeige in Liste/Paarungen
 - **M43 Admin (ein Build):** PIN-Freischaltung (`NEXT_PUBLIC_ADMIN_PIN`), Admin-API-Key lokal hinterlegen, Shell unter Einstellungen → Admin
 - **Heller Spielzettel:** Toggle unter Visuelle Einblendungen — nur der Zettel hell (`scoreSheetTheme`), Rest der App unverändert
 - **Rivalen-Share-Karte:** Teilen aus Paarungs-Detail (Duell-Balken, Punktedifferenz, Form der letzten Runden)
+
+### Fixed
+- **Admin-PIN-Tastatur:** kein `inputMode=numeric` mehr — Buchstaben und Zahlen eingebar
+- **Rivalen-Share-Karte:** lokale Profilbilder (oder Initialen) auf der Duell-Karte
+- **Paarungs-Detail-Karten:** Bild oben volle Breite / halbe Höhe, Infos darunter — persönlichere Rivalen-Ansicht
 
 ### Changed
 - **Startscreen:** „Deine Bilanz“-Toggle oben entfernt; freier Raum für größeren Code-Beitreten-Container
 - **Admin-Zugang:** kein separater Admin-Build mehr nötig; Stats-Admin nur nach PIN + Key (Legacy-Env-Key nur mit PIN, falls PIN gesetzt)
 
 ### Docs
-- **HANDOVER / milestones_active / ios_current / GOiOS / milestones / decisions / roadmap:** Stand 2026-08-12, HEAD Tip `b8a9d79` / Produkt `3e9d9a8`, Tests 98, M42/M43, Admin-PIN alphanumerisch, M30 danach
+- **ios_current / CHANGELOG:** Universal Links + Multi-QR (Team ID `5QGGV8N5ZD`), Stand 2026-08-15
 
 ### Changed
 - **Gold-Aufleuchten statt Lauffeuer:** bei fertiger Zeile oder Spalte leuchten betroffene Felder 3× gleichzeitig vollflächig gold; kurze Fanfare (Sounds-Toggle); kein Extra-Trigger für den gesamten Zettel

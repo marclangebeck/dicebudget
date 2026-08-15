@@ -1,21 +1,27 @@
 # iOS Aktuell - dice.budget
 
-**Stand:** 2026-08-12  
+**Stand:** 2026-08-15  
 **Branch:** `milestone-22-prep`  
-**Produktcode-HEAD (Web):** `3e9d9a8` (M42/M43) · Tip `b8a9d79`  
+**Produktcode-HEAD (Web):** siehe `git log -1`  
 **Bundle ID:** `de.bottletrade.dicebudget`  
+**Apple Team ID (AASA):** `5QGGV8N5ZD`
 
 Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 
 ## Aktueller Stand
 
 - App Store Connect: **Version 2.0**.
-- TestFlight: Builds bis **~51+** (Nutzer-Stand 2026-08-12); Installationen können hinterherhinken — immer **Menü → Version 2.0 (xx)** prüfen (native Bundle-Build).
-- **Release-Kandidat für M30:** aktueller HEAD mit frischem `npm run build:ios` (nach M42/M43).
-- Web/API live: https://dicebudget.bottle-trade.de
-- **Web/iOS ein Build (M43):** Admin per `NEXT_PUBLIC_ADMIN_PIN` (alphanumerisch, volle Tastatur); API-Key lokal nach Freischaltung.
-- Öffentliches Bundle: `NEXT_PUBLIC_ADMIN_API_KEY` leer lassen.
-- Labs (`NEXT_PUBLIC_LABS_PIN`) = InApp-Käufe Features — **getrennt** von Admin.
+- TestFlight: Builds bis **~51+**; Menü → Version prüfen.
+- **Web/iOS ein Build (M43):** Admin per `NEXT_PUBLIC_ADMIN_PIN`; API-Key lokal.
+- Labs (`NEXT_PUBLIC_LABS_PIN`) getrennt von Admin.
+
+## Universal Links / Multi-QR
+
+- QR nach Raum-Erstellung: `https://dicebudget.bottle-trade.de/multi/join?code=…`
+- AASA: `/.well-known/apple-app-site-association` und `/apple-app-site-association`
+- iOS Entitlement: `applinks:dicebudget.bottle-trade.de` (`App.entitlements`)
+- App: `DeepLinkRouter` → Join-Pfad; ohne App: Website-Join
+- Nach Deploy: Nginx-Reload; Apple kann AASA kurz cachen (Minuten bis Stunden)
 
 ### Mac `.env.production` (kritisch)
 

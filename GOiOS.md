@@ -23,5 +23,6 @@ Diese Datei ist ein Kompatibilitaets-Index. Fuer aktuellen iOS-/TestFlight-/App-
 - Nach UI-Aenderungen: Mac `git reset --hard origin/milestone-22-prep`, Env setzen, `npm run build:ios`, Archive/Upload.
 - **Menü-Version:** iOS = Xcode Build zur Laufzeit (`App.getInfo`); Web = `NEXT_PUBLIC_APP_VERSION` + `NEXT_PUBLIC_APP_BUILD` (typisch `web`).
 - **Admin (M43):** `NEXT_PUBLIC_ADMIN_PIN` (alphanumerisch) vor `build:ios`; `NEXT_PUBLIC_ADMIN_API_KEY` leer — Key nach PIN lokal.
+- **Universal Links:** Associated Domains `applinks:dicebudget.bottle-trade.de` (Entitlement im Repo); nach Pull in Xcode Signing prüfen.
 - Bei `git pull`-Fehler: `git restore frontend/package-lock.json` vor Pull (vom Projektroot).
 - Der verbindliche Sync-Workflow steht in `AGENT_RULES.md` Sektion 9.
