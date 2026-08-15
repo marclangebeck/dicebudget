@@ -8907,6 +8907,21 @@ html.zoomable-route.legal-route .legal-page-scroll {
     inset 0 1px 0 rgba(255, 255, 255, 0.16);
 }
 
+.setup-host-success--invite-qr {
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1.1rem 0.95rem;
+}
+
+.setup-host-invite-title {
+  margin: 0;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+  color: #f8fafc;
+}
+
 .setup-host-code-label {
   font-size: 0.625rem;
   font-weight: 800;

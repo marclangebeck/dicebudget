@@ -8,7 +8,6 @@ import { createGameSession, joinSession } from "@/lib/api";
 import { saveActiveGame } from "@/lib/activeGame";
 import { sessionHouseRuleFlagsFromPrefs } from "@/lib/featureFlags";
 import { upsertRivalName } from "@/lib/rivalProfiles";
-import { shareInviteCode } from "@/lib/shareSocial";
 import { buildInviteJoinUrl } from "@/lib/inviteJoinUrl";
 import { InviteQrCode } from "@/components/InviteQrCode";
 import { settingsHrefWithReturn } from "@/lib/settingsReturn";
@@ -23,11 +22,8 @@ export default function MultiHostPage() {
   const router = useRouter();
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
   const [inviteCode, setInviteCode] = useState<string | null>(null);
-  const [leagueCode, setLeagueCode] = useState<string | null>(null);
-  const [createdStrategyMode, setCreatedStrategyMode] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [shareState, setShareState] = useState<"idle" | "shared" | "copied">("idle");
 
   useEffect(() => {
     setSettings(getAppSettings());
@@ -81,24 +77,10 @@ export default function MultiHostPage() {
         return;
       }
       setInviteCode(session.inviteCode);
-      setLeagueCode(session.leagueCode);
-      setCreatedStrategyMode(session.useStrategyRules);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erstellung fehlgeschlagen");
     } finally {
       setLoading(false);
-    }
-  }
-
-  async function shareCode() {
-    if (!inviteCode) return;
-    const result = await shareInviteCode(inviteCode);
-    if (result === "shared") {
-      setShareState("shared");
-      window.setTimeout(() => setShareState("idle"), 2000);
-    } else if (result === "copied") {
-      setShareState("copied");
-      window.setTimeout(() => setShareState("idle"), 2000);
     }
   }
 
@@ -163,57 +145,15 @@ export default function MultiHostPage() {
                 : "Raum anlegen"}
           </button>
         ) : (
-          <div className="setup-host-success">
-            <p className="text-strong text-center text-sm font-semibold">Raum angelegt</p>
-            <p className="setup-host-success-hint">
-              Modus:{" "}
-              <strong className="text-strong">
-                {createdStrategyMode ? "Strategy Edition" : "DiceBudget Klassisch"}
-              </strong>
-            </p>
-
-            <div className="setup-host-qr-block">
-              <p className="setup-host-code-label">QR für Gäste scannen</p>
-              <div className="setup-host-qr-frame">
-                <InviteQrCode
-                  value={buildInviteJoinUrl(inviteCode)}
-                  label={`QR-Code Raum ${inviteCode}`}
-                  size={228}
-                />
-              </div>
-              <p className="setup-host-success-hint">
-                Öffnet die App (TestFlight/Store) oder die Website — gleicher Beitritt wie mit Code.
-              </p>
+          <div className="setup-host-success setup-host-success--invite-qr">
+            <p className="setup-host-invite-title">Spiel beitreten</p>
+            <div className="setup-host-qr-frame">
+              <InviteQrCode
+                value={buildInviteJoinUrl(inviteCode)}
+                label="QR-Code zum Beitreten"
+                size={228}
+              />
             </div>
-
-            <div>
-              <p className="setup-host-code-label">Raum-ID (Fallback)</p>
-              <p className="setup-host-code">{inviteCode}</p>
-            </div>
-
-            {leagueCode && (
-              <div>
-                <p className="setup-host-code-label">Serie (Punkte laufen weiter)</p>
-                <p className="setup-host-code setup-host-code--league">{leagueCode}</p>
-              </div>
-            )}
-
-            <button
-              type="button"
-              onClick={() => void shareCode()}
-              className="home-bento-submit home-bento-submit--lg w-full font-semibold"
-            >
-              {shareState === "shared"
-                ? "Geteilt!"
-                : shareState === "copied"
-                  ? "Link kopiert!"
-                  : "Einladungs-Link teilen"}
-            </button>
-
-            <p className="setup-host-success-hint">
-              Gäste: QR scannen (Startscreen oder Kamera-App).
-            </p>
-
             <Link
               href={`/multi/join?code=${encodeURIComponent(inviteCode)}`}
               className="setup-host-submit flex w-full items-center justify-center no-underline"

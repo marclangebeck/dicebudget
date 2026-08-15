@@ -19,8 +19,8 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ### Changed
 - **iOS Deployment Target:** Minimum von 14.0 auf **15.0** (Xcode-/Pod-Hinweise)
+- **Host nach Raum anlegen:** nur Überschrift „Spiel beitreten“, QR und „Zur Lobby“ — kein Code/Link-Teilen mehr
 - **Multi-Beitritt:** nur noch QR (In-App oder System-Kamera/Universal Link); Gäste tippen keinen Raum-Code mehr
-- **Host teilen:** teilt den Einladungs-Link (wie QR), Raum-ID nur noch als Fallback
 - **Startscreen:** „Deine Bilanz“-Toggle oben entfernt; freier Raum für größeren Beitreten-Container
 - **Admin-Zugang:** kein separater Admin-Build mehr nötig; Stats-Admin nur nach PIN + Key (Legacy-Env-Key nur mit PIN, falls PIN gesetzt)
 
