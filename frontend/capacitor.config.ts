@@ -9,7 +9,6 @@ const config: CapacitorConfig = {
     iosScheme: "https",
   },
   ios: {
-    minVersion: "15.0",
     contentInset: "automatic",
     scrollEnabled: false,
   },
