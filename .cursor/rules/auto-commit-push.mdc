@@ -1,0 +1,27 @@
+---
+description: Nach abgeschlossenem Auftrag automatisch committen und pushen
+alwaysApply: true
+---
+
+# Auto Commit + Push
+
+Nach jedem abgeschlossenen Auftrag mit Dateiänderungen **sofort** committen und pushen — ohne auf extra „GO“ für Git zu warten.
+
+## Ablauf
+
+1. Kurz `git status` / `git diff` / `git log` prüfen
+2. Relevante Dateien stagen (keine Secrets)
+3. Commit mit klarer Message (why), HEREDOC
+4. `git push` auf den aktuellen Branch
+5. Dem Nutzer den Commit-Hash nennen + ggf. **[Mac]** `git pull` / Build-Befehle
+
+## Ausnahmen
+
+- Nutzer sagt ausdrücklich „nicht committen“ / „nicht pushen“
+- Nur Analyse/Antwort ohne Dateiänderungen
+- Hook/Commit schlägt fehl → fixen, neuen Commit (kein force-push auf main)
+
+## Abgrenzung
+
+- **GO** gilt weiter für große Features, Deploy mit sudo, riskante Infra — nicht für den Git-Sync nach erledigter Arbeit.
+- Feature-Umsetzung kann weiterhin vorab GO brauchen; sobald umgesetzt → commit + push automatisch.

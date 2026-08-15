@@ -13,7 +13,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 
 - `AGENT_RULES.md` hat Vorrang vor allen anderen Dokumenten.
 - `AGENT_RULES.md` Sektion 9: Nach Code-Änderungen nummerierte `[Server]`/`[Mac]`-Befehle ausgeben.
-- Keine Commits ohne ausdrückliche Nutzer-Anweisung (**GO**), außer der Nutzer erwartet den Standard-Sync inkl. Push (bei Unklarheit fragen).
+- Nach abgeschlossenen Aufträgen mit Dateiänderungen **automatisch commit + push** (kein extra Git-GO). Ausnahme: Nutzer sagt „nicht pushen“. Feature-/Deploy-GO bleibt für Start großer Arbeiten und sudo.
 - Kein `sudo` durch den Agent; Backend-Deploy per Nutzer auf dem Server.
 - Keine Watcher, kein Polling, keine Dauerprozesse.
 - Agent arbeitet nur unter `/home/bottleadmin/projects/kniffel`.
@@ -113,7 +113,7 @@ HEAD: siehe git log -1 (Produkt ggf. hinter Tip)
 Live: https://dicebudget.bottle-trade.de
 Sprache: Deutsch
 
-Regeln: Keine Commits ohne ausdrückliches GO (bei Unklarheit fragen). Kein sudo. Keine Watcher/Polling/Dauerprozesse. Nach Code-Änderungen nummerierte [Server]/[Mac]-Befehle (AGENT_RULES §9). Frontend-Build: cd frontend && npm run build. Backend-Deploy nur Nutzer: sudo bash infra/scripts/deploy-backend-prod.sh. iOS nur Mac: npm run build:ios.
+Regeln: Nach Auftrag automatisch commit + push (AGENT_RULES §9). Kein sudo. Keine Watcher/Polling/Dauerprozesse. Nach Code-Änderungen nummerierte [Server]/[Mac]-Befehle. Frontend-Build: cd frontend && npm run build. Backend-Deploy nur Nutzer: sudo bash infra/scripts/deploy-backend-prod.sh. iOS nur Mac: npm run build:ios.
 
 Hart: DiceBudget-Kernfunktionalität darf nicht verloren gehen. Turnier (docs/tournament/) nur additiv, eigene iPad-Host-App später, Spieler weiter DiceBudget + QR — Umsetzung nur nach GO.
 

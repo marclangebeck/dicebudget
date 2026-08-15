@@ -169,11 +169,13 @@ Nginx- oder Certbot-Änderungen: minimal, andere VHosts nicht anfassen.
 
 Der Nutzer will **nach jeder Code-Änderung**, dass **GitHub, Server und lokaler Mac auf demselben Stand** sind. Der Agent arbeitet **direkt auf dem Server** (`/home/bottleadmin/projects/kniffel`); der Mac ist ein **getrennter Git-Clone**, auf den der Agent **keinen Zugriff** hat.
 
+**Commit + Push automatisch (Pflicht):** Nach jedem abgeschlossenen Auftrag mit Dateiänderungen **sofort** `git commit` + `git push` — **ohne** extra Nutzer-GO für Git. Ausnahme nur bei ausdrücklichem „nicht pushen“ oder reiner Analyse ohne Änderungen. Feature-/Deploy-GO (§6) bleibt für *Start* größerer Arbeiten und sudo-Deploy; der Git-Sync danach ist Standard.
+
 **Regel für die Kommunikation:** Bei jeder Änderung dem Nutzer **immer** eine **nummerierte Reihenfolge mit kopierbaren Befehlen** ausgeben, jeweils markiert mit **[Server]** (macht der Agent) oder **[Mac]** (macht der Nutzer). Schritte mit `sudo` sind **immer Nutzer-Aufgabe** (Agent hat kein sudo). Keine Inline-Kommentare (`#`) in kopierbaren Befehlen (Mac-Shell interpretiert sie sonst falsch).
 
 **Standard-Reihenfolge nach einer Code-Änderung:**
 
-1. **[Server] GitHub aktualisieren** (Agent):
+1. **[Server] GitHub aktualisieren** (Agent, automatisch nach Auftrag):
 
 ```bash
 cd /home/bottleadmin/projects/kniffel
