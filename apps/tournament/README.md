@@ -12,7 +12,7 @@ Host-App zum Orchestrieren von Turnieren. **Getrennt** von der Spieler-App `fron
 
 - DiceBudget-Spieler-App darf nicht beschädigt werden (siehe `docs/tournament/README.md`).
 - Kein Polling: Lobby nur per Tap „Aktualisieren“.
-- Design: an DiceBudget angelehnt (navy/gold), eigene Typo (Outfit) — ähnlich, nicht gleich.
+- Design: an DiceBudget Startscreen angelehnt (Navy/Slate/Teal, Gold nur Akzent), eigene Typo (Outfit) — ähnlich, nicht gleich.
 - iOS-Native-Projekt: auf dem **Mac** einmalig `npx cap add ios` (falls Ordner `ios/` fehlt), danach `npm run build:ios`.
 
 ## Lokal
