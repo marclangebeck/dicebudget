@@ -114,6 +114,43 @@ a {
   border-color: var(--glass-edge);
 }
 
+.t-choice {
+  display: grid;
+  gap: 0.25rem;
+  width: 100%;
+  text-align: left;
+  border-radius: 0.9rem;
+  border: 1px solid var(--glass-edge);
+  padding: 0.85rem 1rem;
+  background: rgba(2, 6, 23, 0.35);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+.t-choice:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.t-choice--selected {
+  border-color: rgba(56, 189, 248, 0.55);
+  background: rgba(56, 189, 248, 0.14);
+}
+
+.t-choice-title {
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+.t-choice-desc {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
 .t-btn--accent {
   border-color: rgba(45, 212, 191, 0.4);
   background: linear-gradient(155deg, rgba(45, 212, 191, 0.28), rgba(7, 31, 34, 0.95));

@@ -1,7 +1,13 @@
+import {
+  isTournamentModeKey,
+  type TournamentModeKey,
+} from "@/lib/tournamentModes";
+
 const SETUP_DRAFT_KEY = "dicebudget.tournament.setupDraft.v1";
 
 export type SetupDraft = {
   name: string;
+  modeKey?: TournamentModeKey;
 };
 
 export function loadSetupDraft(): SetupDraft | null {
@@ -10,9 +16,12 @@ export function loadSetupDraft(): SetupDraft | null {
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw) as SetupDraft;
-    if (typeof parsed.name === "string") {
-      return { name: parsed.name };
+    if (typeof parsed.name !== "string") return null;
+    const draft: SetupDraft = { name: parsed.name };
+    if (isTournamentModeKey(parsed.modeKey)) {
+      draft.modeKey = parsed.modeKey;
     }
+    return draft;
   } catch {
     /* ignore */
   }
@@ -21,6 +30,14 @@ export function loadSetupDraft(): SetupDraft | null {
 
 export function saveSetupDraft(draft: SetupDraft): void {
   window.localStorage.setItem(SETUP_DRAFT_KEY, JSON.stringify(draft));
+}
+
+export function patchSetupDraft(patch: Partial<SetupDraft>): SetupDraft | null {
+  const current = loadSetupDraft();
+  if (!current) return null;
+  const next: SetupDraft = { ...current, ...patch };
+  saveSetupDraft(next);
+  return next;
 }
 
 export function clearSetupDraft(): void {

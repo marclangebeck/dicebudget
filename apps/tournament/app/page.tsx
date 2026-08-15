@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { APP_NAME, APP_TAGLINE } from "@/lib/branding";
 import { loadHostSession } from "@/lib/hostStore";
-import { loadSetupDraft, saveSetupDraft } from "@/lib/setupDraft";
+import { loadSetupDraft, patchSetupDraft, saveSetupDraft } from "@/lib/setupDraft";
 
 export default function TournamentHomePage() {
   const router = useRouter();
@@ -25,7 +25,12 @@ export default function TournamentHomePage() {
       return;
     }
     setError(null);
-    saveSetupDraft({ name: trimmed });
+    const existing = loadSetupDraft();
+    if (existing) {
+      patchSetupDraft({ name: trimmed });
+    } else {
+      saveSetupDraft({ name: trimmed });
+    }
     router.push("/setup");
   }
 
