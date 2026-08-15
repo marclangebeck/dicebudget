@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **QR-Scan Beitritt:** Startscreen-Mitte und Join ohne `?code=` — Button „QR-Code scannen“ (In-App-Kamera); Code-Eingabe entfernt
 - **Multi-QR + Universal Links:** Host zeigt QR mit Join-URL; AASA (`5QGGV8N5ZD.de.bottletrade.dicebudget`); iOS Associated Domains; Deep-Link öffnet Join in TestFlight/Store, sonst Web
 - **M42 Rivalen-Bilder:** Foto pro Rival nur lokal (IndexedDB), verwalten unter Rivalen; Anzeige in Liste/Paarungen
 - **M43 Admin (ein Build):** PIN-Freischaltung (`NEXT_PUBLIC_ADMIN_PIN`), Admin-API-Key lokal hinterlegen, Shell unter Einstellungen → Admin
@@ -17,7 +18,9 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Paarungs-Detail-Karten:** Bild oben volle Breite / halbe Höhe, Infos darunter — persönlichere Rivalen-Ansicht
 
 ### Changed
-- **Startscreen:** „Deine Bilanz“-Toggle oben entfernt; freier Raum für größeren Code-Beitreten-Container
+- **Multi-Beitritt:** nur noch QR (In-App oder System-Kamera/Universal Link); Gäste tippen keinen Raum-Code mehr
+- **Host teilen:** teilt den Einladungs-Link (wie QR), Raum-ID nur noch als Fallback
+- **Startscreen:** „Deine Bilanz“-Toggle oben entfernt; freier Raum für größeren Beitreten-Container
 - **Admin-Zugang:** kein separater Admin-Build mehr nötig; Stats-Admin nur nach PIN + Key (Legacy-Env-Key nur mit PIN, falls PIN gesetzt)
 
 ### Docs

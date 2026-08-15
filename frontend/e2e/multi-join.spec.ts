@@ -1,15 +1,15 @@
 import { expect, test } from "@playwright/test";
 
-test("Multi-Join-Seite lädt und Code-Eingabe funktioniert", async ({ page }) => {
+test("Multi-Join ohne Code zeigt QR-Scan statt Code-Eingabe", async ({ page }) => {
   await page.goto("/multi/join");
 
-  await expect(page.getByText("Raum-Code vom Host")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Raum beitreten" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "QR-Code scannen" })).toBeVisible();
+  await expect(page.getByPlaceholder("z. B. ABCD2345")).toHaveCount(0);
+});
 
-  const codeInput = page.getByPlaceholder("z. B. ABCD2345");
-  await expect(codeInput).toBeVisible();
-  await codeInput.fill("abcd2345");
-  await expect(codeInput).toHaveValue("ABCD2345");
+test("Multi-Join mit Code in der URL öffnet Lobby-Flow", async ({ page }) => {
+  await page.goto("/multi/join?code=ABCD2345");
 
-  await page.getByRole("button", { name: "Zur Lobby" }).click();
-  await page.waitForURL(/\/multi\/join\?code=ABCD2345/i);
+  await expect(page.getByText(/Code ABCD2345/i)).toBeVisible();
 });

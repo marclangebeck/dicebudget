@@ -18,6 +18,9 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 ## Universal Links / Multi-QR
 
 - QR nach Raum-Erstellung: `https://dicebudget.bottle-trade.de/multi/join?code=…`
+- Gäste: Startscreen **QR-Code scannen** (In-App-Kamera) oder System-Kamera → Universal Link öffnet die App
+- `NSCameraUsageDescription` in `Info.plist` für den In-App-Scanner
+- Keine manuelle Code-Eingabe mehr als Beitrittsweg
 - AASA: `/.well-known/apple-app-site-association` und `/apple-app-site-association`
 - iOS Entitlement: `applinks:dicebudget.bottle-trade.de` (`App.entitlements`)
 - App: `DeepLinkRouter` → Join-Pfad; ohne App: Website-Join

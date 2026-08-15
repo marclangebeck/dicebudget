@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { HomeHeroBanner } from "@/components/HomeHeroBanner";
-import { JoinByCodeForm } from "@/components/JoinByCodeForm";
+import { JoinByQrScan } from "@/components/JoinByQrScan";
 import { useHomeHeroData } from "@/lib/useHomeHeroData";
 
 type ArenaPaneProps = {
@@ -55,12 +55,12 @@ export function HomeBentoGridClassic() {
           href="/multi"
           tone="multi"
           label="Multi-Spiel als Host starten"
-          tagline="Raum erstellen, Code teilen, Rivalen schlagen."
+          tagline="Raum erstellen, QR zeigen, Rivalen einladen."
           badges={["2–6 Spieler", "Duell"]}
           cta="Als Host starten"
           iconSrc="/home-icons/multiplayer.png"
         />
-        <JoinByCodeForm variant="home" />
+        <JoinByQrScan variant="home" />
         <ArenaPane
           href="/solo"
           tone="solo"

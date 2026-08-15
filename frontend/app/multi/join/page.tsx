@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { JoinByCodeForm } from "@/components/JoinByCodeForm";
+import { JoinByQrScan } from "@/components/JoinByQrScan";
 import { getSessionLobby, getSessionRanking, joinSession, createGameSession } from "@/lib/api";
 import { saveActiveGame } from "@/lib/activeGame";
 import { ResumeLobbySheet } from "@/components/ResumeLobbySheet";
@@ -110,11 +110,9 @@ function MultiJoinInner() {
         <header className="join-lobby-hero join-lobby-hero--code">
           <p className="join-lobby-kicker">Multiplayer</p>
           <h1 className="join-lobby-title">Raum beitreten</h1>
-          <p className="join-lobby-subtitle">
-            Code vom Host eingeben – du bleibst in der App.
-          </p>
+          <p className="join-lobby-subtitle">QR vom Host scannen — du bleibst in der App.</p>
         </header>
-        <JoinByCodeForm variant="inline" />
+        <JoinByQrScan variant="panel" />
         <Link href="/multi" className="join-lobby-host-link">
           Stattdessen: Raum erstellen (Host)
         </Link>

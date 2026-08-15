@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
-import { JoinByCodeForm } from "@/components/JoinByCodeForm";
 import { createGameSession, joinSession } from "@/lib/api";
 import { saveActiveGame } from "@/lib/activeGame";
 import { sessionHouseRuleFlagsFromPrefs } from "@/lib/featureFlags";
@@ -108,10 +107,8 @@ export default function MultiHostPage() {
       <AppScreenHeader
         section="Multiplayer"
         title="Multiplayer"
-        subtitle="Erstelle einen Raum oder tritt mit einem Code direkt bei."
+        subtitle="Raum erstellen und QR zeigen — Gäste scannen und treten bei."
       />
-
-      <JoinByCodeForm variant="card" />
 
       <form onSubmit={(e) => void handleCreate(e)} className="setup-host-form">
         <section className="setup-host-success">
@@ -190,7 +187,7 @@ export default function MultiHostPage() {
             </div>
 
             <div>
-              <p className="setup-host-code-label">Raum-Code für Gäste</p>
+              <p className="setup-host-code-label">Raum-ID (Fallback)</p>
               <p className="setup-host-code">{inviteCode}</p>
             </div>
 
@@ -209,12 +206,12 @@ export default function MultiHostPage() {
               {shareState === "shared"
                 ? "Geteilt!"
                 : shareState === "copied"
-                  ? "Kopiert!"
-                  : "Code teilen"}
+                  ? "Link kopiert!"
+                  : "Einladungs-Link teilen"}
             </button>
 
             <p className="setup-host-success-hint">
-              Gäste: QR scannen oder Code unter Multiplayer eingeben.
+              Gäste: QR scannen (Startscreen oder Kamera-App).
             </p>
 
             <Link

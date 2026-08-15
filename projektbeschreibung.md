@@ -83,7 +83,7 @@ API: `POST /runs/:runId/fields/:fieldId/clear` — danach kann ein anderes Feld 
 ### 3.1 Sessions
 
 - Host: `POST /sessions` mit `gameCount`, `maxPlayers`, `useStrategyRules`, optional `leagueCode`, optional `showOpponentPool`
-- Einladungscode; Gäste: Startseite Code eingeben oder `/multi/join?code=…`
+- Einladung per QR / Join-URL; Gäste: Startseite „QR-Code scannen“ oder `/multi/join?code=…` (Universal Link)
 - Join erzeugt `Player` + `Run` (Kopie der Session-Regeln)
 - Auth: Header **`X-Player-Secret`** auf Run-Endpunkten
 
@@ -177,7 +177,7 @@ Tabelle `player_name_aliases` (`aliasName` → `canonicalName`):
 | `HomeBentoGrid` | Start: Bento-Kacheln + Code-Eingabe |
 | `AppScreenHeader` | Einheitlicher Kopf (Setup, Statistik) |
 | `GameSetup` | Solo-Start mit `StrategyModeToggle` |
-| `JoinByCodeForm` | Code auf Startseite (in Bento) |
+| `JoinByQrScan` | QR scannen auf Startseite / Join ohne Code |
 | `PlayBoard` | Spiel, Overlay, Abandon, Feld löschen |
 | `PlayTopBar` | Zurück (Start/Lobby), eigener Pool + optionaler Gegner-Pool (M32) |
 | `BonusOverlay` | Bonus-Einblendung bei erreichtem Oberbonus (M31) |

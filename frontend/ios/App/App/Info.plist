@@ -45,5 +45,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>DiceBudget nutzt die Kamera, um den QR-Code eines Multi-Spiels zu scannen.</string>
 </dict>
 </plist>

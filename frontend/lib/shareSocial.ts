@@ -43,11 +43,13 @@ export function appendSiteLink(body: string): string {
   return `${body}\n\nJetzt spielen: ${SITE_URL}`;
 }
 
-/** Nur den Raum-Code teilen — ohne Einladungstext oder App-Link (z. B. WhatsApp). */
+/** Einladungs-Link (Join-URL) teilen — gleicher Inhalt wie der QR. */
 export async function shareInviteCode(code: string): Promise<"shared" | "copied" | "aborted"> {
+  const { buildInviteJoinUrl } = await import("@/lib/inviteJoinUrl");
+  const text = buildInviteJoinUrl(code);
   if (canUseWebShare()) {
     try {
-      await navigator.share({ text: code });
+      await navigator.share({ text });
       return "shared";
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return "aborted";
@@ -56,7 +58,7 @@ export async function shareInviteCode(code: string): Promise<"shared" | "copied"
 
   if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
     try {
-      await navigator.clipboard.writeText(code);
+      await navigator.clipboard.writeText(text);
       return "copied";
     } catch {
       /* fallback below */

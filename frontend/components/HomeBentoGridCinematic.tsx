@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, type CSSProperties } from "react";
 import { APP_SHORT } from "@/lib/branding";
-import { JoinByCodeForm } from "@/components/JoinByCodeForm";
+import { JoinByQrScan } from "@/components/JoinByQrScan";
 
 type CinematicDoorProps = {
   href: string;
@@ -57,7 +57,7 @@ function CinematicDoor({
   );
 }
 
-/** Cinematic Doors — Editorial-Poster für Multi/Solo; Beitreten-Code in der Mitte. */
+/** Cinematic Doors — Multi/Solo; Beitritt per QR in der Mitte. */
 export function HomeBentoGridCinematic() {
   const [entered, setEntered] = useState(false);
 
@@ -79,14 +79,14 @@ export function HomeBentoGridCinematic() {
           href="/multi"
           tone="multi"
           label="Multi-Spiel als Host starten"
-          tagline="Raum erstellen, Code teilen, Rivalen schlagen."
+          tagline="Raum erstellen, QR zeigen, Rivalen einladen."
           chip="2–6 Spieler"
           cta="Als Host starten"
           iconSrc="/home-icons/multiplayer.png"
           enterDelayMs={80}
           labelClassName="home-cinematic-door-label--host"
         />
-        <JoinByCodeForm variant="home" />
+        <JoinByQrScan variant="home" />
         <CinematicDoor
           href="/solo"
           tone="solo"

@@ -62,8 +62,8 @@ export const APP_TOUR_STEPS_START: AppTourStep[] = [
   {
     id: "join",
     chapter: "start",
-    title: "Mit Code beitreten",
-    body: "Kennst du den Code vom Host? Hier direkt eingeben und der Lobby beitreten — ohne Umweg.",
+    title: "QR-Code scannen",
+    body: "Mitte: QR vom Host scannen und der Lobby beitreten — ohne Code tippen.",
     anchor: '[data-tour-anchor="join"]',
   },
   {
