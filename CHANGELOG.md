@@ -27,6 +27,8 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Admin-Zugang:** kein separater Admin-Build mehr nötig; Stats-Admin nur nach PIN + Key (Legacy-Env-Key nur mit PIN, falls PIN gesetzt)
 
 ### Docs
+- **Agent-Doku Turnier:** Verweise in `AGENT_RULES`, `HANDOVER` (inkl. Übergabe-Prompt), `milestones.md`, `docs/decisions.md`, `docs/milestones_active.md`, `docs/ios_current.md`, `GOiOS.md`, Root-`README`, `projektbeschreibung.md`, Frontend-/Backend-README, `docs/milestone-roadmap-analysis.md`
+- **Tournament (Planung):** `docs/tournament/` — Vision, Roadmap T0–T10, API-Skizze; harte Nebenbedingung: DiceBudget-Funktionalität bleibt vollständig
 - **HANDOVER / milestones_active / ios_current / GOiOS:** Stand 2026-08-15 — Multi-QR, iOS 15, HEAD `faf721b`
 - **ios_current / CHANGELOG:** Universal Links + Multi-QR (Team ID `5QGGV8N5ZD`), Stand 2026-08-15
 

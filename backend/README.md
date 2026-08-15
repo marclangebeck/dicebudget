@@ -2,6 +2,8 @@
 
 Express + Prisma (SQLite) — Port **3020** (Produktion hinter Nginx `/api/`).
 
+Turnier-API ist **geplant** (`docs/tournament/api-sketch.md`), noch nicht implementiert. Bestehende Session-/Run-Routen bleiben der Kern; Turnier soll später orchestrieren, nicht ersetzen. **Hart:** bestehende Funktionalität nicht brechen.
+
 ## Voraussetzungen
 
 - Node.js ≥ 20

@@ -10,7 +10,8 @@ Next.js 15 (App Router), **statischer Export** (`output: "export"` in `next.conf
 - **API-Basis** (`NEXT_PUBLIC_API_URL`):
   - Lokal (Dev): `http://127.0.0.1:3020`
   - Produktion: `https://dicebudget.bottle-trade.de/api` in **`.env.production`**
-- **Capacitor iOS:** nach jeder UI-Änderung `npm run build:ios` (sync nach `ios/App/App/public/`)
+- **Capacitor iOS:** nach jeder UI-Änderung `npm run build:ios` (sync nach `ios/App/App/public/`) — **Spieler-App**
+- **Turnier (Planung):** eigene Host-App später (`docs/tournament/`); Änderungen hier dürfen Solo/Multi/Stats nicht beschädigen
 - Paarungslinks auf `/stats` nutzen `<a href>` (voller Seitenload — static export)
 - **Vollbild ohne Seiten-Scroll:** `/play` nutzt `PlayScreenShell` + `FitScoreSheet`
 - **Legal-Seiten:** `LegalScrollShell` — eigener Scroll-Container + Safe-Area (Capacitor `scrollEnabled: false`)

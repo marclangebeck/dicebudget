@@ -20,6 +20,7 @@ Nur bei Bedarf zusätzlich:
 5. **`docs/decisions.md`** (dauerhaft gültige Architektur- und Betriebsentscheidungen)
 6. **`docs/milestones_archive.md`** (ältere Milestone-Historie)
 7. **`docs/ios_archive.md`** (ältere iOS-/TestFlight-Historie)
+8. **`docs/tournament/`** (Turnier-Host-App Planung; DiceBudget-Kern bleibt unantastbar)
 
 Frontend-Details: `frontend/README.md`. Fachliche Spezifikation: `projektbeschreibung.md`. Bei Widersprüchen gilt **`AGENT_RULES.md`**.
 
@@ -92,7 +93,8 @@ kniffel/
     ├── milestones_archive.md
     ├── ios_current.md
     ├── ios_archive.md
-    └── decisions.md
+    ├── decisions.md
+    └── tournament/          # Turnier-Host Planung (README, roadmap, api-sketch)
 ```
 
 - Keine Drive-by-Refactors in fremden Ordnern

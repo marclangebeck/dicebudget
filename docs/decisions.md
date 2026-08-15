@@ -80,6 +80,15 @@ npm run build
 - App startet nativ direkt auf `/app`, Web-Landing bleibt `/`.
 - Alter App-Store-Connect-Eintrag `com.mlangebeck.mobileapp` wird ignoriert.
 
+## Tournament (geplant, 2026-08)
+
+- **Docs:** `docs/tournament/` (README, roadmap T0–T10, api-sketch).
+- **Produkt:** Kneipen-/Event-Turniere; Spieler bleiben in der DiceBudget-App (QR-Beitritt); Organizer bekommt eine **eigene iPad-App** (eigenes Bundle, eigener TestFlight-Build).
+- **Startorganisatorisch:** Monorepo-Light in diesem Repo (Doku jetzt; spaeter z. B. `apps/host`); konkrete Modi spaeter, Kern breit (Modus als Strategie).
+- **Hart / nicht verhandelbar:** DiceBudget-Kernfunktionalitaet darf nicht verloren gehen. Turnier nur additiv; bestehende Solo/Multi/Stats/Labs-Flows nicht umbauen oder als Pflichtpfad umleiten. Bei Konflikt gewinnt DiceBudget.
+- **AGENT_RULES:** kein Polling-/Abuse-Risiko auch fuer Live/Beamer; Umsetzung nur nach GO.
+- Umsetzung startet nicht ohne Nutzer-GO; Planung ersetzt keine DiceBudget-Milestones (z. B. M30).
+
 ## Bekannte Risikoentscheidungen
 
 - `POST /stats/pairings/reset` und `POST /stats/pairings/baseline` erfordern den Header `X-Admin-Key` (Backend `ADMIN_API_KEY`). **M43:** Client liefert den Key nach Admin-PIN aus lokalem Speicher (oder Legacy-Env); öffentliches Bundle ohne `NEXT_PUBLIC_ADMIN_API_KEY`. **M38:** Baseline admin-only (gemeinsame Bilanz); Spieler blenden lokal aus und pflegen Namen/„Das bin ich“ gerätebezogen. Ohne konfigurierten Server-Key → **503**.

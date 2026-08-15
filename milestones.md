@@ -4,6 +4,7 @@ Diese Datei ist ein Kompatibilitaets-Index. Fuer Agent-Uebergaben nicht mehr den
 
 - Aktueller Arbeitsstand: `docs/milestones_active.md`
 - Vollstaendige Milestone-Historie: `docs/milestones_archive.md`
+- Turnier (Planung): `docs/tournament/` — eigene Host-iPad-App; DiceBudget-Kern unantastbar
 
 ## Standard Fuer Agents
 
@@ -19,20 +20,20 @@ Nur bei Bedarf:
 - `docs/ios_current.md`
 - `docs/ios_archive.md`
 - `docs/decisions.md`
+- `docs/tournament/` (bei Turnier-Themen: README + roadmap; API-Skizze)
 
 ## Aktueller Kurzstand
 
 - Branch: `milestone-22-prep`
-- Produktcode-HEAD: `3e9d9a8` (M42/M43) · Tip `b8a9d79`
+- Produkt: Multi-QR, M42/M43, 2×/3× Pool 1/n + optionale Gutschrift — siehe `HANDOVER.md` / `git log -1`
 - Web/API live: https://dicebudget.bottle-trade.de
-- Frontend-Tests: **98** grün
-- iOS: TestFlight **2.0** (Builds ~51+); Admin = PIN + lokaler Key (ein Build)
-- Letzte Features: M42 Rival-Avatare; M43 Admin-PIN; heller Spielzettel; Rivalen-Share; Gold-Aufleuchten; M37–M41
-- Nächstes: M42/M43 Abnahme / iOS-Build, dann **M30** App Store Release
+- iOS: TestFlight **2.0**, Deployment Target **15.0**
+- **Tournament:** nur Doku/Planung unter `docs/tournament/` (kein Produktcode ohne GO)
+- Nächstes DiceBudget: **M30** App Store (GO); Turnier-Umsetzung separat nach GO
 
 ## Offene Prioritaeten
 
-1. M42/M43 Abnahme; frischer `build:ios` mit `NEXT_PUBLIC_ADMIN_PIN`.
-2. **M30** TestFlight-Regression + App Store Connect (Agreement, 1,19 €, Submit).
-3. Optional M38 Stufe A nur bei Drift; **M36** nach M30.
-4. `milestone-22-prep` → `main` nach Release-Freigabe.
+1. M42/M43 Abnahme / QR-TestFlight; dann **M30**.
+2. Optional M38 Stufe A; **M36** nach M30.
+3. `milestone-22-prep` → `main` nach Release-Freigabe.
+4. **Tournament:** Planung lesen (`docs/tournament/`); Umsetzung erst nach GO; DiceBudget-Funktionalität bleibt vollständig.

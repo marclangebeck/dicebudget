@@ -1,6 +1,8 @@
 # DiceBudget Strategy Edition – Projektbeschreibung
 
 > **Stand Mai 2026:** Produktname **dice.budget**, Domain `dicebudget.bottle-trade.de`, iOS-App (Capacitor) mit Start `/app`. Multiplayer pseudonym (`playerId`), Solo lokal. Siehe `HANDOVER.md` / `milestones.md` für aktuellen Implementierungsstand.
+>
+> **Turnier (Planung, 2026-08):** Kneipen-Turniere mit eigener iPad-Organizer-App und Beitritt über die DiceBudget-Spieler-App (QR). Spezifikation und Roadmap: `docs/tournament/`. **Hart:** Die bestehende DiceBudget-Funktionalität darf dabei nicht verloren gehen (nur additive Erweiterung).
 
 ## 1. Überblick
 
