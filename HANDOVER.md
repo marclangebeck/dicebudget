@@ -31,8 +31,9 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 | Roadmap | **M42/M43** + **Multi-QR** umgesetzt; **M30** danach; Turnier = Planung `docs/tournament/` |
 | Entwickler-Vorschau | **InApp-Käufe (Features)** = Labs-PIN (`NEXT_PUBLIC_LABS_PIN`) — getrennt von Admin |
 | iOS/TestFlight | Version `2.0`; Deployment Target **15.0**; frischer Archive-Build 2026-08-15 (QR-Scan + Host-QR) |
-| Backend Prod | Migrationen inkl. Absolute-Baseline — Deploy nur bei Backend-Änderungen |
-| Tournament | Planung only — Host-iPad eigene App; Spieler DiceBudget; siehe `docs/tournament/` |
+| Tournament | T2 Host `apps/tournament` + T1 API `/tournaments` — Spieler-Join = T3 |
+| Backend Prod | Migrationen inkl. Tournaments — Deploy bei Backend-Änderungen |
+
 ## Multi-Beitritt (QR only) — Stand 2026-08-15
 
 - **Kein Code-Eingabe-Feld** mehr (Startscreen / Multi / Join ohne `?code=`).
@@ -99,7 +100,7 @@ Frontend: `cd frontend && npm run build`.
 2. Optional **Stufe A** Stats nur bei Drift.
 3. **M36** nach M30.
 4. `milestone-22-prep` → `main` nach Release-Freigabe.
-5. **Tournament (Planung):** `docs/tournament/` — eigene iPad-Host-App + Spieler per QR; DiceBudget-Funktionalität ist **nicht verhandelbar** (siehe dort).
+5. **DiceBudget Tournament (Planung):** `docs/tournament/` — eigene iPad-Host-App + Spieler per QR; DiceBudget-Funktionalität ist **nicht verhandelbar** (siehe dort).
 
 ## Agent-Start (Übergabeprompt)
 

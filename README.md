@@ -9,7 +9,8 @@ Weitere Dokumentation:
 - **[HANDOVER.md](./HANDOVER.md)** – Übergabe-Prompt für neue Agents (Copy & Paste oben)
 - **[GOiOS.md](./GOiOS.md)** – iOS / TestFlight / App Store (Spieler-App)
 - **[AGENT_RULES.md](./AGENT_RULES.md)** – verbindlich: kein Abuse-Risiko (keine Loops/Dauerprozesse)
-- **[docs/tournament/](./docs/tournament/)** – Turnier-Host (Planung): iPad-Organizer + Spieler per QR; **DiceBudget-Kern unantastbar**
+- **[docs/tournament/](./docs/tournament/)** – **DiceBudget Tournament** (Host-iPad): Planung + API; App unter `apps/tournament/`
+- **[apps/tournament/README.md](./apps/tournament/README.md)** – Host-App Build (Port 3022, eigenes iOS-Bundle)
 - [projektbeschreibung.md](./projektbeschreibung.md) – fachliche und technische Spezifikation
 - [milestones.md](./milestones.md) – Meilensteine und Status
 - [CHANGELOG.md](./CHANGELOG.md) – Änderungshistorie

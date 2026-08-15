@@ -36,4 +36,4 @@ Nur bei Bedarf:
 1. M42/M43 Abnahme / QR-TestFlight; dann **M30**.
 2. Optional M38 Stufe A; **M36** nach M30.
 3. `milestone-22-prep` → `main` nach Release-Freigabe.
-4. **Tournament:** Planung lesen (`docs/tournament/`); Umsetzung erst nach GO; DiceBudget-Funktionalität bleibt vollständig.
+4. **DiceBudget Tournament:** T2/T1 umgesetzt (`apps/tournament`, `/tournaments`); als Nächstes T3 Spieler-Join (GO).

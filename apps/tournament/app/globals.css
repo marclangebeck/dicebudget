@@ -1,0 +1,199 @@
+:root {
+  --bg0: #140f0c;
+  --bg1: #241c14;
+  --ink: #fff8f0;
+  --muted: rgba(255, 248, 240, 0.72);
+  --accent: #e8b86d;
+  --accent-2: #7dd3c7;
+  --line: rgba(232, 184, 109, 0.28);
+  --danger: #fca5a5;
+  --font: var(--font-tournament), "Avenir Next", "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: var(--font);
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(232, 184, 109, 0.18), transparent 50%),
+    radial-gradient(ellipse at 90% 20%, rgba(125, 211, 199, 0.12), transparent 45%),
+    linear-gradient(165deg, var(--bg0), var(--bg1) 55%, #0c0a08);
+}
+
+body {
+  min-height: 100dvh;
+}
+
+a {
+  color: inherit;
+}
+
+.t-shell {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  padding:
+    max(1.25rem, env(safe-area-inset-top))
+    max(1.25rem, env(safe-area-inset-right))
+    max(1.25rem, env(safe-area-inset-bottom))
+    max(1.25rem, env(safe-area-inset-left));
+}
+
+.t-brand {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.t-tagline {
+  margin: 0 0 1.75rem;
+  max-width: 36rem;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+.t-stack {
+  display: grid;
+  gap: 0.85rem;
+  width: min(100%, 28rem);
+}
+
+.t-btn {
+  display: flex;
+  min-height: 3.4rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  border: 1px solid var(--line);
+  padding: 0.85rem 1.1rem;
+  background: linear-gradient(145deg, rgba(232, 184, 109, 0.22), rgba(36, 28, 20, 0.9));
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 750;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+
+.t-btn:hover {
+  filter: brightness(1.06);
+}
+
+.t-btn:active {
+  transform: scale(0.985);
+}
+
+.t-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  filter: none;
+}
+
+.t-btn--ghost {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.t-btn--accent {
+  border-color: rgba(125, 211, 199, 0.35);
+  background: linear-gradient(145deg, rgba(125, 211, 199, 0.22), rgba(20, 40, 38, 0.92));
+}
+
+.t-card {
+  width: min(100%, 36rem);
+  border-radius: 1.25rem;
+  border: 1px solid var(--line);
+  padding: 1.15rem 1.2rem;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.t-label {
+  display: grid;
+  gap: 0.35rem;
+  margin-bottom: 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.t-input {
+  width: 100%;
+  min-height: 2.85rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 0.65rem 0.8rem;
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.t-error {
+  margin: 0.75rem 0 0;
+  color: var(--danger);
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
+.t-meta {
+  margin: 0 0 0.85rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.t-code {
+  margin: 0 0 1rem;
+  font-size: clamp(1.6rem, 5vw, 2.2rem);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+}
+
+.t-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.t-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.55rem 0.75rem;
+  background: rgba(0, 0, 0, 0.2);
+  font-weight: 650;
+}
+
+.t-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.t-qr {
+  display: block;
+  width: min(100%, 14rem);
+  margin: 0 auto 1rem;
+  border-radius: 0.85rem;
+  background: #fff;
+  padding: 0.65rem;
+}

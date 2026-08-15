@@ -82,9 +82,10 @@ npm run build
 
 ## Tournament (geplant, 2026-08)
 
+- **Produktname:** DiceBudget Tournament (Host-iPad); Spieler bleiben in DiceBudget.
 - **Docs:** `docs/tournament/` (README, roadmap T0–T10, api-sketch).
-- **Produkt:** Kneipen-/Event-Turniere; Spieler bleiben in der DiceBudget-App (QR-Beitritt); Organizer bekommt eine **eigene iPad-App** (eigenes Bundle, eigener TestFlight-Build).
-- **Startorganisatorisch:** Monorepo-Light in diesem Repo (Doku jetzt; spaeter z. B. `apps/host`); konkrete Modi spaeter, Kern breit (Modus als Strategie).
+- **Produkt:** Kneipen-/Event-Turniere; Spieler per QR in der DiceBudget-App; Organizer = eigene App (Bundle-Vorschlag `de.bottletrade.dicebudget.tournament`).
+- **Startorganisatorisch:** Monorepo-Light in diesem Repo (Doku jetzt; spaeter z. B. `apps/tournament`); konkrete Modi spaeter, Kern breit (Modus als Strategie).
 - **Hart / nicht verhandelbar:** DiceBudget-Kernfunktionalitaet darf nicht verloren gehen. Turnier nur additiv; bestehende Solo/Multi/Stats/Labs-Flows nicht umbauen oder als Pflichtpfad umleiten. Bei Konflikt gewinnt DiceBudget.
 - **AGENT_RULES:** kein Polling-/Abuse-Risiko auch fuer Live/Beamer; Umsetzung nur nach GO.
 - Umsetzung startet nicht ohne Nutzer-GO; Planung ersetzt keine DiceBudget-Milestones (z. B. M30).

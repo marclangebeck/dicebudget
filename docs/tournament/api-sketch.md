@@ -1,7 +1,7 @@
 # Tournament API-Skizze (Entwurf)
 
 **Stand:** 2026-08-15  
-**Status:** Entwurf — nicht implementiert, keine stabilen Endpunkte  
+**Status:** T1 API umgesetzt (`/tournaments`); Host-UI in `apps/tournament`. Skizze bleibt Referenz für T3+.
 
 Ziel: gemeinsamer Vertrag zwischen **Host-App (iPad)** und **DiceBudget (Spieler)**.  
 Bestehende Multi-Session-API (`/sessions`, Invite-QR) bleibt für Partien; Turnier **orchestriert** darüber.

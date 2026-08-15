@@ -1,0 +1,9 @@
+node_modules
+.next
+out
+ios/App/App/public
+.env
+.env.local
+.env.production
+*.tsbuildinfo
+.DS_Store

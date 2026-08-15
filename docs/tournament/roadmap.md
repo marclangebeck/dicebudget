@@ -1,9 +1,10 @@
-# Tournament Roadmap
+# DiceBudget Tournament — Roadmap
 
+**Produktname:** DiceBudget Tournament  
 **Stand:** 2026-08-15  
 **Produktprinzipien:** [`README.md`](./README.md) (inkl. harter Nebenbedingungen)
 
-DiceBudget-Spieler-App bleibt unangetastet in der Kernfunktion; Turnier wird **daneben** aufgebaut.
+DiceBudget-Spieler-App bleibt unangetastet in der Kernfunktion; **DiceBudget Tournament** (Host-iPad) wird **daneben** aufgebaut.
 
 ## Modi (breit, später konkret)
 
@@ -14,10 +15,10 @@ Konkrete Modus-Liste und Regeldetails kommen **pro Milestone**, nicht als Startb
 
 | ID | Milestone | Ziel | Hinweis |
 |----|-----------|------|---------|
-| **T0** | Vision & Vertrag | Diese Docs, Rollen, API-Skizze, Abgrenzung zu DiceBudget | erledigt mit Anlegen dieses Ordners; Skizze iterieren |
-| **T1** | Backend Turnier-Kern | Turnier anlegen, Join-Code/QR-Payload, Spieler-Liste, Status (Lobby → läuft → fertig) | ohne Änderung am Solo/Multi-Happy-Path |
-| **T2** | Host-App Skelett | Eigenes Frontend-Ziel + Capacitor, Bundle-ID, Start „Turnier erstellen/öffnen“ | eigener iOS-Build-Pfad |
-| **T3** | Spieler-Anbindung | Optional: Turnier per QR in DiceBudget; Anzeige Tisch/Runde | **additiv**; Startscreen ohne Turnier unverändert |
+| **T0** | Vision & Vertrag | Docs, Rollen, API-Skizze, Name **DiceBudget Tournament** | erledigt |
+| **T1** | Backend Turnier-Kern | Turnier anlegen, Join-Code/QR-Payload, Spieler-Liste, Status | **umgesetzt** (`/tournaments`) |
+| **T2** | Host-App Skelett | `apps/tournament`, Capacitor Bundle `de.bottletrade.dicebudget.tournament`, Start/Host-Lobby | **umgesetzt** (iOS `cap add` auf Mac) |
+| **T3** | Spieler-Anbindung | Optional: Turnier per QR in DiceBudget; Anzeige Tisch/Runde | **additiv**; Startscreen-Button aktivieren |
 | **T4** | Spielplan & Auslosung | Tische/Paarungen, manuell + einfache Auto-Auslosung | Modus-agnostische Pairing-API |
 | **T5** | Partie-Link | Host startet Tisch → bestehende Multi-Session; Ergebnis zurück ins Turnier | Multi-Kern wiederverwenden, nicht forken |
 | **T6** | Live & Beamer | Ranking/Spielplan-Ansicht; sparsame Updates | kein Polling-Spam (AGENT_RULES) |
@@ -48,4 +49,5 @@ T7/T8 können nach dem Kern parallel oder nacheinander kommen; weitere Modi dana
 
 ## Nächster Schritt
 
-Nach GO: T0 vertiefen (API-Skizze schärfen) oder T1 Backend-Spike in kleinem Inkrement — **ohne** Commit/Deploy ohne Nutzer-Freigabe.
+**T3** (nach GO): Spieler-App „Turnier beitreten“ an `POST /tournaments/invite/:code/join` anbinden.  
+iOS Host: auf dem Mac `cd apps/tournament && npx cap add ios && npm run build:ios`.

@@ -1,0 +1,86 @@
+function apiBase(): string {
+  const fromEnv = process.env.NEXT_PUBLIC_API_URL?.trim();
+  if (fromEnv) return fromEnv.replace(/\/$/, "");
+  return "http://127.0.0.1:3020";
+}
+
+async function apiFetch<T>(
+  path: string,
+  init?: RequestInit & { hostToken?: string },
+): Promise<T> {
+  const headers = new Headers(init?.headers);
+  headers.set("Accept", "application/json");
+  if (init?.body && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+  if (init?.hostToken) {
+    headers.set("X-Host-Token", init.hostToken);
+  }
+  const res = await fetch(`${apiBase()}${path}`, { ...init, headers });
+  const data: unknown = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const err =
+      typeof data === "object" &&
+      data &&
+      "error" in data &&
+      typeof (data as { error: unknown }).error === "string"
+        ? (data as { error: string }).error
+        : `HTTP ${res.status}`;
+    throw new Error(err);
+  }
+  return data as T;
+}
+
+export type TournamentDto = {
+  id: string;
+  inviteCode: string;
+  name: string | null;
+  modeKey: string;
+  status: string;
+  maxEntries: number;
+  entryCount: number;
+  createdAt: string;
+  entries?: TournamentEntryDto[];
+};
+
+export type TournamentEntryDto = {
+  id: string;
+  displayName: string;
+  orderIndex: number;
+  joinedAt: string;
+};
+
+export type CreateTournamentResponse = {
+  tournament: TournamentDto;
+  hostToken: string;
+};
+
+export function createTournament(input: {
+  name?: string;
+  modeKey?: string;
+  maxEntries?: number;
+}): Promise<CreateTournamentResponse> {
+  return apiFetch("/tournaments", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+export function getTournamentByInvite(
+  inviteCode: string,
+  hostToken?: string,
+): Promise<{ tournament: TournamentDto }> {
+  return apiFetch(`/tournaments/invite/${encodeURIComponent(inviteCode)}`, {
+    hostToken,
+  });
+}
+
+export function startTournament(
+  tournamentId: string,
+  hostToken: string,
+): Promise<{ tournament: TournamentDto }> {
+  return apiFetch(`/tournaments/${encodeURIComponent(tournamentId)}/start`, {
+    method: "POST",
+    hostToken,
+  });
+}

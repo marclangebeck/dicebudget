@@ -173,3 +173,31 @@ model Roll {
   @@unique([fieldId, rollNumber])
   @@map("rolls")
 }
+
+/// DiceBudget Tournament (Host-App) — orchestriert Partien, getrennt von GameSession
+model Tournament {
+  id          String             @id @default(cuid())
+  inviteCode  String             @unique @map("invite_code")
+  name        String?
+  modeKey     String             @default("league") @map("mode_key")
+  status      String             @default("OPEN")
+  hostToken   String             @map("host_token")
+  maxEntries  Int                @default(32) @map("max_entries")
+  createdAt   DateTime           @default(now()) @map("created_at")
+  entries     TournamentEntry[]
+
+  @@map("tournaments")
+}
+
+model TournamentEntry {
+  id           String     @id @default(cuid())
+  tournamentId String     @map("tournament_id")
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  displayName  String     @map("display_name")
+  playerId     String?    @map("player_id")
+  orderIndex   Int        @map("order_index")
+  joinedAt     DateTime   @default(now()) @map("joined_at")
+
+  @@index([tournamentId])
+  @@map("tournament_entries")
+}

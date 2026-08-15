@@ -12,6 +12,7 @@ import { playerNamesRouter } from "./routes/playerNames.js";
 import { runsRouter } from "./routes/runs.js";
 import { sessionsRouter } from "./routes/sessions.js";
 import { statsRouter } from "./routes/stats.js";
+import { tournamentsRouter } from "./routes/tournaments.js";
 
 /** Express-App ohne Listen — für Tests und Produktion. */
 export function createApp(): express.Application {
@@ -23,6 +24,8 @@ export function createApp(): express.Application {
       origin: [
         "http://127.0.0.1:3021",
         "http://localhost:3021",
+        "http://127.0.0.1:3022",
+        "http://localhost:3022",
         "https://dicebudget.bottle-trade.de",
         "capacitor://localhost",
         "ionic://localhost",
@@ -47,6 +50,7 @@ export function createApp(): express.Application {
   app.use("/sessions", sessionsRouter);
   app.use("/stats", statsRouter);
   app.use("/player-names", playerNamesRouter);
+  app.use("/tournaments", tournamentsRouter);
 
   app.use(errorHandler);
 

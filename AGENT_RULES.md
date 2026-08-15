@@ -81,7 +81,9 @@ Nur arbeiten innerhalb:
 ```
 kniffel/
 ├── backend/      # Express API (Port 3020, nur bei Bedarf starten)
-├── frontend/     # Next.js (Dev 3021; Produktion: static export → out/)
+├── frontend/     # Next.js Spieler-App (Dev 3021; Produktion: static export → out/)
+├── apps/
+│   └── tournament/  # DiceBudget Tournament Host (Dev 3022; eigenes iOS-Bundle)
 ├── public/       # Legacy-Testseite (nicht Produktions-Frontend)
 ├── infra/        # Nginx, Deploy-Skripte
 ├── HANDOVER.md

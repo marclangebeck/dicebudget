@@ -25,3 +25,19 @@ export const joinSessionLimiter = rateLimit({
   legacyHeaders: false,
   message,
 });
+
+export const createTournamentLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message,
+});
+
+export const joinTournamentLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message,
+});

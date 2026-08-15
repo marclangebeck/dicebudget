@@ -40,6 +40,12 @@ import {
   HouseRuleError,
   RollSaleNotAvailableError,
 } from "../services/houseRulesService.js";
+import {
+  TournamentConflictError,
+  TournamentForbiddenError,
+  TournamentInputError,
+  TournamentNotFoundError,
+} from "../services/tournamentService.js";
 
 export function errorHandler(
   err: unknown,
@@ -54,9 +60,22 @@ export function errorHandler(
   if (
     err instanceof InvalidSessionPlayersError ||
     err instanceof InvalidPlayerNameError ||
-    err instanceof PoolEndgameInputError
+    err instanceof PoolEndgameInputError ||
+    err instanceof TournamentInputError
   ) {
     res.status(400).json({ error: err.message });
+    return;
+  }
+  if (err instanceof TournamentForbiddenError) {
+    res.status(403).json({ error: err.message });
+    return;
+  }
+  if (err instanceof TournamentConflictError) {
+    res.status(409).json({ error: err.message });
+    return;
+  }
+  if (err instanceof TournamentNotFoundError) {
+    res.status(404).json({ error: err.message });
     return;
   }
   if (err instanceof PoolEndgameNotAvailableError) {
