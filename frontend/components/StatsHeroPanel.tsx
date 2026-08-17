@@ -27,14 +27,18 @@ export function StatsHeroPanel({ overview }: Props) {
   } = overview;
 
   return (
-    <section className="stats-hero-panel" aria-label="Statistik-Übersicht">
-      <div className="stats-hero-panel-top">
-        <div className="stats-hero-panel-copy">
-          <p className="stats-hero-panel-kicker">Übersicht</p>
-          <p className="stats-hero-panel-title">{recordTitle}</p>
+    <>
+      <div className="settings-toggle-row">
+        <div className="settings-toggle-row-copy">
+          <p className="settings-toggle-row-title">{recordTitle}</p>
+          <p className="settings-toggle-row-hint">
+            {hasRecord
+              ? `Siegquote ${winShare}% · S ${recordWinsLabel} · N ${recordLossesLabel}`
+              : "Noch keine entschiedenen Spiele"}
+          </p>
         </div>
-        <div className="stats-hero-panel-score-wrap">
-          <strong className="stats-hero-panel-score tabular-nums">{recordSummaryLabel}</strong>
+        <div className="stats-overview-score">
+          <span className="stats-overview-score-value tabular-nums">{recordSummaryLabel}</span>
           <ShareActionBar
             shareSuffix="Bilanz"
             filename="dicebudget-bilanz.png"
@@ -44,18 +48,12 @@ export function StatsHeroPanel({ overview }: Props) {
           />
         </div>
       </div>
-
       {hasRecord && (
-        <div className="stats-hero-panel-track-wrap">
-          <div className="home-hero-record-track stats-hero-panel-track" aria-hidden>
-            <div className="home-hero-record-track-win" style={{ width: `${winShare}%` }} />
-            <div className="home-hero-record-track-loss" style={{ width: `${100 - winShare}%` }} />
-          </div>
-          <p className="stats-hero-panel-winshare tabular-nums">{winShare}% Siegquote</p>
+        <div className="stats-overview-track" aria-hidden>
+          <span className="stats-overview-track-win" style={{ width: `${winShare}%` }} />
         </div>
       )}
-
-      <div className="stats-hero-panel-kpis" aria-label="Kennzahlen">
+      <div className="stats-overview-kpis" aria-label="Kennzahlen">
         <span>
           <strong className="tabular-nums">{pairingCount}</strong>
           {pairingCount === 1 ? "Paarung" : "Paarungen"}
@@ -73,12 +71,6 @@ export function StatsHeroPanel({ overview }: Props) {
           Saison
         </span>
       </div>
-
-      {hasRecord && (
-        <p className="stats-hero-panel-legend tabular-nums" aria-hidden>
-          Siege {recordWinsLabel} · Niederlagen {recordLossesLabel}
-        </p>
-      )}
-    </section>
+    </>
   );
 }

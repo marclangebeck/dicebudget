@@ -7,11 +7,16 @@ import { getPairingSummaries, getStats, hasAdminApiKey, resetPairings } from "@/
 import { subscribeAdminAccess } from "@/lib/adminAccess";
 import type { PairingSummaryDto } from "@/lib/pairingTypes";
 import { mergePairingSummaries, type MergedPairingSummary } from "@/lib/pairingMerge";
-import { playerLabel } from "@/lib/playerIdentity";
 import { PairingAccordionItem } from "@/components/PairingAccordionItem";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
+import { SettingsGroup } from "@/components/settings/SettingsGroup";
+import { SettingsSegmented } from "@/components/settings/SettingsSegmented";
 import { StatsHeroPanel } from "@/components/StatsHeroPanel";
-import { getOrCreatePlayerId, normalizePublicPlayerId } from "@/lib/playerIdentity";
+import {
+  getOrCreatePlayerId,
+  normalizePublicPlayerId,
+  playerLabel,
+} from "@/lib/playerIdentity";
 import {
   loadDisplayNames,
   loadRivalProfiles,
@@ -51,7 +56,7 @@ import { useForegroundRefresh } from "@/lib/useForegroundRefresh";
 const SORT_OPTIONS: { id: PairingSortMode; label: string }[] = [
   { id: "recent", label: "Zuletzt" },
   { id: "closest", label: "Engste" },
-  { id: "mostRounds", label: "Meiste Runden" },
+  { id: "mostRounds", label: "Meiste" },
 ];
 
 function StatsPageInner() {
@@ -79,7 +84,6 @@ function StatsPageInner() {
   const [hiddenKeys, setHiddenKeys] = useState<Set<string>>(() => new Set());
   const [sortMode, setSortMode] = useState<PairingSortMode>("recent");
   const [detailReloadToken, setDetailReloadToken] = useState(0);
-  const [toolsOpen, setToolsOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -370,242 +374,209 @@ function StatsPageInner() {
   }, [manuallyHiddenCount]);
 
   return (
-    <div className="stats-screen flex flex-col gap-2.5 pb-2">
+    <div className="settings-screen">
       <AppScreenHeader
         section="Statistik"
         title="Deine Duelle"
-        subtitle="Bilanz und Paarungen — aufklappen für Details und Foto"
+        subtitle="Bilanz und Paarungen — aufklappen für Foto und Details"
       />
 
-      <p className="stats-foreign-filter-note">
-        Namen kommen vom Server. Fotos bleiben nur auf diesem Gerät.{" "}
-        {isAdmin
-          ? "Als Admin: Siege/Diff und „Server bereinigen“ gelten für alle Geräte. „Hier ausblenden“ nur lokal."
-          : "Gemeinsame Zahlen kommen vom Server; Bereinigen und Siege nachtragen nur der Admin. „Hier ausblenden“ nur auf diesem Gerät."}
-      </p>
+      <div className="settings-list">
+        {(ownPairings.length > 0 || loading) && (
+          <SettingsGroup title="Übersicht">
+            {!loading && !error && ownPairings.length > 0 ? (
+              <>
+                <StatsHeroPanel overview={overview} />
+                <p className="settings-group-caption settings-group-pad" style={{ paddingTop: 0 }}>
+                  Namen vom Server, Fotos nur auf diesem Gerät.
+                  {foreignPairingCount > 0
+                    ? ` ${foreignPairingCount === 1 ? "1 Paarung ohne dich ist" : `${foreignPairingCount} Paarungen ohne dich sind`} nur hier ausgeblendet.`
+                    : ""}
+                  {!canFilterOwn && mergedPairings.length > 0
+                    ? " Fremde Paarungen bleiben sichtbar, bis du in einem davon mitspielst."
+                    : ""}
+                </p>
+              </>
+            ) : (
+              <p className="settings-group-pad settings-toggle-row-hint">
+                {loading ? "Lade …" : "Noch keine Übersicht."}
+              </p>
+            )}
+          </SettingsGroup>
+        )}
 
-      {isAdmin && (
-        <p className="glass-alert-success px-3 py-2 text-xs leading-snug">
-          <strong>Admin-Workflow (Stufe 0):</strong> Globale Korrektur über{" "}
-          <strong>Verwalten → Auswählen</strong> und dann{" "}
-          <strong>Löschen · Server</strong> oder Paarung tippen → Siege/Diff.
-          „Ausblenden“ nie für Sync nutzen.
-        </p>
-      )}
+        {error && (
+          <p className="glass-alert-error px-3 py-2 text-sm" role="alert">
+            {error}
+          </p>
+        )}
 
-      {foreignPairingCount > 0 && (
-        <p className="stats-foreign-filter-note">
-          {foreignPairingCount === 1
-            ? "1 Paarung ohne dich ist nur hier ausgeblendet."
-            : `${foreignPairingCount} Paarungen ohne dich sind nur hier ausgeblendet.`}
-        </p>
-      )}
+        {deleteNotice && (
+          <p className="glass-alert-success px-3 py-2 text-sm">{deleteNotice}</p>
+        )}
 
-      {!loading && !error && !canFilterOwn && mergedPairings.length > 0 && (
-        <p className="stats-foreign-filter-note">
-          Fremde Paarungen bleiben sichtbar, bis du in einem davon mitspielst.
-        </p>
-      )}
+        {!loading && !error && ownPairings.length > 0 && (
+          <SettingsGroup title="Sortierung">
+            <div className="settings-group-pad">
+              <SettingsSegmented
+                ariaLabel="Paarungen sortieren"
+                value={sortMode}
+                onChange={(value) => setSortMode(value as PairingSortMode)}
+                options={SORT_OPTIONS.map((option) => ({
+                  value: option.id,
+                  label: option.label,
+                }))}
+              />
+            </div>
+          </SettingsGroup>
+        )}
 
-      {!loading && !error && ownPairings.length > 0 && (
-        <StatsHeroPanel overview={overview} />
-      )}
-
-      {error && <p className="glass-alert-error px-3 py-2 text-sm">{error}</p>}
-
-      {deleteNotice && (
-        <p className="glass-alert-success px-3 py-2 text-sm">{deleteNotice}</p>
-      )}
-
-      {!loading && !error && (ownPairings.length > 0 || manuallyHiddenCount > 0) && (
-        <>
-          {ownPairings.length > 0 && (
-            <div className="stats-sort-row" role="toolbar" aria-label="Paarungen sortieren">
-              {SORT_OPTIONS.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  className={`stats-sort-chip${sortMode === option.id ? " stats-sort-chip--active" : ""}`}
-                  aria-pressed={sortMode === option.id}
-                  onClick={() => setSortMode(option.id)}
+        <SettingsGroup title="Duelle">
+          {loading && !error && (
+            <p className="settings-group-pad settings-toggle-row-hint">Lade Paarungen …</p>
+          )}
+          {!loading && !error && ownPairings.length === 0 && (
+            <div className="settings-group-pad">
+              <p className="settings-toggle-row-hint">
+                {manuallyHiddenCount > 0
+                  ? "Keine sichtbaren Paarungen. Unter Verwalten kannst du Ausgeblendete wieder anzeigen."
+                  : "Noch keine Paarungen. Spiele mindestens eine Multiplayer-Runde zu Ende."}
+              </p>
+              {manuallyHiddenCount === 0 && (
+                <Link
+                  href="/multi"
+                  className="glass-button mt-2 inline-flex min-h-10 w-full items-center justify-center px-4 text-sm font-semibold no-underline"
                 >
-                  {option.label}
-                </button>
-              ))}
+                  Multi starten
+                </Link>
+              )}
             </div>
           )}
+          {!loading && ownPairings.length > 0 && (
+            <ul className="stats-pairing-list stats-pairing-list--grouped">
+              {sortedPairings.map((pairing) => {
+                const highlight = getPairingHighlight(pairing, ownPlayerId, featuredKey);
+                return (
+                  <PairingAccordionItem
+                    key={pairing.key}
+                    pairing={pairing}
+                    ownPlayerId={ownPlayerId}
+                    aliases={displayAliases}
+                    mergeAliases={aliases}
+                    open={openKeys.has(pairing.key)}
+                    onToggle={() => toggleOpen(pairing.key)}
+                    onEditPairing={
+                      selectMode || !isAdmin ? undefined : setEditingPairing
+                    }
+                    selectable={selectMode}
+                    selected={selectedKeys.has(pairing.key)}
+                    onToggleSelect={() => toggleSelected(pairing.key)}
+                    badge={highlight.badge}
+                    badgeTone={highlight.tone}
+                    featured={highlight.featured}
+                    duelShareA={duelWinShare(pairing)}
+                    reloadToken={detailReloadToken}
+                  />
+                );
+              })}
+            </ul>
+          )}
+        </SettingsGroup>
 
-          <div className="stats-tools">
-            <button
-              type="button"
-              className={`stats-tools-toggle${toolsOpen || selectMode ? " is-open" : ""}`}
-              aria-expanded={toolsOpen || selectMode}
-              onClick={() => {
-                if (selectMode) {
-                  exitSelectMode();
-                  setToolsOpen(false);
-                  return;
-                }
-                setToolsOpen((open) => !open);
-              }}
-            >
-              <span>Verwalten</span>
-              <span className="stats-tools-toggle-chevron" aria-hidden>
-                {toolsOpen || selectMode ? "▾" : "▸"}
-              </span>
-            </button>
-
-            {(toolsOpen || selectMode) && (
-              <div className="stats-tools-panel" role="group" aria-label="Statistik verwalten">
-                {!selectMode ? (
-                  <>
-                    {ownPairings.length > 0 && (
-                      <>
-                        <button
-                          type="button"
-                          className="btn-chip px-3 py-1.5 text-xs"
-                          onClick={() => {
-                            setDeleteNotice(null);
-                            void refreshPairings({ quiet: true });
-                            setDeleteNotice("Statistik aktualisiert.");
-                          }}
-                        >
-                          Aktualisieren
-                        </button>
-                        <button
-                          type="button"
-                          className="btn-chip px-3 py-1.5 text-xs"
-                          onClick={() => {
-                            setDeleteNotice(null);
-                            setSelectMode(true);
-                          }}
-                        >
-                          {isAdmin ? "Auswählen · korrigieren / löschen" : "Paarungen auswählen"}
-                        </button>
-                      </>
-                    )}
-                    {manuallyHiddenCount > 0 && (
+        {(ownPairings.length > 0 || manuallyHiddenCount > 0) && (
+          <SettingsGroup title="Verwalten">
+            <div className="settings-group-pad">
+              <p className="settings-toggle-row-hint">
+                {isAdmin
+                  ? "Aktualisieren, auswählen, Server löschen oder hier ausblenden."
+                  : "Aktualisieren oder auf diesem Gerät ausblenden. Endgültig für alle nur der Admin."}
+              </p>
+              {!selectMode ? (
+                <div className="stats-manage-actions">
+                  {ownPairings.length > 0 && (
+                    <>
                       <button
                         type="button"
-                        className="btn-chip px-3 py-1.5 text-xs"
-                        onClick={handleRestoreHidden}
+                        className="glass-button min-h-10 flex-1 px-3 text-xs font-semibold"
+                        onClick={() => {
+                          setDeleteNotice(null);
+                          void refreshPairings({ quiet: true });
+                          setDeleteNotice("Statistik aktualisiert.");
+                        }}
                       >
-                        {manuallyHiddenCount === 1
-                          ? "1 ausgeblendete wieder anzeigen"
-                          : `${manuallyHiddenCount} ausgeblendete wieder anzeigen`}
+                        Aktualisieren
                       </button>
-                    )}
-                    {ownPairings.length === 0 && manuallyHiddenCount === 0 && (
-                      <p className="stats-foreign-filter-note mb-0">Keine Aktionen verfügbar.</p>
-                    )}
-                  </>
-                ) : (
-                  <>
+                      <button
+                        type="button"
+                        className="glass-button min-h-10 flex-1 px-3 text-xs font-semibold"
+                        onClick={() => {
+                          setDeleteNotice(null);
+                          setSelectMode(true);
+                        }}
+                      >
+                        Auswählen
+                      </button>
+                    </>
+                  )}
+                  {manuallyHiddenCount > 0 && (
+                    <button
+                      type="button"
+                      className="glass-button min-h-10 w-full px-3 text-xs font-semibold"
+                      onClick={handleRestoreHidden}
+                    >
+                      {manuallyHiddenCount === 1
+                        ? "1 ausgeblendete wieder anzeigen"
+                        : `${manuallyHiddenCount} ausgeblendete wieder anzeigen`}
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <p className="settings-toggle-row-hint mt-2">
+                    {isAdmin
+                      ? "Paarung(en) anhaken. Server-Löschen gilt für alle Geräte. Ausblenden nur hier."
+                      : "Ausblenden gilt nur auf diesem Gerät."}
+                  </p>
+                  <div className="stats-manage-actions">
                     {isAdmin && (
                       <button
                         type="button"
-                        className="btn-danger px-3 py-1.5 text-xs"
+                        className="glass-button min-h-10 flex-1 px-3 text-xs font-semibold disabled:opacity-50"
                         disabled={selectedKeys.size === 0 || deleting}
                         onClick={() => void handleServerResetSelected()}
                       >
                         {deleting
                           ? "Löschen …"
-                          : `Löschen · Server, alle Geräte (${selectedKeys.size})`}
+                          : `Server (${selectedKeys.size})`}
                       </button>
                     )}
                     <button
                       type="button"
-                      className="btn-chip px-3 py-1.5 text-xs"
+                      className="glass-button min-h-10 flex-1 px-3 text-xs font-semibold disabled:opacity-50"
                       disabled={selectedKeys.size === 0 || deleting}
                       onClick={handleDeleteSelected}
                     >
                       {deleting
-                        ? "Wird ausgeblendet …"
-                        : `Ausblenden · nur dieses Gerät (${selectedKeys.size})`}
+                        ? "…"
+                        : `Ausblenden (${selectedKeys.size})`}
                     </button>
                     <button
                       type="button"
-                      className="btn-chip px-3 py-1.5 text-xs"
+                      className="glass-button min-h-10 flex-1 px-3 text-xs font-semibold"
                       disabled={deleting}
                       onClick={() => {
                         exitSelectMode();
-                        setToolsOpen(true);
                       }}
                     >
-                      Abbrechen
+                      Fertig
                     </button>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-          {selectMode && (
-            <p className="stats-foreign-filter-note">
-              {isAdmin ? (
-                <>
-                  Paarung(en) anhaken. <strong>Löschen · Server</strong> entfernt sie für alle
-                  Geräte. Oder eine Paarung tippen → Siege/Diff setzen. „Ausblenden“ gilt nur
-                  hier.
-                </>
-              ) : (
-                <>
-                  „Ausblenden“ = nur dieses Handy. Endgültig für alle: Admin →{" "}
-                  <strong>Löschen · Server</strong>.
+                  </div>
                 </>
               )}
-            </p>
-          )}
-        </>
-      )}
-
-      {loading && !error && (
-        <p className="stats-empty-state">Lade Paarungen …</p>
-      )}
-
-      {!loading && !error && ownPairings.length === 0 && (
-        <div className="stats-empty-state stats-empty-state--cta">
-          <p>
-            {manuallyHiddenCount > 0
-              ? "Keine sichtbaren Paarungen. Du kannst ausgeblendete Paarungen wieder anzeigen."
-              : "Noch keine Paarungen. Spiele mindestens eine Multiplayer-Runde zu Ende."}
-          </p>
-          {manuallyHiddenCount === 0 && (
-            <Link href="/multi" className="setup-host-submit mt-3 inline-flex min-h-10 items-center px-4 no-underline">
-              Multi starten
-            </Link>
-          )}
-        </div>
-      )}
-
-      {!loading && ownPairings.length > 0 && (
-        <ul className="stats-pairing-list">
-          {sortedPairings.map((pairing) => {
-            const highlight = getPairingHighlight(pairing, ownPlayerId, featuredKey);
-            return (
-              <PairingAccordionItem
-                key={pairing.key}
-                pairing={pairing}
-                ownPlayerId={ownPlayerId}
-                aliases={displayAliases}
-                mergeAliases={aliases}
-                open={openKeys.has(pairing.key)}
-                onToggle={() => toggleOpen(pairing.key)}
-                onEditPairing={
-                  selectMode || !isAdmin ? undefined : setEditingPairing
-                }
-                selectable={selectMode}
-                selected={selectedKeys.has(pairing.key)}
-                onToggleSelect={() => toggleSelected(pairing.key)}
-                badge={highlight.badge}
-                badgeTone={highlight.tone}
-                featured={highlight.featured}
-                duelShareA={duelWinShare(pairing)}
-                reloadToken={detailReloadToken}
-              />
-            );
-          })}
-        </ul>
-      )}
+            </div>
+          </SettingsGroup>
+        )}
+      </div>
 
       {editingPairing && (
         <PairingEditOverlay
@@ -627,7 +598,7 @@ function StatsPageInner() {
 
 export default function StatsPage() {
   return (
-    <Suspense fallback={<p className="stats-empty-state">Lade Paarungen …</p>}>
+    <Suspense fallback={<p className="settings-toggle-row-hint px-3">Lade Paarungen …</p>}>
       <StatsPageInner />
     </Suspense>
   );

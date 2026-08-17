@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**HEAD:** siehe `git log -1` (QR vom Zettel, Feldnamen größer)  
+**HEAD:** siehe `git log -1` (Statistik-Layout wie Spielregeln)  
 **Sprache:** Deutsch  
 **Stand Doku:** 2026-08-17
 
@@ -29,7 +29,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 | Bereich | Status |
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
-| Branch | `milestone-22-prep` @ Tip (Tournament-Setup-Config) |
+| Branch | `milestone-22-prep` @ Tip (Statistik-Layout wie Spielregeln) |
 | Frontend-Tests | **121** grün |
 | Roadmap | **M42/M43** + **Multi-QR** umgesetzt; **M30** danach; Turnier = Planung `docs/tournament/` |
 | Entwickler-Vorschau | **InApp-Käufe (Features)** = Labs-PIN (`NEXT_PUBLIC_LABS_PIN`) — getrennt von Admin |
@@ -62,6 +62,12 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 - Nach Pull mit neuen npm-Deps: `npm install` vor `build:ios`.
 
 ## Letzte Produktänderungen
+
+### Statistik-Layout — 2026-08-17
+
+- `/stats` nutzt dieselben Gruppen wie Spielregeln (`settings-screen` + `SettingsGroup`).
+- Übersicht (Bilanz + KPIs + Teilen), Sortierung als Segment, Duelle in einer Panel-Karte, Verwalten unten.
+- Inhalt/API unverändert.
 
 ### Spielername (Server) — 2026-08-17
 

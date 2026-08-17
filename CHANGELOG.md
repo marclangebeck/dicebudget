@@ -29,6 +29,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Paarungs-Detail-Karten:** Bild oben volle Breite / halbe Höhe, Infos darunter — persönlichere Rivalen-Ansicht
 
 ### Changed
+- **Statistik wie Spielregeln:** gleicher Screen-Hintergrund, flache Gruppen Übersicht / Sortierung (Zuletzt · Engste · Meiste) / Duelle / Verwalten statt Hero-Karte und Chip-Leiste
 - **Zettel-Feldnamen größer:** 1er–Chance lesbarer; kleine Alle-Fünfe-Würfel liegen overlay und schieben die Zeile nicht
 - **Einstellungen dichter:** flache Gruppen statt Accordion; Segment **Klassisch | Strategy**; kompakte Toggle-/Stepper-Zeilen; Labs unten
 - **Keine Rivalen-Verwaltung mehr:** Namen vom Server; ✏️-Aliase, Menü „Rivalen verwalten“ und „Das bin ich“-UI entfernt. Fotos lokal in der Statistik.

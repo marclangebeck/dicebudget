@@ -6868,124 +6868,102 @@ html.zoomable-route.legal-route .legal-page-scroll {
   text-align: center;
 }
 
-.stats-hero-panel {
-  position: relative;
-  isolation: isolate;
+.stats-overview-score {
   display: flex;
-  flex-direction: column;
-  gap: 0.42rem;
-  overflow: hidden;
-  border-radius: 1rem;
-  border: 1px solid rgba(214, 168, 90, 0.28);
-  padding: 0.62rem 0.72rem 0.58rem;
-  color: #f8fafc;
-  background:
-    radial-gradient(circle at 16% 0%, rgba(214, 168, 90, 0.24), transparent 42%),
-    linear-gradient(145deg, #171d25 0%, #2d261f 48%, #111827 100%);
-  box-shadow:
-    0 14px 30px -22px rgba(0, 0, 0, 0.82),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
-}
-
-.stats-hero-panel-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.55rem;
-}
-
-.stats-hero-panel-kicker {
-  margin: 0;
-  font-size: 0.52rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: rgba(214, 168, 90, 0.88);
-}
-
-.stats-hero-panel-title {
-  margin: 0.12rem 0 0;
-  font-size: 0.82rem;
-  font-weight: 750;
-  line-height: 1.15;
-  color: #f8fafc;
-}
-
-.stats-hero-panel-score-wrap {
-  display: flex;
-  flex-shrink: 0;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
+  flex-shrink: 0;
 }
 
-.stats-hero-panel-score {
-  font-size: 1.45rem;
-  font-weight: 900;
-  line-height: 1;
+.stats-overview-score-value {
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 850;
   letter-spacing: -0.03em;
-  color: #ffffff;
-  text-shadow: 0 0 16px rgba(214, 168, 90, 0.22);
 }
 
-.stats-hero-panel-track-wrap {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
+.stats-overview-track {
+  height: 0.28rem;
+  margin: 0 0.75rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(248, 113, 113, 0.35);
 }
 
-.stats-hero-panel-track {
-  flex: 1 1 0;
-  min-width: 0;
+.stats-overview-track-win {
+  display: block;
+  height: 100%;
+  background: rgba(52, 211, 153, 0.85);
 }
 
-.stats-hero-panel-winshare {
-  margin: 0;
-  flex-shrink: 0;
-  font-size: 0.58rem;
-  font-weight: 750;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: rgba(226, 232, 240, 0.78);
-}
-
-.stats-hero-panel-kpis {
+.stats-overview-kpis {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.32rem;
+  gap: 0.35rem;
+  padding: 0.55rem 0.75rem 0.7rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.stats-hero-panel-kpis span {
+.stats-overview-kpis span {
   display: flex;
   min-width: 0;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.62rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.06);
-  padding: 0.28rem 0.2rem;
-  color: rgba(203, 213, 225, 0.82);
-  font-size: 0.48rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  line-height: 1.15;
-  text-align: center;
-  text-transform: uppercase;
-}
-
-.stats-hero-panel-kpis strong {
-  color: #ffffff;
-  font-size: 0.72rem;
-  font-weight: 850;
-  letter-spacing: -0.02em;
-  text-transform: none;
-}
-
-.stats-hero-panel-legend {
-  margin: 0;
-  font-size: 0.56rem;
+  gap: 0.12rem;
   color: rgba(148, 163, 184, 0.82);
-  text-align: center;
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.stats-overview-kpis strong {
+  color: rgba(248, 250, 252, 0.96);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.stats-manage-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+}
+
+.stats-pairing-list--grouped {
+  gap: 0;
+}
+
+.settings-screen .stats-pairing-list--grouped .stats-section {
+  border-radius: 0;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: transparent;
+  box-shadow: none;
+}
+
+.settings-screen .stats-pairing-list--grouped .stats-section-trigger {
+  padding: 0.55rem 0.75rem 0.6rem;
+}
+
+.settings-screen .stats-pairing-list--grouped > li:first-child .stats-section {
+  border-top: none;
+}
+
+.settings-screen .stats-section--featured {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.settings-screen .stats-section--selected {
+  background: rgba(248, 113, 113, 0.1);
+}
+
+.settings-screen .stats-section-trigger-chevron {
+  border-right-color: rgba(203, 213, 225, 0.52);
+  border-bottom-color: rgba(203, 213, 225, 0.52);
+}
+
+.settings-screen .stats-empty-state {
+  border: none;
+  background: transparent;
+  color: rgba(148, 163, 184, 0.82);
 }
 
 .stats-sort-row {

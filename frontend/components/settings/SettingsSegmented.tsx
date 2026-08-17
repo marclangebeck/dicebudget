@@ -14,7 +14,12 @@ type Props = {
 
 export function SettingsSegmented({ options, value, onChange, ariaLabel }: Props) {
   return (
-    <div className="settings-segmented" role="radiogroup" aria-label={ariaLabel}>
+    <div
+      className="settings-segmented"
+      role="radiogroup"
+      aria-label={ariaLabel}
+      style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
+    >
       {options.map((option) => {
         const selected = option.value === value;
         return (
