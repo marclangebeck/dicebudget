@@ -24,7 +24,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Paarungs-Detail-Karten:** Bild oben volle Breite / halbe Höhe, Infos darunter — persönlichere Rivalen-Ansicht
 
 ### Changed
-- **DBT Startscreen:** „Name des Events“ (Format Liga/Turnier kommt danach)
+- **Spielzettel-Zahlen:** Eintragsfelder und Summen größer (an Zellenhöhe gekoppelt, Abstand zum Rand); Solo und Multi inkl. Tischmodus
 - **Startscreen:** Beitritts-Button heißt „Turnier/Liga beitreten“ (weiterhin Demnächst / ohne Funktion)
 - **Tournament Host:** Liga und Turnier beide wählbar; nach Größe getrennte Zweige (`/setup/league` · `/setup/turnier`); Spieler-App bleibt nur Join
 - **Tournament Host Setup (Anlegen):** Kurzcheck legt Ereignis per API an → Lobby mit QR; Draft wird geleert

@@ -274,7 +274,7 @@ function ScoreTile({
           ? `${label}: ${field.score} Punkte · ${field.rollsUsed} Würfe – tippen zum Korrigieren`
           : previewTitle ?? `${label} – tippen zum Eintragen`
       }
-      className={`play-cell flex h-full min-h-[1.9rem] w-full items-center justify-center text-[11px] font-semibold tabular-nums md:min-h-[1.6rem] md:text-[10px] ${
+      className={`play-cell flex h-full min-h-[1.9rem] w-full items-center justify-center tabular-nums md:min-h-[1.6rem] ${
         done
           ? "play-cell--done"
           : isActive
@@ -327,7 +327,7 @@ function SummaryTile({
 
   return (
     <div
-      className={`play-summary flex h-full min-h-[2.2rem] w-full flex-col items-center justify-center px-0.5 text-[11px] tabular-nums md:min-h-[1.9rem] md:text-[10px] ${
+      className={`play-summary flex h-full min-h-[2.2rem] w-full flex-col items-center justify-center px-0.5 tabular-nums md:min-h-[1.9rem] ${
         highlight ? "play-summary--highlight" : ""
       } ${
         isErgebnis1 ? "play-summary--ergebnis1" : ""
