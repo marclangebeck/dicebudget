@@ -30,6 +30,8 @@ import {
 } from "@/lib/statsPairingInsights";
 import type { StatsDto } from "@/lib/statsTypes";
 import type { PlayerAliasMap } from "@/lib/playerAliases";
+import { playerIdsFromPairings } from "@/lib/displayNameMerge";
+import { useMergedDisplayNames } from "@/lib/useMergedDisplayNames";
 import {
   canFilterPairingsByOwnPlayer,
   clearHiddenPairingKeys,
@@ -61,6 +63,7 @@ function StatsPageInner() {
   const [stats, setStats] = useState<StatsDto | null>(null);
   const [ownPlayerId, setOwnPlayerId] = useState("");
   const [aliases, setAliases] = useState<PlayerAliasMap>({});
+  const displayAliases = useMergedDisplayNames(playerIdsFromPairings(pairings));
   const [rivalProfiles, setRivalProfiles] = useState<RivalProfile[]>([]);
   const [selfProfileId, setSelfProfileId] = useState<string | null>(null);
   const [editingPlayerId, setEditingPlayerId] = useState<string | null>(null);
@@ -258,10 +261,10 @@ function StatsPageInner() {
     const labels = chosen
       .map(
         (p) =>
-          `${playerLabel(p.playerA, ownPlayerId, aliases)} vs. ${playerLabel(
+          `${playerLabel(p.playerA, ownPlayerId, displayAliases)} vs. ${playerLabel(
             p.playerB,
             ownPlayerId,
-            aliases,
+            displayAliases,
           )}`,
       )
       .join("\n");
@@ -301,7 +304,7 @@ function StatsPageInner() {
     } finally {
       setDeleting(false);
     }
-  }, [ownPairings, selectedKeys, ownPlayerId, aliases, exitSelectMode, isAdmin]);
+  }, [ownPairings, selectedKeys, ownPlayerId, displayAliases, exitSelectMode, isAdmin]);
 
   const handleServerResetSelected = useCallback(async () => {
     if (!isAdmin) return;
@@ -310,10 +313,10 @@ function StatsPageInner() {
     const labels = chosen
       .map(
         (p) =>
-          `${playerLabel(p.playerA, ownPlayerId, aliases)} vs. ${playerLabel(
+          `${playerLabel(p.playerA, ownPlayerId, displayAliases)} vs. ${playerLabel(
             p.playerB,
             ownPlayerId,
-            aliases,
+            displayAliases,
           )}`,
       )
       .join("\n");
@@ -352,7 +355,7 @@ function StatsPageInner() {
     ownPairings,
     selectedKeys,
     ownPlayerId,
-    aliases,
+    displayAliases,
     exitSelectMode,
     refreshPairings,
   ]);
@@ -589,7 +592,8 @@ function StatsPageInner() {
                 key={pairing.key}
                 pairing={pairing}
                 ownPlayerId={ownPlayerId}
-                aliases={aliases}
+                aliases={displayAliases}
+                mergeAliases={aliases}
                 open={openKeys.has(pairing.key)}
                 onToggle={() => toggleOpen(pairing.key)}
                 onEditPlayerAlias={selectMode ? undefined : setEditingPlayerId}
@@ -614,7 +618,7 @@ function StatsPageInner() {
         <PlayerAliasOverlay
           playerId={editingPlayerId}
           ownPlayerId={ownPlayerId}
-          aliases={aliases}
+          aliases={displayAliases}
           currentAlias={aliases[normalizePublicPlayerId(editingPlayerId)]}
           onClose={() => setEditingPlayerId(null)}
           onSave={(displayNames) => {
@@ -630,7 +634,7 @@ function StatsPageInner() {
           merged={editingPairing.group}
           sourceSummaries={editingPairing.sources}
           ownPlayerId={ownPlayerId}
-          aliases={aliases}
+          aliases={displayAliases}
           onClose={() => setEditingPairing(null)}
           onSaved={() => {
             setEditingPairing(null);

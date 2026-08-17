@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { HouseRuleInfoOverlay } from "@/components/HouseRuleInfoOverlay";
 import { LabsUnlockDialog } from "@/components/LabsUnlockDialog";
+import { PlayerNameSetup } from "@/components/PlayerNameSetup";
 import { SettingsGameActions } from "@/components/settings/SettingsGameActions";
 import { SettingsRangeCard } from "@/components/settings/SettingsRangeCard";
 import { SettingsSection } from "@/components/settings/SettingsSection";
@@ -128,6 +129,8 @@ function SettingsPageInner() {
       />
 
       <div className="settings-list">
+        <PlayerNameSetup variant="settings" onDone={() => undefined} />
+
         <SettingsSection
           id="mode"
           title="Spielmodus"

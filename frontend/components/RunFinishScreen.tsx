@@ -11,7 +11,7 @@ import {
   buildRunFinishShareText,
   renderRunFinishShareImage,
 } from "@/lib/matchResultShare";
-import { loadDisplayNames } from "@/lib/rivalProfiles";
+import { useMergedDisplayNames } from "@/lib/useMergedDisplayNames";
 import { playerLabel } from "@/lib/playerIdentity";
 import { runHasOpenFields } from "@/lib/runUtils";
 import type { SessionLobbyDto } from "@/lib/sessionTypes";
@@ -84,7 +84,11 @@ export function RunFinishScreen({
       })
     : null;
 
-  const aliases = useMemo(() => loadDisplayNames(), []);
+  const extraNameIds = useMemo(
+    () => (lobby?.players ?? []).map((player) => player.playerId),
+    [lobby],
+  );
+  const aliases = useMergedDisplayNames(extraNameIds);
 
   const roundRanking = useMemo(() => {
     if (!lobby || lobby.players.length < 2) return [];

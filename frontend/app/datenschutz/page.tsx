@@ -89,24 +89,38 @@ export default function DatenschutzPage() {
           <p>
             Multiplayer-Daten werden pseudonym verarbeitet. Beim ersten Start
             erzeugt die App lokal eine zufällige Spieler-ID. Auf dem Server
-            speichern wir für Multiplayer keine Klarnamen, sondern nur diese
-            pseudonyme ID sowie Spielwerte (z. B. Punkte, Sieger, Zeitstempel,
-            Einladungscode, geheimer Spieler-Schlüssel).
+            speichern wir diese ID, Spielwerte (z. B. Punkte, Sieger,
+            Zeitstempel, Einladungscode, geheimer Spieler-Schlüssel) und
+            optional einen von dir gewählten Spielernamen (Anzeigename /
+            Nickname).
+          </p>
+          <p>
+            Der Spielername ist kein Konto: Es gibt keine E-Mail-Adresse, kein
+            öffentliches Namensverzeichnis und keinen Foto-Upload. Der Name ist
+            an die Geräte-ID gebunden und wird anderen nur im gemeinsamen
+            Spielkontext gezeigt (Lobby, abgeschlossene gemeinsame Partien und
+            deren Statistik). Du kannst den Namen in den Einstellungen ändern
+            oder vom Server entfernen; Spielstände und Paarungszahlen bleiben
+            davon unberührt.
           </p>
           <p>
             Der geheime Schlüssel (<code>playerSecret</code>) wird in deinem
             App-WebView lokal gespeichert (technisch analog zu{" "}
             <code>sessionStorage</code>) — nicht in einem Konto auf unserer
             Seite. Wechselst du das Gerät, musst du den Raum erneut über den
-            Code betreten.
+            Code betreten. Ein neuer Name auf einem neuen Gerät gehört zu einer
+            neuen Spieler-ID.
           </p>
 
           <h3>4.3 Statistik</h3>
           <p>
             Abgeschlossene Multiplayer-Spiele können in aggregierter Statistik
             erscheinen (z. B. Paarungsvergleiche zwischen pseudonymen
-            Spieler-IDs aus Multiplayer-Runden). Lesbare Anzeigenamen können
-            lokal auf dem Gerät verwaltet werden.
+            Spieler-IDs). Lesbare Namen kommen vom Server-Anzeigenamen und
+            zusätzlich von lokalen Aliasen auf diesem Gerät. Fotos von Rivalen
+            bleiben ausschließlich lokal auf dem Gerät (IndexedDB) und werden
+            nicht hochgeladen. Statistik-Schlüssel ist die Spieler-ID, nicht
+            der Name.
           </p>
 
           <h3>4.4 Technische Daten</h3>
@@ -123,6 +137,8 @@ export default function DatenschutzPage() {
           <ul>
             <li>Kein Verkauf deiner Daten an Dritte</li>
             <li>Keine Werbe-Tracker oder Social-Media-Pixel in der App</li>
+            <li>Kein öffentliches Spieler-Namensverzeichnis</li>
+            <li>Kein Foto-Upload auf unsere Server</li>
             <li>Kein Newsletter und keine Pflicht-E-Mail bei der Nutzung</li>
             <li>Keine standortbasierte Tracking-Profile</li>
           </ul>
@@ -144,7 +160,9 @@ export default function DatenschutzPage() {
             Spiel- und Session-Daten bleiben gespeichert, solange sie für
             laufende oder ausgewertete Partien benötigt werden. Abgeschlossene
             Runs und Statistikwerte können länger gespeichert bleiben, damit
-            Rekorde und Paarungsauswertungen funktionieren. Du kannst uns
+            Rekorde und Paarungsauswertungen funktionieren. Den Spielernamen
+            kannst du selbst ändern oder löschen; ohne Namen fällt die Anzeige
+            auf eine Kurzform der Spieler-ID zurück. Du kannst uns
             unter der oben genannten E-Mail-Adresse um Auskunft oder Löschung
             bitten, soweit keine gesetzlichen Aufbewahrungspflichten
             entgegenstehen.

@@ -278,6 +278,53 @@ body {
   color: #e2e8f0;
 }
 
+.player-name-gate {
+  background: #020617;
+}
+
+.player-name-gate-card {
+  width: 100%;
+  max-width: 20rem;
+  text-align: center;
+}
+
+.player-name-gate-heading {
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: #f8fafc;
+}
+
+.player-name-gate-copy {
+  margin: 0.5rem 0 1.1rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #94a3b8;
+}
+
+.player-name-label {
+  display: block;
+  text-align: left;
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #cbd5e1;
+}
+
+.player-name-gate .glass-input {
+  margin-top: 0.4rem;
+}
+
+.settings-compact-card .player-name-label {
+  color: inherit;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .btn-primary {
   border-radius: 0.85rem;
   border: 1px solid rgba(214, 168, 90, 0.44);

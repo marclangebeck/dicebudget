@@ -3,9 +3,9 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**HEAD:** `faf721b` (Host-Einladung nur QR + Lobby)  
+**HEAD:** siehe `git log -1` (Spielername Server)  
 **Sprache:** Deutsch  
-**Stand Doku:** 2026-08-15
+**Stand Doku:** 2026-08-17
 
 Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Aktiver Stand: `docs/milestones_active.md`. iOS/TestFlight: `docs/ios_current.md`. Architektur/Betrieb: `docs/decisions.md` nur bei Bedarf. **Produktfamilie (3 Apps):** `docs/tournament/products.md`. Event-Host: `docs/tournament/` — DiceBudget-Kern unantastbar.
 
@@ -20,7 +20,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 - Mac-Clone: `/Users/marclangebeck/projects/kniffel` (auch `~/projects/kniffel`).
 - Reine Frontend-Änderungen: `cd frontend && npm run build` auf dem Server; Nginx liefert `frontend/out/` aus.
 - **Events:** drei Apps — **DiceBudget** (Pro), **DiceBudget Tournament** (Host), **DiceBudget GO** (nur Teilnahme, geplant). Quelle: `docs/tournament/products.md`. DiceBudget-Kern unantastbar; Events nur additiv. Hosten nur Tournament.
-- **Spielername:** Beschluss in `docs/decisions.md` — einmal nach der Sanduhr, Server an `playerId`; bestehende Spielstände unverändert; Fotos lokal. Noch nicht im Code.
+- **Spielername:** einmal nach der Sanduhr, Server an `playerId` (`/player-names/display`). Overlay nur Anzeige — kein Stats-Merge. Fotos lokal. Backend-Deploy nötig (Migration).
 
 ## Aktueller Stand
 
@@ -28,12 +28,12 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
 | Branch | `milestone-22-prep` @ Tip `faf721b` |
-| Frontend-Tests | **105** grün |
+| Frontend-Tests | **116** grün |
 | Roadmap | **M42/M43** + **Multi-QR** umgesetzt; **M30** danach; Turnier = Planung `docs/tournament/` |
 | Entwickler-Vorschau | **InApp-Käufe (Features)** = Labs-PIN (`NEXT_PUBLIC_LABS_PIN`) — getrennt von Admin |
 | iOS/TestFlight | Version `2.0`; Deployment Target **15.0**; frischer Archive-Build 2026-08-15 (QR-Scan + Host-QR) |
 | Tournament | T2 Host `apps/tournament` + T1 API; Setup-Wizard; Join in Pro-App = T3; **GO** geplant (`docs/tournament/products.md`) |
-| Backend Prod | Migrationen inkl. Tournaments — Deploy bei Backend-Änderungen |
+| Backend Prod | Migrationen inkl. Tournaments + **player_display_names** — Deploy bei Backend-Änderungen |
 
 ## Multi-Beitritt (QR only) — Stand 2026-08-15
 
@@ -60,6 +60,13 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 - Nach Pull mit neuen npm-Deps: `npm install` vor `build:ios`.
 
 ## Letzte Produktänderungen
+
+### Spielername (Server) — 2026-08-17
+
+- Einmal nach der Sanduhr; Speichern per `PUT /player-names/display` (`X-Name-Token` bei Updates).
+- Lobby/Statistik/Finish zeigen Server-Namen als Overlay. `mergePairingSummaries` bleibt bei lokalen Aliasen.
+- Ändern/Löschen unter Einstellungen. Fotos nur lokal.
+- Datenschutz `/datenschutz` §§4.2–4.3. Prod braucht Backend-Deploy (Migration `player_display_names`).
 
 ### Multi-QR + Scan — 2026-08-15 (`9bbd3b3` … `faf721b`)
 
@@ -118,7 +125,7 @@ Regeln: Nach Auftrag automatisch commit + push (AGENT_RULES §9). Kein sudo. Kei
 
 Hart: DiceBudget-Kern unantastbar. Drei Apps: DiceBudget (Pro), Tournament (Host), GO (nur Event-Teilnahme, geplant). Events nur additiv. Quelle: docs/tournament/products.md.
 
-Stand 2026-08-17: Host-Setup (Event-Name → Liga/Turnier → Größe → Anlegen → Lobby/QR). Pro-App-Button „Turnier/Liga beitreten“ noch Demnächst. GO noch nicht im Code. M42/M43, Multi-QR erledigt. M30 App Store bleibt DiceBudget-Track.
+Stand 2026-08-17: Spielername nach Sanduhr (Server an playerId, Overlay ohne Stats-Merge). Host-Setup (Event-Name → Liga/Turnier → Größe → Anlegen → Lobby/QR). Pro-App-Button „Turnier/Liga beitreten“ noch Demnächst. GO noch nicht im Code. M42/M43, Multi-QR erledigt. M30 App Store bleibt DiceBudget-Track.
 
 Antworten auf Deutsch. Kleine Inkremente, vor größeren Features Nutzer-GO einholen.
 ```

@@ -33,6 +33,10 @@ import {
   SessionNotReadyError,
 } from "../services/sessionService.js";
 import {
+  DisplayNameForbiddenError,
+  InvalidDisplayNameError,
+} from "../services/playerDisplayNames.js";
+import {
   InvalidPlayerNameMergeError,
   PlayerNameAliasNotFoundError,
 } from "../services/playerNames.js";
@@ -61,12 +65,13 @@ export function errorHandler(
     err instanceof InvalidSessionPlayersError ||
     err instanceof InvalidPlayerNameError ||
     err instanceof PoolEndgameInputError ||
-    err instanceof TournamentInputError
+    err instanceof TournamentInputError ||
+    err instanceof InvalidDisplayNameError
   ) {
     res.status(400).json({ error: err.message });
     return;
   }
-  if (err instanceof TournamentForbiddenError) {
+  if (err instanceof TournamentForbiddenError || err instanceof DisplayNameForbiddenError) {
     res.status(403).json({ error: err.message });
     return;
   }

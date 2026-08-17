@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { JoinByQrScan } from "@/components/JoinByQrScan";
@@ -12,6 +12,7 @@ import { loadDisplayNames } from "@/lib/rivalProfiles";
 import type { PlayerAliasMap } from "@/lib/playerAliases";
 import { PlayerAliasOverlay } from "@/components/PlayerAliasOverlay";
 import { normalizePublicPlayerId, getOrCreatePlayerId, playerLabel } from "@/lib/playerIdentity";
+import { useMergedDisplayNames } from "@/lib/useMergedDisplayNames";
 
 function MultiJoinInner() {
   const router = useRouter();
@@ -23,6 +24,15 @@ function MultiJoinInner() {
   const [tab, setTab] = useState<"lobby" | "rank">("lobby");
   const [playerId, setPlayerId] = useState("");
   const [aliases, setAliases] = useState<PlayerAliasMap>({});
+  const extraNameIds = useMemo(() => {
+    const ids = new Set<string>();
+    if (playerId) ids.add(playerId);
+    for (const p of lobby?.players ?? []) ids.add(p.playerId);
+    for (const row of ranking?.ranking ?? []) ids.add(row.playerId);
+    if (ranking?.winner?.playerId) ids.add(ranking.winner.playerId);
+    return [...ids];
+  }, [playerId, lobby, ranking]);
+  const displayAliases = useMergedDisplayNames(extraNameIds);
   const [editingPlayerId, setEditingPlayerId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
@@ -194,7 +204,7 @@ function MultiJoinInner() {
                     className="join-player-row"
                   >
                     <span className="flex items-center gap-2">
-                      {playerLabel(p.playerId, playerId, aliases)}
+                      {playerLabel(p.playerId, playerId, displayAliases)}
                       <button
                         type="button"
                         className="btn-chip px-2 py-0.5 text-xs"
@@ -215,7 +225,7 @@ function MultiJoinInner() {
                 <form onSubmit={(e) => void handleJoin(e)} className="join-action-card">
                   <p className="text-secondary text-sm">
                     Du trittst pseudonym bei als{" "}
-                    <strong className="text-strong">{playerLabel(playerId, playerId, aliases)}</strong>.
+                    <strong className="text-strong">{playerLabel(playerId, playerId, displayAliases)}</strong>.
                   </p>
                   <button
                     type="submit"
@@ -238,7 +248,7 @@ function MultiJoinInner() {
               {ranking.winner && ranking.allRunsFinished && (
                 <div className="join-winner-card">
                   <p className="text-accent font-semibold">
-                    Gewinner Runde {ranking.roundNumber}: {playerLabel(ranking.winner.playerId, playerId, aliases)} (
+                    Gewinner Runde {ranking.roundNumber}: {playerLabel(ranking.winner.playerId, playerId, displayAliases)} (
                     {ranking.winner.totalScore} Punkte)
                   </p>
                   <p className="text-muted mt-1 text-xs">
@@ -257,7 +267,7 @@ function MultiJoinInner() {
                     >
                       <span>
                         <span className="mr-2 text-slate-500">{row.rank}.</span>
-                        {playerLabel(row.playerId, playerId, aliases)}
+                        {playerLabel(row.playerId, playerId, displayAliases)}
                         <button
                           type="button"
                           className="btn-chip ml-2 px-2 py-0.5 text-xs"
@@ -291,7 +301,7 @@ function MultiJoinInner() {
                       >
                         <span>
                           <span className="mr-2 text-slate-500">{row.rank}.</span>
-                          {playerLabel(row.playerId, playerId, aliases)}
+                          {playerLabel(row.playerId, playerId, displayAliases)}
                           <button
                             type="button"
                             className="btn-chip ml-2 px-2 py-0.5 text-xs"
@@ -334,7 +344,7 @@ function MultiJoinInner() {
         <PlayerAliasOverlay
           playerId={editingPlayerId}
           ownPlayerId={playerId}
-          aliases={aliases}
+          aliases={displayAliases}
           currentAlias={aliases[normalizePublicPlayerId(editingPlayerId)]}
           onClose={() => setEditingPlayerId(null)}
           onSave={(displayNames) => {

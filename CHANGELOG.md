@@ -5,7 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
-- **DiceBudget Tournament (T2):** Host-App-Skelett unter `apps/tournament` (Next.js Export, Port 3022, Bundle `de.bottletrade.dicebudget.tournament`)
+- **Spielername (Server):** einmal nach der Sanduhr; `GET/PUT/DELETE /player-names/display`; Lobby/Statistik zeigen Namen; Settings ändern/löschen; Paarungs-Zahlen unverändert
 - **Tournament API (T1):** `POST/GET /tournaments…`, Join, Start mit `X-Host-Token`; Migration `tournaments` / `tournament_entries`
 - **2×/3× Alle Fünfe — Pool-Gutschrift:** Unter-Toggle unter InApp-Käufe; abgezogene Pools optional dem Erfolgreichen gutgeschrieben (Session-Flags, Default aus)
 - **2× Alle Fünfe Multi n Spieler:** Mitspieler verlieren je 1/n Pool (zu zweit Hälfte wie bisher); Auto auch bei 3+; 3× weiter gesamter Pool
@@ -40,7 +40,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Admin-Zugang:** kein separater Admin-Build mehr nötig; Stats-Admin nur nach PIN + Key (Legacy-Env-Key nur mit PIN, falls PIN gesetzt)
 
 ### Docs
-- **Spielername (Server):** einmal nach der Sanduhr festlegen, an Geraete-`playerId`; Stats-Zahlen unverändert; Fotos lokal — `docs/decisions.md`
+- **Spielername (Server):** umgesetzt — einmal nach der Sanduhr, an Geräte-`playerId`; Datenschutz §§4.2–4.3; Stats-Zahlen unverändert; Fotos lokal — `docs/decisions.md`
 - **Produktfamilie (drei Apps):** `docs/tournament/products.md` — DiceBudget (Pro, 1,49 €), Tournament (Host, 0 €), DiceBudget GO (Teilnahme, 0 €, geplant); Trichter Clubs → Join → Upsell
 - **DiceBudget Tournament:** Produktname Host-App festgelegt; Bundle-Vorschlag `de.bottletrade.dicebudget.tournament`; Docs `docs/tournament/` aktualisiert
 - **Agent-Doku Turnier:** Verweise in `AGENT_RULES`, `HANDOVER` (inkl. Übergabe-Prompt), `milestones.md`, `docs/decisions.md`, `docs/milestones_active.md`, `docs/ios_current.md`, `GOiOS.md`, Root-`README`, `projektbeschreibung.md`, Frontend-/Backend-README, `docs/milestone-roadmap-analysis.md`

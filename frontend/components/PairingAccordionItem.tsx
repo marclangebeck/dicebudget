@@ -14,6 +14,8 @@ type Props = {
   pairing: PairingSummaryDto;
   ownPlayerId: string;
   aliases: PlayerAliasMap;
+  /** Nur für Stats-Merge; ohne Server-Namen. Default: aliases */
+  mergeAliases?: PlayerAliasMap;
   open: boolean;
   onToggle: () => void;
   onEditPlayerAlias?: (playerId: string) => void;
@@ -43,6 +45,7 @@ export function PairingAccordionItem({
   pairing,
   ownPlayerId,
   aliases,
+  mergeAliases,
   open,
   onToggle,
   onEditPlayerAlias,
@@ -82,7 +85,7 @@ export function PairingAccordionItem({
     setDetailLoading(true);
     setDetailError(null);
 
-    void loadMergedPairingDetail(pairing.key, aliases, ownPlayerId)
+    void loadMergedPairingDetail(pairing.key, mergeAliases ?? aliases, ownPlayerId)
       .then((result) => {
         if (cancelled) return;
         setDetail(result);
@@ -101,7 +104,7 @@ export function PairingAccordionItem({
     return () => {
       cancelled = true;
     };
-  }, [open, pairing.key, aliases, ownPlayerId, reloadToken]);
+  }, [open, pairing.key, aliases, mergeAliases, ownPlayerId, reloadToken]);
 
   const showDetail = open && detail && detailKey === pairing.key;
 

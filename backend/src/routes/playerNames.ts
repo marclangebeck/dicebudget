@@ -1,5 +1,11 @@
 import { Router } from "express";
 import { requireAdminKey } from "../middleware/adminAuth.js";
+import { playerDisplayNameLimiter } from "../middleware/rateLimits.js";
+import {
+  deletePlayerDisplayName,
+  listPlayerDisplayNames,
+  upsertPlayerDisplayName,
+} from "../services/playerDisplayNames.js";
 import {
   listPlayerNameAliases,
   mergePlayerNames,
@@ -7,6 +13,41 @@ import {
 } from "../services/playerNames.js";
 
 export const playerNamesRouter = Router();
+
+playerNamesRouter.get("/display", async (req, res, next) => {
+  try {
+    const names = await listPlayerDisplayNames(req.query.ids);
+    res.json({ names });
+  } catch (error) {
+    next(error);
+  }
+});
+
+playerNamesRouter.put("/display", playerDisplayNameLimiter, async (req, res, next) => {
+  try {
+    const headerToken = req.header("X-Name-Token");
+    const result = await upsertPlayerDisplayName({
+      playerId: req.body?.playerId,
+      displayName: req.body?.displayName,
+      nameToken: headerToken || req.body?.nameToken,
+    });
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+playerNamesRouter.delete("/display", playerDisplayNameLimiter, async (req, res, next) => {
+  try {
+    await deletePlayerDisplayName({
+      playerId: req.body?.playerId,
+      nameToken: req.header("X-Name-Token") || req.body?.nameToken,
+    });
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+});
 
 playerNamesRouter.get("/aliases", async (_req, res, next) => {
   try {

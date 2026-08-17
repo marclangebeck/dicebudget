@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { MatchAnalysisView } from "@/components/MatchAnalysisView";
 import { getSessionMatchAnalysis } from "@/lib/api";
 import { loadActiveGame } from "@/lib/activeGame";
-import { loadDisplayNames } from "@/lib/rivalProfiles";
 import type { SessionMatchAnalysisDto } from "@/lib/matchAnalysisTypes";
 import { getOrCreatePlayerId } from "@/lib/playerIdentity";
+import { useMergedDisplayNames } from "@/lib/useMergedDisplayNames";
 
 function formatDateTime(iso: string | null): string {
   if (!iso) return "—";
@@ -52,6 +52,19 @@ function MatchAnalysisInner() {
       .finally(() => setLoading(false));
   }, [invite, perspectiveParam]);
 
+  const extraNameIds = useMemo(() => {
+    if (!analysis) return [];
+    return [
+      analysis.viewerPlayerId,
+      analysis.opponentPlayerId,
+      analysis.viewerName,
+      analysis.opponentName,
+      ...analysis.ranking.map((row) => row.playerId),
+      ...analysis.comparisons.map((row) => row.opponentPlayerId),
+    ].filter((id): id is string => Boolean(id));
+  }, [analysis]);
+  const aliases = useMergedDisplayNames(extraNameIds);
+
   const backHref = pairingKey
     ? `/stats?pairing=${encodeURIComponent(pairingKey)}`
     : "/stats";
@@ -71,7 +84,7 @@ function MatchAnalysisInner() {
         <MatchAnalysisView
           analysis={analysis}
           ownPlayerId={perspectiveParam || getOrCreatePlayerId()}
-          aliases={loadDisplayNames()}
+          aliases={aliases}
           subtitle={
             analysis.finishedAt
               ? `Gespielt am ${formatDateTime(analysis.finishedAt)}`

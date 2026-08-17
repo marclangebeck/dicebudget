@@ -15,6 +15,7 @@ type ApiRequestInit = Omit<RequestInit, "headers"> & {
   headers?: HeadersInit;
   playerSecret?: string;
   adminKey?: string;
+  nameToken?: string;
 };
 
 function getAdminApiKey(): string | undefined {
@@ -27,13 +28,16 @@ export function hasAdminApiKey(): boolean {
 }
 
 async function request<T>(path: string, init?: ApiRequestInit): Promise<T> {
-  const { playerSecret, adminKey, ...fetchRest } = init ?? {};
+  const { playerSecret, adminKey, nameToken, ...fetchRest } = init ?? {};
   const headers = new Headers({ "Content-Type": "application/json" });
   if (init?.headers) {
     new Headers(init.headers).forEach((v, k) => headers.set(k, v));
   }
   if (playerSecret) {
     headers.set("X-Player-Secret", playerSecret);
+  }
+  if (nameToken) {
+    headers.set("X-Name-Token", nameToken);
   }
   const resolvedAdminKey = adminKey ?? getAdminApiKey();
   if (resolvedAdminKey) {
@@ -82,6 +86,9 @@ function translateApiError(message: string | undefined, status: number): string 
     raw.includes("Admin-API nicht konfiguriert")
   ) {
     return "Admin-API nicht konfiguriert (Server ADMIN_API_KEY fehlt).";
+  }
+  if (raw === "Name-Token ungültig" || raw.toLowerCase().includes("name-token")) {
+    return "Spielername konnte nicht geändert werden. Bitte in den Einstellungen neu setzen.";
   }
   return raw || `Anfrage fehlgeschlagen (${status})`;
 }
@@ -377,4 +384,36 @@ export function resolvePoolEndgame(
       playerSecret,
     },
   );
+}
+
+export function getPlayerDisplayNames(playerIds: string[]) {
+  const ids = [...new Set(playerIds.map((id) => id.trim()).filter(Boolean))].slice(0, 64);
+  if (ids.length === 0) {
+    return Promise.resolve({ names: {} as Record<string, string> });
+  }
+  const query = encodeURIComponent(ids.join(","));
+  return request<{ names: Record<string, string> }>(`/player-names/display?ids=${query}`);
+}
+
+export function putPlayerDisplayName(
+  playerId: string,
+  displayName: string,
+  nameToken?: string,
+) {
+  return request<{ playerId: string; displayName: string; nameToken: string }>(
+    "/player-names/display",
+    {
+      method: "PUT",
+      body: JSON.stringify({ playerId, displayName }),
+      nameToken,
+    },
+  );
+}
+
+export function deletePlayerDisplayName(playerId: string, nameToken: string) {
+  return request<Record<string, never>>("/player-names/display", {
+    method: "DELETE",
+    body: JSON.stringify({ playerId }),
+    nameToken,
+  });
 }

@@ -41,3 +41,11 @@ export const joinTournamentLimiter = rateLimit({
   legacyHeaders: false,
   message,
 });
+
+export const playerDisplayNameLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message,
+});

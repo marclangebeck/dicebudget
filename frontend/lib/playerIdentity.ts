@@ -36,11 +36,11 @@ export function playerLabel(
   ownPlayerId?: string,
   aliases?: Record<string, string>,
 ): string {
-  let normalized = normalizePublicPlayerId(playerId);
-  if (normalized.startsWith("legacy:")) normalized = normalized.slice(7);
-  if (ownPlayerId && normalized === ownPlayerId) return "Du";
-  const alias = aliases?.[normalized]?.trim();
+  const normalized = normalizePublicPlayerId(playerId);
+  const stripped = normalized.startsWith("legacy:") ? normalized.slice(7) : normalized;
+  const alias = aliases?.[normalized]?.trim() || aliases?.[stripped]?.trim();
   if (alias) return alias;
+  if (ownPlayerId && normalized === normalizePublicPlayerId(ownPlayerId)) return "Du";
   return `Unbekannt (${shortPlayerId(playerId)})`;
 }
 

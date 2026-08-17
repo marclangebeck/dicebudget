@@ -15,6 +15,7 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 - **Web/iOS ein Build (M43):** Admin per `NEXT_PUBLIC_ADMIN_PIN`; API-Key lokal.
 - Labs (`NEXT_PUBLIC_LABS_PIN`) getrennt von Admin.
 - **Events:** drei Apps — `docs/tournament/products.md`. Dieses Dokument und `frontend` `npm run build:ios` betreffen nur **DiceBudget Pro**. Tournament: `apps/tournament`. GO: geplant. DiceBudget-Kern bleibt unantastbar.
+- **Spielername:** einmal nach Sanduhr; ohne Backend-Deploy in Prod sieht die App den Namen-API-Fehler. iOS-Build nach Pull.
 
 ## Deployment Target
 

@@ -1,5 +1,6 @@
 import type { Viewport } from "next";
 import type { ReactNode } from "react";
+import { PlayerNameGate } from "@/components/PlayerNameGate";
 import { SetupScreenLayout } from "@/components/SetupScreenLayout";
 
 export const viewport: Viewport = {
@@ -12,5 +13,9 @@ export const viewport: Viewport = {
 };
 
 export default function MultiLayout({ children }: { children: ReactNode }) {
-  return <SetupScreenLayout>{children}</SetupScreenLayout>;
+  return (
+    <SetupScreenLayout>
+      <PlayerNameGate>{children}</PlayerNameGate>
+    </SetupScreenLayout>
+  );
 }

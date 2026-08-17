@@ -84,7 +84,7 @@ npm run build
 - Datenschutzseite und App-Store-Privacy **vor dem ersten Release mit Namen** anpassen.
 - Kein Foto-Upload.
 
-**Umsetzung:** erst nach diesem Beschluss, eigener kleiner Milestone; DiceBudget-Kern und bestehende Stats-APIs nicht als Pflicht-Rewrite.
+**Umsetzung (2026-08-17):** `GET/PUT/DELETE /player-names/display`; einmaliger Screen nach der Sanduhr; Overlay nur Anzeige (kein Stats-Merge); Datenschutz §§4.2–4.3. DiceBudget-Kern und bestehende Stats-APIs unverändert.
 
 ## Produktentscheidungen
 
