@@ -8381,7 +8381,214 @@ html.zoomable-route.legal-route .legal-page-scroll {
 .settings-list {
   display: flex;
   flex-direction: column;
+  gap: 0.85rem;
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.settings-group-label {
+  margin: 0;
+  padding: 0 0.15rem;
+  color: rgba(203, 213, 225, 0.72);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.settings-group--labs .settings-group-label {
+  color: rgba(229, 192, 123, 0.78);
+}
+
+.settings-group-panel {
+  display: flex;
+  flex-direction: column;
+  border-radius: 1rem;
+  border: 1px solid var(--settings-card-border);
+  background:
+    linear-gradient(145deg, rgba(20, 24, 31, 0.78), rgba(28, 32, 40, 0.72));
+  box-shadow:
+    0 12px 28px -22px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.settings-group--labs .settings-group-panel {
+  border-color: rgba(214, 168, 90, 0.18);
+  background:
+    linear-gradient(145deg, rgba(20, 24, 31, 0.78), rgba(32, 28, 24, 0.72));
+}
+
+.settings-group-pad {
+  padding: 0.65rem 0.75rem;
+}
+
+.settings-group-caption {
+  margin: 0.45rem 0 0;
+  color: rgba(148, 163, 184, 0.82);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.settings-segmented {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.28rem;
+  padding: 0.22rem;
+  border-radius: 0.85rem;
+  background: rgba(8, 12, 18, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.settings-segmented-option {
+  min-height: 2.35rem;
+  border: none;
+  border-radius: 0.68rem;
+  background: transparent;
+  color: rgba(148, 163, 184, 0.88);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 750;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.settings-segmented-option.is-selected {
+  background: rgba(226, 232, 240, 0.12);
+  color: rgba(248, 250, 252, 0.96);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.settings-toggle-row,
+.settings-stepper-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 3.1rem;
+  padding: 0.55rem 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.settings-toggle-row:first-child,
+.settings-stepper-row:first-child,
+.settings-labs-feature-group:first-child .settings-toggle-row:first-child {
+  border-top: none;
+}
+
+.settings-toggle-row--nested {
+  padding-left: 1.35rem;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.settings-toggle-row--disabled,
+.settings-stepper-row--disabled {
+  opacity: 0.48;
+  pointer-events: none;
+}
+
+.settings-toggle-row-copy {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+}
+
+.settings-toggle-row-title {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  color: rgba(241, 245, 249, 0.94);
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.settings-toggle-row-hint {
+  margin: 0;
+  color: rgba(148, 163, 184, 0.82);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.settings-stepper-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.settings-stepper-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(248, 250, 252, 0.92);
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.settings-stepper-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.settings-stepper-value {
+  min-width: 1.5rem;
+  text-align: center;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+}
+
+.settings-name-block {
+  display: flex;
+  flex-direction: column;
   gap: 0.45rem;
+  padding: 0.65rem 0.75rem;
+}
+
+.settings-name-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgba(148, 163, 184, 0.88);
+}
+
+.settings-name-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.settings-table-names {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.settings-table-names--disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.settings-labs-feature-group {
+  display: flex;
+  flex-direction: column;
 }
 
 .settings-section {

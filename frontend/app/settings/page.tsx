@@ -7,12 +7,12 @@ import { HouseRuleInfoOverlay } from "@/components/HouseRuleInfoOverlay";
 import { LabsUnlockDialog } from "@/components/LabsUnlockDialog";
 import { PlayerNameSetup } from "@/components/PlayerNameSetup";
 import { SettingsGameActions } from "@/components/settings/SettingsGameActions";
-import { SettingsRangeCard } from "@/components/settings/SettingsRangeCard";
-import { SettingsSection } from "@/components/settings/SettingsSection";
-import { SettingsToggleCard } from "@/components/settings/SettingsToggleCard";
+import { SettingsGroup } from "@/components/settings/SettingsGroup";
+import { SettingsSegmented } from "@/components/settings/SettingsSegmented";
+import { SettingsStepperRow } from "@/components/settings/SettingsStepperRow";
+import { SettingsToggleRow } from "@/components/settings/SettingsToggleRow";
 import { getHouseRuleInfo, type HouseRuleInfo } from "@/lib/houseRuleInfo";
 import { getVisualFeedbackInfo } from "@/lib/visualFeedbackInfo";
-import { MODE_CLASSIC_LABEL, MODE_STRATEGY_LABEL } from "@/lib/branding";
 import {
   FEATURE_FLAGS_CHANGED_EVENT,
   isFeatureEnabled,
@@ -35,14 +35,6 @@ import {
   type AppSettings,
 } from "@/lib/uiPrefs";
 
-type SettingsSectionId =
-  | "mode"
-  | "visuals"
-  | "solo"
-  | "multi"
-  | "ipad"
-  | "house-rules";
-
 function SettingsPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -58,14 +50,6 @@ function SettingsPageInner() {
     null,
   );
   const [featureRevision, setFeatureRevision] = useState(0);
-  const [openSections, setOpenSections] = useState<Record<SettingsSectionId, boolean>>({
-    mode: false,
-    visuals: false,
-    solo: false,
-    multi: false,
-    ipad: false,
-    "house-rules": false,
-  });
 
   useEffect(() => {
     setSettingsState(getAppSettings());
@@ -93,186 +77,139 @@ function SettingsPageInner() {
     setFeedbackPrefsState((current) => setGameFeedbackPrefs({ ...current, ...update }));
   }
 
-  function toggleSection(id: SettingsSectionId) {
-    setOpenSections((current) => ({ ...current, [id]: !current[id] }));
-  }
-
   const tableModeActive = settings.tableModeEnabled;
   const labsFeatures = listLabsFeatures();
   void featureRevision;
-
-  const visualsEnabledCount = [
-    feedbackPrefs.animationsEnabled,
-    feedbackPrefs.sheetFuseHighlightEnabled,
-    feedbackPrefs.soundsEnabled,
-    feedbackPrefs.progressHintsEnabled,
-  ].filter(Boolean).length;
-
-  const houseRulesSummary = labsUnlocked
-    ? `${labsFeatures.filter((feature) => isFeatureEnabled(feature.id)).length} aktiv`
-    : "Code nötig";
 
   return (
     <div className="settings-screen">
       <AppScreenHeader
         section="Einstellungen"
-        title="Alles auf einen Blick"
-        subtitle="Bereiche aufklappen, anpassen, zuklappen — Spielstart unten."
+        title="Spiel & Feedback"
+        subtitle="Kurz einstellen — starten unten."
         backHref={returnTarget?.href}
         backLabel={returnTarget ? `Zurück zu ${returnTarget.label}` : undefined}
       />
 
       <div className="settings-list">
-        <PlayerNameSetup variant="settings" onDone={() => undefined} />
+        <SettingsGroup title="Modus">
+          <div className="settings-group-pad">
+            <SettingsSegmented
+              ariaLabel="Spielmodus"
+              value={settings.useStrategyRules ? "strategy" : "classic"}
+              onChange={(value) =>
+                updateSettings({ useStrategyRules: value === "strategy" })
+              }
+              options={[
+                { value: "classic", label: "Klassisch" },
+                { value: "strategy", label: "Strategy" },
+              ]}
+            />
+            <p className="settings-group-caption">
+              {settings.useStrategyRules
+                ? "Wurf-Pool und begrenzte Gesamtwürfe."
+                : "Ohne Pool — nur Punkte eintragen."}
+            </p>
+          </div>
+        </SettingsGroup>
 
-        <SettingsSection
-          id="mode"
-          title="Spielmodus"
-          summary={settings.useStrategyRules ? "Strategy" : "Klassisch"}
-          open={openSections.mode}
-          onToggle={() => toggleSection("mode")}
-        >
-          <SettingsToggleCard
-            title={settings.useStrategyRules ? MODE_STRATEGY_LABEL : MODE_CLASSIC_LABEL}
-            description={
-              settings.useStrategyRules
-                ? "Wurf-Pool und begrenzte Gesamtwürfe über alle Felder."
-                : "Ohne Pool — nur Punkte eintragen."
-            }
-            checked={settings.useStrategyRules}
-            onChange={(value) => updateSettings({ useStrategyRules: value })}
-          />
-        </SettingsSection>
+        <SettingsGroup title="Spieler">
+          <PlayerNameSetup variant="settings" onDone={() => undefined} />
+        </SettingsGroup>
 
-        <SettingsSection
-          id="visuals"
-          title="Visuelle Einblendungen"
-          summary={`${visualsEnabledCount} von 4 aktiv`}
-          open={openSections.visuals}
-          onToggle={() => toggleSection("visuals")}
-        >
-          <SettingsToggleCard
+        <SettingsGroup title="Feedback">
+          <SettingsToggleRow
             title="Erfolgsanimationen"
-            description="Overlays bei Bonus, unterer Spalte, Große Straße und Alle Fünfe."
+            hint="Bonus, Straße, Alle Fünfe"
             checked={feedbackPrefs.animationsEnabled}
             onChange={(value) => updateFeedback({ animationsEnabled: value })}
             onInfo={() => setRuleInfo(getVisualFeedbackInfo("animations"))}
           />
-          <SettingsToggleCard
+          <SettingsToggleRow
             title="Gold-Aufleuchten"
-            description="Betroffene Felder leuchten 3× gold auf (Zeile oder Spalte), plus Fanfare."
+            hint="Zeile/Spalte + Fanfare"
             checked={feedbackPrefs.sheetFuseHighlightEnabled}
             onChange={(value) => updateFeedback({ sheetFuseHighlightEnabled: value })}
             onInfo={() => setRuleInfo(getVisualFeedbackInfo("sheetFuse"))}
           />
-          <SettingsToggleCard
+          <SettingsToggleRow
             title="Sounds"
-            description="Akustische Hinweise bei Erfolgen und Fortschritts-Meilensteinen."
             checked={feedbackPrefs.soundsEnabled}
             onChange={(value) => updateFeedback({ soundsEnabled: value })}
             onInfo={() => setRuleInfo(getVisualFeedbackInfo("sounds"))}
           />
-          <SettingsToggleCard
-            title="Fortschritt (25 / 50 / 75 %)"
-            description="Kurzer Hinweis, wenn ein Viertel der Würfe absolviert ist."
+          <SettingsToggleRow
+            title="Fortschritt"
+            hint="25 / 50 / 75 %"
             checked={feedbackPrefs.progressHintsEnabled}
             onChange={(value) => updateFeedback({ progressHintsEnabled: value })}
             onInfo={() => setRuleInfo(getVisualFeedbackInfo("progress"))}
           />
-          <SettingsToggleCard
+          <SettingsToggleRow
             title="Heller Spielzettel"
-            description="Nur der Zettel hell (Zellen/Hintergrund) — Rest der App bleibt dunkel."
+            hint="Nur der Zettel hell"
             checked={settings.scoreSheetTheme === "light"}
             onChange={(value) =>
               updateSettings({ scoreSheetTheme: value ? "light" : "dark" })
             }
           />
-        </SettingsSection>
+        </SettingsGroup>
 
-        <SettingsSection
-          id="solo"
-          title="Solo"
-          summary={`${settings.soloGameCount} ${settings.soloGameCount === 1 ? "Spiel" : "Spiele"}`}
-          open={openSections.solo}
-          onToggle={() => toggleSection("solo")}
-        >
-          <SettingsRangeCard
-            title="Anzahl Spiele"
+        <SettingsGroup title="Solo">
+          <SettingsStepperRow
+            title="Spiele"
+            hint={`${settings.soloGameCount * 13} Felder`}
             value={settings.soloGameCount}
-            hint={
-              <>
-                {settings.soloGameCount === 1 ? "Spiel" : "Spiele"} ·{" "}
-                {settings.soloGameCount * 13} Felder
-              </>
-            }
             min={1}
             max={6}
             onChange={(value) => updateSettings({ soloGameCount: value })}
           />
-        </SettingsSection>
+        </SettingsGroup>
 
-        <SettingsSection
-          id="multi"
-          title="Multi"
-          summary={
-            settings.tableModeEnabled
-              ? "Tischmodus aktiv"
-              : `${settings.multiplayerGameCount} Spiele · ${settings.multiplayerMaxPlayers} Spieler`
-          }
-          open={openSections.multi}
-          onToggle={() => toggleSection("multi")}
-        >
-          <SettingsRangeCard
-            title="Anzahl Spiele"
-            value={settings.multiplayerGameCount}
+        <SettingsGroup title="Multi">
+          <SettingsStepperRow
+            title="Spiele"
             hint={
               settings.useStrategyRules
                 ? `max. ${settings.multiplayerGameCount * 39} Würfe`
-                : settings.multiplayerGameCount === 1
-                  ? "1 Spiel"
-                  : `${settings.multiplayerGameCount} Spiele`
+                : undefined
             }
+            value={settings.multiplayerGameCount}
             min={1}
             max={6}
             onChange={(value) => updateSettings({ multiplayerGameCount: value })}
           />
-          <SettingsRangeCard
+          <SettingsStepperRow
             title="Mitspieler"
-            value={settings.tableModeEnabled ? 2 : settings.multiplayerMaxPlayers}
-            hint={settings.tableModeEnabled ? "Tischmodus: fest 2 Spieler" : "2–6 Spieler im Raum"}
+            hint={tableModeActive ? "Tischmodus: fest 2" : "2–6 im Raum"}
+            value={tableModeActive ? 2 : settings.multiplayerMaxPlayers}
             min={2}
             max={6}
-            disabled={settings.tableModeEnabled}
+            disabled={tableModeActive}
             onChange={(value) => updateSettings({ multiplayerMaxPlayers: value })}
           />
           {settings.useStrategyRules && (
             <>
-              <SettingsToggleCard
+              <SettingsToggleRow
                 title="Gegner-Pool"
-                description="Pool des Gegners im Spiel anzeigen."
+                hint="Pool im Spiel anzeigen"
                 checked={settings.showOpponentPool}
                 onChange={(value) => updateSettings({ showOpponentPool: value })}
               />
-              <SettingsToggleCard
+              <SettingsToggleRow
                 title="Pool-Endspiel"
-                description="Pool-Sieger darf ein Feld verbessern."
+                hint="Pool-Sieger verbessert ein Feld"
                 checked={settings.poolEndgameEnabled}
                 onChange={(value) => updateSettings({ poolEndgameEnabled: value })}
               />
             </>
           )}
-        </SettingsSection>
+        </SettingsGroup>
 
-        <SettingsSection
-          id="ipad"
-          title="iPad-Tisch"
-          summary={settings.tableModeEnabled ? "Aktiv" : "Aus"}
-          open={openSections.ipad}
-          onToggle={() => toggleSection("ipad")}
-        >
-          <SettingsToggleCard
+        <SettingsGroup title="iPad-Tisch">
+          <SettingsToggleRow
             title="Zwei Spieler auf einem iPad"
-            description="Lokaler Tischmodus mit geteiltem Bildschirm."
+            hint="Geteilter Bildschirm"
             checked={settings.tableModeEnabled}
             onChange={(value) =>
               updateSettings({
@@ -282,31 +219,32 @@ function SettingsPageInner() {
             }
           />
           <div
-            className={`settings-compact-card settings-compact-card--wide settings-compact-card--slim${tableModeActive ? "" : " settings-compact-card--disabled"}`}
+            className={`settings-group-pad settings-table-names${
+              tableModeActive ? "" : " settings-table-names--disabled"
+            }`}
           >
-            <p className="settings-compact-title settings-compact-title--sm">Spielernamen</p>
             <div className="grid grid-cols-2 gap-2">
               <label className="flex min-w-0 flex-col gap-1">
-                <span className="setup-slider-label text-left text-[0.62rem]">Links</span>
+                <span className="settings-toggle-row-hint">Links</span>
                 <input
                   type="text"
                   value={settings.tableLeftName}
                   maxLength={24}
                   disabled={!tableModeActive}
-                  placeholder="Spielername"
+                  placeholder="Name"
                   onFocus={(e) => e.target.select()}
                   onChange={(e) => updateSettings({ tableLeftName: e.target.value })}
                   className="glass-input min-h-9 px-3 text-sm font-semibold disabled:opacity-45"
                 />
               </label>
               <label className="flex min-w-0 flex-col gap-1">
-                <span className="setup-slider-label text-left text-[0.62rem]">Rechts</span>
+                <span className="settings-toggle-row-hint">Rechts</span>
                 <input
                   type="text"
                   value={settings.tableRightName}
                   maxLength={24}
                   disabled={!tableModeActive}
-                  placeholder="Spielername"
+                  placeholder="Name"
                   onFocus={(e) => e.target.select()}
                   onChange={(e) => updateSettings({ tableRightName: e.target.value })}
                   className="glass-input min-h-9 px-3 text-sm font-semibold disabled:opacity-45"
@@ -314,23 +252,13 @@ function SettingsPageInner() {
               </label>
             </div>
           </div>
-        </SettingsSection>
+        </SettingsGroup>
 
-        <SettingsSection
-          id="house-rules"
-          title="InApp-Käufe (Features)"
-          summary={houseRulesSummary}
-          variant="labs"
-          open={openSections["house-rules"]}
-          onToggle={() => toggleSection("house-rules")}
-        >
+        <SettingsGroup title="InApp-Features" variant="labs">
           {!labsUnlocked ? (
-            <div className="settings-compact-card settings-compact-card--wide settings-compact-card--slim settings-compact-card--labs">
-              <p className="settings-compact-title settings-compact-title--sm">
-                Entwickler-Vorschau
-              </p>
-              <p className="settings-compact-text settings-compact-text--sm">
-                Code eingeben, um alle Features (Brennt, Verkauf, Alle Fünfe, Oberer Bereich) zu testen.
+            <div className="settings-group-pad">
+              <p className="settings-toggle-row-hint">
+                Code eingeben, um Brennt, Verkauf, Alle Fünfe und mehr zu testen.
               </p>
               <button
                 type="button"
@@ -344,67 +272,71 @@ function SettingsPageInner() {
             <>
               {labsFeatures.map((feature) => (
                 <div key={feature.id} className="settings-labs-feature-group">
-                  <SettingsToggleCard
+                  <SettingsToggleRow
                     title={feature.title}
-                    description={feature.description}
+                    hint={feature.description}
                     checked={isFeatureEnabled(feature.id)}
                     onChange={(value) => setLabsFeaturePref(feature.id, value)}
                     onInfo={
                       feature.infoKey
-                        ? () => setRuleInfo(getHouseRuleInfo(feature.infoKey))
+                        ? () => {
+                            const info = getHouseRuleInfo(feature.infoKey);
+                            if (info) setRuleInfo(info);
+                          }
                         : undefined
                     }
                   />
                   {isFeatureEnabled(feature.id) &&
                     listLabsChildFeatures(feature.id).map((child) => (
-                      <SettingsToggleCard
+                      <SettingsToggleRow
                         key={child.id}
                         title={child.title}
-                        description={child.description}
+                        hint={child.description}
                         checked={isFeatureEnabled(child.id)}
                         onChange={(value) => setLabsFeaturePref(child.id, value)}
                         nested
                         onInfo={
                           child.infoKey
-                            ? () => setRuleInfo(getHouseRuleInfo(child.infoKey))
+                            ? () => {
+                                const info = getHouseRuleInfo(child.infoKey);
+                                if (info) setRuleInfo(info);
+                              }
                             : undefined
                         }
                       />
                     ))}
                 </div>
               ))}
-              <div className="settings-compact-card settings-compact-card--wide settings-compact-card--slim settings-compact-card--labs">
-                <p className="settings-compact-text settings-compact-text--sm">
-                  Vorschau sperren entfernt den Zugang auf diesem Gerät.
-                </p>
+              <div className="settings-group-pad">
                 <button
                   type="button"
                   onClick={() => lockLabs()}
-                  className="glass-button mt-2 min-h-9 w-full px-4 text-xs font-semibold"
+                  className="glass-button min-h-9 w-full px-4 text-xs font-semibold"
                 >
                   Vorschau sperren
                 </button>
               </div>
             </>
           )}
-        </SettingsSection>
+        </SettingsGroup>
+
+        <SettingsGroup title="Admin">
+          <div className="settings-group-pad">
+            <p className="settings-toggle-row-hint">
+              PIN und lokaler API-Key für Stats-Admin.
+            </p>
+            <button
+              type="button"
+              className="glass-button mt-2 min-h-10 w-full px-4 text-sm font-semibold"
+              onClick={() => router.push("/settings/admin")}
+            >
+              Admin öffnen
+            </button>
+          </div>
+        </SettingsGroup>
       </div>
 
       <SettingsGameActions settings={settings} />
-
-      <div className="settings-compact-card settings-compact-card--wide settings-compact-card--slim mx-1 mt-2">
-        <p className="settings-compact-title settings-compact-title--sm">Admin</p>
-        <p className="settings-compact-text settings-compact-text--sm">
-          PIN-Freischaltung und lokaler API-Key für Stats-Admin / spätere Config.
-        </p>
-        <button
-          type="button"
-          className="glass-button mt-2 min-h-10 w-full px-4 text-sm font-semibold"
-          onClick={() => router.push("/settings/admin")}
-        >
-          Admin öffnen
-        </button>
-      </div>
 
       <LabsUnlockDialog
         open={showLabsUnlock}

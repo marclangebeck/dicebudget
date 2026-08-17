@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**HEAD:** siehe `git log -1` (Spielername Server)  
+**HEAD:** siehe `git log -1` (Settings-UI dichter)  
 **Sprache:** Deutsch  
 **Stand Doku:** 2026-08-17
 
@@ -27,7 +27,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 | Bereich | Status |
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
-| Branch | `milestone-22-prep` @ Tip `faf721b` |
+| Branch | `milestone-22-prep` @ Tip (Settings flach/dicht) |
 | Frontend-Tests | **116** grün |
 | Roadmap | **M42/M43** + **Multi-QR** umgesetzt; **M30** danach; Turnier = Planung `docs/tournament/` |
 | Entwickler-Vorschau | **InApp-Käufe (Features)** = Labs-PIN (`NEXT_PUBLIC_LABS_PIN`) — getrennt von Admin |

@@ -72,25 +72,71 @@ export function PlayerNameSetup({ onDone, variant = "gate" }: Props) {
     }
   }
 
+  if (variant === "settings") {
+    return (
+      <div className="settings-name-block">
+        <p className="settings-toggle-row-hint">
+          Auf dem Server, an dieses Gerät gebunden. Fotos bleiben lokal.
+        </p>
+        <label className="player-name-label settings-name-label">
+          Anzeigename
+          <input
+            className="glass-input mt-1 w-full min-h-9 px-3 text-sm font-semibold"
+            value={name}
+            maxLength={24}
+            autoComplete="nickname"
+            placeholder="z. B. Mara"
+            onChange={(e) => {
+              setName(e.target.value);
+              setSaved(false);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") void save();
+            }}
+          />
+        </label>
+        {error && (
+          <p className="glass-alert-error mt-2 px-3 py-2 text-sm" role="alert">
+            {error}
+          </p>
+        )}
+        {saved && (
+          <p className="settings-toggle-row-hint mt-1">Gespeichert.</p>
+        )}
+        <div className="settings-name-actions">
+          <button
+            type="button"
+            className="glass-button min-h-9 flex-1 px-3 text-xs font-semibold disabled:opacity-50"
+            disabled={busy}
+            onClick={() => void save()}
+          >
+            {busy ? "…" : "Speichern"}
+          </button>
+          {(loadOwnDisplayName() || loadOwnNameToken()) && (
+            <button
+              type="button"
+              className="glass-button min-h-9 flex-1 px-3 text-xs font-semibold disabled:opacity-50"
+              disabled={busy}
+              onClick={() => void remove()}
+            >
+              Entfernen
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   const form = (
     <>
-      {variant === "settings" && (
-        <p className="settings-compact-title settings-compact-title--sm">Spielername</p>
-      )}
-      {variant === "settings" && (
-        <p className="settings-compact-text settings-compact-text--sm">
-          Nickname auf dem Server, an dieses Gerät gebunden. Kein Konto, kein
-          Foto-Upload. Andere sehen ihn in Lobby und Statistik.
-        </p>
-      )}
       <label className="player-name-label">
-        {variant === "settings" ? "Anzeigename" : "Spielername"}
+        Spielername
         <input
           className="glass-input mt-1 w-full"
           value={name}
           maxLength={24}
           autoComplete="nickname"
-          autoFocus={variant === "gate"}
+          autoFocus
           placeholder="z. B. Mara"
           onChange={(e) => {
             setName(e.target.value);
@@ -106,33 +152,16 @@ export function PlayerNameSetup({ onDone, variant = "gate" }: Props) {
           {error}
         </p>
       )}
-      {saved && variant === "settings" && (
-        <p className="settings-compact-text settings-compact-text--sm mt-2">Gespeichert.</p>
-      )}
       <button
         type="button"
         className="setup-host-submit mt-3 w-full disabled:opacity-50"
         disabled={busy}
         onClick={() => void save()}
       >
-        {busy ? "Speichere …" : variant === "settings" ? "Namen speichern" : "Weiter"}
+        {busy ? "Speichere …" : "Weiter"}
       </button>
-      {variant === "settings" && (loadOwnDisplayName() || loadOwnNameToken()) && (
-        <button
-          type="button"
-          className="glass-button mt-2 min-h-9 w-full px-4 text-xs font-semibold disabled:opacity-50"
-          disabled={busy}
-          onClick={() => void remove()}
-        >
-          Namen vom Server entfernen
-        </button>
-      )}
     </>
   );
-
-  if (variant === "settings") {
-    return <div className="settings-compact-card settings-compact-card--wide settings-compact-card--slim">{form}</div>;
-  }
 
   return (
     <div className="player-name-gate fixed inset-0 z-50 flex items-center justify-center p-6">

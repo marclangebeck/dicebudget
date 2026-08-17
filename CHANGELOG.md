@@ -25,6 +25,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Paarungs-Detail-Karten:** Bild oben volle Breite / halbe Höhe, Infos darunter — persönlichere Rivalen-Ansicht
 
 ### Changed
+- **Einstellungen dichter:** flache Gruppen statt Accordion; Segment **Klassisch | Strategy**; kompakte Toggle-/Stepper-Zeilen; Labs unten
 - **Keine Rivalen-Verwaltung mehr:** Namen vom Server; ✏️-Aliase, Menü „Rivalen verwalten“ und „Das bin ich“-UI entfernt. Fotos lokal in der Statistik.
 - **Startscreen:** Beitritts-Button heißt „Turnier/Liga beitreten“ (weiterhin Demnächst / ohne Funktion)
 - **Tournament Host:** Liga und Turnier beide wählbar; nach Größe getrennte Zweige (`/setup/league` · `/setup/turnier`); Spieler-App bleibt nur Join
