@@ -1,6 +1,18 @@
+const PROD_API = "https://dicebudget.bottle-trade.de/api";
+
+function isNativeShell(): boolean {
+  if (typeof window === "undefined") return false;
+  const protocol = window.location.protocol;
+  if (protocol === "capacitor:" || protocol === "ionic:") return true;
+  return protocol === "https:" && window.location.hostname === "localhost";
+}
+
 function apiBase(): string {
-  const fromEnv = process.env.NEXT_PUBLIC_API_URL?.trim();
-  if (fromEnv) return fromEnv.replace(/\/$/, "");
+  const fromEnv = process.env.NEXT_PUBLIC_API_URL?.trim().replace(/\/$/, "");
+  if (isNativeShell()) {
+    return fromEnv && fromEnv.startsWith("http") ? fromEnv : PROD_API;
+  }
+  if (fromEnv) return fromEnv;
   return "http://127.0.0.1:3020";
 }
 

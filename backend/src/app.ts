@@ -19,7 +19,12 @@ import { tournamentsRouter } from "./routes/tournaments.js";
 export function createApp(): express.Application {
   const app = express();
 
-  app.use(helmet());
+  app.use(
+    helmet({
+      // API wird von Capacitor (https://localhost) gelesen; same-origin → WebKit „Load failed“
+      crossOriginResourcePolicy: { policy: "cross-origin" },
+    }),
+  );
   app.use(
     cors({
       origin(origin, callback) {

@@ -29,5 +29,6 @@ describe("CORS preflight", () => {
       .set("Access-Control-Request-Headers", "content-type")
       .expect(204);
     assert.equal(res.headers["access-control-allow-origin"], "https://localhost");
+    assert.equal(res.headers["cross-origin-resource-policy"], "cross-origin");
   });
 });

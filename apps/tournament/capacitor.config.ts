@@ -7,6 +7,7 @@ const config: CapacitorConfig = {
   server: {
     androidScheme: "https",
     iosScheme: "https",
+    hostname: "dicebudget.bottle-trade.de",
   },
   ios: {
     contentInset: "automatic",
