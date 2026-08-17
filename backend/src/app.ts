@@ -7,6 +7,7 @@ import {
   MIN_GAME_COUNT,
   ROLLS_PER_FIELD,
 } from "./config.js";
+import { isAllowedCorsOrigin } from "./lib/corsOrigins.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { playerNamesRouter } from "./routes/playerNames.js";
 import { runsRouter } from "./routes/runs.js";
@@ -21,15 +22,13 @@ export function createApp(): express.Application {
   app.use(helmet());
   app.use(
     cors({
-      origin: [
-        "http://127.0.0.1:3021",
-        "http://localhost:3021",
-        "http://127.0.0.1:3022",
-        "http://localhost:3022",
-        "https://dicebudget.bottle-trade.de",
-        "capacitor://localhost",
-        "ionic://localhost",
-      ],
+      origin(origin, callback) {
+        if (isAllowedCorsOrigin(origin)) {
+          callback(null, true);
+          return;
+        }
+        callback(null, false);
+      },
     }),
   );
   app.use(express.json({ limit: "100kb" }));

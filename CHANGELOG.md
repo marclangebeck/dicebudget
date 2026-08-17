@@ -22,6 +22,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Rivalen-Share-Karte:** Teilen aus Paarungs-Detail (Duell-Balken, Punktedifferenz, Form der letzten Runden)
 
 ### Fixed
+- **Tournament Anlegen „Load failed“:** CORS erlaubt Capacitor-Origin `https://localhost` (iosScheme https)
 - **Admin-PIN-Tastatur:** kein `inputMode=numeric` mehr — Buchstaben und Zahlen eingebar
 - **Rivalen-Share-Karte:** lokale Profilbilder (oder Initialen) auf der Duell-Karte
 - **Paarungs-Detail-Karten:** Bild oben volle Breite / halbe Höhe, Infos darunter — persönlichere Rivalen-Ansicht

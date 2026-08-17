@@ -16,7 +16,14 @@ async function apiFetch<T>(
   if (init?.hostToken) {
     headers.set("X-Host-Token", init.hostToken);
   }
-  const res = await fetch(`${apiBase()}${path}`, { ...init, headers });
+  let res: Response;
+  try {
+    res = await fetch(`${apiBase()}${path}`, { ...init, headers });
+  } catch {
+    throw new Error(
+      "Keine Verbindung zum Server. Prüfe die Internetverbindung oder ob das Backend läuft.",
+    );
+  }
   const data: unknown = await res.json().catch(() => ({}));
   if (!res.ok) {
     const err =
