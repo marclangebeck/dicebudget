@@ -118,30 +118,32 @@ function YatzyRowLabel({
   }
 
   return (
-    <div className="flex items-center gap-0.5">
-      <span className="text-[10px] leading-tight md:text-[11px]">{FIELD_LABELS.KNIFFEL}</span>
-      {extraYatzyCount > 0 && (
-        <span
-          className="rounded bg-emerald-100 px-1 py-px text-[9px] font-bold leading-none text-emerald-900"
-          title={`${extraYatzyCount} Zusatz Alle Fünfe`}
+    <div className="play-kniffel-label">
+      <span className="play-kniffel-label-text">{FIELD_LABELS.KNIFFEL}</span>
+      <span className="play-kniffel-label-extras">
+        {extraYatzyCount > 0 && (
+          <span
+            className="play-kniffel-extra-count"
+            title={`${extraYatzyCount} Zusatz Alle Fünfe`}
+          >
+            +{extraYatzyCount}
+          </span>
+        )}
+        <button
+          ref={plusButtonRef}
+          type="button"
+          disabled={disabled || busy}
+          onClick={(e) => {
+            e.stopPropagation();
+            openPicker();
+          }}
+          title="Zusatz Alle Fünfe: +100 Punkte auf Ergebnis Spiel (nächste Spalte)"
+          aria-label="Zusatz Alle Fünfe Bonus hinzufügen"
+          className="play-kniffel-plus"
         >
-          +{extraYatzyCount}
-        </span>
-      )}
-      <button
-        ref={plusButtonRef}
-        type="button"
-        disabled={disabled || busy}
-        onClick={(e) => {
-          e.stopPropagation();
-          openPicker();
-        }}
-        title="Zusatz Alle Fünfe: +100 Punkte auf Ergebnis Spiel (nächste Spalte)"
-        aria-label="Zusatz Alle Fünfe Bonus hinzufügen"
-        className="flex h-5 min-w-5 items-center justify-center rounded border border-emerald-700 bg-emerald-600 px-0.5 text-[11px] font-bold leading-none text-white disabled:opacity-40"
-      >
-        +
-      </button>
+          +
+        </button>
+      </span>
       {showPicker && pickerAnchor && (
         <ExtraYatzyPickerOverlay
           anchor={pickerAnchor}
@@ -231,7 +233,7 @@ function FieldRowLabel({
       </span>
     );
   }
-  return <span className="text-[10px] leading-tight md:text-[11px]">{FIELD_LABELS[row.fieldType]}</span>;
+  return <span className="play-field-label-text">{FIELD_LABELS[row.fieldType]}</span>;
 }
 
 function previewClass(tier: FieldPreview["tier"] | undefined): string {
@@ -371,7 +373,7 @@ export function ScoreSheetTable({
   const games = run.games;
   const yatzyMarkCounts = buildYatzyMarkCounts(run);
   const gameColCount = games.length;
-  const labelColPct = gameColCount <= 2 ? 30 : gameColCount <= 4 ? 26 : 22;
+  const labelColPct = gameColCount <= 2 ? 32 : gameColCount <= 4 ? 28 : 24;
   const gameColPct = (100 - labelColPct) / gameColCount;
   const sheetTheme = getAppSettings().scoreSheetTheme;
 
@@ -381,7 +383,7 @@ export function ScoreSheetTable({
         sheetTheme === "light" ? "play-score-board--light" : "play-score-board--dark"
       }`}
     >
-      <table className="play-score-table h-full w-full table-fixed border-collapse text-[11px] md:text-[10px]">
+      <table className="play-score-table h-full w-full table-fixed border-collapse">
         <colgroup>
           <col style={{ width: `${labelColPct}%` }} />
           {games.map((game) => (
@@ -390,13 +392,13 @@ export function ScoreSheetTable({
         </colgroup>
         <thead>
           <tr className="play-table-head-row">
-            <th className="play-table-head-label px-1 py-1 text-left text-[10px] font-semibold">
+            <th className="play-table-head-label px-1 py-1 text-left font-semibold">
               Feld
             </th>
             {games.map((game) => (
               <th
                 key={game.id}
-                className="play-table-head-game px-0 py-1 text-center text-[10px] font-bold"
+                className="play-table-head-game px-0 py-1 text-center font-bold"
               >
                 Sp{game.index}
               </th>

@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **QR vom Zettel:** im Multi oben neben „Zur Lobby“ erneut anzeigen, ohne den Raum zu verlassen
 - **Tournament-Setup-Einstellungen:** Liga (Runden, Partie) und Turnier (Gruppe, Quali, K.O.-Hinweis) im Host-Wizard; `config` am Tournament; Kurzcheck + Lobby zeigen Format
 - **T3 Teilnehmer-Join:** Startscreen „Turnier/Liga beitreten“ aktiv; QR → `/tournament/join`; Lobby mit Anmeldung (Name + playerId); AASA für Event-Links
 - **Spielername (Server):** einmal nach der Sanduhr; `GET/PUT/DELETE /player-names/display`; Lobby/Statistik zeigen Namen; Settings ändern/löschen; Paarungs-Zahlen unverändert
@@ -28,6 +29,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Paarungs-Detail-Karten:** Bild oben volle Breite / halbe Höhe, Infos darunter — persönlichere Rivalen-Ansicht
 
 ### Changed
+- **Zettel-Feldnamen größer:** 1er–Chance lesbarer; kleine Alle-Fünfe-Würfel liegen overlay und schieben die Zeile nicht
 - **Einstellungen dichter:** flache Gruppen statt Accordion; Segment **Klassisch | Strategy**; kompakte Toggle-/Stepper-Zeilen; Labs unten
 - **Keine Rivalen-Verwaltung mehr:** Namen vom Server; ✏️-Aliase, Menü „Rivalen verwalten“ und „Das bin ich“-UI entfernt. Fotos lokal in der Statistik.
 - **Startscreen:** Beitritts-Button heißt „Turnier/Liga beitreten“ (weiterhin Demnächst / ohne Funktion)

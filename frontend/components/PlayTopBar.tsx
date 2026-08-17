@@ -1,4 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import { InviteQrCode } from "@/components/InviteQrCode";
+import { buildInviteJoinUrl } from "@/lib/inviteJoinUrl";
 
 type Props = {
   inviteCode?: string | null;
@@ -28,19 +33,36 @@ export function PlayTopBar({
   abandonBusy,
   onAbandon,
 }: Props) {
+  const [showQr, setShowQr] = useState(false);
+  const joinUrl = inviteCode ? buildInviteJoinUrl(inviteCode) : null;
+
   return (
     <div className="play-top-bar shrink-0">
-      {inviteCode && (
-        <Link
-          href={`/multi/join?code=${encodeURIComponent(inviteCode)}`}
-          className="app-nav-btn"
-        >
-          <span aria-hidden className="app-nav-btn-icon">
-            ←
-          </span>
-          <span>Zur Lobby</span>
-        </Link>
-      )}
+      <div className="play-top-bar-start">
+        {inviteCode && (
+          <>
+            <Link
+              href={`/multi/join?code=${encodeURIComponent(inviteCode)}`}
+              className="app-nav-btn"
+            >
+              <span aria-hidden className="app-nav-btn-icon">
+                ←
+              </span>
+              <span>Zur Lobby</span>
+            </Link>
+            <button
+              type="button"
+              className="play-qr-btn"
+              onClick={() => setShowQr(true)}
+              aria-label="QR-Code zum Beitreten zeigen"
+              title="QR-Code erneut zeigen"
+            >
+              <QrIcon />
+              <span>QR</span>
+            </button>
+          </>
+        )}
+      </div>
 
       <div className="play-top-bar-end">
         {useStrategyRules && rollsRemaining !== null && (
@@ -105,6 +127,59 @@ export function PlayTopBar({
           </button>
         )}
       </div>
+
+      {showQr && inviteCode && joinUrl && (
+        <div
+          className="play-invite-qr-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="play-invite-qr-title"
+        >
+          <button
+            type="button"
+            className="play-invite-qr-backdrop"
+            aria-label="Schließen"
+            onClick={() => setShowQr(false)}
+          />
+          <div className="play-invite-qr-card">
+            <p className="play-invite-qr-kicker">Multiplayer</p>
+            <h2 id="play-invite-qr-title" className="play-invite-qr-title">
+              Spiel beitreten
+            </h2>
+            <p className="play-invite-qr-hint">
+              Späterer Mitspieler scannt denselben QR wie beim Anlegen.
+            </p>
+            <div className="play-invite-qr-frame">
+              <InviteQrCode
+                value={joinUrl}
+                label={`QR-Code zum Beitreten, Raum ${inviteCode}`}
+                size={228}
+              />
+            </div>
+            <button
+              type="button"
+              className="glass-button min-h-10 w-full px-4 text-sm font-semibold"
+              onClick={() => setShowQr(false)}
+            >
+              Schließen
+            </button>
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+function QrIcon() {
+  return (
+    <svg className="play-qr-btn-icon" viewBox="0 0 24 24" aria-hidden fill="none">
+      <path
+        d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path d="M7 12h10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
   );
 }

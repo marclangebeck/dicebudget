@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**HEAD:** siehe `git log -1` (Tournament-Setup-Einstellungen)  
+**HEAD:** siehe `git log -1` (QR vom Zettel, Feldnamen größer)  
 **Sprache:** Deutsch  
 **Stand Doku:** 2026-08-17
 
@@ -22,7 +22,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 - **Events:** drei Apps — **DiceBudget** (Pro), **DiceBudget Tournament** (Host), **DiceBudget GO** (nur Teilnahme, geplant). Quelle: `docs/tournament/products.md`. DiceBudget-Kern unantastbar; Events nur additiv. Hosten nur Tournament.
 - **Spielername:** einmal nach der Sanduhr, Server an `playerId`. Fotos lokal in der Statistik, ohne Rivalen-Verwaltung. Backend-Deploy nötig (Migration).
 - **T3 Event-Join:** Pro-App `/tournament/join` + Startscreen-QR; Host-QR unverändert.
-- **Tournament-Setup:** Liga-/Turnier-Einstellungen im Host; Backend-Migration `tournament_config` — Deploy nötig.
+- **Tournament-Setup:** Liga-/Turnier-Einstellungen im Host; Backend-Migration `tournament_config` + CORS `https://localhost` — Deploy nötig.
 
 ## Aktueller Stand
 

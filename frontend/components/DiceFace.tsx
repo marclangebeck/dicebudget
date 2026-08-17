@@ -26,7 +26,7 @@ const SIZE_STYLES = {
     pip: "size-3 sm:size-3.5",
   },
   field: {
-    shell: "h-5 w-5 gap-[2px] p-[2px]",
+    shell: "h-6 w-6 gap-[2px] p-[2px]",
     pip: "size-1",
   },
   mini: {
