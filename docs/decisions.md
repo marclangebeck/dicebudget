@@ -80,15 +80,15 @@ npm run build
 - App startet nativ direkt auf `/app`, Web-Landing bleibt `/`.
 - Alter App-Store-Connect-Eintrag `com.mlangebeck.mobileapp` wird ignoriert.
 
-## Tournament (geplant, 2026-08)
+## Tournament / Produktfamilie (2026-08)
 
-- **Produktname:** DiceBudget Tournament (Host-iPad); Spieler bleiben in DiceBudget.
-- **Docs:** `docs/tournament/` (README, roadmap T0–T10, api-sketch).
-- **Produkt:** Jeder mit DiceBudget Tournament kann ein Turnier eröffnen (privat, Verein, Event, …); Spieler per QR in der DiceBudget-App; Host = eigene App (Bundle `de.bottletrade.dicebudget.tournament`). UI der Host-App an DiceBudget angelehnt (ähnlich, nicht 1:1).
-- **Startorganisatorisch:** Monorepo-Light in diesem Repo (Doku jetzt; spaeter z. B. `apps/tournament`); konkrete Modi spaeter, Kern breit (Modus als Strategie).
-- **Hart / nicht verhandelbar:** DiceBudget-Kernfunktionalitaet darf nicht verloren gehen. Turnier nur additiv; bestehende Solo/Multi/Stats/Labs-Flows nicht umbauen oder als Pflichtpfad umleiten. Bei Konflikt gewinnt DiceBudget.
-- **AGENT_RULES:** kein Polling-/Abuse-Risiko auch fuer Live/Beamer; Umsetzung nur nach GO.
-- Umsetzung startet nicht ohne Nutzer-GO; Planung ersetzt keine DiceBudget-Milestones (z. B. M30).
+- **Drei Apps:** **DiceBudget** (1,49 €, Pro, `frontend/`), **DiceBudget Tournament** (0 €, Host, `apps/tournament/`), **DiceBudget GO** (0 €, nur Event-Teilnahme, geplant). Details: `docs/tournament/products.md`.
+- **Host:** nur Tournament. Event-Name zuerst, dann Format **Liga** oder **Turnier**.
+- **Teilnahme:** QR-Scan in GO oder in der bezahlten DiceBudget-App. Pro hostet nicht.
+- **Trichter:** Tournament in Clubs/Kneipen zeigen → Beitritte (spaeter abrechenbar) → Upsell GO → DiceBudget fuer privates Spiel.
+- **Docs:** `docs/tournament/` (products, README, roadmap T0–T10, api-sketch).
+- **Hart:** DiceBudget-Kern unantastbar; Events nur additiv. Bei Konflikt gewinnt DiceBudget.
+- **AGENT_RULES:** kein Polling-/Abuse-Risiko; Umsetzung groesserer Schritte nur nach Nutzer-GO. Planung ersetzt keine DiceBudget-Milestones (z. B. M30).
 
 ## Bekannte Risikoentscheidungen
 

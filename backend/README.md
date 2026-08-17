@@ -2,7 +2,7 @@
 
 Express + Prisma (SQLite) — Port **3020** (Produktion hinter Nginx `/api/`).
 
-Turnier-API ist **geplant** (`docs/tournament/api-sketch.md`), noch nicht implementiert. Bestehende Session-/Run-Routen bleiben der Kern; Turnier soll später orchestrieren, nicht ersetzen. **Hart:** bestehende Funktionalität nicht brechen.
+Event-API (`/tournaments`) ist **umgesetzt** (T1); Join-UI in den Teilnehmer-Apps folgt. Bestehende Session-/Run-Routen bleiben der Kern; Events orchestrieren, ersetzen nicht. Produktfamilie: `docs/tournament/products.md`. **Hart:** bestehende Funktionalität nicht brechen.
 
 ## Voraussetzungen
 

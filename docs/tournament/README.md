@@ -1,63 +1,66 @@
 # DiceBudget Tournament
 
 **Produktname:** DiceBudget Tournament  
-**Stand:** 2026-08-15  
-**Status:** T0–T2 umgesetzt (API + Host-Skelett); weitere Milestones offen  
-**Bezug:** Spieler-App = dieses Repo (`frontend/`, Bundle `de.bottletrade.dicebudget`)
+**Stand:** 2026-08-17  
+**Status:** T0–T2 + Host-Setup-Wizard (API + Host-Skelett); T3+ offen  
+**Produktfamilie:** [`products.md`](./products.md) — **drei Apps** (DiceBudget · Tournament · GO)
 
 ## Vision (kurz)
 
-Jeder mit **DiceBudget Tournament** kann ein Ereignis eröffnen — **Liga** (jeder gegen jeden) oder **Turnier** (Gruppen → K.O.). Spieler nutzen die **DiceBudget**-App nur zum **Beitritt per QR** (kein Format-Setup dort). **Live-Stand** läuft in der App und ist **anzeigetauglich**. Alles konfigurierbar.
+Jeder mit **DiceBudget Tournament** kann ein **Event** eröffnen — **Liga** (jeder gegen jeden) oder **Turnier** (Gruppen → K.O.). Der Name kommt **vor** dem Format („Name des Events“).
+
+Teilnehmer scannen den QR. Dafür ist **DiceBudget GO** (kostenlos, nur Scan) oder die **bezahlte DiceBudget-App** (Pro, inkl. Event-Beitritt) vorgesehen. Organisation bleibt in Tournament; die DiceBudget-App **hostet keine** Events.
+
+**Live-Stand** (Rankings, Auslosung, Spielplan) läuft über den Server und ist anzeigetauglich. Geräte sprechen **nicht** direkt miteinander: **Host ↔ Server ↔ Teilnehmer-Geräte**.
+
+Beitritte per QR sind später der **abrechenbare** Pfad (Host zahlt je Teilnehmer). Billing folgt extra.
 
 ## Rollen
 
 | Rolle | Gerät / App | Aufgabe |
 |-------|-------------|---------|
-| Host / Organizer | **DiceBudget Tournament** (eigene App, getrenntes Bundle / TestFlight) | Turnier anlegen, Modi/Parameter, Auslosung, Spielplan, Live-Anzeige, Steuerung |
-| Spieler | **DiceBudget** (bestehende App) | per QR beitreten, Partien spielen, eigenen Kontext sehen |
-| Zuschauer / Wand | Host-Display oder Anzeige-Ansicht | Rankings, Pairings, nächste Runde — ohne Spieleingabe |
+| Host / Organizer | **DiceBudget Tournament** (0 €, Bundle `de.bottletrade.dicebudget.tournament`) | Event anlegen, Format, Größe, QR, Lobby, Auslosung, Live-Anzeige |
+| Teilnehmer (Event) | **DiceBudget GO** (0 €, geplant) **oder** **DiceBudget** (1,49 €, `frontend/`) | QR scannen, Partien spielen; GO = nur dieser Pfad |
+| Zuschauer / Wand | Host-Display | Rankings, Pairings — ohne Spieleingabe |
 
-Kommunikation: **iPad-Host ↔ Server ↔ Spieler-Apps** (kein Peer-to-Peer).
+Kommunikation: **Host-App ↔ Server ↔ Teilnehmer-Apps** (kein Peer-to-Peer).
 
-## Beitritt in der Spieler-App (UI)
+## Beitritt (UI, Ist)
 
-Startscreen-Mitte (zwischen Multi und Solo): **zwei Halbbreiten-Buttons** nebeneinander, jeweils gesamter Container = Aktion:
+Startscreen DiceBudget (zwischen Multi und Solo): zwei Buttons:
 
-1. **Multi-Spiel / Gegner-Raum beitreten** — QR-Scan (bestehend, aktiv)
-2. **Turnier beitreten** — QR-Scan (Platzhalter `disabled` / „Demnächst“, Funktion folgt mit T3)
+1. **Multi-Spiel / Gegner-Raum beitreten** — QR-Scan (aktiv, privates Multi)
+2. **Turnier/Liga beitreten** — Platzhalter `disabled` / „Demnächst“ (T3)
 
-Umsetzung: `HomeJoinButtons` in `JoinByQrScan.tsx`.
+Umsetzung: `HomeJoinButtons` in `JoinByQrScan.tsx`.  
+**DiceBudget GO** existiert noch nicht; T3 verdrahtet zuerst den Pro-Button, GO folgt als eigenes Produkt.
 
-## Architektur-Annahme (Start)
+## Architektur-Annahme
 
-- **Monorepo-Light** in diesem Repo: Doku jetzt; später z. B. `apps/tournament` (Host) neben `frontend/` (Spieler)
-- **Zwei iOS-Apps / zwei Builds / zwei TestFlight-Einträge**
-  - Spieler: `de.bottletrade.dicebudget`
-  - Host (Vorschlag): `de.bottletrade.dicebudget.tournament`
-- Turnier-Modi **breit** gedacht (Plugin/Strategie); konkrete Modi Milestone für Milestone
-- API-Vertrag zwischen Host und Spieler-App dokumentieren, bevor große UI entsteht
+- Monorepo: `frontend/` = DiceBudget; `apps/tournament/` = Host; GO später (gleicher Kern, eigenes Bundle)
+- Drei iOS-Apps / drei TestFlight-Einträge (GO noch ohne Bundle im Repo)
+- Event-Modi als Strategie: `league` | `turnier` (weitere später)
+- API-Vertrag: [`api-sketch.md`](./api-sketch.md)
 
-Details: [`roadmap.md`](./roadmap.md) · API-Skizze: [`api-sketch.md`](./api-sketch.md)
+Details: [`roadmap.md`](./roadmap.md) · Produkte: [`products.md`](./products.md)
 
 ---
 
 ## Nicht verhandelbar (harte Nebenbedingungen)
 
 1. **DiceBudget darf seine Funktionalität unter keinen Umständen verlieren.**  
-   Solo, Multi (QR), Stats, Labs/Hausregeln, Admin, iOS-Spieler-App bleiben vollwertig und nutzbar **ohne** Turnier.
-2. **Turnier nur additiv.** Neue Routen, Flags, APIs, optionale UI. Bestehende Flows nicht umbauen oder als Pflichtpfad umleiten.
-3. **Getrennte Produkte auf dem Gerät.** Host = **DiceBudget Tournament**; Spieler-App erhält höchstens einen optionalen Einstieg („Turnier beitreten“).
+   Solo, Multi (QR), Stats, Labs/Hausregeln, Admin bleiben vollwertig **ohne** Event.
+2. **Events nur additiv.** Neue Routen, Flags, APIs, optionale UI. Bestehende Flows nicht umbauen oder als Pflichtpfad umleiten.
+3. **Getrennte Produkte.** Host = Tournament. Teilnahme = GO und/oder DiceBudget. Pro-App höchstens optionaler Einstieg „Turnier/Liga beitreten“.
 4. **Regression vor Merge.** Bestehende Backend-/Frontend-Tests grün; bei riskanten Änderungen Smoke: Solo, Multi-QR, Stats.
-5. **Kein Feature-Tausch.** Turnier-Milestones ersetzen keine DiceBudget-Roadmap (z. B. M30 App Store).
-6. **AGENT_RULES gelten weiter.** Kein Polling-/Abuse-Risiko; Live-Updates nur mit klarem, sparsamen Design und GO.
+5. **Kein Feature-Tausch.** Event-Milestones ersetzen keine DiceBudget-Roadmap (z. B. M30 App Store).
+6. **AGENT_RULES gelten weiter.** Kein Polling-/Abuse-Risiko; Live-Updates nur mit klarem, sparsamen Design und Nutzer-GO.
 
-Bei Konflikt zwischen Turnier-Komfort und DiceBudget-Stabilität gewinnt **immer** DiceBudget.
+Bei Konflikt zwischen Event-Komfort und DiceBudget-Stabilität gewinnt **immer** DiceBudget.
 
 ## Agent-Lesezeichen
 
-Neue Agents bei Turnier-Themen:
-
-1. `AGENT_RULES.md` → Punkt `docs/tournament/`
-2. `HANDOVER.md` (Regeln + Übergabe-Prompt)
-3. Dieses README + `roadmap.md`
+1. `AGENT_RULES.md` → `docs/tournament/`
+2. `HANDOVER.md`
+3. [`products.md`](./products.md) + dieses README + `roadmap.md`
 4. Bei Bedarf: `api-sketch.md`, `docs/decisions.md` (Abschnitt Tournament)

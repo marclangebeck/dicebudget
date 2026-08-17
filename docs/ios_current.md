@@ -14,7 +14,7 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 - TestFlight: frischer Archive-Build **2026-08-15** (Multi-QR / In-App-Scan / Host-Overlay vereinfacht); Deployment Target **15.0**.
 - **Web/iOS ein Build (M43):** Admin per `NEXT_PUBLIC_ADMIN_PIN`; API-Key lokal.
 - Labs (`NEXT_PUBLIC_LABS_PIN`) getrennt von Admin.
-- **Tournament (Planung):** eigene Organizer-iPad-App geplant (separates Bundle/TestFlight) — `docs/tournament/`. Dieses Dokument und `npm run build:ios` betreffen nur die **Spieler-App**. DiceBudget-Kern bleibt unantastbar.
+- **Events:** drei Apps — `docs/tournament/products.md`. Dieses Dokument und `frontend` `npm run build:ios` betreffen nur **DiceBudget Pro**. Tournament: `apps/tournament`. GO: geplant. DiceBudget-Kern bleibt unantastbar.
 
 ## Deployment Target
 

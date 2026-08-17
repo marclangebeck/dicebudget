@@ -7,10 +7,11 @@ Strategische Würfelspiel-Variante mit Wurf-Pool und wählbarer Spielanzahl (1�
 Weitere Dokumentation:
 
 - **[HANDOVER.md](./HANDOVER.md)** – Übergabe-Prompt für neue Agents (Copy & Paste oben)
-- **[GOiOS.md](./GOiOS.md)** – iOS / TestFlight / App Store (Spieler-App)
+- **[GOiOS.md](./GOiOS.md)** – iOS / TestFlight / App Store (DiceBudget Pro)
 - **[AGENT_RULES.md](./AGENT_RULES.md)** – verbindlich: kein Abuse-Risiko (keine Loops/Dauerprozesse)
-- **[docs/tournament/](./docs/tournament/)** – **DiceBudget Tournament** (Host-iPad): Planung + API; App unter `apps/tournament/`
-- **[apps/tournament/README.md](./apps/tournament/README.md)** – Host-App Build (Port 3022, eigenes iOS-Bundle)
+- **[docs/tournament/products.md](./docs/tournament/products.md)** – **drei Apps:** DiceBudget · Tournament · GO
+- **[docs/tournament/](./docs/tournament/)** – Event-Host (Liga/Turnier): Planung + API; App unter `apps/tournament/`
+- **[apps/tournament/README.md](./apps/tournament/README.md)** – Tournament-Build (Port 3022, eigenes iOS-Bundle)
 - [projektbeschreibung.md](./projektbeschreibung.md) – fachliche und technische Spezifikation
 - [milestones.md](./milestones.md) – Meilensteine und Status
 - [CHANGELOG.md](./CHANGELOG.md) – Änderungshistorie

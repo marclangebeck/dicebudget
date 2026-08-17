@@ -3,8 +3,8 @@
 **Stand:** 2026-08-15  
 **Status:** T1 API umgesetzt (`/tournaments`); Host-UI in `apps/tournament`. Skizze bleibt Referenz für T3+.
 
-Ziel: gemeinsamer Vertrag zwischen **Host-App (iPad)** und **DiceBudget (Spieler)**.  
-Bestehende Multi-Session-API (`/sessions`, Invite-QR) bleibt für Partien; Turnier **orchestriert** darüber.
+Ziel: Vertrag zwischen **DiceBudget Tournament** (Host) und **Teilnehmer-Apps** (**DiceBudget** Pro und später **DiceBudget GO**).  
+Bestehende Multi-Session-API (`/sessions`, Invite-QR) bleibt für Partien; das Event **orchestriert** darüber. Produktrollen: [`products.md`](./products.md).
 
 ## Begriffe
 
@@ -55,14 +55,17 @@ Kern-API liefert Pairings und Standings; Modus-Plugins berechnen Auslosung und R
 
 | Bleibt wie bisher | Neu / optional |
 |-------------------|----------------|
-| `/multi`, Solo, Stats, Labs | `/tournament/…` Join nur wenn User scannt |
-| Multi-Invite-QR | Turnier-QR |
-| Session-Finalize / Pairing-Stats | Turnier-Standing separat |
+| `/multi`, Solo, Stats, Labs in **DiceBudget** | `/tournament/…` Join nur nach QR-Scan |
+| Multi-Invite-QR | Event-QR (Liga/Turnier) |
+| Session-Finalize / Pairing-Stats | Event-Standing separat |
+| — | später: Join als Abrechnungs-Hook; **GO** nur Event-Join |
 
 ## Offene Fragen (später)
 
 - Auth Organizer (Gerät-PIN vs. Account)  
 - Ob Ergebnis nur aus Session gelesen oder Host manuell korrigieren darf  
 - Mehrere Partien parallel vs. ein Tisch nach dem anderen  
+- Abrechnung am Join (Host zahlt je Eintrag)  
+- Gleiche Join-API für DiceBudget und GO
 
 Nächste Schärfung: ein Mini-Szenario „8 Spieler, 4 Tische, 3 Liga-Runden“ durch diese Ressourcen spielen.

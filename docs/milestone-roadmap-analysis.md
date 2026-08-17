@@ -1,16 +1,16 @@
 # Milestone-Roadmap — Umsetzung Projektanalyse
 
 **Erstellt:** 2026-06-11  
-**Aktualisiert:** 2026-08-15 (M42/M43; Multi-QR; Tournament-Planung `docs/tournament/`)  
+**Aktualisiert:** 2026-08-17 (Produktfamilie drei Apps: `docs/tournament/products.md`)  
 **Basis:** Vollständige Projektanalyse (Backend, Frontend, Release)  
 **Branch:** `milestone-22-prep`  
 **Produktcode-HEAD:** siehe `git log -1`  
-**Nächster Milestone:** **M30** App Store Release (nach Abnahme); Turnier = separates Track (`docs/tournament/`), nur nach GO  
+**Nächster Milestone:** **M30** App Store Release (nach Abnahme); Events = separates Track (`docs/tournament/`)  
 **Arbeitsweise:** Pro Milestone ein **GO** vom Nutzer, danach Umsetzung in Sprints, dann Abnahme. **Kein Produktcode ohne GO.**
 
 **Vor M30 umgesetzt (nicht nummeriert):** Feature-Labor (`5e621ac`), Hausregeln Strategy hinter Labor-Toggles — **bis M36:** jeder Spieler schaltet lokal per Code frei (Labor-Zwischenstand, bewusst OK). **M42** Rival-Avatare lokal; **M43** Admin-PIN + lokaler API-Key (ein Build).
 
-**Geplant:** **M36** nach M30; **M37–M41** umgesetzt (Details unten). **Tournament T0–T10:** `docs/tournament/roadmap.md` (eigene Host-App; DiceBudget-Kern unantastbar).
+**Geplant:** **M36** nach M30; **M37–M41** umgesetzt (Details unten). **Tournament T0–T10:** `docs/tournament/roadmap.md`. Drei Apps: `docs/tournament/products.md`. DiceBudget-Kern unantastbar.
 
 Dieses Dokument ergänzt `docs/milestones_active.md`. Nach Abschluss eines Milestones: Eintrag in `CHANGELOG.md`, Update `HANDOVER.md`, optional Archivierung hier. Turnier-Themen: zusätzlich `docs/tournament/README.md`.
 

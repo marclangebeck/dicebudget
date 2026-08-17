@@ -20,7 +20,7 @@ Nur bei Bedarf zusätzlich:
 5. **`docs/decisions.md`** (dauerhaft gültige Architektur- und Betriebsentscheidungen)
 6. **`docs/milestones_archive.md`** (ältere Milestone-Historie)
 7. **`docs/ios_archive.md`** (ältere iOS-/TestFlight-Historie)
-8. **`docs/tournament/`** (Turnier-Host-App Planung; DiceBudget-Kern bleibt unantastbar)
+8. **`docs/tournament/`** (Produktfamilie + Host: `products.md`, README, roadmap; DiceBudget-Kern unantastbar)
 
 Frontend-Details: `frontend/README.md`. Fachliche Spezifikation: `projektbeschreibung.md`. Bei Widersprüchen gilt **`AGENT_RULES.md`**.
 
@@ -81,9 +81,10 @@ Nur arbeiten innerhalb:
 ```
 kniffel/
 ├── backend/      # Express API (Port 3020, nur bei Bedarf starten)
-├── frontend/     # Next.js Spieler-App (Dev 3021; Produktion: static export → out/)
+├── frontend/     # DiceBudget Pro (Dev 3021; static export → out/)
 ├── apps/
 │   └── tournament/  # DiceBudget Tournament Host (Dev 3022; eigenes iOS-Bundle)
+│                    # DiceBudget GO: geplant, noch kein Ordner
 ├── public/       # Legacy-Testseite (nicht Produktions-Frontend)
 ├── infra/        # Nginx, Deploy-Skripte
 ├── HANDOVER.md

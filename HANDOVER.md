@@ -7,7 +7,7 @@
 **Sprache:** Deutsch  
 **Stand Doku:** 2026-08-15
 
-Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Aktiver Stand: `docs/milestones_active.md`. iOS/TestFlight: `docs/ios_current.md`. Architektur/Betrieb: `docs/decisions.md` nur bei Bedarf. **Turnier (Planung):** `docs/tournament/` — Umsetzung nur nach GO; DiceBudget-Kern unantastbar.
+Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Aktiver Stand: `docs/milestones_active.md`. iOS/TestFlight: `docs/ios_current.md`. Architektur/Betrieb: `docs/decisions.md` nur bei Bedarf. **Produktfamilie (3 Apps):** `docs/tournament/products.md`. Event-Host: `docs/tournament/` — DiceBudget-Kern unantastbar.
 
 ## Verbindliche Regeln
 
@@ -19,7 +19,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 - Agent arbeitet nur unter `/home/bottleadmin/projects/kniffel`.
 - Mac-Clone: `/Users/marclangebeck/projects/kniffel` (auch `~/projects/kniffel`).
 - Reine Frontend-Änderungen: `cd frontend && npm run build` auf dem Server; Nginx liefert `frontend/out/` aus.
-- **Turnier:** Docs unter `docs/tournament/`. Harte Regel: DiceBudget darf **keine** Funktionalität verlieren; Turnier nur additiv; eigene iPad-Host-App (separates Bundle/TestFlight); Spieler weiter über DiceBudget + QR. Details: `docs/tournament/README.md`.
+- **Events:** drei Apps — **DiceBudget** (Pro), **DiceBudget Tournament** (Host), **DiceBudget GO** (nur Teilnahme, geplant). Quelle: `docs/tournament/products.md`. DiceBudget-Kern unantastbar; Events nur additiv. Hosten nur Tournament.
 
 ## Aktueller Stand
 
@@ -31,7 +31,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 | Roadmap | **M42/M43** + **Multi-QR** umgesetzt; **M30** danach; Turnier = Planung `docs/tournament/` |
 | Entwickler-Vorschau | **InApp-Käufe (Features)** = Labs-PIN (`NEXT_PUBLIC_LABS_PIN`) — getrennt von Admin |
 | iOS/TestFlight | Version `2.0`; Deployment Target **15.0**; frischer Archive-Build 2026-08-15 (QR-Scan + Host-QR) |
-| Tournament | T2 Host `apps/tournament` + T1 API `/tournaments` — Spieler-Join = T3 |
+| Tournament | T2 Host `apps/tournament` + T1 API; Setup-Wizard; Join in Pro-App = T3; **GO** geplant (`docs/tournament/products.md`) |
 | Backend Prod | Migrationen inkl. Tournaments — Deploy bei Backend-Änderungen |
 
 ## Multi-Beitritt (QR only) — Stand 2026-08-15
@@ -92,7 +92,7 @@ Frontend: `cd frontend && npm run build`.
 - Admin: `adminAccess.ts`, `settings/admin/page.tsx`, `AdminUnlockDialog.tsx`
 - Rival-Avatare: `rivalAvatarStore.ts`, `RivalAvatar.tsx`, `RivalManagePanel.tsx`
 - iOS: `docs/ios_current.md`, `GOiOS.md`, `docs/testflight-app-store.md`
-- **Tournament (Planung):** `docs/tournament/README.md`, `docs/tournament/roadmap.md`, `docs/tournament/api-sketch.md`
+- **Events / 3 Apps:** `docs/tournament/products.md`, `docs/tournament/README.md`, `docs/tournament/roadmap.md`, `docs/tournament/api-sketch.md`
 
 ## Offene Prioritäten
 
@@ -100,12 +100,12 @@ Frontend: `cd frontend && npm run build`.
 2. Optional **Stufe A** Stats nur bei Drift.
 3. **M36** nach M30.
 4. `milestone-22-prep` → `main` nach Release-Freigabe.
-5. **DiceBudget Tournament (Planung):** `docs/tournament/` — eigene iPad-Host-App + Spieler per QR; DiceBudget-Funktionalität ist **nicht verhandelbar** (siehe dort).
+5. **Produktfamilie:** `docs/tournament/products.md` — Tournament (Host) + GO (Teilnahme, geplant) + DiceBudget (Pro inkl. Event-Join); Kern unantastbar.
 
 ## Agent-Start (Übergabeprompt)
 
 ```text
-Du arbeitest an dice.budget (kniffel). Lies zuerst AGENT_RULES.md und HANDOVER.md, dann docs/milestones_active.md und docs/ios_current.md. Bei Turnier-Themen zusätzlich docs/tournament/README.md und docs/tournament/roadmap.md.
+Du arbeitest an dice.budget (kniffel). Lies zuerst AGENT_RULES.md und HANDOVER.md, dann docs/milestones_active.md und docs/ios_current.md. Bei Event-/Turnier-Themen docs/tournament/products.md, README.md und roadmap.md.
 
 Workspace: /home/bottleadmin/projects/kniffel
 Branch: milestone-22-prep
@@ -115,9 +115,9 @@ Sprache: Deutsch
 
 Regeln: Nach Auftrag automatisch commit + push (AGENT_RULES §9). Kein sudo. Keine Watcher/Polling/Dauerprozesse. Nach Code-Änderungen nummerierte [Server]/[Mac]-Befehle. Frontend-Build: cd frontend && npm run build. Backend-Deploy nur Nutzer: sudo bash infra/scripts/deploy-backend-prod.sh. iOS nur Mac: npm run build:ios.
 
-Hart: DiceBudget-Kernfunktionalität darf nicht verloren gehen. Turnier (docs/tournament/) nur additiv, eigene iPad-Host-App später, Spieler weiter DiceBudget + QR — Umsetzung nur nach GO.
+Hart: DiceBudget-Kern unantastbar. Drei Apps: DiceBudget (Pro), Tournament (Host), GO (nur Event-Teilnahme, geplant). Events nur additiv. Quelle: docs/tournament/products.md.
 
-Stand 2026-08-15: Multi-Beitritt nur noch per QR (In-App-Scan + Universal Links); Code-Eingabe entfernt; Host-Overlay = „Spiel beitreten“ + QR + „Zur Lobby“. iOS Deployment Target 15.0. M42/M43 erledigt. 2×/3× Alle Fünfe: 1/n + optionale Gutschrift. Nächstes großes Thema typischerweise M30 (App Store) — GO abwarten; Turnier = Planung.
+Stand 2026-08-17: Host-Setup (Event-Name → Liga/Turnier → Größe → Anlegen → Lobby/QR). Pro-App-Button „Turnier/Liga beitreten“ noch Demnächst. GO noch nicht im Code. M42/M43, Multi-QR erledigt. M30 App Store bleibt DiceBudget-Track.
 
-Antworten auf Deutsch. Kleine Inkremente, vor größeren Features GO einholen.
+Antworten auf Deutsch. Kleine Inkremente, vor größeren Features Nutzer-GO einholen.
 ```

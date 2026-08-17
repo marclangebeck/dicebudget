@@ -1,10 +1,10 @@
 # DiceBudget Tournament — Roadmap
 
 **Produktname:** DiceBudget Tournament  
-**Stand:** 2026-08-15  
-**Produktprinzipien:** [`README.md`](./README.md) (inkl. harter Nebenbedingungen)
+**Stand:** 2026-08-17  
+**Produktprinzipien:** [`README.md`](./README.md) · Produktfamilie: [`products.md`](./products.md)
 
-DiceBudget-Spieler-App bleibt unangetastet in der Kernfunktion; **DiceBudget Tournament** (Host-iPad) wird **daneben** aufgebaut.
+**DiceBudget** (Pro) bleibt in der Kernfunktion unantastbar. **Tournament** (Host) und später **DiceBudget GO** (nur Event-Teilnahme) stehen **daneben**. Hosten nur Tournament; Mitspielen GO oder Pro.
 
 ## Modi (breit, später konkret)
 
@@ -18,13 +18,13 @@ Konkrete Modus-Liste und Regeldetails kommen **pro Milestone**, nicht als Startb
 | **T0** | Vision & Vertrag | Docs, Rollen, API-Skizze, Name **DiceBudget Tournament** | erledigt |
 | **T1** | Backend Turnier-Kern | Turnier anlegen, Join-Code/QR-Payload, Spieler-Liste, Status | **umgesetzt** (`/tournaments`) |
 | **T2** | Host-App Skelett | `apps/tournament`, Capacitor Bundle `de.bottletrade.dicebudget.tournament`, Start/Host-Lobby | **umgesetzt** (iOS `cap add` auf Mac) |
-| **T3** | Spieler-Anbindung | Optional: Turnier per QR in DiceBudget; Anzeige Tisch/Runde | **additiv**; Startscreen-Button aktivieren |
+| **T3** | Teilnehmer-Join | QR in **DiceBudget** (Pro-Button aktivieren); später gleiches in **GO** | **additiv**; GO-App extra Track |
 | **T4** | Spielplan & Auslosung | Tische/Paarungen, manuell + einfache Auto-Auslosung | Modus-agnostische Pairing-API |
 | **T5** | Partie-Link | Host startet Tisch → bestehende Multi-Session; Ergebnis zurück ins Turnier | Multi-Kern wiederverwenden, nicht forken |
 | **T6** | Live & Beamer | Ranking/Spielplan-Ansicht; sparsame Updates | kein Polling-Spam (AGENT_RULES) |
 | **T7** | Erster Tabellen-Modus | z. B. Liga über mehrere Runden | erster Modus-Plugin-Beweis |
 | **T8** | Erster Turnier-Modus | Bracket, Weiterkommen, Freilose | zweiter Modus-Beweis (`modeKey: turnier`) |
-| **T9** | iOS Host Release | Eigenes TestFlight, Checkliste, getrennt von DiceBudget | zwei Uploads / zwei Apps |
+| **T9** | iOS Host Release | Eigenes TestFlight, getrennt von DiceBudget | Host-Upload; GO separat |
 | **T10** | Feld-Pilot | Echtes Turnier (beliebiger Host), Feedback, Härten | danach weitere Modi |
 
 ## Reihenfolge
@@ -46,9 +46,11 @@ T7/T8 können nach dem Kern parallel oder nacheinander kommen; weitere Modi dana
 - volle Modus-Bibliothek  
 - Organizer-Accounts (PIN vs. Login)  
 - Zuschauer-Web ohne App  
+- **DiceBudget GO** als dritte App (Bundle, Store, Upgrade → Pro)  
+- Abrechnung je QR-Beitritt  
 
 ## Nächster Schritt
 
-**Host-Setup:** Name → Format (**Liga** | **Turnier**) → Größe → format-Zweig → Kurzcheck → Anlegen → Lobby/QR.  
-Beide Formate werden in **DiceBudget Tournament** ausgebaut; die Spieler-App nur Beitritt (T3).  
-iOS Host: auf dem Mac bei Bedarf `cd apps/tournament && npm run build:ios`.
+**Host-Setup (Tournament):** Event-Name → Format (Liga \| Turnier) → Größe → Format-Zweig → Kurzcheck → Anlegen → Lobby/QR.  
+Liga- und Turnier-Zweig in **Tournament** weiter ausbauen. Teilnehmer-Join (T3) in der **Pro-App**, danach **GO**.  
+iOS Host: `cd apps/tournament && npm run build:ios` (Mac).

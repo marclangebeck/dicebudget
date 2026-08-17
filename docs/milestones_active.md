@@ -6,7 +6,7 @@
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de — Frontend Unit-Tests **105** grün  
 **Backend:** Migrationen u. a. `20260807120000_pairing_baseline_absolute`, `20260807140000_pairing_baseline_app_snapshot` — Deploy nach Stabilitäts-Batch
 
-Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`. Turnier-Planung (eigene Host-App): `docs/tournament/` — DiceBudget-Kern unantastbar; Umsetzung nur nach GO.
+Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`. Events / drei Apps: `docs/tournament/products.md` — DiceBudget-Kern unantastbar.
 
 ## Aktueller Milestone
 
@@ -514,7 +514,7 @@ Dateien:
 2. **M30** danach: TestFlight-Regression; iOS-Upload; App Store Connect.
 3. Optional: Auto-Refresh nach Pool-Endspiel fuer Statistik-Toggle.
 4. Optional: `milestone-22-prep` nach Nutzer-Freigabe auf `main` bringen.
-5. **Tournament:** Planung unter `docs/tournament/` (Host-iPad + Spieler-QR); Umsetzung erst nach GO; DiceBudget-Kern unantastbar.
+5. **Events:** `docs/tournament/products.md` — Host in Tournament, Teilnahme GO (geplant) oder DiceBudget Pro; Kern unantastbar.
 
 ## Bekannte Technische Schulden
 
@@ -527,7 +527,7 @@ Dateien:
 1. M42/M43 Abnahme / iOS-Build mit Admin-PIN; dann **M30**.
 2. Optional M36 nach M30.
 3. `milestone-22-prep` → `main` nach Release-Freigabe.
-4. **Tournament:** nur Planung (`docs/tournament/`); Umsetzung nach GO; DiceBudget-Kern unantastbar (`docs/decisions.md`).
+4. **Events:** Host in Tournament weiterbauen; GO geplant; DiceBudget-Kern unantastbar (`docs/tournament/products.md`).
 
 ## Letzte UX (2026-08-12)
 

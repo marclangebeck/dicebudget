@@ -8,17 +8,17 @@ Diese Datei ist ein Kompatibilitaets-Index. Fuer aktuellen iOS-/TestFlight-/App-
 - Aeltere iOS-/TestFlight-Historie: `docs/ios_archive.md`
 - Xcode-Einsteiger-Anleitung: `docs/ios-xcode-anleitung.md`
 - App-Store-Connect-Schrittfolge: `docs/testflight-app-store.md`
-- Turnier-Host (Planung, eigene App): `docs/tournament/`
+- Turnier-Host (Events, eigene App): `docs/tournament/` · Produktfamilie: `docs/tournament/products.md`
 
 ## Kurzstand
 
-- Bundle ID Spieler-App: `de.bottletrade.dicebudget`
+- Bundle ID **DiceBudget** (Pro): `de.bottletrade.dicebudget`
 - Version in App Store Connect: `2.0`
 - Deployment Target: **15.0**
 - TestFlight: Archive **2026-08-15** (HEAD `faf721b` — Multi-QR / Scan / Host-Overlay)
 - Details und Checkliste: `docs/ios_current.md`
-- Nächster großer Schritt: Abnahme QR-Build, danach **M30** Store-Submit (GO)
-- **Geplant (nicht implementiert):** zweite iOS-App für Turnier-Organizer (eigenes Bundle/TestFlight) — siehe `docs/tournament/`. `npm run build:ios` der Spieler-App erzeugt **nicht** die Host-App.
+- Nächster großer Schritt DiceBudget: Abnahme QR-Build, danach **M30** Store-Submit (Nutzer-GO)
+- **Drei Apps:** Pro + **Tournament** (Host, `apps/tournament`) + **GO** (geplant). Siehe `docs/tournament/products.md`. `npm run build:ios` in `frontend/` erzeugt **nicht** Tournament und **nicht** GO.
 
 ## Wichtig
 
@@ -28,4 +28,4 @@ Diese Datei ist ein Kompatibilitaets-Index. Fuer aktuellen iOS-/TestFlight-/App-
 - **Admin (M43):** `NEXT_PUBLIC_ADMIN_PIN` vor `build:ios`; `NEXT_PUBLIC_ADMIN_API_KEY` leer.
 - **Multi-QR:** Associated Domains `applinks:dicebudget.bottle-trade.de`; Kamera-Permission für In-App-Scan.
 - Der verbindliche Sync-Workflow steht in `AGENT_RULES.md` Sektion 9.
-- Turnier darf die Spieler-App nicht beschädigen (harte Regel in `docs/tournament/README.md` und `docs/decisions.md`).
+- Events dürfen die DiceBudget-Pro-App nicht beschädigen (harte Regel in `docs/tournament/products.md`).
