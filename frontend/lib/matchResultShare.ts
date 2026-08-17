@@ -1,6 +1,6 @@
 import { APP_NAME } from "@/lib/branding";
 import type { HeadToHeadAnalysisDto, MatchAnalysisDto } from "@/lib/matchAnalysisTypes";
-import { getRivalAvatarBlob } from "@/lib/rivalAvatarStore";
+import { getPlayerPhotoBlob } from "@/lib/playerPhotos";
 import {
   SHARE_CARD_SIZE,
   canvasToPngBlob,
@@ -271,9 +271,9 @@ export type PairingShareParams = {
   netDiff?: number;
   /** Letzte Ergebnisse chronologisch (älteste zuerst), max. ~5. */
   form?: Array<"A" | "B" | "tie">;
-  /** Lokale Rivalen-IDs für Avatare (IndexedDB, optional). */
-  playerARivalId?: string | null;
-  playerBRivalId?: string | null;
+  /** Lokale Foto-Keys (playerId, IndexedDB). */
+  playerAPhotoId?: string | null;
+  playerBPhotoId?: string | null;
 };
 
 export type HomeRecordShareParams = {
@@ -411,8 +411,8 @@ export async function renderPairingShareImage(params: PairingShareParams): Promi
         : "rgba(56, 189, 248, 0.22)";
 
   const [avatarA, avatarB] = await Promise.all([
-    params.playerARivalId ? getRivalAvatarBlob(params.playerARivalId) : Promise.resolve(null),
-    params.playerBRivalId ? getRivalAvatarBlob(params.playerBRivalId) : Promise.resolve(null),
+    params.playerAPhotoId ? getPlayerPhotoBlob(params.playerAPhotoId) : Promise.resolve(null),
+    params.playerBPhotoId ? getPlayerPhotoBlob(params.playerBPhotoId) : Promise.resolve(null),
   ]);
 
   drawShareBackground(ctx);
@@ -423,7 +423,7 @@ export async function renderPairingShareImage(params: PairingShareParams): Promi
   ctx.textBaseline = "alphabetic";
   ctx.fillStyle = "#e5c07b";
   ctx.font = "700 28px system-ui, sans-serif";
-  ctx.fillText("RIVALEN-DUELL", SHARE_CARD_SIZE / 2, 200);
+  ctx.fillText("DUELL", SHARE_CARD_SIZE / 2, 200);
 
   const avatarR = 72;
   const avatarCy = 300;

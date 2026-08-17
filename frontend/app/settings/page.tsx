@@ -73,12 +73,6 @@ function SettingsPageInner() {
   }, []);
 
   useEffect(() => {
-    if (searchParams.get("open") === "rivals") {
-      router.replace("/settings/rivals");
-    }
-  }, [router, searchParams]);
-
-  useEffect(() => {
     setLabsUnlocked(isLabsUnlocked());
     return subscribeLabsAccess(() => setLabsUnlocked(isLabsUnlocked()));
   }, []);

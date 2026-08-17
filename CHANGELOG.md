@@ -6,6 +6,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ### Added
 - **Spielername (Server):** einmal nach der Sanduhr; `GET/PUT/DELETE /player-names/display`; Lobby/Statistik zeigen Namen; Settings ändern/löschen; Paarungs-Zahlen unverändert
+- **Lokale Fotos an playerId:** bisherige Rivalen-Bilder bleiben (IndexedDB), ohne Rivalen-Verwaltung; Foto in der Paarung setzen
 - **Tournament API (T1):** `POST/GET /tournaments…`, Join, Start mit `X-Host-Token`; Migration `tournaments` / `tournament_entries`
 - **2×/3× Alle Fünfe — Pool-Gutschrift:** Unter-Toggle unter InApp-Käufe; abgezogene Pools optional dem Erfolgreichen gutgeschrieben (Session-Flags, Default aus)
 - **2× Alle Fünfe Multi n Spieler:** Mitspieler verlieren je 1/n Pool (zu zweit Hälfte wie bisher); Auto auch bei 3+; 3× weiter gesamter Pool
@@ -24,7 +25,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Paarungs-Detail-Karten:** Bild oben volle Breite / halbe Höhe, Infos darunter — persönlichere Rivalen-Ansicht
 
 ### Changed
-- **Einstellungen → Multi:** nach Raum anlegen wie der Host-Weg — QR + „Zur Lobby“, kein Code-Teilen
+- **Keine Rivalen-Verwaltung mehr:** Namen vom Server; ✏️-Aliase, Menü „Rivalen verwalten“ und „Das bin ich“-UI entfernt. Fotos lokal in der Statistik.
 - **Startscreen:** Beitritts-Button heißt „Turnier/Liga beitreten“ (weiterhin Demnächst / ohne Funktion)
 - **Tournament Host:** Liga und Turnier beide wählbar; nach Größe getrennte Zweige (`/setup/league` · `/setup/turnier`); Spieler-App bleibt nur Join
 - **Tournament Host Setup (Anlegen):** Kurzcheck legt Ereignis per API an → Lobby mit QR; Draft wird geleert

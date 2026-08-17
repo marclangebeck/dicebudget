@@ -8,10 +8,7 @@ import { getSessionLobby, getSessionRanking, joinSession, createGameSession } fr
 import { saveActiveGame } from "@/lib/activeGame";
 import { ResumeLobbySheet } from "@/components/ResumeLobbySheet";
 import type { SessionLobbyDto, SessionRankingDto } from "@/lib/sessionTypes";
-import { loadDisplayNames } from "@/lib/rivalProfiles";
-import type { PlayerAliasMap } from "@/lib/playerAliases";
-import { PlayerAliasOverlay } from "@/components/PlayerAliasOverlay";
-import { normalizePublicPlayerId, getOrCreatePlayerId, playerLabel } from "@/lib/playerIdentity";
+import { getOrCreatePlayerId, playerLabel } from "@/lib/playerIdentity";
 import { useMergedDisplayNames } from "@/lib/useMergedDisplayNames";
 
 function MultiJoinInner() {
@@ -23,7 +20,6 @@ function MultiJoinInner() {
   const [ranking, setRanking] = useState<SessionRankingDto | null>(null);
   const [tab, setTab] = useState<"lobby" | "rank">("lobby");
   const [playerId, setPlayerId] = useState("");
-  const [aliases, setAliases] = useState<PlayerAliasMap>({});
   const extraNameIds = useMemo(() => {
     const ids = new Set<string>();
     if (playerId) ids.add(playerId);
@@ -33,11 +29,9 @@ function MultiJoinInner() {
     return [...ids];
   }, [playerId, lobby, ranking]);
   const displayAliases = useMergedDisplayNames(extraNameIds);
-  const [editingPlayerId, setEditingPlayerId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     setPlayerId(getOrCreatePlayerId());
-    setAliases(loadDisplayNames());
   }, []);
 
   const [nextRoundLoading, setNextRoundLoading] = useState(false);
@@ -205,14 +199,6 @@ function MultiJoinInner() {
                   >
                     <span className="flex items-center gap-2">
                       {playerLabel(p.playerId, playerId, displayAliases)}
-                      <button
-                        type="button"
-                        className="btn-chip px-2 py-0.5 text-xs"
-                        onClick={() => setEditingPlayerId(p.playerId)}
-                        aria-label="Alias setzen"
-                      >
-                        ✏️
-                      </button>
                     </span>
                     <span className="join-player-state tabular-nums">
                       {p.runFinished ? `${p.totalScore} ✓` : "spielt"}
@@ -268,14 +254,6 @@ function MultiJoinInner() {
                       <span>
                         <span className="mr-2 text-slate-500">{row.rank}.</span>
                         {playerLabel(row.playerId, playerId, displayAliases)}
-                        <button
-                          type="button"
-                          className="btn-chip ml-2 px-2 py-0.5 text-xs"
-                          onClick={() => setEditingPlayerId(row.playerId)}
-                          aria-label="Alias setzen"
-                        >
-                          ✏️
-                        </button>
                         {!row.finished && (
                           <span className="ml-2 text-xs text-slate-600">(noch aktiv)</span>
                         )}
@@ -302,14 +280,6 @@ function MultiJoinInner() {
                         <span>
                           <span className="mr-2 text-slate-500">{row.rank}.</span>
                           {playerLabel(row.playerId, playerId, displayAliases)}
-                          <button
-                            type="button"
-                            className="btn-chip ml-2 px-2 py-0.5 text-xs"
-                            onClick={() => setEditingPlayerId(row.playerId)}
-                            aria-label="Alias setzen"
-                          >
-                            ✏️
-                          </button>
                         </span>
                         <span className="text-muted tabular-nums text-xs">
                           S {row.winPoints} · +{row.bonusPoints} ·{" "}
@@ -339,20 +309,6 @@ function MultiJoinInner() {
       <Link href="/multi" className="join-lobby-host-link">
         Neuer Raum (Host)
       </Link>
-
-      {editingPlayerId && (
-        <PlayerAliasOverlay
-          playerId={editingPlayerId}
-          ownPlayerId={playerId}
-          aliases={displayAliases}
-          currentAlias={aliases[normalizePublicPlayerId(editingPlayerId)]}
-          onClose={() => setEditingPlayerId(null)}
-          onSave={(displayNames) => {
-            setAliases(displayNames);
-            setEditingPlayerId(null);
-          }}
-        />
-      )}
     </div>
   );
 }

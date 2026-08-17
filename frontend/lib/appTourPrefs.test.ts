@@ -79,14 +79,14 @@ describe("appTourPrefs", () => {
 });
 
 describe("appTourSteps", () => {
-  it("hat drei Kapitel mit Strategy- und Rivalen-Inhalt", () => {
+  it("hat drei Kapitel mit Strategy- und Statistik-Inhalt", () => {
     assert.equal(Object.keys(APP_TOUR_STEPS_BY_CHAPTER).length, 3);
     assert.ok(getAppTourSteps("start").length >= 4);
     assert.ok(getAppTourSteps("strategy").length >= 6);
-    assert.ok(getAppTourSteps("rivals").length >= 4);
+    assert.ok(getAppTourSteps("rivals").length >= 3);
     assert.ok(APP_TOUR_STEPS.some((step) => step.id === "pool-build"));
     assert.ok(APP_TOUR_STEPS.some((step) => step.id === "pool-spend"));
-    assert.ok(APP_TOUR_STEPS.some((step) => step.id === "rivals-manage"));
+    assert.ok(APP_TOUR_STEPS.some((step) => step.id === "stats-photos"));
     assert.ok(APP_TOUR_STEPS.some((step) => step.id === "house-rules"));
   });
 

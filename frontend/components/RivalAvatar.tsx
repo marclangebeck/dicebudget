@@ -1,11 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  getRivalAvatarBlob,
-  subscribeRivalAvatars,
-} from "@/lib/rivalAvatarStore";
-import { findRivalByPlayerId } from "@/lib/rivalProfiles";
+import { getPlayerPhotoBlob } from "@/lib/playerPhotos";
+import { subscribeRivalAvatars } from "@/lib/rivalAvatarStore";
 
 type Size = "sm" | "md" | "banner";
 
@@ -17,13 +14,13 @@ function initialsFromName(name: string): string {
 }
 
 type RivalAvatarProps = {
-  rivalId: string | null | undefined;
+  playerId: string | null | undefined;
   name: string;
   size?: Size;
   className?: string;
 };
 
-export function RivalAvatar({ rivalId, name, size = "md", className = "" }: RivalAvatarProps) {
+export function RivalAvatar({ playerId, name, size = "md", className = "" }: RivalAvatarProps) {
   const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -31,11 +28,11 @@ export function RivalAvatar({ rivalId, name, size = "md", className = "" }: Riva
     let cancelled = false;
 
     async function load() {
-      if (!rivalId) {
+      if (!playerId) {
         setUrl(null);
         return;
       }
-      const blob = await getRivalAvatarBlob(rivalId);
+      const blob = await getPlayerPhotoBlob(playerId);
       if (cancelled) return;
       if (!blob) {
         setUrl(null);
@@ -56,7 +53,7 @@ export function RivalAvatar({ rivalId, name, size = "md", className = "" }: Riva
       unsub();
       if (revoked) URL.revokeObjectURL(revoked);
     };
-  }, [rivalId]);
+  }, [playerId]);
 
   const sizeClass =
     size === "banner" ? "rival-avatar--banner" : size === "sm" ? "rival-avatar--sm" : "rival-avatar--md";
@@ -89,13 +86,7 @@ export function RivalAvatarByPlayer({
   size = "sm",
   className,
 }: RivalAvatarByPlayerProps) {
-  const profile = findRivalByPlayerId(playerId);
   return (
-    <RivalAvatar
-      rivalId={profile?.id}
-      name={name}
-      size={size}
-      className={className}
-    />
+    <RivalAvatar playerId={playerId} name={name} size={size} className={className} />
   );
 }

@@ -18,7 +18,6 @@ import {
   subscribeRivalProfiles,
   type RivalProfile,
 } from "@/lib/rivalProfiles";
-import { PlayerAliasOverlay } from "@/components/PlayerAliasOverlay";
 import { PairingEditOverlay } from "@/components/PairingEditOverlay";
 import { buildStatsOverview } from "@/lib/statsOverview";
 import {
@@ -66,7 +65,6 @@ function StatsPageInner() {
   const displayAliases = useMergedDisplayNames(playerIdsFromPairings(pairings));
   const [rivalProfiles, setRivalProfiles] = useState<RivalProfile[]>([]);
   const [selfProfileId, setSelfProfileId] = useState<string | null>(null);
-  const [editingPlayerId, setEditingPlayerId] = useState<string | null>(null);
   const [editingPairing, setEditingPairing] = useState<{
     group: MergedPairingSummary;
     sources: PairingSummaryDto[];
@@ -270,7 +268,7 @@ function StatsPageInner() {
       .join("\n");
     const confirmed = window.confirm(
       `Folgende Paarungen hier ausblenden?\n\n${labels}\n\n` +
-        "Nur auf diesem Gerät. Rivalen bleiben erhalten. " +
+        "Nur auf diesem Gerät. " +
         "Server-Daten und andere Geräte sind unverändert. " +
         "Du kannst ausgeblendete Paarungen später wieder anzeigen.",
     );
@@ -375,15 +373,12 @@ function StatsPageInner() {
     <div className="stats-screen flex flex-col gap-2.5 pb-2">
       <AppScreenHeader
         section="Statistik"
-        title="Meine Rivalen"
-        subtitle="Bilanz und Duelle — Rivalen tippen zum Benennen, Paarung zum Aufklappen"
+        title="Deine Duelle"
+        subtitle="Bilanz und Paarungen — aufklappen für Details und Foto"
       />
 
-      <Link href="/settings/rivals" className="stats-rivals-manage-link">
-        Rivalen verwalten
-      </Link>
       <p className="stats-foreign-filter-note">
-        Namen und „Das bin ich“ gelten nur auf diesem Gerät.{" "}
+        Namen kommen vom Server. Fotos bleiben nur auf diesem Gerät.{" "}
         {isAdmin
           ? "Als Admin: Siege/Diff und „Server bereinigen“ gelten für alle Geräte. „Hier ausblenden“ nur lokal."
           : "Gemeinsame Zahlen kommen vom Server; Bereinigen und Siege nachtragen nur der Admin. „Hier ausblenden“ nur auf diesem Gerät."}
@@ -408,8 +403,7 @@ function StatsPageInner() {
 
       {!loading && !error && !canFilterOwn && mergedPairings.length > 0 && (
         <p className="stats-foreign-filter-note">
-          Fremde Paarungen (z. B. Malte vs. Nicole) bleiben sichtbar, bis du unter{" "}
-          <Link href="/settings/rivals">Rivalen</Link> bei dir „Das bin ich“ tippst.
+          Fremde Paarungen bleiben sichtbar, bis du in einem davon mitspielst.
         </p>
       )}
 
@@ -596,7 +590,6 @@ function StatsPageInner() {
                 mergeAliases={aliases}
                 open={openKeys.has(pairing.key)}
                 onToggle={() => toggleOpen(pairing.key)}
-                onEditPlayerAlias={selectMode ? undefined : setEditingPlayerId}
                 onEditPairing={
                   selectMode || !isAdmin ? undefined : setEditingPairing
                 }
@@ -612,21 +605,6 @@ function StatsPageInner() {
             );
           })}
         </ul>
-      )}
-
-      {editingPlayerId && (
-        <PlayerAliasOverlay
-          playerId={editingPlayerId}
-          ownPlayerId={ownPlayerId}
-          aliases={displayAliases}
-          currentAlias={aliases[normalizePublicPlayerId(editingPlayerId)]}
-          onClose={() => setEditingPlayerId(null)}
-          onSave={(displayNames) => {
-            setAliases(displayNames);
-            setEditingPlayerId(null);
-            setDetailReloadToken((value) => value + 1);
-          }}
-        />
       )}
 
       {editingPairing && (

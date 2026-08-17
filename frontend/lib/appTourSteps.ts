@@ -34,8 +34,8 @@ export const APP_TOUR_CHAPTERS: AppTourChapterMeta[] = [
   },
   {
     id: "rivals",
-    label: "Rivalen",
-    title: "Statistik & Rivalen",
+    label: "Statistik",
+    title: "Statistik",
     next: null,
   },
 ];
@@ -50,7 +50,7 @@ export const APP_TOUR_STEPS_START: AppTourStep[] = [
     id: "welcome",
     chapter: "start",
     title: "Willkommen bei dice.budget",
-    body: "Kurze Tour in drei Kapiteln: Start, Strategy (Pool) und Rivalen. Jederzeit überspringbar — über das Menü erneut startbar.",
+    body: "Kurze Tour in drei Kapiteln: Start, Strategy (Pool) und Statistik. Jederzeit überspringbar — über das Menü erneut startbar.",
   },
   {
     id: "host",
@@ -127,31 +127,25 @@ export const APP_TOUR_STEPS_STRATEGY: AppTourStep[] = [
   },
 ];
 
-/** Kapitel C — Statistik & Rivalen */
+/** Kapitel C — Statistik */
 export const APP_TOUR_STEPS_RIVALS: AppTourStep[] = [
   {
     id: "stats-overview",
     chapter: "rivals",
-    title: "Statistik & Meine Rivalen",
-    body: "Unter Statistik siehst du Bilanz, Siegquote und Duelle. Gegner erscheinen als „Meine Rivalen“ — mit Namen, die nur du vergibst.",
+    title: "Statistik & Duelle",
+    body: "Unter Statistik siehst du Bilanz, Siegquote und Paarungen. Namen kommen vom Server — einmal nach der Sanduhr festlegen.",
   },
   {
-    id: "rivals-local",
+    id: "stats-photos",
     chapter: "rivals",
-    title: "Nur auf diesem Gerät",
-    body: "Rivalen-Namen sind lokal. Der Server kennt nur pseudonyme IDs — deine Namen werden nicht hochgeladen.",
+    title: "Fotos nur auf dem Gerät",
+    body: "In einer Paarung kannst du ein Foto setzen. Es bleibt lokal (IndexedDB) und wird nicht hochgeladen.",
   },
   {
-    id: "rivals-after-game",
+    id: "stats-own",
     chapter: "rivals",
-    title: "Nach dem Spiel benennen",
-    body: "Unbekannte Gegner: neuen Namen vergeben oder mit einem bestehenden Rivalen verknüpfen. So bleiben Aliase und Statistik sauber.",
-  },
-  {
-    id: "rivals-manage",
-    chapter: "rivals",
-    title: "Rivalen verwalten",
-    body: "Über das Menü → Rivalen verwalten: anlegen, umbenennen, zusammenführen oder löschen. Von der Statistik gibt es einen Direktlink.",
+    title: "Deine Bilanz",
+    body: "Die Statistik erkennt dich über die Geräte-ID. Deinen Namen änderst du in den Einstellungen, nicht bei jedem Start.",
   },
 ];
 

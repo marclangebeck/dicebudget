@@ -18,7 +18,6 @@ type Props = {
   mergeAliases?: PlayerAliasMap;
   open: boolean;
   onToggle: () => void;
-  onEditPlayerAlias?: (playerId: string) => void;
   onEditPairing?: (payload: {
     group: MergedPairingSummary;
     sources: PairingSummaryDto[];
@@ -48,7 +47,6 @@ export function PairingAccordionItem({
   mergeAliases,
   open,
   onToggle,
-  onEditPlayerAlias,
   onEditPairing,
   selectable,
   selected,
@@ -192,7 +190,6 @@ export function PairingAccordionItem({
                 pairingKey={pairing.key}
                 ownPlayerId={ownPlayerId}
                 aliases={aliases}
-                onEditPlayerAlias={onEditPlayerAlias ?? (() => {})}
                 onEditPairing={
                   onEditPairing
                     ? () =>

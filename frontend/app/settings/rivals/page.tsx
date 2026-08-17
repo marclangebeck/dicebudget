@@ -1,19 +1,13 @@
 "use client";
 
-import { AppScreenHeader } from "@/components/AppScreenHeader";
-import { RivalManagePanel } from "@/components/RivalManagePanel";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export default function RivalsSettingsPage() {
-  return (
-    <div className="settings-screen">
-      <AppScreenHeader
-        section="Rivalen"
-        title="Rivalen verwalten"
-        subtitle="Anlegen, Bilder, umbenennen, zusammenführen oder löschen — nur auf diesem Gerät."
-        backHref="/stats"
-        backLabel="Zurück zur Statistik"
-      />
-      <RivalManagePanel />
-    </div>
-  );
+/** Alte Rivalen-Verwaltung: Namen kommen vom Server, Fotos in der Statistik. */
+export default function RivalsRedirectPage() {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace("/stats");
+  }, [router]);
+  return null;
 }

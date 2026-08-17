@@ -116,11 +116,10 @@ export default function DatenschutzPage() {
           <p>
             Abgeschlossene Multiplayer-Spiele können in aggregierter Statistik
             erscheinen (z. B. Paarungsvergleiche zwischen pseudonymen
-            Spieler-IDs). Lesbare Namen kommen vom Server-Anzeigenamen und
-            zusätzlich von lokalen Aliasen auf diesem Gerät. Fotos von Rivalen
-            bleiben ausschließlich lokal auf dem Gerät (IndexedDB) und werden
-            nicht hochgeladen. Statistik-Schlüssel ist die Spieler-ID, nicht
-            der Name.
+            Spieler-IDs). Lesbare Namen kommen vom Server-Anzeigenamen.
+            Fotos bleiben ausschließlich lokal auf dem Gerät (IndexedDB, an die
+            Spieler-ID gebunden) und werden nicht hochgeladen.
+            Statistik-Schlüssel ist die Spieler-ID, nicht der Name.
           </p>
 
           <h3>4.4 Technische Daten</h3>

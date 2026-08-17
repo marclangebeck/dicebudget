@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { PlayerPhotoEditor } from "@/components/PlayerPhotoEditor";
 import { ShareActionBar } from "@/components/ShareActionBar";
-import { RivalAvatar } from "@/components/RivalAvatar";
 import {
   buildPairingShareText,
   recentPairingForm,
@@ -11,7 +11,6 @@ import {
 import type { PairingDetailDto } from "@/lib/pairingTypes";
 import type { PlayerAliasMap } from "@/lib/playerAliases";
 import { playerLabel } from "@/lib/playerIdentity";
-import { findRivalByPlayerId } from "@/lib/rivalProfiles";
 
 function formatDateTime(iso: string | null): string {
   if (!iso) return "—";
@@ -37,7 +36,6 @@ type Props = {
   pairingKey: string;
   ownPlayerId: string;
   aliases: PlayerAliasMap;
-  onEditPlayerAlias: (playerId: string) => void;
   onEditPairing?: () => void;
 };
 
@@ -46,14 +44,11 @@ export function PairingDetailPanel({
   pairingKey,
   ownPlayerId,
   aliases,
-  onEditPlayerAlias,
   onEditPairing,
 }: Props) {
   const netDiff = pairing.playerABonusPoints - pairing.playerBBonusPoints;
   const nameA = playerLabel(pairing.playerA, ownPlayerId, aliases);
   const nameB = playerLabel(pairing.playerB, ownPlayerId, aliases);
-  const rivalA = findRivalByPlayerId(pairing.playerA);
-  const rivalB = findRivalByPlayerId(pairing.playerB);
   const shareParams = {
     playerAName: nameA,
     playerBName: nameB,
@@ -63,17 +58,17 @@ export function PairingDetailPanel({
     roundsPlayed: pairing.roundsPlayed,
     netDiff,
     form: recentPairingForm(pairing.rounds, 5),
-    playerARivalId: rivalA?.id ?? null,
-    playerBRivalId: rivalB?.id ?? null,
+    playerAPhotoId: pairing.playerA,
+    playerBPhotoId: pairing.playerB,
   };
 
   return (
     <div className="stats-pairing-detail">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <ShareActionBar
-          label="Rivalen-Karte teilen"
-          shareSuffix="Rivalen"
-          filename="dicebudget-rivalen.png"
+          label="Duell-Karte teilen"
+          shareSuffix="Duell"
+          filename="dicebudget-duell.png"
           compact
           buildText={() => buildPairingShareText(shareParams)}
           buildImage={() => renderPairingShareImage(shareParams)}
@@ -88,17 +83,10 @@ export function PairingDetailPanel({
       <section className="stats-detail-scores">
         <div className="stats-detail-player-card">
           <div className="stats-detail-player-media">
-            <RivalAvatar rivalId={rivalA?.id} name={nameA} size="banner" />
+            <PlayerPhotoEditor playerId={pairing.playerA} name={nameA} size="banner" />
           </div>
           <div className="stats-detail-player-body">
             <p className="stats-detail-player-name">{nameA}</p>
-            <button
-              type="button"
-              className="btn-chip mt-1.5 px-2 py-0.5 text-xs"
-              onClick={() => onEditPlayerAlias(pairing.playerA)}
-            >
-              ✏️ Alias
-            </button>
             <p className="stats-detail-wins tabular-nums">{pairing.playerAWins}</p>
             <p className="stats-detail-metric-label">Siege</p>
             <p className="stats-detail-diff tabular-nums">
@@ -108,17 +96,10 @@ export function PairingDetailPanel({
         </div>
         <div className="stats-detail-player-card stats-detail-player-card--b">
           <div className="stats-detail-player-media">
-            <RivalAvatar rivalId={rivalB?.id} name={nameB} size="banner" />
+            <PlayerPhotoEditor playerId={pairing.playerB} name={nameB} size="banner" />
           </div>
           <div className="stats-detail-player-body">
             <p className="stats-detail-player-name">{nameB}</p>
-            <button
-              type="button"
-              className="btn-chip mt-1.5 px-2 py-0.5 text-xs"
-              onClick={() => onEditPlayerAlias(pairing.playerB)}
-            >
-              ✏️ Alias
-            </button>
             <p className="stats-detail-wins tabular-nums">{pairing.playerBWins}</p>
             <p className="stats-detail-metric-label">Siege</p>
             <p className="stats-detail-diff tabular-nums">

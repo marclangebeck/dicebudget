@@ -58,7 +58,7 @@ export function StatsHeroPanel({ overview }: Props) {
       <div className="stats-hero-panel-kpis" aria-label="Kennzahlen">
         <span>
           <strong className="tabular-nums">{pairingCount}</strong>
-          {pairingCount === 1 ? "Rivale" : "Rivalen"}
+          {pairingCount === 1 ? "Paarung" : "Paarungen"}
         </span>
         <span>
           <strong className="tabular-nums">{totalRounds}</strong>

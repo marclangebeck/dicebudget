@@ -20,7 +20,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 - Mac-Clone: `/Users/marclangebeck/projects/kniffel` (auch `~/projects/kniffel`).
 - Reine Frontend-Änderungen: `cd frontend && npm run build` auf dem Server; Nginx liefert `frontend/out/` aus.
 - **Events:** drei Apps — **DiceBudget** (Pro), **DiceBudget Tournament** (Host), **DiceBudget GO** (nur Teilnahme, geplant). Quelle: `docs/tournament/products.md`. DiceBudget-Kern unantastbar; Events nur additiv. Hosten nur Tournament.
-- **Spielername:** einmal nach der Sanduhr, Server an `playerId` (`/player-names/display`). Overlay nur Anzeige — kein Stats-Merge. Fotos lokal. Backend-Deploy nötig (Migration).
+- **Spielername:** einmal nach der Sanduhr, Server an `playerId`. Fotos lokal in der Statistik, ohne Rivalen-Verwaltung. Backend-Deploy nötig (Migration).
 
 ## Aktueller Stand
 
@@ -65,7 +65,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 
 - Einmal nach der Sanduhr; Speichern per `PUT /player-names/display` (`X-Name-Token` bei Updates).
 - Lobby/Statistik/Finish zeigen Server-Namen als Overlay. `mergePairingSummaries` bleibt bei lokalen Aliasen.
-- Ändern/Löschen unter Einstellungen. Fotos nur lokal.
+- Ändern/Löschen unter Einstellungen. Fotos nur lokal, in der Paarung setzen (keine Rivalen-Verwaltung).
 - Datenschutz `/datenschutz` §§4.2–4.3. Prod braucht Backend-Deploy (Migration `player_display_names`).
 
 ### Multi-QR + Scan — 2026-08-15 (`9bbd3b3` … `faf721b`)
