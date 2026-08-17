@@ -2,7 +2,7 @@
 
 **Produktname:** DiceBudget Tournament  
 **Stand:** 2026-08-17  
-**Status:** T0–T2 + Host-Setup-Wizard (API + Host-Skelett); T3+ offen  
+**Status:** T0–T3 (API + Host-Skelett + Teilnehmer-Join in DiceBudget Pro); T4+ offen  
 **Produktfamilie:** [`products.md`](./products.md) — **drei Apps** (DiceBudget · Tournament · GO)
 
 ## Vision (kurz)
@@ -30,10 +30,10 @@ Kommunikation: **Host-App ↔ Server ↔ Teilnehmer-Apps** (kein Peer-to-Peer).
 Startscreen DiceBudget (zwischen Multi und Solo): zwei Buttons:
 
 1. **Multi-Spiel / Gegner-Raum beitreten** — QR-Scan (aktiv, privates Multi)
-2. **Turnier/Liga beitreten** — Platzhalter `disabled` / „Demnächst“ (T3)
+2. **Turnier/Liga beitreten** — QR-Scan → `/tournament/join?code=…` (T3)
 
-Umsetzung: `HomeJoinButtons` in `JoinByQrScan.tsx`.  
-**DiceBudget GO** existiert noch nicht; T3 verdrahtet zuerst den Pro-Button, GO folgt als eigenes Produkt.
+Umsetzung: `HomeJoinButtons` in `JoinByQrScan.tsx`; Lobby `frontend/app/tournament/join/page.tsx`.  
+**DiceBudget GO** existiert noch nicht; nutzt später denselben Join-Pfad.
 
 ## Architektur-Annahme
 

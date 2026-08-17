@@ -10,6 +10,7 @@ import type { SessionLobbyDto, SessionRankingDto } from "./sessionTypes";
 import type { HouseRuleAutoEventDto } from "@/lib/ruleEventFeedback";
 import { getApiBase } from "@/lib/apiBase";
 import { resolveAdminApiKeyForRequest } from "@/lib/adminAccess";
+import type { TournamentDto, TournamentEntryDto } from "./tournamentTypes";
 
 type ApiRequestInit = Omit<RequestInit, "headers"> & {
   headers?: HeadersInit;
@@ -415,5 +416,24 @@ export function deletePlayerDisplayName(playerId: string, nameToken: string) {
     method: "DELETE",
     body: JSON.stringify({ playerId }),
     nameToken,
+  });
+}
+
+export function getTournamentByInvite(inviteCode: string) {
+  return request<{ tournament: TournamentDto }>(
+    `/tournaments/invite/${encodeURIComponent(inviteCode)}`,
+  );
+}
+
+export function joinTournament(
+  inviteCode: string,
+  input: { displayName: string; playerId: string },
+) {
+  return request<{
+    tournament: TournamentDto;
+    entry: TournamentEntryDto;
+  }>(`/tournaments/invite/${encodeURIComponent(inviteCode)}/join`, {
+    method: "POST",
+    body: JSON.stringify(input),
   });
 }

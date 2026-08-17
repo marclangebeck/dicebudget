@@ -89,7 +89,7 @@ function HostInner() {
       )}
 
       <p className="t-meta">
-        Teilnehmer scannen den QR in der DiceBudget-App (Join folgt mit T3).
+        Teilnehmer scannen den QR in der DiceBudget-App → Event-Lobby.
       </p>
 
       <p className="t-meta">

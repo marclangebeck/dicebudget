@@ -6,7 +6,9 @@
         "appID": "5QGGV8N5ZD.de.bottletrade.dicebudget",
         "paths": [
           "/multi/join",
-          "/multi/join/*"
+          "/multi/join/*",
+          "/tournament/join",
+          "/tournament/join/*"
         ]
       }
     ]

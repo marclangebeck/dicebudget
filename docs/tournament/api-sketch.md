@@ -1,7 +1,7 @@
 # Tournament API-Skizze (Entwurf)
 
 **Stand:** 2026-08-15  
-**Status:** T1 API umgesetzt (`/tournaments`); Host-UI in `apps/tournament`. Skizze bleibt Referenz für T3+.
+**Status:** T1 API umgesetzt (`/tournaments`); Host-UI in `apps/tournament`; T3 Join in DiceBudget Pro (`/tournament/join`). Skizze bleibt Referenz für T4+.
 
 Ziel: Vertrag zwischen **DiceBudget Tournament** (Host) und **Teilnehmer-Apps** (**DiceBudget** Pro und später **DiceBudget GO**).  
 Bestehende Multi-Session-API (`/sessions`, Invite-QR) bleibt für Partien; das Event **orchestriert** darüber. Produktrollen: [`products.md`](./products.md).

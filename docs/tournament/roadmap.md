@@ -18,7 +18,7 @@ Konkrete Modus-Liste und Regeldetails kommen **pro Milestone**, nicht als Startb
 | **T0** | Vision & Vertrag | Docs, Rollen, API-Skizze, Name **DiceBudget Tournament** | erledigt |
 | **T1** | Backend Turnier-Kern | Turnier anlegen, Join-Code/QR-Payload, Spieler-Liste, Status | **umgesetzt** (`/tournaments`) |
 | **T2** | Host-App Skelett | `apps/tournament`, Capacitor Bundle `de.bottletrade.dicebudget.tournament`, Start/Host-Lobby | **umgesetzt** (iOS `cap add` auf Mac) |
-| **T3** | Teilnehmer-Join | QR in **DiceBudget** (Pro-Button aktivieren); später gleiches in **GO** | **additiv**; GO-App extra Track |
+| **T3** | Teilnehmer-Join | QR in **DiceBudget** (Pro-Button aktivieren); später gleiches in **GO** | **umgesetzt** (Pro); GO-App extra Track |
 | **T4** | Spielplan & Auslosung | Tische/Paarungen, manuell + einfache Auto-Auslosung | Modus-agnostische Pairing-API |
 | **T5** | Partie-Link | Host startet Tisch → bestehende Multi-Session; Ergebnis zurück ins Turnier | Multi-Kern wiederverwenden, nicht forken |
 | **T6** | Live & Beamer | Ranking/Spielplan-Ansicht; sparsame Updates | kein Polling-Spam (AGENT_RULES) |
@@ -51,6 +51,7 @@ T7/T8 können nach dem Kern parallel oder nacheinander kommen; weitere Modi dana
 
 ## Nächster Schritt
 
-**Host-Setup (Tournament):** Event-Name → Format (Liga \| Turnier) → Größe → Format-Zweig → Kurzcheck → Anlegen → Lobby/QR.  
-Liga- und Turnier-Zweig in **Tournament** weiter ausbauen. Teilnehmer-Join (T3) in der **Pro-App**, danach **GO**.  
-iOS Host: `cd apps/tournament && npm run build:ios` (Mac).
+**T4** Spielplan & Auslosung (Host). Optional Host-Lobby härten.  
+**DiceBudget GO** erst nach stabilem T3/T4–T5-Pfad.  
+iOS Host: `cd apps/tournament && npm run build:ios` (Mac).  
+Pro: `cd frontend && npm run build:ios` (Mac) für Event-Join Universal Links.

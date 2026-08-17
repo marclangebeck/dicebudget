@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **T3 Teilnehmer-Join:** Startscreen „Turnier/Liga beitreten“ aktiv; QR → `/tournament/join`; Lobby mit Anmeldung (Name + playerId); AASA für Event-Links
 - **Spielername (Server):** einmal nach der Sanduhr; `GET/PUT/DELETE /player-names/display`; Lobby/Statistik zeigen Namen; Settings ändern/löschen; Paarungs-Zahlen unverändert
 - **Lokale Fotos an playerId:** bisherige Rivalen-Bilder bleiben (IndexedDB), ohne Rivalen-Verwaltung; Foto in der Paarung setzen
 - **Tournament API (T1):** `POST/GET /tournaments…`, Join, Start mit `X-Host-Token`; Migration `tournaments` / `tournament_entries`

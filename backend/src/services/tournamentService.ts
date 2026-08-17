@@ -104,6 +104,7 @@ function toTournamentDto(
     entries?: {
       id: string;
       displayName: string;
+      playerId: string | null;
       orderIndex: number;
       joinedAt: Date;
     }[];
@@ -125,6 +126,7 @@ function toTournamentDto(
           entries: entries.map((e) => ({
             id: e.id,
             displayName: e.displayName,
+            playerId: e.playerId,
             orderIndex: e.orderIndex,
             joinedAt: e.joinedAt.toISOString(),
           })),
@@ -238,6 +240,7 @@ export async function joinTournament(
     entry: {
       id: result.entry.id,
       displayName: result.entry.displayName,
+      playerId: result.entry.playerId,
       orderIndex: result.entry.orderIndex,
       joinedAt: result.entry.joinedAt.toISOString(),
     },

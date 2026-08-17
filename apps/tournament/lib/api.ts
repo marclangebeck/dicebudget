@@ -46,6 +46,7 @@ export type TournamentDto = {
 export type TournamentEntryDto = {
   id: string;
   displayName: string;
+  playerId: string | null;
   orderIndex: number;
   joinedAt: string;
 };

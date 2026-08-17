@@ -37,8 +37,8 @@ Es gibt **drei** Produkte. Events (Liga oder Turnier) werden in der **Organisati
 | Thema | Stand |
 |-------|--------|
 | Tournament-Host (Setup, Anlegen, Lobby/QR) | im Bau (`apps/tournament`) |
-| Backend `/tournaments` | da (Join-API existiert; Spieler-UI noch nicht verdrahtet) |
-| DiceBudget Startscreen „Turnier/Liga beitreten“ | nur Label, **Demnächst** / disabled |
+| Backend `/tournaments` | da (Join-API + Spieler-UI in Pro) |
+| DiceBudget Startscreen „Turnier/Liga beitreten“ | **aktiv** (T3 → `/tournament/join`) |
 | DiceBudget GO | **nicht** angelegt |
 | Abrechnung je Beitritt | **nicht** angelegt |
 | Upgrade GO → DiceBudget | **nicht** angelegt |

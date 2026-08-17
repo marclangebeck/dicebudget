@@ -5,15 +5,35 @@ import { useRouter } from "next/navigation";
 import jsQR from "jsqr";
 import { normalizeInviteCode } from "@/lib/activeGame";
 import { pathFromInviteDeepLink } from "@/lib/inviteJoinUrl";
+import {
+  pathFromAnyJoinDeepLink,
+  pathFromTournamentJoinDeepLink,
+  TOURNAMENT_JOIN_PATH,
+} from "@/lib/tournamentJoinUrl";
+
+type JoinKind = "multi" | "tournament";
 
 type Props = {
   /** Startscreen-Mitte zwischen Multi und Solo */
   variant?: "home" | "panel";
+  /** multi = Gegner-Raum; tournament = Event (Liga/Turnier) */
+  kind?: JoinKind;
 };
 
-function resolveJoinPathFromScan(raw: string): string | null {
+function resolveJoinPathFromScan(raw: string, prefer: JoinKind): string | null {
   const trimmed = raw.trim();
-  const fromUrl = pathFromInviteDeepLink(trimmed);
+  if (prefer === "tournament") {
+    const tournament = pathFromTournamentJoinDeepLink(trimmed);
+    if (tournament) return tournament;
+    const multi = pathFromInviteDeepLink(trimmed);
+    if (multi) return multi;
+    const code = normalizeInviteCode(trimmed);
+    if (code.length >= 6) {
+      return `${TOURNAMENT_JOIN_PATH}?code=${encodeURIComponent(code)}`;
+    }
+    return null;
+  }
+  const fromUrl = pathFromAnyJoinDeepLink(trimmed);
   if (fromUrl) return fromUrl;
   const code = normalizeInviteCode(trimmed);
   if (code.length >= 6) {
@@ -25,9 +45,8 @@ function resolveJoinPathFromScan(raw: string): string | null {
 /**
  * Beitritt nur per QR: öffnet die Gerätekamera in der App und leitet zur Lobby.
  * (System-Kamera + Universal Link bleibt parallel nutzbar.)
- * Home: gesamter Container = ein Button (Multi-Raum).
  */
-export function JoinByQrScan({ variant = "home" }: Props) {
+export function JoinByQrScan({ variant = "home", kind = "multi" }: Props) {
   const router = useRouter();
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -81,7 +100,7 @@ export function JoinByQrScan({ variant = "home" }: Props) {
       inversionAttempts: "dontInvert",
     });
     if (result?.data) {
-      const path = resolveJoinPathFromScan(result.data);
+      const path = resolveJoinPathFromScan(result.data, kind);
       if (path) {
         handledRef.current = true;
         stopScanner();
@@ -90,7 +109,7 @@ export function JoinByQrScan({ variant = "home" }: Props) {
       }
     }
     rafRef.current = requestAnimationFrame(tick);
-  }, [router, stopScanner]);
+  }, [kind, router, stopScanner]);
 
   async function startScanner() {
     setError(null);
@@ -145,6 +164,69 @@ export function JoinByQrScan({ variant = "home" }: Props) {
       </div>
     </div>
   ) : null;
+
+  if (kind === "tournament" && variant === "home") {
+    return (
+      <>
+        <div className="home-cinematic-join-slot">
+          <button
+            type="button"
+            className="home-cinematic-join home-cinematic-join--tournament home-cinematic-join--hit"
+            aria-label="Turnier/Liga beitreten, QR-Code scannen"
+            data-tour-anchor="tournament-join"
+            onClick={() => void startScanner()}
+          >
+            <span className="home-cinematic-join-copy">
+              <span className="home-cinematic-join-kicker">Ereignis</span>
+              <span className="home-cinematic-join-title">Turnier/Liga beitreten</span>
+              <span className="home-cinematic-join-cta">
+                <ScanIcon />
+                <span>QR-Code scannen</span>
+              </span>
+            </span>
+          </button>
+          {error && (
+            <p className="home-cinematic-join-error" role="alert">
+              {error}
+            </p>
+          )}
+        </div>
+        {overlay}
+      </>
+    );
+  }
+
+  if (kind === "tournament") {
+    return (
+      <>
+        <section
+          className="join-qr-panel"
+          aria-label="Ereignis per QR beitreten"
+          data-tour-anchor="tournament-join"
+        >
+          <div className="join-qr-panel-copy">
+            <p className="join-qr-panel-kicker">Ereignis</p>
+            <p className="join-qr-panel-title">Turnier/Liga beitreten</p>
+            <p className="join-qr-panel-hint">QR vom Host scannen — in die Event-Lobby</p>
+          </div>
+          <button
+            type="button"
+            className="glass-button glass-button--primary min-h-12 w-full px-4 text-sm font-semibold"
+            onClick={() => void startScanner()}
+          >
+            <ScanIcon />
+            <span>QR-Code scannen</span>
+          </button>
+          {error && (
+            <p className="glass-alert-error mt-2 text-sm" role="alert">
+              {error}
+            </p>
+          )}
+        </section>
+        {overlay}
+      </>
+    );
+  }
 
   if (variant === "home") {
     return (
@@ -204,35 +286,15 @@ export function JoinByQrScan({ variant = "home" }: Props) {
   );
 }
 
-/** Platzhalter: Ereignis-QR später; gesamter Container = Button, ohne Aktion. */
-export function TournamentJoinPlaceholder() {
-  return (
-    <div className="home-cinematic-join-slot">
-      <button
-        type="button"
-        className="home-cinematic-join home-cinematic-join--tournament home-cinematic-join--hit"
-        aria-label="Turnier/Liga beitreten, QR-Code scannen — demnächst"
-        disabled
-      >
-        <span className="home-cinematic-join-copy">
-          <span className="home-cinematic-join-kicker">Ereignis</span>
-          <span className="home-cinematic-join-title">Turnier/Liga beitreten</span>
-          <span className="home-cinematic-join-cta">
-            <ScanIcon />
-            <span>QR-Code scannen</span>
-          </span>
-          <span className="home-cinematic-join-soon">Demnächst</span>
-        </span>
-      </button>
-    </div>
-  );
+export function TournamentJoinScan({ variant = "home" }: { variant?: "home" | "panel" }) {
+  return <JoinByQrScan variant={variant} kind="tournament" />;
 }
 
 export function HomeJoinButtons() {
   return (
     <div className="home-cinematic-join-row" aria-label="Beitreten per QR">
-      <JoinByQrScan variant="home" />
-      <TournamentJoinPlaceholder />
+      <JoinByQrScan variant="home" kind="multi" />
+      <TournamentJoinScan variant="home" />
     </div>
   );
 }

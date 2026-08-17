@@ -48,6 +48,8 @@ describe("tournaments API", () => {
 
     assert.equal(lobby.body.tournament.entryCount, 2);
     assert.equal(lobby.body.tournament.entries.length, 2);
+    assert.equal(lobby.body.tournament.entries[0].playerId, "p-anna");
+    assert.equal(lobby.body.tournament.entries[1].playerId, "p-ben");
 
     const started = await request(app)
       .post(`/tournaments/${tournamentId}/start`)

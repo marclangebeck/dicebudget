@@ -3,14 +3,14 @@
 import { useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { isCapacitorNative } from "@/lib/apiBase";
-import { pathFromInviteDeepLink } from "@/lib/inviteJoinUrl";
+import { pathFromAnyJoinDeepLink } from "@/lib/tournamentJoinUrl";
 
 type Props = {
   children: ReactNode;
 };
 
 /**
- * Universal Links / Deep Links: öffnet /multi/join?code=… in der nativen App
+ * Universal Links / Deep Links: öffnet /multi/join oder /tournament/join in der nativen App
  * (TestFlight und Store). Web bleibt unverändert.
  */
 export function DeepLinkRouter({ children }: Props) {
@@ -23,7 +23,7 @@ export function DeepLinkRouter({ children }: Props) {
     let cancelled = false;
 
     function navigateFromUrl(raw: string) {
-      const path = pathFromInviteDeepLink(raw);
+      const path = pathFromAnyJoinDeepLink(raw);
       if (path) router.push(path);
     }
 
