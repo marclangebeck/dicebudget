@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { InviteQrCode } from "@/components/InviteQrCode";
 import { createGameSession, joinSession } from "@/lib/api";
 import { saveActiveGame } from "@/lib/activeGame";
 import { sessionHouseRuleFlagsFromPrefs } from "@/lib/featureFlags";
+import { buildInviteJoinUrl } from "@/lib/inviteJoinUrl";
 import { createLocalSoloRun } from "@/lib/localSoloRun";
 import { upsertRivalName } from "@/lib/rivalProfiles";
-import { shareInviteCode } from "@/lib/shareSocial";
 import {
   createTableModePlayerId,
   saveTableModeSession,
@@ -26,9 +27,6 @@ export function SettingsGameActions({ settings }: Props) {
   const [multiLoading, setMultiLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [inviteCode, setInviteCode] = useState<string | null>(null);
-  const [leagueCode, setLeagueCode] = useState<string | null>(null);
-  const [createdStrategyMode, setCreatedStrategyMode] = useState<boolean | null>(null);
-  const [shareState, setShareState] = useState<"idle" | "shared" | "copied">("idle");
 
   async function handleSoloStart() {
     setSoloLoading(true);
@@ -48,7 +46,6 @@ export function SettingsGameActions({ settings }: Props) {
     setMultiLoading(true);
     setError(null);
     setInviteCode(null);
-    setLeagueCode(null);
     try {
       const effectiveMaxPlayers = settings.tableModeEnabled ? 2 : settings.multiplayerMaxPlayers;
       const { session } = await createGameSession(
@@ -91,24 +88,10 @@ export function SettingsGameActions({ settings }: Props) {
         return;
       }
       setInviteCode(session.inviteCode);
-      setLeagueCode(session.leagueCode);
-      setCreatedStrategyMode(session.useStrategyRules);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Multi-Start fehlgeschlagen");
     } finally {
       setMultiLoading(false);
-    }
-  }
-
-  async function shareCode() {
-    if (!inviteCode) return;
-    const result = await shareInviteCode(inviteCode);
-    if (result === "shared") {
-      setShareState("shared");
-      window.setTimeout(() => setShareState("idle"), 2000);
-    } else if (result === "copied") {
-      setShareState("copied");
-      window.setTimeout(() => setShareState("idle"), 2000);
     }
   }
 
@@ -144,40 +127,20 @@ export function SettingsGameActions({ settings }: Props) {
           </button>
         </div>
       ) : (
-        <div className="settings-compact-card settings-compact-card--wide settings-compact-card--slim">
-          <p className="settings-compact-title settings-compact-title--sm">Raum angelegt</p>
-          <p className="settings-compact-text settings-compact-text--sm">
-            Modus:{" "}
-            <strong className="text-strong">
-              {createdStrategyMode ? "Strategy Edition" : "DiceBudget Klassisch"}
-            </strong>
-          </p>
-          <div className="mt-2">
-            <p className="setup-host-code-label">Raum-Code</p>
-            <p className="setup-host-code">{inviteCode}</p>
+        <div className="setup-host-success setup-host-success--invite-qr">
+          <p className="setup-host-invite-title">Spiel beitreten</p>
+          <div className="setup-host-qr-frame">
+            <InviteQrCode
+              value={buildInviteJoinUrl(inviteCode)}
+              label="QR-Code zum Beitreten"
+              size={228}
+            />
           </div>
-          {leagueCode && (
-            <div className="mt-2">
-              <p className="setup-host-code-label">Serie</p>
-              <p className="setup-host-code setup-host-code--league">{leagueCode}</p>
-            </div>
-          )}
-          <button
-            type="button"
-            onClick={() => void shareCode()}
-            className="home-bento-submit home-bento-submit--lg mt-3 w-full font-semibold"
-          >
-            {shareState === "shared"
-              ? "Geteilt!"
-              : shareState === "copied"
-                ? "Kopiert!"
-                : "Code teilen"}
-          </button>
           <Link
             href={`/multi/join?code=${encodeURIComponent(inviteCode)}`}
             className="setup-host-submit mt-2 flex w-full items-center justify-center no-underline"
           >
-            Zur Lobby
+            Zur Lobby (auch als Host)
           </Link>
         </div>
       )}
