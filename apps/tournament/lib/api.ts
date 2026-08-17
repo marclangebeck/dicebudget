@@ -2,18 +2,20 @@ const PROD_API = "https://dicebudget.bottle-trade.de/api";
 
 function isNativeShell(): boolean {
   if (typeof window === "undefined") return false;
+  const cap = (window as Window & { Capacitor?: { isNativePlatform?: () => boolean } })
+    .Capacitor;
+  if (cap?.isNativePlatform?.()) return true;
   const protocol = window.location.protocol;
-  if (protocol === "capacitor:" || protocol === "ionic:") return true;
-  return protocol === "https:" && window.location.hostname === "localhost";
+  return protocol === "capacitor:" || protocol === "ionic:";
 }
 
 function apiBase(): string {
   const fromEnv = process.env.NEXT_PUBLIC_API_URL?.trim().replace(/\/$/, "");
   if (isNativeShell()) {
-    return fromEnv && fromEnv.startsWith("http") ? fromEnv : PROD_API;
+    return fromEnv?.startsWith("http") ? fromEnv : PROD_API;
   }
   if (fromEnv) return fromEnv;
-  return "http://127.0.0.1:3020";
+  return PROD_API;
 }
 
 async function apiFetch<T>(
@@ -28,13 +30,12 @@ async function apiFetch<T>(
   if (init?.hostToken) {
     headers.set("X-Host-Token", init.hostToken);
   }
+  const url = `${apiBase()}${path}`;
   let res: Response;
   try {
-    res = await fetch(`${apiBase()}${path}`, { ...init, headers });
+    res = await fetch(url, { ...init, headers });
   } catch {
-    throw new Error(
-      "Keine Verbindung zum Server. Prüfe die Internetverbindung oder ob das Backend läuft.",
-    );
+    throw new Error(`API nicht erreichbar (${url})`);
   }
   const data: unknown = await res.json().catch(() => ({}));
   if (!res.ok) {
