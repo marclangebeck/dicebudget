@@ -12,7 +12,7 @@
 
 **Geplant:** **M36** nach M30; **M37–M41** umgesetzt (Details unten). **Tournament T0–T10:** `docs/tournament/roadmap.md`. Drei Apps: `docs/tournament/products.md`. DiceBudget-Kern unantastbar.
 
-Dieses Dokument ergänzt `docs/milestones_active.md`. Nach Abschluss eines Milestones: Eintrag in `CHANGELOG.md`, Update `HANDOVER.md`, optional Archivierung hier. Turnier-Themen: zusätzlich `docs/tournament/README.md`.
+Dieses Dokument ergänzt `docs/milestones_active.md`. Nach Abschluss eines Milestones: Eintrag in `CHANGELOG.md`, Update `HANDOVER.md`, optional Archivierung hier. Event-Themen: `docs/tournament/products.md` + README.
 
 ---
 
