@@ -40,6 +40,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Admin-Zugang:** kein separater Admin-Build mehr nötig; Stats-Admin nur nach PIN + Key (Legacy-Env-Key nur mit PIN, falls PIN gesetzt)
 
 ### Docs
+- **Spielername (Server):** einmal nach der Sanduhr festlegen, an Geraete-`playerId`; Stats-Zahlen unverändert; Fotos lokal — `docs/decisions.md`
 - **Produktfamilie (drei Apps):** `docs/tournament/products.md` — DiceBudget (Pro, 1,49 €), Tournament (Host, 0 €), DiceBudget GO (Teilnahme, 0 €, geplant); Trichter Clubs → Join → Upsell
 - **DiceBudget Tournament:** Produktname Host-App festgelegt; Bundle-Vorschlag `de.bottletrade.dicebudget.tournament`; Docs `docs/tournament/` aktualisiert
 - **Agent-Doku Turnier:** Verweise in `AGENT_RULES`, `HANDOVER` (inkl. Übergabe-Prompt), `milestones.md`, `docs/decisions.md`, `docs/milestones_active.md`, `docs/ios_current.md`, `GOiOS.md`, Root-`README`, `projektbeschreibung.md`, Frontend-/Backend-README, `docs/milestone-roadmap-analysis.md`

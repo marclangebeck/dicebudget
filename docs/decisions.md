@@ -61,14 +61,30 @@ npm run build
 
 - Solo laeuft lokal auf dem Geraet.
 - Solo-Spielstaende und Solo-Statistik werden lokal gespeichert.
-- Multiplayer verwendet eine lokale `playerId` pro Geraet.
-- Server speichert Multiplayer-Daten pseudonym, nicht mit Klarnamen.
-- Lesbare Namen/Aliase werden lokal auf dem Geraet aufgeloest.
-- Dauerhafte Multiplayer-Vergleiche benoetigen serverseitige pseudonyme Matchdaten.
+- Multiplayer verwendet eine lokale `playerId` pro Geraet (besteht weiter; Schluessel fuer Stats/Paarungen).
+- **Historisch (bis 2026-08):** Server ohne Anzeigenamen; lesbare Aliase nur lokal; Rivalen manuell. Das gilt **nicht** mehr als Zielbild — siehe Abschnitt „Spielername (Server)“.
+- Dauerhafte Multiplayer-Vergleiche bleiben an **pseudonyme `playerId`** gebunden. Namen sind Anzeige, nicht die Identitaet der Statistik.
 - "Gar nichts auf dem Server speichern" und "geraeteuebergreifende Langzeitvergleiche" sind nicht gleichzeitig erreichbar.
-- **Stats-Sync Stufe 0 (2026-08):** Globale Korrektur nur Admin-Baseline und „Server bereinigen“. „Hier ausblenden“ ist bewusst nur lokal und darf nicht als Sync-Werkzeug gelten. Keine zentralen Anzeigenamen — Datenschutzmodell unveraendert.
+- **Stats-Sync Stufe 0 (2026-08):** Globale Korrektur nur Admin-Baseline und „Server bereinigen“. „Hier ausblenden“ ist bewusst nur lokal und darf nicht als Sync-Werkzeug gelten.
 - **Baseline absolut (2026-08):** Admin-Siege werden als absoluter Zielstand gespeichert (`is_absolute`), damit alle Geraete denselben Stand sehen; Legacy-Baselines bleiben additiv. Client-Merge nutzt bei Override Max statt Summe.
-- **Stufe A (optional, spaeter):** Pseudonyme Geraete-`playerId`-Links nur bei nachgewiesenem Drift der „meine Bilanz“-Filter — weiterhin ohne Klarname auf dem Server.
+- **Stufe A (optional, spaeter):** Pseudonyme Geraete-`playerId`-Links nur bei nachgewiesenem Drift der „meine Bilanz“-Filter.
+
+## Spielername (Server) — 2026-08-17
+
+**Ziel:** Kein manuelles Pflegen von Rivalen-Namen mehr. Nach dem Kauf legt die Person **einmal** einen Spielernamen fest. Der Name liegt auf dem Server an der bestehenden Geraete-`playerId`. Spielt X gegen Y, sehen beide in Lobby/Statistik die Namen. **Fotos bleiben nur lokal** (IndexedDB, unveraendert).
+
+**Hart — Spielstaende bleiben:** Bestehende Paarungen, Baselines, Siege/Niederlagen, lokale Solo-Laeufe und Admin-Korrekturen **nicht umschluesseln, nicht loeschen, nicht neu mergen**. Nur Anzeige: `playerId` → Spielername. Alte Runden ohne Namen bleiben `playerId`-basiert sichtbar.
+
+**Onboarding:** Nach der Sanduhr (`AppIntroSplash`) ein **einmaliger Screen** „Spielername festlegen“, bevor der Startscreen. Pflichtfeld (Nickname, kein Klarnamen-Zwang). Danach denselben Namen an die `playerId` koppeln — auch spaeter in **DiceBudget GO** / **Tournament-Teilnahme** auf demselben Geraet, sobald die Apps denselben Speicher/Key nutzen. Aendern spaeter in den Einstellungen (nicht jeden Start neu abfragen).
+
+**Datenschutz-Leitplanken:**
+- Spielername = Anzeigename, kein Konto, keine E-Mail, kein oeffentliches Namensverzeichnis.
+- Sichtbar nur im gemeinsamen Spielkontext (Lobby, abgeschlossene gemeinsame Partien/Statistik).
+- Name aenderbar und vom Server loeschbar (Anzeige faellt auf Kurz-ID zurueck; Stats-Zahlen bleiben).
+- Datenschutzseite und App-Store-Privacy **vor dem ersten Release mit Namen** anpassen.
+- Kein Foto-Upload.
+
+**Umsetzung:** erst nach diesem Beschluss, eigener kleiner Milestone; DiceBudget-Kern und bestehende Stats-APIs nicht als Pflicht-Rewrite.
 
 ## Produktentscheidungen
 

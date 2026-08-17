@@ -20,6 +20,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 - Mac-Clone: `/Users/marclangebeck/projects/kniffel` (auch `~/projects/kniffel`).
 - Reine Frontend-Änderungen: `cd frontend && npm run build` auf dem Server; Nginx liefert `frontend/out/` aus.
 - **Events:** drei Apps — **DiceBudget** (Pro), **DiceBudget Tournament** (Host), **DiceBudget GO** (nur Teilnahme, geplant). Quelle: `docs/tournament/products.md`. DiceBudget-Kern unantastbar; Events nur additiv. Hosten nur Tournament.
+- **Spielername:** Beschluss in `docs/decisions.md` — einmal nach der Sanduhr, Server an `playerId`; bestehende Spielstände unverändert; Fotos lokal. Noch nicht im Code.
 
 ## Aktueller Stand
 
