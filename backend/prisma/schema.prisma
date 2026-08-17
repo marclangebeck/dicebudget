@@ -195,6 +195,8 @@ model Tournament {
   status      String             @default("OPEN")
   hostToken   String             @map("host_token")
   maxEntries  Int                @default(32) @map("max_entries")
+  /// JSON-String (Liga-/Turnier-Einstellungen); SQLite ohne Prisma-Json
+  config      String?
   createdAt   DateTime           @default(now()) @map("created_at")
   entries     TournamentEntry[]
 

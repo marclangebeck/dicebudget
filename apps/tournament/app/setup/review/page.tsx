@@ -5,6 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createTournament } from "@/lib/api";
 import { APP_NAME } from "@/lib/branding";
+import {
+  buildEventConfigPayload,
+  formatGroupPreview,
+  matchModeLabel,
+  type LeagueSettings,
+  type MatchPrefs,
+  type TurnierSettings,
+} from "@/lib/eventConfig";
 import { saveHostSession } from "@/lib/hostStore";
 import { clearSetupDraft, loadSetupDraft } from "@/lib/setupDraft";
 import { TOURNAMENT_MODE_OPTIONS } from "@/lib/tournamentModes";
@@ -12,9 +20,12 @@ import { TOURNAMENT_MODE_OPTIONS } from "@/lib/tournamentModes";
 export default function SetupReviewPage() {
   const router = useRouter();
   const [name, setName] = useState<string | null>(null);
-  const [modeKey, setModeKey] = useState<string | null>(null);
+  const [modeKey, setModeKey] = useState<"league" | "turnier" | null>(null);
   const [modeLabel, setModeLabel] = useState("");
   const [maxEntries, setMaxEntries] = useState<number | null>(null);
+  const [match, setMatch] = useState<MatchPrefs | null>(null);
+  const [league, setLeague] = useState<LeagueSettings | null>(null);
+  const [turnier, setTurnier] = useState<TurnierSettings | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,6 +42,9 @@ export default function SetupReviewPage() {
     const mode = TOURNAMENT_MODE_OPTIONS.find((o) => o.key === draft.modeKey);
     setModeLabel(mode?.label ?? draft.modeKey);
     setMaxEntries(draft.maxEntries);
+    setMatch(draft.match);
+    setLeague(draft.league);
+    setTurnier(draft.turnier);
   }, [router]);
 
   async function onCreate() {
@@ -46,6 +60,12 @@ export default function SetupReviewPage() {
         name: draft.name.trim(),
         modeKey: draft.modeKey,
         maxEntries: draft.maxEntries,
+        config: buildEventConfigPayload(
+          draft.modeKey,
+          draft.match,
+          draft.league,
+          draft.turnier,
+        ),
       });
       saveHostSession({
         tournamentId: res.tournament.id,
@@ -61,7 +81,7 @@ export default function SetupReviewPage() {
     }
   }
 
-  if (!name || maxEntries == null || !modeKey) {
+  if (!name || maxEntries == null || !modeKey || !match || !league || !turnier) {
     return (
       <main className="t-shell">
         <p className="t-meta">Lade…</p>
@@ -77,7 +97,7 @@ export default function SetupReviewPage() {
       </h1>
       <p className="t-meta">
         Mit „Anlegen“ wird das Ereignis auf dem Server erstellt und die Lobby mit
-        QR geöffnet.
+        QR geöffnet. Anmeldungen schließen erst im Warteraum.
       </p>
 
       <section className="t-card" aria-label="Zusammenfassung">
@@ -94,6 +114,49 @@ export default function SetupReviewPage() {
             <span>Max. Spieler</span>
             <span>{maxEntries}</span>
           </li>
+          {modeKey === "league" ? (
+            <li>
+              <span>Runden</span>
+              <span>{league.rounds}</span>
+            </li>
+          ) : (
+            <>
+              <li>
+                <span>Gruppengröße</span>
+                <span>{turnier.groupSize}</span>
+              </li>
+              <li>
+                <span>Quali</span>
+                <span>Top {turnier.qualifyPerGroup}</span>
+              </li>
+              <li>
+                <span>K.O.</span>
+                <span>Einfach</span>
+              </li>
+            </>
+          )}
+          <li>
+            <span>Partie</span>
+            <span>
+              {matchModeLabel(match.useStrategyRules)} · {match.gameCount}{" "}
+              {match.gameCount === 1 ? "Spiel" : "Spiele"}
+            </span>
+          </li>
+          {match.useStrategyRules && (
+            <li>
+              <span>Pool</span>
+              <span>
+                {match.showOpponentPool ? "Gegner sichtbar" : "Gegner aus"}
+                {" · "}
+                {match.poolEndgameEnabled ? "Endspiel an" : "Endspiel aus"}
+              </span>
+            </li>
+          )}
+          {modeKey === "turnier" && (
+            <p className="t-setting-hint" style={{ margin: "0.65rem 0 0" }}>
+              {formatGroupPreview(maxEntries, turnier.groupSize)}
+            </p>
+          )}
         </ul>
       </section>
 

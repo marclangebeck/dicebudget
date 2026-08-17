@@ -2,6 +2,10 @@ import { randomBytes } from "crypto";
 import { generateSecretToken } from "../lib/secretToken.js";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../db/prisma.js";
+import {
+  normalizeTournamentConfig,
+  type TournamentConfig,
+} from "./tournamentConfig.js";
 
 export const TOURNAMENT_STATUS = {
   OPEN: "OPEN",
@@ -92,6 +96,23 @@ function normalizeDisplayName(raw: unknown): string {
   return raw.trim().slice(0, 32);
 }
 
+function parseStoredConfig(raw: string | null): unknown {
+  if (!raw) return {};
+  try {
+    return JSON.parse(raw) as unknown;
+  } catch {
+    return {};
+  }
+}
+
+function configFromRow(modeKey: string, raw: string | null): TournamentConfig {
+  try {
+    return normalizeTournamentConfig(modeKey, parseStoredConfig(raw));
+  } catch {
+    return normalizeTournamentConfig(modeKey, {});
+  }
+}
+
 function toTournamentDto(
   row: {
     id: string;
@@ -100,6 +121,7 @@ function toTournamentDto(
     modeKey: string;
     status: string;
     maxEntries: number;
+    config: string | null;
     createdAt: Date;
     entries?: {
       id: string;
@@ -119,6 +141,7 @@ function toTournamentDto(
     modeKey: row.modeKey,
     status: row.status,
     maxEntries: row.maxEntries,
+    config: configFromRow(row.modeKey, row.config),
     entryCount: entries.length,
     createdAt: row.createdAt.toISOString(),
     ...(options?.includeEntries
@@ -139,10 +162,19 @@ export async function createTournament(input: {
   name?: unknown;
   modeKey?: unknown;
   maxEntries?: unknown;
+  config?: unknown;
 }) {
   const name = normalizeName(input.name);
   const modeKey = normalizeModeKey(input.modeKey);
   const maxEntries = normalizeMaxEntries(input.maxEntries);
+  let config: TournamentConfig;
+  try {
+    config = normalizeTournamentConfig(modeKey, input.config ?? {});
+  } catch (error) {
+    throw new TournamentInputError(
+      error instanceof Error ? error.message : "Ungültige Event-Einstellungen",
+    );
+  }
   const hostToken = generateSecretToken();
 
   const tournament = await prisma.$transaction(async (tx) => {
@@ -153,6 +185,7 @@ export async function createTournament(input: {
         name,
         modeKey,
         maxEntries,
+        config: JSON.stringify(config),
         hostToken,
         status: TOURNAMENT_STATUS.OPEN,
       },

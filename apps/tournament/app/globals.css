@@ -271,3 +271,130 @@ a {
   padding: 0.65rem;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
 }
+
+.t-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.85rem;
+  padding: 0.45rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.t-setting-row:first-of-type {
+  border-top: none;
+}
+
+.t-setting-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.t-setting-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 750;
+}
+
+.t-setting-hint {
+  margin: 0.15rem 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.t-segmented {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.3rem;
+  padding: 0.22rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(2, 6, 23, 0.4);
+}
+
+.t-segmented-option {
+  min-height: 2.4rem;
+  border: none;
+  border-radius: 0.68rem;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.t-segmented-option.is-selected {
+  background: rgba(56, 189, 248, 0.16);
+  color: var(--ink);
+}
+
+.t-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.t-stepper-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 0.55rem;
+  border: 1px solid var(--glass-edge);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.t-stepper-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.t-stepper-value {
+  min-width: 1.6rem;
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.t-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 2.85rem;
+  height: 1.7rem;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  background: rgba(2, 6, 23, 0.55);
+  cursor: pointer;
+}
+
+.t-switch.is-on {
+  border-color: rgba(56, 189, 248, 0.5);
+  background: rgba(56, 189, 248, 0.35);
+}
+
+.t-switch-knob {
+  position: absolute;
+  top: 0.12rem;
+  left: 0.14rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 999px;
+  background: #fff;
+  transition: transform 0.16s ease;
+}
+
+.t-switch.is-on .t-switch-knob {
+  transform: translateX(1.1rem);
+}

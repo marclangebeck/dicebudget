@@ -38,6 +38,7 @@ export type TournamentDto = {
   modeKey: string;
   status: string;
   maxEntries: number;
+  config?: Record<string, unknown>;
   entryCount: number;
   createdAt: string;
   entries?: TournamentEntryDto[];
@@ -60,6 +61,7 @@ export function createTournament(input: {
   name?: string;
   modeKey?: string;
   maxEntries?: number;
+  config?: Record<string, unknown>;
 }): Promise<CreateTournamentResponse> {
   return apiFetch("/tournaments", {
     method: "POST",

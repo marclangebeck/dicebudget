@@ -36,7 +36,7 @@ Es gibt **drei** Produkte. Events (Liga oder Turnier) werden in der **Organisati
 
 | Thema | Stand |
 |-------|--------|
-| Tournament-Host (Setup, Anlegen, Lobby/QR) | im Bau (`apps/tournament`) |
+| Tournament-Host (Setup, Anlegen, Lobby/QR) | Wizard inkl. Liga-/Turnier-Einstellungen (`apps/tournament`) |
 | Backend `/tournaments` | da (Join-API + Spieler-UI in Pro) |
 | DiceBudget Startscreen „Turnier/Liga beitreten“ | **aktiv** (T3 → `/tournament/join`) |
 | DiceBudget GO | **nicht** angelegt |

@@ -40,7 +40,12 @@ QR-Payload (Idee): URL auf DiceBudget-Domain, z. B.
 
 ```
 modeKey: "league" | "turnier" | …   // erweiterbar (UI: Liga / Turnier)
-config:  { … }                        // modus-spezifisch, validiert serverseitig
+config:  {
+  // Partie
+  useStrategyRules, gameCount, showOpponentPool, poolEndgameEnabled
+  // Liga: rounds
+  // Turnier: groupSize, qualifyPerGroup (1|2), knockout: "single"
+}
 ```
 
 Kern-API liefert Pairings und Standings; Modus-Plugins berechnen Auslosung und Ranking.

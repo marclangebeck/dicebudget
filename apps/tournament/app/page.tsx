@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { APP_NAME, APP_TAGLINE } from "@/lib/branding";
 import { loadHostSession } from "@/lib/hostStore";
+import {
+  DEFAULT_LEAGUE_SETTINGS,
+  DEFAULT_MATCH_PREFS,
+  DEFAULT_TURNIER_SETTINGS,
+} from "@/lib/eventConfig";
 import { loadSetupDraft, patchSetupDraft, saveSetupDraft } from "@/lib/setupDraft";
 
 export default function TournamentHomePage() {
@@ -29,7 +34,12 @@ export default function TournamentHomePage() {
     if (existing) {
       patchSetupDraft({ name: trimmed });
     } else {
-      saveSetupDraft({ name: trimmed });
+      saveSetupDraft({
+        name: trimmed,
+        match: DEFAULT_MATCH_PREFS,
+        league: DEFAULT_LEAGUE_SETTINGS,
+        turnier: DEFAULT_TURNIER_SETTINGS,
+      });
     }
     router.push("/setup");
   }

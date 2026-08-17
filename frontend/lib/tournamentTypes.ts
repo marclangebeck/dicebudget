@@ -5,6 +5,7 @@ export type TournamentDto = {
   modeKey: string;
   status: string;
   maxEntries: number;
+  config?: Record<string, unknown>;
   entryCount: number;
   createdAt: string;
   entries?: TournamentEntryDto[];

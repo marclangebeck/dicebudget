@@ -10,6 +10,7 @@ import {
   type TournamentDto,
 } from "@/lib/api";
 import { APP_NAME } from "@/lib/branding";
+import { TOURNAMENT_MODE_OPTIONS } from "@/lib/tournamentModes";
 import { clearHostSession, loadHostSession } from "@/lib/hostStore";
 
 function HostInner() {
@@ -75,9 +76,15 @@ function HostInner() {
     router.push("/");
   }
 
+  const modeLabel =
+    TOURNAMENT_MODE_OPTIONS.find((option) => option.key === tournament?.modeKey)
+      ?.label ?? tournament?.modeKey;
+
   return (
     <main className="t-shell">
-      <p className="t-meta">{APP_NAME} · Lobby</p>
+      <p className="t-meta">
+        {APP_NAME} · {modeLabel ?? "Lobby"}
+      </p>
       <h1 className="t-brand" style={{ fontSize: "1.55rem" }}>
         {tournament?.name?.trim() || "Ereignis-Lobby"}
       </h1>

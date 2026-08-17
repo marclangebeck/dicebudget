@@ -27,6 +27,7 @@ tournamentsRouter.post("/", createTournamentLimiter, async (req, res, next) => {
       name: req.body?.name,
       modeKey: req.body?.modeKey,
       maxEntries: req.body?.maxEntries,
+      config: req.body?.config,
     });
     res.status(201).json(result);
   } catch (error) {

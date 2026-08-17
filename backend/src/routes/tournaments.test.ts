@@ -26,6 +26,8 @@ describe("tournaments API", () => {
     assert.equal(created.body.tournament.status, "OPEN");
     assert.ok(created.body.tournament.inviteCode);
     assert.ok(created.body.hostToken);
+    assert.equal(created.body.tournament.config.rounds, 3);
+    assert.equal(created.body.tournament.config.gameCount, 1);
 
     const code = created.body.tournament.inviteCode as string;
     const hostToken = created.body.hostToken as string;
@@ -62,6 +64,36 @@ describe("tournaments API", () => {
       .post(`/tournaments/invite/${code}/join`)
       .send({ displayName: "Carla" })
       .expect(409);
+  });
+
+  it("nimmt Turnier-Config entgegen", async () => {
+    const created = await request(app)
+      .post("/tournaments")
+      .send({
+        name: "Cup",
+        modeKey: "turnier",
+        maxEntries: 16,
+        config: {
+          groupSize: 4,
+          qualifyPerGroup: 2,
+          gameCount: 2,
+          useStrategyRules: false,
+        },
+      })
+      .expect(201);
+
+    assert.equal(created.body.tournament.config.groupSize, 4);
+    assert.equal(created.body.tournament.config.qualifyPerGroup, 2);
+    assert.equal(created.body.tournament.config.knockout, "single");
+    assert.equal(created.body.tournament.config.gameCount, 2);
+    assert.equal(created.body.tournament.config.useStrategyRules, false);
+  });
+
+  it("lehnt ungültige Liga-Config ab", async () => {
+    await request(app)
+      .post("/tournaments")
+      .send({ modeKey: "league", config: { rounds: 99 } })
+      .expect(400);
   });
 
   it("lehnt Start mit falschem Host-Token ab", async () => {

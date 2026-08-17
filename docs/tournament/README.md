@@ -2,7 +2,7 @@
 
 **Produktname:** DiceBudget Tournament  
 **Stand:** 2026-08-17  
-**Status:** T0–T3 (API + Host-Skelett + Teilnehmer-Join in DiceBudget Pro); T4+ offen  
+**Status:** T0–T3 + Host-Setup mit Liga-/Turnier-Einstellungen; T4+ offen  
 **Produktfamilie:** [`products.md`](./products.md) — **drei Apps** (DiceBudget · Tournament · GO)
 
 ## Vision (kurz)

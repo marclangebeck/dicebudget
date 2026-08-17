@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**HEAD:** siehe `git log -1` (T3 Teilnehmer-Join)  
+**HEAD:** siehe `git log -1` (Tournament-Setup-Einstellungen)  
 **Sprache:** Deutsch  
 **Stand Doku:** 2026-08-17
 
@@ -21,14 +21,15 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 - Reine Frontend-Änderungen: `cd frontend && npm run build` auf dem Server; Nginx liefert `frontend/out/` aus.
 - **Events:** drei Apps — **DiceBudget** (Pro), **DiceBudget Tournament** (Host), **DiceBudget GO** (nur Teilnahme, geplant). Quelle: `docs/tournament/products.md`. DiceBudget-Kern unantastbar; Events nur additiv. Hosten nur Tournament.
 - **Spielername:** einmal nach der Sanduhr, Server an `playerId`. Fotos lokal in der Statistik, ohne Rivalen-Verwaltung. Backend-Deploy nötig (Migration).
-- **T3 Event-Join:** Pro-App `/tournament/join` + Startscreen-QR; Host-QR unverändert. Kein Backend-Deploy nötig außer wenn API noch nicht live (T1).
+- **T3 Event-Join:** Pro-App `/tournament/join` + Startscreen-QR; Host-QR unverändert.
+- **Tournament-Setup:** Liga-/Turnier-Einstellungen im Host; Backend-Migration `tournament_config` — Deploy nötig.
 
 ## Aktueller Stand
 
 | Bereich | Status |
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
-| Branch | `milestone-22-prep` @ Tip (T3 Event-Join Pro) |
+| Branch | `milestone-22-prep` @ Tip (Tournament-Setup-Config) |
 | Frontend-Tests | **121** grün |
 | Roadmap | **M42/M43** + **Multi-QR** umgesetzt; **M30** danach; Turnier = Planung `docs/tournament/` |
 | Entwickler-Vorschau | **InApp-Käufe (Features)** = Labs-PIN (`NEXT_PUBLIC_LABS_PIN`) — getrennt von Admin |
