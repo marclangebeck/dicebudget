@@ -1,8 +1,7 @@
 "use client";
 
 import { Suspense, useCallback, useEffect, useState } from "react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import QRCode from "qrcode";
 import {
   getTournamentByInvite,
@@ -11,6 +10,7 @@ import {
 } from "@/lib/api";
 import { APP_NAME } from "@/lib/branding";
 import { TOURNAMENT_MODE_OPTIONS } from "@/lib/tournamentModes";
+import { goToNewEventStart } from "@/lib/hostNav";
 import { clearHostSession, loadHostSession } from "@/lib/hostStore";
 
 function statusLabel(status?: string): string {
@@ -20,7 +20,6 @@ function statusLabel(status?: string): string {
 }
 
 function HostInner() {
-  const router = useRouter();
   const params = useSearchParams();
   const code = (params.get("code") ?? "").trim().toUpperCase();
   const [tournament, setTournament] = useState<TournamentDto | null>(null);
@@ -82,7 +81,7 @@ function HostInner() {
 
   function onLeave() {
     clearHostSession();
-    router.push("/");
+    window.location.assign("/");
   }
 
   const modeLabel =
@@ -184,9 +183,13 @@ function HostInner() {
             >
               {isOpen ? "Ereignis starten" : "Gestartet"}
             </button>
-            <Link href="/" className="t-btn t-btn--ghost">
-              Zur Startseite
-            </Link>
+            <button
+              type="button"
+              className="t-btn t-btn--ghost"
+              onClick={() => goToNewEventStart()}
+            >
+              Neues Event
+            </button>
             <button type="button" className="t-btn t-btn--ghost" onClick={onLeave}>
               Host-Sitzung löschen
             </button>

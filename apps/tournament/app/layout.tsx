@@ -31,9 +31,13 @@ export const viewport: Viewport = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const build = process.env.NEXT_PUBLIC_TOURNAMENT_BUILD;
   return (
     <html lang="de">
-      <body className={`${outfit.variable} antialiased`}>{children}</body>
+      <body className={`${outfit.variable} antialiased`}>
+        {children}
+        {build ? <p className="t-build-id">{build}</p> : null}
+      </body>
     </html>
   );
 }

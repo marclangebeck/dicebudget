@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3022",
-    "build": "next build",
-    "build:ios": "npm run build && bash scripts/verify-web-export.sh && npx cap sync ios && bash scripts/verify-web-export.sh ios-public && bash scripts/ios-ipad-landscape.sh && bash scripts/open-xcode.sh",
+    "build": "bash scripts/stamp-build.sh && next build",
+    "build:ios": "npm run build && bash scripts/verify-web-export.sh && npx cap sync ios && bash scripts/verify-web-export.sh ios-public && bash scripts/ios-ipad-landscape.sh && find ios/App/App/public -exec touch {} + && bash scripts/open-xcode.sh",
     "open:ios": "bash scripts/open-xcode.sh",
     "cap:sync": "npx cap sync ios",
     "lint": "eslint"

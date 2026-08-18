@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { APP_NAME, APP_TAGLINE } from "@/lib/branding";
 import { loadHostSession } from "@/lib/hostStore";
+import { goToHostLobby } from "@/lib/hostNav";
 import {
   DEFAULT_LEAGUE_SETTINGS,
   DEFAULT_MATCH_PREFS,
@@ -11,17 +12,24 @@ import {
 } from "@/lib/eventConfig";
 import { loadSetupDraft, patchSetupDraft, saveSetupDraft } from "@/lib/setupDraft";
 
-export default function TournamentHomePage() {
+function TournamentHomeInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const forceNew = searchParams.get("new") === "1";
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [hasSaved, setHasSaved] = useState(false);
 
   useEffect(() => {
-    setHasSaved(Boolean(loadHostSession()));
+    const saved = loadHostSession();
+    setHasSaved(Boolean(saved));
+    if (saved && !forceNew) {
+      goToHostLobby(saved.inviteCode);
+      return;
+    }
     const draft = loadSetupDraft();
     if (draft?.name) setName(draft.name);
-  }, []);
+  }, [forceNew]);
 
   function onContinue() {
     const trimmed = name.trim();
@@ -41,7 +49,7 @@ export default function TournamentHomePage() {
         turnier: DEFAULT_TURNIER_SETTINGS,
       });
     }
-    router.push("/setup");
+    router.push("/setup/");
   }
 
   function onOpenSaved() {
@@ -50,7 +58,7 @@ export default function TournamentHomePage() {
       setError("Kein gespeichertes Host-Event auf diesem Gerät.");
       return;
     }
-    router.push(`/host?code=${encodeURIComponent(saved.inviteCode)}`);
+    goToHostLobby(saved.inviteCode);
   }
 
   return (
@@ -79,8 +87,8 @@ export default function TournamentHomePage() {
             Weiter
           </button>
           {hasSaved && (
-            <button type="button" className="t-btn t-btn--ghost" onClick={onOpenSaved}>
-              Letztes Event öffnen
+            <button type="button" className="t-btn t-btn--accent" onClick={onOpenSaved}>
+              Event-Lobby öffnen
             </button>
           )}
         </div>
@@ -92,5 +100,13 @@ export default function TournamentHomePage() {
         </p>
       )}
     </main>
+  );
+}
+
+export default function TournamentHomePage() {
+  return (
+    <Suspense fallback={<main className="t-shell">Lade…</main>}>
+      <TournamentHomeInner />
+    </Suspense>
   );
 }

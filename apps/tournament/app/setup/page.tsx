@@ -31,7 +31,7 @@ export default function SetupFormatPage() {
       router.replace("/");
       return;
     }
-    router.push("/setup/size");
+    router.push("/setup/size/");
   }
 
   if (!name) {

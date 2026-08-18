@@ -1,10 +1,16 @@
+import path from "node:path";
 import type { NextConfig } from "next";
+
+const appDir = path.resolve(__dirname);
 
 const nextConfig: NextConfig = {
   output: "export",
-  // Verhindert, dass Next.js ~/package-lock.json als Workspace-Root nimmt
-  // und ins falsche `out/` schreibt (Mac-Warnung „multiple lockfiles“).
-  outputFileTracingRoot: process.cwd(),
+  distDir: ".next",
+  trailingSlash: true,
+  outputFileTracingRoot: appDir,
+  turbopack: {
+    root: appDir,
+  },
 };
 
 export default nextConfig;

@@ -399,6 +399,19 @@ a {
   transform: translateX(1.1rem);
 }
 
+.t-build-id {
+  position: fixed;
+  right: 0.65rem;
+  bottom: 0.4rem;
+  z-index: 20;
+  margin: 0;
+  color: rgba(148, 163, 184, 0.55);
+  font-size: 0.62rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}
+
 .t-shell--cockpit {
   gap: 0.75rem;
 }

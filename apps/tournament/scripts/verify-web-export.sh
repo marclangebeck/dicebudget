@@ -15,7 +15,7 @@ if [[ ! -d "$TARGET" ]]; then
   exit 1
 fi
 
-if ! grep -Rqs "t-cockpit-grid" "$TARGET"; then
+if ! grep -Rqs --binary-files=text "t-cockpit-grid" "$TARGET"; then
   echo "Cockpit-UI nicht in $TARGET (kein t-cockpit-grid)." >&2
   echo "Next.js hat vermutlich ins falsche out/ geschrieben. Archive abbrechen." >&2
   exit 1

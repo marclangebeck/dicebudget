@@ -45,7 +45,7 @@ export default function SetupTurnierPage() {
       router.replace("/");
       return;
     }
-    router.push("/setup/review");
+    router.push("/setup/review/");
   }
 
   if (!name || maxEntries == null) {

@@ -44,7 +44,7 @@ export default function SetupLeaguePage() {
       router.replace("/");
       return;
     }
-    router.push("/setup/review");
+    router.push("/setup/review/");
   }
 
   if (!name || maxEntries == null) {
