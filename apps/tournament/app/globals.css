@@ -494,7 +494,7 @@ a {
   font-weight: 750;
 }
 
-@media (min-width: 64rem) {
+@media (min-width: 48rem) {
   .t-shell--cockpit {
     min-height: 100dvh;
     max-height: 100dvh;
