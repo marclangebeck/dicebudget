@@ -14,7 +14,8 @@ Jeder mit dieser App kann ein Event eröffnen. Teilnehmer treten per QR bei (GO 
 
 - DiceBudget-Pro-App darf nicht beschädigt werden (siehe `docs/tournament/README.md`).
 - Kein Polling: Lobby nur per Tap „Aktualisieren“.
-- Nach dem Anlegen: ein Screen, drei Container (Beitritt / Feld / Leitung). iPad (auch hochkant) nebeneinander.
+- Nach dem Anlegen: ein Screen, drei Container (Beitritt / Feld / Leitung), für **iPad Querformat**.
+- `build:ios` prüft den Export und setzt iPad auf Landscape + Vollbild. Danach in Xcode **Product → Archive** (TestFlight), Scheme **DiceBudget Tournament**.
 - Design: an DiceBudget Startscreen angelehnt (Navy/Slate/Teal, Gold nur Akzent), eigene Typo (Outfit) — ähnlich, nicht gleich.
 - iOS-Native-Projekt: auf dem **Mac** einmalig `npx cap add ios` (falls Ordner `ios/` fehlt), danach `npm run build:ios`.
 
@@ -45,4 +46,4 @@ npx cap add ios
 npm run build:ios
 ```
 
-In Xcode: Scheme **DiceBudget Tournament**, Gerät/iPad wählen, **Play** — sonst bleibt die alte App auf dem Home-Screen. Archive: Team, Build-Nummer, **Any iOS Device** → App Store Connect (eigener Eintrag, nicht DiceBudget).
+In Xcode: Scheme **DiceBudget Tournament**, Build-Nummer hoch, **Product → Archive** → App Store Connect. Nicht das DiceBudget-Pro-Projekt archivieren.

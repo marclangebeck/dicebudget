@@ -29,6 +29,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Paarungs-Detail-Karten:** Bild oben volle Breite / halbe Höhe, Infos darunter — persönlichere Rivalen-Ansicht
 
 ### Changed
+- **Tournament Host iPad:** Querformat (Vollbild); Lobby-Cockpit für Landscape; `build:ios` prüft, dass die neue UI wirklich im Archive-Bundle liegt
 - **Tournament Host-Lobby:** nach dem Anlegen ein Screen mit drei Containern (Beitritt / Feld / Leitung); auf dem iPad (auch hochkant) nebeneinander, schmal untereinander
 - **Statistik wie Spielregeln:** gleicher Screen-Hintergrund, flache Gruppen Übersicht / Sortierung (Zuletzt · Engste · Meiste) / Duelle / Verwalten statt Hero-Karte und Chip-Leiste
 - **Zettel-Feldnamen größer:** 1er–Chance lesbarer; kleine Alle-Fünfe-Würfel liegen overlay und schieben die Zeile nicht

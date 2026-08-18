@@ -66,7 +66,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 ### Tournament Host-Cockpit — 2026-08-18
 
 - Nach dem Anlegen bleibt der Host auf `/host`: Container Beitritt (QR), Feld (Liste), Leitung (Start).
-- Ab ~1024px Breite nebeneinander (iPad quer); schmal untereinander. Kein Polling.
+- **iPad Querformat** (Vollbild). TestFlight: `apps/tournament` → `npm run build:ios` → Xcode **Archive** (Scheme Tournament, nicht Pro).
 - T4 (Spielplan) soll denselben Screen füllen, keine neue Route.
 
 ### Statistik-Layout — 2026-08-17
