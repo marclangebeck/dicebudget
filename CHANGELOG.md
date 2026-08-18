@@ -29,6 +29,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 - **Paarungs-Detail-Karten:** Bild oben volle Breite / halbe Höhe, Infos darunter — persönlichere Rivalen-Ansicht
 
 ### Changed
+- **Tournament Host:** Einrichten und Lobby je ein Screen mit drei Containern (kein Wizard mehr)
 - **Tournament Host:** Lobby liegt auf dem Start-Screen (kein `/host`-Sprung); drei Container immer nebeneinander
 - **Tournament Host:** App öffnet nach Anlegen die 3-Container-Lobby (nicht den Namens-Screen); Export mit trailingSlash für Capacitor; Build-Hash unten rechts
 - **Tournament Host iPad:** Querformat (Vollbild); Lobby-Cockpit für Landscape; `build:ios` prüft, dass die neue UI wirklich im Archive-Bundle liegt

@@ -458,8 +458,13 @@ a {
   flex-direction: column;
 }
 
-.t-panel .t-label {
-  margin-bottom: 0.55rem;
+.t-panel--setup-match .t-card {
+  width: 100%;
+  max-width: none;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
 }
 
 .t-panel-body {

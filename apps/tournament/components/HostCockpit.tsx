@@ -96,6 +96,7 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
         <h1 className="t-brand">
           {tournament?.name?.trim() || "Ereignis-Lobby"}
         </h1>
+        <p className="t-meta">Drei Container — Beitritt · Feld · Leitung</p>
         <p className="t-meta">
           {statusLabel(tournament?.status)}
           {" · "}
