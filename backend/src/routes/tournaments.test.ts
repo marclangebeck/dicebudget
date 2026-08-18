@@ -78,6 +78,7 @@ describe("tournaments API", () => {
           qualifyPerGroup: 2,
           gameCount: 2,
           useStrategyRules: false,
+          houseRules: { houseRulesBurn: false, houseRulesYatzyStreakCredit: true },
         },
       })
       .expect(201);
@@ -87,6 +88,12 @@ describe("tournaments API", () => {
     assert.equal(created.body.tournament.config.knockout, "single");
     assert.equal(created.body.tournament.config.gameCount, 2);
     assert.equal(created.body.tournament.config.useStrategyRules, false);
+    assert.equal(created.body.tournament.config.houseRules.houseRulesBurn, false);
+    assert.equal(created.body.tournament.config.houseRules.houseRulesYatzyStreak, true);
+    assert.equal(
+      created.body.tournament.config.houseRules.houseRulesYatzyStreakCredit,
+      true,
+    );
   });
 
   it("lehnt ungültige Liga-Config ab", async () => {

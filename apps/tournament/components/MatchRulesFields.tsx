@@ -8,6 +8,12 @@ import {
   MATCH_GAME_COUNT_MIN,
   type MatchPrefs,
 } from "@/lib/eventConfig";
+import {
+  listChildHouseRules,
+  listTopHouseRules,
+  setHouseRule,
+  type HouseRuleId,
+} from "@/lib/houseRules";
 
 type Props = {
   value: MatchPrefs;
@@ -15,6 +21,13 @@ type Props = {
 };
 
 export function MatchRulesFields({ value, onChange }: Props) {
+  function toggleHouseRule(id: HouseRuleId, checked: boolean) {
+    onChange({
+      ...value,
+      houseRules: setHouseRule(value.houseRules, id, checked),
+    });
+  }
+
   return (
     <section className="t-card" aria-label="Partie-Regeln">
       <p className="t-label" style={{ marginBottom: "0.65rem" }}>
@@ -67,6 +80,33 @@ export function MatchRulesFields({ value, onChange }: Props) {
           />
         </>
       )}
+      <p className="t-label" style={{ marginTop: "0.85rem" }}>
+        Spielregeln
+      </p>
+      <p className="t-setting-hint" style={{ margin: "0 0 0.35rem" }}>
+        Wie in DiceBudget unter InApp-Features.
+      </p>
+      {listTopHouseRules().map((option) => (
+        <div key={option.id}>
+          <SetupToggleRow
+            title={option.title}
+            hint={option.description}
+            checked={value.houseRules[option.id]}
+            onChange={(checked) => toggleHouseRule(option.id, checked)}
+          />
+          {value.houseRules[option.id] &&
+            listChildHouseRules(option.id).map((child) => (
+              <SetupToggleRow
+                key={child.id}
+                title={child.title}
+                hint={child.description}
+                nested
+                checked={value.houseRules[child.id]}
+                onChange={(checked) => toggleHouseRule(child.id, checked)}
+              />
+            ))}
+        </div>
+      ))}
     </section>
   );
 }

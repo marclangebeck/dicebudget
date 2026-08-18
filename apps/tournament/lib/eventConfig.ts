@@ -1,3 +1,5 @@
+import { DEFAULT_HOUSE_RULES, parseHouseRules, type HouseRulePrefs } from "./houseRules";
+
 export const MATCH_GAME_COUNT_MIN = 1;
 export const MATCH_GAME_COUNT_MAX = 6;
 export const LEAGUE_ROUNDS_MIN = 1;
@@ -10,6 +12,7 @@ export type MatchPrefs = {
   gameCount: number;
   showOpponentPool: boolean;
   poolEndgameEnabled: boolean;
+  houseRules: HouseRulePrefs;
 };
 
 export type LeagueSettings = {
@@ -26,6 +29,7 @@ export const DEFAULT_MATCH_PREFS: MatchPrefs = {
   gameCount: 1,
   showOpponentPool: false,
   poolEndgameEnabled: false,
+  houseRules: { ...DEFAULT_HOUSE_RULES },
 };
 
 export const DEFAULT_LEAGUE_SETTINGS: LeagueSettings = {
@@ -74,6 +78,7 @@ export function buildEventConfigPayload(
     ...match,
     showOpponentPool: match.useStrategyRules ? match.showOpponentPool : false,
     poolEndgameEnabled: match.useStrategyRules ? match.poolEndgameEnabled : false,
+    houseRules: parseHouseRules(match.houseRules),
   };
   if (modeKey === "turnier") {
     return {

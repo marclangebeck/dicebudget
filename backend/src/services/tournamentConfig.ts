@@ -5,11 +5,23 @@ export const LEAGUE_ROUNDS_MAX = 10;
 export const GROUP_SIZE_MIN = 3;
 export const GROUP_SIZE_MAX = 6;
 
+export type TournamentHouseRules = {
+  houseRulesBurn: boolean;
+  houseRulesRollSale: boolean;
+  houseRulesYatzyStreak: boolean;
+  houseRulesYatzyStreakCredit: boolean;
+  houseRulesYatzyTriple: boolean;
+  houseRulesYatzyTripleCredit: boolean;
+  houseRulesUpperRace: boolean;
+  houseRulesColumnPoolBonuses: boolean;
+};
+
 export type TournamentMatchConfig = {
   useStrategyRules: boolean;
   gameCount: number;
   showOpponentPool: boolean;
   poolEndgameEnabled: boolean;
+  houseRules: TournamentHouseRules;
 };
 
 export type LeagueTournamentConfig = TournamentMatchConfig & {
@@ -24,11 +36,23 @@ export type TurnierTournamentConfig = TournamentMatchConfig & {
 
 export type TournamentConfig = LeagueTournamentConfig | TurnierTournamentConfig;
 
+export const DEFAULT_HOUSE_RULES: TournamentHouseRules = {
+  houseRulesBurn: true,
+  houseRulesRollSale: true,
+  houseRulesYatzyStreak: true,
+  houseRulesYatzyStreakCredit: false,
+  houseRulesYatzyTriple: true,
+  houseRulesYatzyTripleCredit: false,
+  houseRulesUpperRace: true,
+  houseRulesColumnPoolBonuses: true,
+};
+
 export const DEFAULT_MATCH_CONFIG: TournamentMatchConfig = {
   useStrategyRules: true,
   gameCount: 1,
   showOpponentPool: false,
   poolEndgameEnabled: false,
+  houseRules: { ...DEFAULT_HOUSE_RULES },
 };
 
 export const DEFAULT_LEAGUE_ROUNDS = 3;
@@ -55,6 +79,44 @@ function readInt(value: unknown, fallback: number): number {
   return fallback;
 }
 
+function normalizeHouseRules(raw: unknown): TournamentHouseRules {
+  const obj = asObject(raw);
+  const next: TournamentHouseRules = {
+    houseRulesBurn: readBoolean(obj.houseRulesBurn, DEFAULT_HOUSE_RULES.houseRulesBurn),
+    houseRulesRollSale: readBoolean(
+      obj.houseRulesRollSale,
+      DEFAULT_HOUSE_RULES.houseRulesRollSale,
+    ),
+    houseRulesYatzyStreak: readBoolean(
+      obj.houseRulesYatzyStreak,
+      DEFAULT_HOUSE_RULES.houseRulesYatzyStreak,
+    ),
+    houseRulesYatzyStreakCredit: readBoolean(
+      obj.houseRulesYatzyStreakCredit,
+      DEFAULT_HOUSE_RULES.houseRulesYatzyStreakCredit,
+    ),
+    houseRulesYatzyTriple: readBoolean(
+      obj.houseRulesYatzyTriple,
+      DEFAULT_HOUSE_RULES.houseRulesYatzyTriple,
+    ),
+    houseRulesYatzyTripleCredit: readBoolean(
+      obj.houseRulesYatzyTripleCredit,
+      DEFAULT_HOUSE_RULES.houseRulesYatzyTripleCredit,
+    ),
+    houseRulesUpperRace: readBoolean(
+      obj.houseRulesUpperRace,
+      DEFAULT_HOUSE_RULES.houseRulesUpperRace,
+    ),
+    houseRulesColumnPoolBonuses: readBoolean(
+      obj.houseRulesColumnPoolBonuses,
+      DEFAULT_HOUSE_RULES.houseRulesColumnPoolBonuses,
+    ),
+  };
+  if (!next.houseRulesYatzyStreak) next.houseRulesYatzyStreakCredit = false;
+  if (!next.houseRulesYatzyTriple) next.houseRulesYatzyTripleCredit = false;
+  return next;
+}
+
 function normalizeMatch(raw: Record<string, unknown>): TournamentMatchConfig {
   const gameCount = readInt(raw.gameCount, DEFAULT_MATCH_CONFIG.gameCount);
   if (gameCount < MATCH_GAME_COUNT_MIN || gameCount > MATCH_GAME_COUNT_MAX) {
@@ -75,11 +137,15 @@ function normalizeMatch(raw: Record<string, unknown>): TournamentMatchConfig {
     poolEndgameEnabled: useStrategyRules
       ? readBoolean(raw.poolEndgameEnabled, DEFAULT_MATCH_CONFIG.poolEndgameEnabled)
       : false,
+    houseRules: normalizeHouseRules(raw.houseRules),
   };
 }
 
 export function defaultTournamentConfig(modeKey: string): TournamentConfig {
-  const match = { ...DEFAULT_MATCH_CONFIG };
+  const match: TournamentMatchConfig = {
+    ...DEFAULT_MATCH_CONFIG,
+    houseRules: { ...DEFAULT_HOUSE_RULES },
+  };
   if (modeKey === "turnier") {
     return {
       ...match,

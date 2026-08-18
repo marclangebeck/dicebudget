@@ -14,6 +14,8 @@ describe("normalizeTournamentConfig", () => {
     }
     assert.equal(config.useStrategyRules, true);
     assert.equal(config.gameCount, 1);
+    assert.equal(config.houseRules.houseRulesBurn, true);
+    assert.equal(config.houseRules.houseRulesYatzyStreakCredit, false);
   });
 
   it("füllt Turnier-Defaults", () => {
@@ -28,6 +30,31 @@ describe("normalizeTournamentConfig", () => {
 
   it("lehnt ungültige Runden ab", () => {
     assert.throws(() => normalizeTournamentConfig("league", { rounds: 0 }));
+  });
+
+  it("nimmt Hausregeln entgegen", () => {
+    const config = normalizeTournamentConfig("league", {
+      houseRules: {
+        houseRulesBurn: false,
+        houseRulesYatzyStreakCredit: true,
+      },
+    });
+    assert.equal(config.houseRules.houseRulesBurn, false);
+    assert.equal(config.houseRules.houseRulesYatzyStreak, true);
+    assert.equal(config.houseRules.houseRulesYatzyStreakCredit, true);
+  });
+
+  it("stellt Gutschrift aus wenn die Elternregel aus ist", () => {
+    const config = normalizeTournamentConfig("league", {
+      houseRules: {
+        houseRulesYatzyStreak: false,
+        houseRulesYatzyStreakCredit: true,
+        houseRulesYatzyTriple: false,
+        houseRulesYatzyTripleCredit: true,
+      },
+    });
+    assert.equal(config.houseRules.houseRulesYatzyStreakCredit, false);
+    assert.equal(config.houseRules.houseRulesYatzyTripleCredit, false);
   });
 });
 

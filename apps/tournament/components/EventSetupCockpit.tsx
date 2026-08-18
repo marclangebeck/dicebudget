@@ -23,6 +23,8 @@ import { clearSetupDraft, loadSetupDraft, saveSetupDraft } from "@/lib/setupDraf
 import {
   DEFAULT_MAX_ENTRIES,
   MAX_ENTRIES_PRESETS,
+  MAX_MAX_ENTRIES,
+  MIN_MAX_ENTRIES,
   TOURNAMENT_MODE_OPTIONS,
   clampMaxEntries,
   type TournamentModeKey,
@@ -39,6 +41,7 @@ export function EventSetupCockpit({ onCreated, onCancel }: Props) {
   const [name, setName] = useState("");
   const [modeKey, setModeKey] = useState<TournamentModeKey>("league");
   const [maxEntries, setMaxEntries] = useState(DEFAULT_MAX_ENTRIES);
+  const [playerCountDraft, setPlayerCountDraft] = useState(String(DEFAULT_MAX_ENTRIES));
   const [league, setLeague] = useState<LeagueSettings>(DEFAULT_LEAGUE_SETTINGS);
   const [turnier, setTurnier] = useState<TurnierSettings>(DEFAULT_TURNIER_SETTINGS);
   const [match, setMatch] = useState<MatchPrefs>(DEFAULT_MATCH_PREFS);
@@ -50,7 +53,10 @@ export function EventSetupCockpit({ onCreated, onCancel }: Props) {
     if (!draft) return;
     setName(draft.name);
     if (draft.modeKey) setModeKey(draft.modeKey);
-    if (draft.maxEntries) setMaxEntries(draft.maxEntries);
+    if (draft.maxEntries) {
+      setMaxEntries(draft.maxEntries);
+      setPlayerCountDraft(String(draft.maxEntries));
+    }
     setLeague(draft.league);
     setTurnier(draft.turnier);
     setMatch(draft.match);
@@ -154,12 +160,52 @@ export function EventSetupCockpit({ onCreated, onCancel }: Props) {
                   type="button"
                   className={`t-choice t-choice--compact${maxEntries === preset ? " t-choice--selected" : ""}`}
                   aria-pressed={maxEntries === preset}
-                  onClick={() => setMaxEntries(preset)}
+                  onClick={() => {
+                    setMaxEntries(preset);
+                    setPlayerCountDraft(String(preset));
+                  }}
                 >
                   <span className="t-choice-title">{preset}</span>
                 </button>
               ))}
             </div>
+            <label className="t-label" style={{ marginTop: "0.75rem" }}>
+              Eigene Zahl
+              <input
+                className="t-input"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                enterKeyHint="done"
+                aria-label={`Spielerzahl ${MIN_MAX_ENTRIES} bis ${MAX_MAX_ENTRIES}`}
+                value={playerCountDraft}
+                onChange={(e) => {
+                  const raw = e.target.value.replace(/\D/g, "").slice(0, 2);
+                  setPlayerCountDraft(raw);
+                  if (raw === "") return;
+                  const n = Number(raw);
+                  if (
+                    Number.isInteger(n) &&
+                    n >= MIN_MAX_ENTRIES &&
+                    n <= MAX_MAX_ENTRIES
+                  ) {
+                    setMaxEntries(n);
+                  }
+                }}
+                onBlur={() => {
+                  const n = Number(playerCountDraft);
+                  const size = Number.isInteger(n)
+                    ? clampMaxEntries(n)
+                    : clampMaxEntries(maxEntries);
+                  setMaxEntries(size);
+                  setPlayerCountDraft(String(size));
+                }}
+                style={{ textTransform: "none", letterSpacing: "normal" }}
+              />
+            </label>
+            <p className="t-setting-hint">
+              {MIN_MAX_ENTRIES}–{MAX_MAX_ENTRIES} Spieler, nicht nur die Presets.
+            </p>
           </div>
         </section>
 

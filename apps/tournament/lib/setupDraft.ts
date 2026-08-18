@@ -13,6 +13,7 @@ import {
   type MatchPrefs,
   type TurnierSettings,
 } from "@/lib/eventConfig";
+import { parseHouseRules } from "@/lib/houseRules";
 import {
   clampMaxEntries,
   isTournamentModeKey,
@@ -60,6 +61,7 @@ function parseMatch(raw: unknown): MatchPrefs {
         ? obj.poolEndgameEnabled
         : DEFAULT_MATCH_PREFS.poolEndgameEnabled
       : false,
+    houseRules: parseHouseRules(obj.houseRules),
   };
 }
 
