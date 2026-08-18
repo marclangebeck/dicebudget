@@ -3,15 +3,13 @@
 import Link from "next/link";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { getPairingSummaries, getStats, hasAdminApiKey, resetPairings } from "@/lib/api";
+import { getPairingSummaries, hasAdminApiKey, resetPairings } from "@/lib/api";
 import { subscribeAdminAccess } from "@/lib/adminAccess";
 import type { PairingSummaryDto } from "@/lib/pairingTypes";
 import { mergePairingSummaries, type MergedPairingSummary } from "@/lib/pairingMerge";
 import { PairingAccordionItem } from "@/components/PairingAccordionItem";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { SettingsGroup } from "@/components/settings/SettingsGroup";
-import { SettingsSegmented } from "@/components/settings/SettingsSegmented";
-import { StatsHeroPanel } from "@/components/StatsHeroPanel";
 import {
   getOrCreatePlayerId,
   normalizePublicPlayerId,
@@ -24,15 +22,10 @@ import {
   type RivalProfile,
 } from "@/lib/rivalProfiles";
 import { PairingEditOverlay } from "@/components/PairingEditOverlay";
-import { buildStatsOverview } from "@/lib/statsOverview";
 import {
   duelWinShare,
-  getPairingHighlight,
-  pickFeaturedPairingKey,
   sortPairings,
-  type PairingSortMode,
 } from "@/lib/statsPairingInsights";
-import type { StatsDto } from "@/lib/statsTypes";
 import type { PlayerAliasMap } from "@/lib/playerAliases";
 import { playerIdsFromPairings } from "@/lib/displayNameMerge";
 import { useMergedDisplayNames } from "@/lib/useMergedDisplayNames";
@@ -53,18 +46,11 @@ import {
 } from "@/lib/selfIdentity";
 import { useForegroundRefresh } from "@/lib/useForegroundRefresh";
 
-const SORT_OPTIONS: { id: PairingSortMode; label: string }[] = [
-  { id: "recent", label: "Zuletzt" },
-  { id: "closest", label: "Engste" },
-  { id: "mostRounds", label: "Meiste" },
-];
-
 function StatsPageInner() {
   const searchParams = useSearchParams();
   const deepLinkKey = (searchParams.get("pairing") ?? "").trim();
 
   const [pairings, setPairings] = useState<PairingSummaryDto[]>([]);
-  const [stats, setStats] = useState<StatsDto | null>(null);
   const [ownPlayerId, setOwnPlayerId] = useState("");
   const [aliases, setAliases] = useState<PlayerAliasMap>({});
   const displayAliases = useMergedDisplayNames(playerIdsFromPairings(pairings));
@@ -82,7 +68,6 @@ function StatsPageInner() {
   const [deleting, setDeleting] = useState(false);
   const [deleteNotice, setDeleteNotice] = useState<string | null>(null);
   const [hiddenKeys, setHiddenKeys] = useState<Set<string>>(() => new Set());
-  const [sortMode, setSortMode] = useState<PairingSortMode>("recent");
   const [detailReloadToken, setDetailReloadToken] = useState(0);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -95,12 +80,8 @@ function StatsPageInner() {
     if (!opts?.quiet) setLoading(true);
     setError(null);
     try {
-      const [{ pairings: data }, { stats: statsData }] = await Promise.all([
-        getPairingSummaries(),
-        getStats(),
-      ]);
+      const { pairings: data } = await getPairingSummaries();
       setPairings(data);
-      setStats(statsData);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Statistik nicht geladen");
     } finally {
@@ -219,19 +200,9 @@ function StatsPageInner() {
     return scoped.filter((pairing) => pairingIsHidden(pairing, hiddenKeys)).length;
   }, [mergedPairings, ownPlayerId, aliases, ownPlayerIds, canFilterOwn, hiddenKeys]);
 
-  const overview = useMemo(
-    () => buildStatsOverview(ownPairings, stats, ownPlayerId, aliases),
-    [ownPairings, stats, ownPlayerId, aliases],
-  );
-
-  const featuredKey = useMemo(
-    () => pickFeaturedPairingKey(ownPairings),
-    [ownPairings],
-  );
-
   const sortedPairings = useMemo(
-    () => sortPairings(ownPairings, sortMode),
-    [ownPairings, sortMode],
+    () => sortPairings(ownPairings, "recent"),
+    [ownPairings],
   );
 
   const exitSelectMode = useCallback(() => {
@@ -378,33 +349,10 @@ function StatsPageInner() {
       <AppScreenHeader
         section="Statistik"
         title="Deine Duelle"
-        subtitle="Bilanz und Paarungen — aufklappen für Foto und Details"
+        subtitle="Paarungen — aufklappen für Foto und Details"
       />
 
       <div className="settings-list">
-        {(ownPairings.length > 0 || loading) && (
-          <SettingsGroup title="Übersicht">
-            {!loading && !error && ownPairings.length > 0 ? (
-              <>
-                <StatsHeroPanel overview={overview} />
-                <p className="settings-group-caption settings-group-pad" style={{ paddingTop: 0 }}>
-                  Namen vom Server, Fotos nur auf diesem Gerät.
-                  {foreignPairingCount > 0
-                    ? ` ${foreignPairingCount === 1 ? "1 Paarung ohne dich ist" : `${foreignPairingCount} Paarungen ohne dich sind`} nur hier ausgeblendet.`
-                    : ""}
-                  {!canFilterOwn && mergedPairings.length > 0
-                    ? " Fremde Paarungen bleiben sichtbar, bis du in einem davon mitspielst."
-                    : ""}
-                </p>
-              </>
-            ) : (
-              <p className="settings-group-pad settings-toggle-row-hint">
-                {loading ? "Lade …" : "Noch keine Übersicht."}
-              </p>
-            )}
-          </SettingsGroup>
-        )}
-
         {error && (
           <p className="glass-alert-error px-3 py-2 text-sm" role="alert">
             {error}
@@ -413,22 +361,6 @@ function StatsPageInner() {
 
         {deleteNotice && (
           <p className="glass-alert-success px-3 py-2 text-sm">{deleteNotice}</p>
-        )}
-
-        {!loading && !error && ownPairings.length > 0 && (
-          <SettingsGroup title="Sortierung">
-            <div className="settings-group-pad">
-              <SettingsSegmented
-                ariaLabel="Paarungen sortieren"
-                value={sortMode}
-                onChange={(value) => setSortMode(value as PairingSortMode)}
-                options={SORT_OPTIONS.map((option) => ({
-                  value: option.id,
-                  label: option.label,
-                }))}
-              />
-            </div>
-          </SettingsGroup>
         )}
 
         <SettingsGroup title="Duelle">
@@ -453,10 +385,18 @@ function StatsPageInner() {
             </div>
           )}
           {!loading && ownPairings.length > 0 && (
-            <ul className="stats-pairing-list stats-pairing-list--grouped">
-              {sortedPairings.map((pairing) => {
-                const highlight = getPairingHighlight(pairing, ownPlayerId, featuredKey);
-                return (
+            <>
+              <p className="settings-group-caption settings-group-pad" style={{ paddingBottom: 0 }}>
+                Namen vom Server, Fotos nur auf diesem Gerät.
+                {foreignPairingCount > 0
+                  ? ` ${foreignPairingCount === 1 ? "1 Paarung ohne dich ist" : `${foreignPairingCount} Paarungen ohne dich sind`} nur hier ausgeblendet.`
+                  : ""}
+                {!canFilterOwn && mergedPairings.length > 0
+                  ? " Fremde Paarungen bleiben sichtbar, bis du in einem davon mitspielst."
+                  : ""}
+              </p>
+              <ul className="stats-pairing-list">
+                {sortedPairings.map((pairing) => (
                   <PairingAccordionItem
                     key={pairing.key}
                     pairing={pairing}
@@ -471,15 +411,12 @@ function StatsPageInner() {
                     selectable={selectMode}
                     selected={selectedKeys.has(pairing.key)}
                     onToggleSelect={() => toggleSelected(pairing.key)}
-                    badge={highlight.badge}
-                    badgeTone={highlight.tone}
-                    featured={highlight.featured}
                     duelShareA={duelWinShare(pairing)}
                     reloadToken={detailReloadToken}
                   />
-                );
-              })}
-            </ul>
+                ))}
+              </ul>
+            </>
           )}
         </SettingsGroup>
 

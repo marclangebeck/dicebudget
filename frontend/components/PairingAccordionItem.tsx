@@ -7,7 +7,6 @@ import type { MergedPairingSummary } from "@/lib/pairingMerge";
 import type { PairingSummaryDto } from "@/lib/pairingTypes";
 import type { PlayerAliasMap } from "@/lib/playerAliases";
 import { playerLabel } from "@/lib/playerIdentity";
-import type { PairingHighlightTone } from "@/lib/statsPairingInsights";
 import { RivalAvatarByPlayer } from "@/components/RivalAvatar";
 
 type Props = {
@@ -25,20 +24,9 @@ type Props = {
   selectable?: boolean;
   selected?: boolean;
   onToggleSelect?: () => void;
-  badge?: string | null;
-  badgeTone?: PairingHighlightTone | null;
-  featured?: boolean;
   duelShareA?: number;
   reloadToken?: number;
 };
-
-function badgeClass(tone: PairingHighlightTone | null | undefined): string {
-  if (tone === "lead") return "stats-pairing-badge--lead";
-  if (tone === "chase") return "stats-pairing-badge--chase";
-  if (tone === "tie") return "stats-pairing-badge--tie";
-  if (tone === "even") return "stats-pairing-badge--even";
-  return "";
-}
 
 export function PairingAccordionItem({
   pairing,
@@ -51,9 +39,6 @@ export function PairingAccordionItem({
   selectable,
   selected,
   onToggleSelect,
-  badge,
-  badgeTone,
-  featured,
   duelShareA = 50,
   reloadToken = 0,
 }: Props) {
@@ -109,13 +94,8 @@ export function PairingAccordionItem({
   return (
     <li>
       <section
-        className={`stats-section ${open ? "is-open" : ""}${featured ? " stats-section--featured" : ""}${selected ? " stats-section--selected" : ""}${badge ? " stats-section--badged" : ""}`}
+        className={`stats-section ${open ? "is-open" : ""}${selected ? " stats-section--selected" : ""}`}
       >
-        {badge && (
-          <span className={`stats-pairing-badge stats-section-badge ${badgeClass(badgeTone)}`}>
-            {badge}
-          </span>
-        )}
         <button
           type="button"
           className="stats-section-trigger"

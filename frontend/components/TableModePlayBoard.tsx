@@ -682,7 +682,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
                       {isRunEnded(run)
                         ? `${run.totalScore} Punkte · fertig`
                         : run.useStrategyRules
-                          ? `Pool ${run.rollsInPool}`
+                          ? <>Pool <span className="play-pool-num">{run.rollsInPool}</span></>
                           : "Klassisch"}
                     </p>
                   )}

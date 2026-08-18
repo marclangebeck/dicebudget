@@ -68,11 +68,11 @@ export function PlayTopBar({
         {useStrategyRules && rollsRemaining !== null && (
           <div className="play-top-chips">
             <span className="play-chip">
-              Pool <strong className="tabular-nums">{rollsInPool}</strong>
+              Pool <strong className="tabular-nums play-pool-num">{rollsInPool}</strong>
             </span>
             {opponentPool !== null && opponentPool !== undefined && (
               <span className="play-chip play-chip--sky">
-                Gegner <strong className="tabular-nums">{opponentPool}</strong>
+                Gegner <strong className="tabular-nums play-pool-num">{opponentPool}</strong>
               </span>
             )}
             {showOpponentPoolControl && onRefreshOpponentPool && (

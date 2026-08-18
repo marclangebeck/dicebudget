@@ -82,9 +82,7 @@ export function PairingDetailPanel({
 
       <section className="stats-detail-scores">
         <div className="stats-detail-player-card">
-          <div className="stats-detail-player-media">
-            <PlayerPhotoEditor playerId={pairing.playerA} name={nameA} size="banner" />
-          </div>
+          <PlayerPhotoEditor playerId={pairing.playerA} name={nameA} size="banner" />
           <div className="stats-detail-player-body">
             <p className="stats-detail-player-name">{nameA}</p>
             <p className="stats-detail-wins tabular-nums">{pairing.playerAWins}</p>
@@ -95,9 +93,7 @@ export function PairingDetailPanel({
           </div>
         </div>
         <div className="stats-detail-player-card stats-detail-player-card--b">
-          <div className="stats-detail-player-media">
-            <PlayerPhotoEditor playerId={pairing.playerB} name={nameB} size="banner" />
-          </div>
+          <PlayerPhotoEditor playerId={pairing.playerB} name={nameB} size="banner" />
           <div className="stats-detail-player-body">
             <p className="stats-detail-player-name">{nameB}</p>
             <p className="stats-detail-wins tabular-nums">{pairing.playerBWins}</p>
