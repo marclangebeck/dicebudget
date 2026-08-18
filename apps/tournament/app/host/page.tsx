@@ -13,6 +13,12 @@ import { APP_NAME } from "@/lib/branding";
 import { TOURNAMENT_MODE_OPTIONS } from "@/lib/tournamentModes";
 import { clearHostSession, loadHostSession } from "@/lib/hostStore";
 
+function statusLabel(status?: string): string {
+  if (status === "OPEN") return "Anmeldung";
+  if (status === "RUNNING") return "Läuft";
+  return status ?? "…";
+}
+
 function HostInner() {
   const router = useRouter();
   const params = useSearchParams();
@@ -25,6 +31,9 @@ function HostInner() {
   const host = loadHostSession();
   const hostToken =
     host && host.inviteCode === code ? host.hostToken : undefined;
+  const isOpen = tournament?.status === "OPEN";
+  const entryCount = tournament?.entryCount ?? 0;
+  const maxEntries = tournament?.maxEntries;
 
   const refresh = useCallback(async () => {
     if (!code) {
@@ -41,7 +50,7 @@ function HostInner() {
       const joinUrl = `${site}/tournament/join?code=${encodeURIComponent(code)}`;
       const dataUrl = await QRCode.toDataURL(joinUrl, {
         margin: 1,
-        width: 320,
+        width: 420,
         color: { dark: "#0c1a2e", light: "#ffffff" },
       });
       setQrDataUrl(dataUrl);
@@ -81,79 +90,109 @@ function HostInner() {
       ?.label ?? tournament?.modeKey;
 
   return (
-    <main className="t-shell">
-      <p className="t-meta">
-        {APP_NAME} · {modeLabel ?? "Lobby"}
-      </p>
-      <h1 className="t-brand" style={{ fontSize: "1.55rem" }}>
-        {tournament?.name?.trim() || "Ereignis-Lobby"}
-      </h1>
-      <p className="t-code">{code || "—"}</p>
-
-      {qrDataUrl && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img className="t-qr" src={qrDataUrl} alt={`QR für Ereignis ${code}`} />
-      )}
-
-      <p className="t-meta">
-        Teilnehmer scannen den QR in der DiceBudget-App → Event-Lobby.
-      </p>
-
-      <p className="t-meta">
-        Status: <strong>{tournament?.status ?? "…"}</strong>
-        {" · "}
-        Spieler: {tournament?.entryCount ?? 0}
-        {tournament ? ` / ${tournament.maxEntries}` : ""}
-      </p>
-
-      <section className="t-card" aria-label="Angemeldete Spieler">
-        <p className="t-label" style={{ marginBottom: "0.55rem" }}>
-          Angemeldet
+    <main className="t-shell t-shell--cockpit">
+      <header className="t-cockpit-head">
+        <p className="t-meta">
+          {APP_NAME}
+          {modeLabel ? ` · ${modeLabel}` : ""}
         </p>
-        {tournament?.entries && tournament.entries.length > 0 ? (
-          <ul className="t-list">
-            {tournament.entries.map((entry) => (
-              <li key={entry.id}>
-                <span>{entry.displayName}</span>
-                <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
-                  #{entry.orderIndex + 1}
-                </span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="t-meta" style={{ margin: 0 }}>
-            Noch keine Anmeldungen — QR bereit halten und Liste per „Aktualisieren“
-            prüfen.
+        <h1 className="t-brand">
+          {tournament?.name?.trim() || "Ereignis-Lobby"}
+        </h1>
+        <p className="t-meta">
+          {statusLabel(tournament?.status)}
+          {" · "}
+          {entryCount}
+          {maxEntries != null ? ` / ${maxEntries}` : ""} Spieler
+        </p>
+      </header>
+
+      <div className="t-cockpit-grid">
+        <section className="t-card t-panel" aria-label="Beitritt">
+          <p className="t-label">Beitritt</p>
+          <div className="t-panel-body t-panel-join">
+            <p className="t-code">{code || "—"}</p>
+            {isOpen && qrDataUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                className="t-qr"
+                src={qrDataUrl}
+                alt={`QR für Ereignis ${code}`}
+              />
+            ) : null}
+            <p className="t-meta">
+              {isOpen
+                ? "Teilnehmer scannen in der DiceBudget-App."
+                : "Anmeldung geschlossen."}
+            </p>
+          </div>
+        </section>
+
+        <section className="t-card t-panel" aria-label="Feld">
+          <p className="t-label">
+            Feld · {entryCount}
+            {maxEntries != null ? ` / ${maxEntries}` : ""}
           </p>
-        )}
-      </section>
+          <div className="t-panel-body">
+            {tournament?.entries && tournament.entries.length > 0 ? (
+              <ul className="t-list">
+                {tournament.entries.map((entry) => (
+                  <li key={entry.id}>
+                    <span>{entry.displayName}</span>
+                    <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
+                      #{entry.orderIndex + 1}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="t-meta" style={{ margin: 0 }}>
+                Noch keine Anmeldungen. QR zeigen, dann „Aktualisieren“.
+              </p>
+            )}
+          </div>
+        </section>
 
-      <div className="t-row" style={{ marginTop: "1rem" }}>
-        <button type="button" className="t-btn t-btn--ghost" onClick={() => void refresh()}>
-          Aktualisieren
-        </button>
-        <button
-          type="button"
-          className="t-btn t-btn--accent"
-          disabled={busy || !hostToken || tournament?.status !== "OPEN"}
-          onClick={() => void onStart()}
-        >
-          Ereignis starten
-        </button>
-        <Link href="/" className="t-btn t-btn--ghost">
-          Zur Startseite
-        </Link>
-        <button type="button" className="t-btn t-btn--ghost" onClick={onLeave}>
-          Host-Sitzung löschen
-        </button>
+        <section className="t-card t-panel" aria-label="Leitung">
+          <p className="t-label">Leitung</p>
+          <div className="t-panel-body">
+            <p className="t-status">{statusLabel(tournament?.status)}</p>
+            <p className="t-meta">
+              {isOpen
+                ? "Wenn das Feld steht: Ereignis starten. Danach keine neuen Anmeldungen."
+                : "Spielplan und Auslosung kommen als nächster Schritt in diesem Screen."}
+            </p>
+            {error && (
+              <p className="t-error" role="alert">
+                {error}
+              </p>
+            )}
+          </div>
+          <div className="t-panel-actions">
+            <button
+              type="button"
+              className="t-btn t-btn--ghost"
+              onClick={() => void refresh()}
+            >
+              Aktualisieren
+            </button>
+            <button
+              type="button"
+              className="t-btn t-btn--accent"
+              disabled={busy || !hostToken || !isOpen}
+              onClick={() => void onStart()}
+            >
+              {isOpen ? "Ereignis starten" : "Gestartet"}
+            </button>
+            <Link href="/" className="t-btn t-btn--ghost">
+              Zur Startseite
+            </Link>
+            <button type="button" className="t-btn t-btn--ghost" onClick={onLeave}>
+              Host-Sitzung löschen
+            </button>
+          </div>
+        </section>
       </div>
-
-      {error && (
-        <p className="t-error" role="alert">
-          {error}
-        </p>
-      )}
     </main>
   );
 }

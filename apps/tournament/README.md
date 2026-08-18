@@ -14,6 +14,7 @@ Jeder mit dieser App kann ein Event eröffnen. Teilnehmer treten per QR bei (GO 
 
 - DiceBudget-Pro-App darf nicht beschädigt werden (siehe `docs/tournament/README.md`).
 - Kein Polling: Lobby nur per Tap „Aktualisieren“.
+- Nach dem Anlegen: ein Screen, drei Container (Beitritt / Feld / Leitung). iPad quer nebeneinander.
 - Design: an DiceBudget Startscreen angelehnt (Navy/Slate/Teal, Gold nur Akzent), eigene Typo (Outfit) — ähnlich, nicht gleich.
 - iOS-Native-Projekt: auf dem **Mac** einmalig `npx cap add ios` (falls Ordner `ios/` fehlt), danach `npm run build:ios`.
 

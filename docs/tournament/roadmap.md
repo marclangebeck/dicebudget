@@ -51,7 +51,7 @@ T7/T8 können nach dem Kern parallel oder nacheinander kommen; weitere Modi dana
 
 ## Nächster Schritt
 
-**T4** Spielplan & Auslosung (Host). Optional Host-Lobby härten.  
+**T4** Spielplan & Auslosung (Host) — in den bestehenden Lobby-Containern, keine Extra-Route. Host-Lobby ist als 3-Container-Cockpit gehärtet.  
 **DiceBudget GO** erst nach stabilem T3/T4–T5-Pfad.  
 iOS Host: `cd apps/tournament && npm run build:ios` (Mac).  
 Pro: `cd frontend && npm run build:ios` (Mac) für Event-Join Universal Links.

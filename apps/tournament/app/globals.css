@@ -398,3 +398,117 @@ a {
 .t-switch.is-on .t-switch-knob {
   transform: translateX(1.1rem);
 }
+
+.t-shell--cockpit {
+  gap: 0.75rem;
+}
+
+.t-cockpit-head {
+  flex-shrink: 0;
+}
+
+.t-cockpit-head .t-brand {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+}
+
+.t-cockpit-head .t-meta {
+  margin: 0 0 0.2rem;
+}
+
+.t-cockpit-head .t-meta:last-child {
+  margin: 0.2rem 0 0;
+}
+
+.t-cockpit-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.t-cockpit-grid .t-card {
+  width: 100%;
+  max-width: none;
+}
+
+.t-panel {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.t-panel .t-label {
+  margin-bottom: 0.55rem;
+}
+
+.t-panel-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.t-panel-join {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.45rem;
+}
+
+.t-panel-join .t-code {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.4vw, 1.7rem);
+}
+
+.t-panel-join .t-meta {
+  margin: 0;
+}
+
+.t-panel-join .t-qr {
+  width: min(100%, 16.5rem);
+  margin: 0.15rem 0;
+}
+
+.t-panel-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-top: auto;
+}
+
+.t-panel-actions .t-btn {
+  min-height: 2.85rem;
+  width: 100%;
+  font-size: 0.95rem;
+}
+
+.t-status {
+  margin: 0 0 0.85rem;
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+@media (min-width: 64rem) {
+  .t-shell--cockpit {
+    min-height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+  }
+
+  .t-cockpit-grid {
+    grid-template-columns:
+      minmax(16rem, 1.05fr)
+      minmax(18rem, 1.25fr)
+      minmax(15rem, 1fr);
+  }
+
+  .t-panel-join .t-qr {
+    width: min(100%, 18.5rem);
+  }
+}

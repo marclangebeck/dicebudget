@@ -1,8 +1,8 @@
 # DiceBudget Tournament
 
 **Produktname:** DiceBudget Tournament  
-**Stand:** 2026-08-17  
-**Status:** T0–T3 + Host-Setup mit Liga-/Turnier-Einstellungen; T4+ offen  
+**Stand:** 2026-08-18  
+**Status:** T0–T3 + Host-Setup + Host-Cockpit (3 Container); T4+ offen  
 **Produktfamilie:** [`products.md`](./products.md) — **drei Apps** (DiceBudget · Tournament · GO)
 
 ## Vision (kurz)
