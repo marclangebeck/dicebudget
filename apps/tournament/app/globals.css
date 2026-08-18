@@ -414,6 +414,9 @@ a {
 
 .t-shell--cockpit {
   gap: 0.75rem;
+  min-height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
 }
 
 .t-cockpit-head {
@@ -435,7 +438,7 @@ a {
 
 .t-cockpit-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.25fr) minmax(0, 1fr);
   gap: 0.75rem;
   flex: 1;
   min-height: 0;
@@ -505,23 +508,4 @@ a {
   color: var(--ink);
   font-size: 1.05rem;
   font-weight: 750;
-}
-
-@media (orientation: landscape), (min-width: 48rem) {
-  .t-shell--cockpit {
-    min-height: 100dvh;
-    max-height: 100dvh;
-    overflow: hidden;
-  }
-
-  .t-cockpit-grid {
-    grid-template-columns:
-      minmax(16rem, 1.05fr)
-      minmax(18rem, 1.25fr)
-      minmax(15rem, 1fr);
-  }
-
-  .t-panel-join .t-qr {
-    width: min(100%, 18.5rem);
-  }
 }

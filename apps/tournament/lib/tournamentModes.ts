@@ -30,7 +30,7 @@ export function isTournamentModeKey(value: unknown): value is TournamentModeKey 
 
 /** Nächster Wizard-Schritt nach Größe — formatabhängig. */
 export function setupPathAfterSize(modeKey: TournamentModeKey): string {
-  return modeKey === "turnier" ? "/setup/turnier/" : "/setup/league/";
+  return modeKey === "turnier" ? "/setup/turnier" : "/setup/league";
 }
 
 export const MIN_MAX_ENTRIES = 2;

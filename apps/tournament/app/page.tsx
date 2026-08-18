@@ -2,9 +2,9 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { HostCockpit } from "@/components/HostCockpit";
 import { APP_NAME, APP_TAGLINE } from "@/lib/branding";
-import { loadHostSession } from "@/lib/hostStore";
-import { goToHostLobby } from "@/lib/hostNav";
+import { loadHostSession, type HostSession } from "@/lib/hostStore";
 import {
   DEFAULT_LEAGUE_SETTINGS,
   DEFAULT_MATCH_PREFS,
@@ -18,15 +18,12 @@ function TournamentHomeInner() {
   const forceNew = searchParams.get("new") === "1";
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [hasSaved, setHasSaved] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [session, setSession] = useState<HostSession | null>(null);
 
   useEffect(() => {
-    const saved = loadHostSession();
-    setHasSaved(Boolean(saved));
-    if (saved && !forceNew) {
-      goToHostLobby(saved.inviteCode);
-      return;
-    }
+    setSession(loadHostSession());
+    setReady(true);
     const draft = loadSetupDraft();
     if (draft?.name) setName(draft.name);
   }, [forceNew]);
@@ -49,16 +46,24 @@ function TournamentHomeInner() {
         turnier: DEFAULT_TURNIER_SETTINGS,
       });
     }
-    router.push("/setup/");
+    router.push("/setup");
   }
 
-  function onOpenSaved() {
-    const saved = loadHostSession();
-    if (!saved) {
-      setError("Kein gespeichertes Host-Event auf diesem Gerät.");
-      return;
-    }
-    goToHostLobby(saved.inviteCode);
+  if (!ready) {
+    return <main className="t-shell">Lade…</main>;
+  }
+
+  if (session && !forceNew) {
+    return (
+      <HostCockpit
+        inviteCode={session.inviteCode}
+        onNewEvent={() => router.replace("/?new=1")}
+        onSessionCleared={() => {
+          setSession(null);
+          router.replace("/");
+        }}
+      />
+    );
   }
 
   return (
@@ -86,8 +91,12 @@ function TournamentHomeInner() {
           <button type="button" className="t-btn" onClick={onContinue}>
             Weiter
           </button>
-          {hasSaved && (
-            <button type="button" className="t-btn t-btn--accent" onClick={onOpenSaved}>
+          {session && (
+            <button
+              type="button"
+              className="t-btn t-btn--accent"
+              onClick={() => router.replace("/")}
+            >
               Event-Lobby öffnen
             </button>
           )}

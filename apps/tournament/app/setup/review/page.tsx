@@ -13,7 +13,6 @@ import {
   type MatchPrefs,
   type TurnierSettings,
 } from "@/lib/eventConfig";
-import { goToHostLobby } from "@/lib/hostNav";
 import { saveHostSession } from "@/lib/hostStore";
 import { clearSetupDraft, loadSetupDraft } from "@/lib/setupDraft";
 import { TOURNAMENT_MODE_OPTIONS } from "@/lib/tournamentModes";
@@ -74,7 +73,7 @@ export default function SetupReviewPage() {
         hostToken: res.hostToken,
       });
       clearSetupDraft();
-      goToHostLobby(res.tournament.inviteCode);
+      router.replace("/");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Anlegen fehlgeschlagen");
     } finally {

@@ -6,7 +6,6 @@ const appDir = path.resolve(__dirname);
 const nextConfig: NextConfig = {
   output: "export",
   distDir: ".next",
-  trailingSlash: true,
   outputFileTracingRoot: appDir,
   turbopack: {
     root: appDir,
