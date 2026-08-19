@@ -5,6 +5,11 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { getTournamentByInvite, joinTournament } from "@/lib/api";
 import {
+  GENTLE_AUTO_REFRESH_MS,
+  useGentleAutoRefresh,
+} from "@/lib/useGentleAutoRefresh";
+import { useForegroundRefresh } from "@/lib/useForegroundRefresh";
+import {
   loadActiveTournament,
   saveActiveTournament,
 } from "@/lib/activeTournament";
@@ -106,6 +111,7 @@ function TournamentJoinInner() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [joinedEntryId, setJoinedEntryId] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   useEffect(() => {
     setPlayerId(getOrCreatePlayerId());
@@ -114,37 +120,61 @@ function TournamentJoinInner() {
     if (saved) setJoinedEntryId(saved.entryId);
   }, [code]);
 
-  const refresh = useCallback(async () => {
-    if (!code) return;
-    setError(null);
-    try {
-      const { tournament: next } = await getTournamentByInvite(code);
-      setTournament(next);
-      const mine =
-        next.entries?.find((e) => e.playerId && e.playerId === playerId) ??
-        null;
-      if (mine) {
-        setJoinedEntryId(mine.id);
-        saveActiveTournament({
-          inviteCode: code,
-          tournamentId: next.id,
-          entryId: mine.id,
-          displayName: mine.displayName,
-          playerId,
-        });
-      } else {
-        const saved = loadActiveTournament(code);
-        if (saved) setJoinedEntryId(saved.entryId);
+  const refresh = useCallback(
+    async (options?: { silent?: boolean }): Promise<boolean> => {
+      if (!code) return false;
+      if (!options?.silent) setError(null);
+      try {
+        const { tournament: next } = await getTournamentByInvite(code);
+        setTournament(next);
+        const mine =
+          next.entries?.find((e) => e.playerId && e.playerId === playerId) ??
+          null;
+        if (mine) {
+          setJoinedEntryId(mine.id);
+          saveActiveTournament({
+            inviteCode: code,
+            tournamentId: next.id,
+            entryId: mine.id,
+            displayName: mine.displayName,
+            playerId,
+          });
+        } else {
+          const saved = loadActiveTournament(code);
+          if (saved) setJoinedEntryId(saved.entryId);
+        }
+        setLastUpdated(new Date());
+        return true;
+      } catch (e) {
+        if (!options?.silent) {
+          setError(e instanceof Error ? e.message : "Laden fehlgeschlagen");
+        }
+        return false;
       }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Laden fehlgeschlagen");
-    }
-  }, [code, playerId]);
+    },
+    [code, playerId],
+  );
 
   useEffect(() => {
     if (!code || !playerId) return;
     void refresh();
   }, [code, playerId, refresh]);
+
+  const autoRefreshEnabled = Boolean(
+    code && playerId && tournament?.status === "RUNNING",
+  );
+  const { paused: autoRefreshPaused, effectiveIntervalMs } = useGentleAutoRefresh({
+    enabled: autoRefreshEnabled,
+    intervalMs: GENTLE_AUTO_REFRESH_MS,
+    onRefresh: () => refresh({ silent: true }),
+  });
+
+  useForegroundRefresh(() => {
+    if (!code || !playerId) return;
+    if (tournament?.status === "OPEN") {
+      void refresh({ silent: true });
+    }
+  });
 
   async function handleJoin(e: React.FormEvent) {
     e.preventDefault();
@@ -242,6 +272,20 @@ function TournamentJoinInner() {
         >
           Aktualisieren
         </button>
+        {autoRefreshEnabled && (
+          <p className="join-lobby-auto-hint">
+            {autoRefreshPaused
+              ? `Auto-Update pausiert (nächster Versuch in ${Math.round(effectiveIntervalMs / 1000)} s) — „Aktualisieren“ jederzeit möglich`
+              : `Live · alle ${GENTLE_AUTO_REFRESH_MS / 1000} s${
+                  lastUpdated
+                    ? ` · zuletzt ${lastUpdated.toLocaleTimeString("de-DE", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}`
+                    : ""
+                }`}
+          </p>
+        )}
       </header>
 
       {error && (
