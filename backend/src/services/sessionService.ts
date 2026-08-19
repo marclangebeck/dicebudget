@@ -682,9 +682,200 @@ export async function finalizeSessionStats(
     });
   }
 
+  // Falls diese Session zu einem Tournament-Match gehört, Ergebnis zurückschreiben
+  // (inkl. Tabellen-Updates für Liga/Gruppe).
+  await maybeFinalizeTournamentMatchFromSession({
+    sessionId: session.id,
+    phaseHint: session.koTieBreakEnabled ? "KO" : undefined,
+    koTieBreakWinnerPlayerId: session.koTieBreakWinnerPlayerId ?? undefined,
+    players: session.players.map((p) => ({
+      publicPlayerId: publicPlayerIdFromStoredName(p.name),
+      totalScore: p.run.totalScore,
+    })),
+  });
+
   invalidatePairingStatsCache();
 
   return getSessionRanking(session.inviteCode);
+}
+
+async function maybeFinalizeTournamentMatchFromSession(input: {
+  sessionId: string;
+  phaseHint?: string;
+  koTieBreakWinnerPlayerId?: string;
+  players: { publicPlayerId: string; totalScore: number }[];
+}): Promise<void> {
+  const tournamentMatch = await prisma.tournamentMatch.findUnique({
+    where: { sessionId: input.sessionId },
+    include: { homeEntry: true, awayEntry: true },
+  });
+  if (!tournamentMatch) return;
+  if (tournamentMatch.status === "FINISHED") return;
+
+  const homeEntryId = tournamentMatch.homeEntryId;
+  const awayEntryId = tournamentMatch.awayEntryId;
+  const groupId = tournamentMatch.groupId;
+
+  const homePlayerId = tournamentMatch.homeEntry.playerId;
+  const awayPlayerId = tournamentMatch.awayEntry.playerId;
+  if (!homePlayerId || !awayPlayerId) return;
+
+  const playerTotals = new Map(input.players.map((p) => [p.publicPlayerId, p.totalScore]));
+  const homeScore = playerTotals.get(homePlayerId);
+  const awayScore = playerTotals.get(awayPlayerId);
+  if (homeScore == null || awayScore == null) return;
+
+  const tie = homeScore === awayScore;
+  const phase = tournamentMatch.phase;
+
+  if (phase === "KO") {
+    const winnerPlayerId = tie
+      ? input.koTieBreakWinnerPlayerId ?? null
+      : homeScore > awayScore
+        ? homePlayerId
+        : awayPlayerId;
+
+    const winnerEntryId =
+      winnerPlayerId === homePlayerId
+        ? homeEntryId
+        : winnerPlayerId === awayPlayerId
+          ? awayEntryId
+          : null;
+
+    const homePoints = winnerEntryId === homeEntryId ? 1 : 0;
+    const awayPoints = winnerEntryId === awayEntryId ? 1 : 0;
+
+    await prisma.tournamentMatch.update({
+      where: { id: tournamentMatch.id },
+      data: {
+        status: "FINISHED",
+        homeScore,
+        awayScore,
+        homePointsAwarded: homePoints,
+        awayPointsAwarded: awayPoints,
+        winnerEntryId,
+        tieBreakNeeded: false,
+      },
+    });
+    return;
+  }
+
+  if (phase !== "LEAGUE" && phase !== "GROUP") return;
+  if (!groupId) return;
+
+  const homeDiff = homeScore - awayScore;
+  const awayDiff = -homeDiff;
+
+  let homePoints: number;
+  let awayPoints: number;
+  let homeWinsInc: number;
+  let awayWinsInc: number;
+  let homeDrawsInc: number;
+  let awayDrawsInc: number;
+  let homeLossesInc: number;
+  let awayLossesInc: number;
+
+  if (tie) {
+    homePoints = 0.5;
+    awayPoints = 0.5;
+    homeWinsInc = 0;
+    awayWinsInc = 0;
+    homeDrawsInc = 1;
+    awayDrawsInc = 1;
+    homeLossesInc = 0;
+    awayLossesInc = 0;
+  } else if (homeScore > awayScore) {
+    homePoints = 1;
+    awayPoints = 0;
+    homeWinsInc = 1;
+    awayWinsInc = 0;
+    homeDrawsInc = 0;
+    awayDrawsInc = 0;
+    homeLossesInc = 0;
+    awayLossesInc = 1;
+  } else {
+    homePoints = 0;
+    awayPoints = 1;
+    homeWinsInc = 0;
+    awayWinsInc = 1;
+    homeDrawsInc = 0;
+    awayDrawsInc = 0;
+    homeLossesInc = 1;
+    awayLossesInc = 0;
+  }
+
+  await prisma.$transaction(async (tx) => {
+    const [homeStanding, awayStanding] = await Promise.all([
+      tx.tournamentGroupStanding.findFirst({
+        where: { groupId, entryId: homeEntryId },
+      }),
+      tx.tournamentGroupStanding.findFirst({
+        where: { groupId, entryId: awayEntryId },
+      }),
+    ]);
+
+    if (!homeStanding || !awayStanding) return;
+
+    await Promise.all([
+      tx.tournamentGroupStanding.update({
+        where: { id: homeStanding.id },
+        data: {
+          matchesPlayed: homeStanding.matchesPlayed + 1,
+          wins: homeStanding.wins + homeWinsInc,
+          draws: homeStanding.draws + homeDrawsInc,
+          losses: homeStanding.losses + homeLossesInc,
+          points: homeStanding.points + homePoints,
+          totalScoreDiff: homeStanding.totalScoreDiff + homeDiff,
+          totalScoreFor: homeStanding.totalScoreFor + homeScore,
+          totalScoreAgainst: homeStanding.totalScoreAgainst + awayScore,
+        },
+      }),
+      tx.tournamentGroupStanding.update({
+        where: { id: awayStanding.id },
+        data: {
+          matchesPlayed: awayStanding.matchesPlayed + 1,
+          wins: awayStanding.wins + awayWinsInc,
+          draws: awayStanding.draws + awayDrawsInc,
+          losses: awayStanding.losses + awayLossesInc,
+          points: awayStanding.points + awayPoints,
+          totalScoreDiff: awayStanding.totalScoreDiff + awayDiff,
+          totalScoreFor: awayStanding.totalScoreFor + awayScore,
+          totalScoreAgainst: awayStanding.totalScoreAgainst + homeScore,
+        },
+      }),
+      tx.tournamentMatch.update({
+        where: { id: tournamentMatch.id },
+        data: {
+          status: "FINISHED",
+          homeScore,
+          awayScore,
+          homePointsAwarded: homePoints,
+          awayPointsAwarded: awayPoints,
+          winnerEntryId: tie ? null : homeScore > awayScore ? homeEntryId : awayEntryId,
+          tieBreakNeeded: false,
+        },
+      }),
+    ]);
+
+    const ordered = await tx.tournamentGroupStanding.findMany({
+      where: { groupId },
+    });
+
+    ordered.sort(
+      (a, b) =>
+        (b.points ?? 0) - (a.points ?? 0) ||
+        (b.totalScoreDiff ?? 0) - (a.totalScoreDiff ?? 0) ||
+        (b.totalScoreFor ?? 0) - (a.totalScoreFor ?? 0) ||
+        a.entryId.localeCompare(b.entryId),
+    );
+
+    for (let i = 0; i < ordered.length; i += 1) {
+      await tx.tournamentGroupStanding.update({
+        where: { id: ordered[i]!.id },
+        data: { rank: i + 1 },
+      });
+    }
+  });
 }
 
 /**
