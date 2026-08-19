@@ -5,26 +5,28 @@ import QRCode from "qrcode";
 import {
   createTournamentMatchSession,
   getTournamentByInvite,
+  patchTournamentDraw,
+  prepareTournamentDraw,
+  releaseNextTournamentRound,
+  shuffleTournamentDraw,
   startTournament,
+  type DrawPreviewDto,
+  type ScheduleMetaDto,
   type TournamentDto,
 } from "@/lib/api";
 import { APP_NAME } from "@/lib/branding";
+import {
+  formatMatchScore,
+  matchStatusLabel,
+  phaseLabel,
+  tournamentStatusLabel,
+} from "@/lib/displayFormat";
 import { TOURNAMENT_MODE_OPTIONS } from "@/lib/tournamentModes";
 import { clearHostSession, loadHostSession } from "@/lib/hostStore";
-
-function statusLabel(status?: string): string {
-  if (status === "OPEN") return "Anmeldung";
-  if (status === "RUNNING") return "Läuft";
-  return status ?? "…";
-}
-
-function phaseLabel(phase?: string): string {
-  if (phase === "LEAGUE") return "Liga";
-  if (phase === "GROUP") return "Gruppenphase";
-  if (phase === "KO") return "K.O.";
-  if (phase === "KO_THIRD") return "Platz 3";
-  return phase ?? "Phase";
-}
+import {
+  GENTLE_AUTO_REFRESH_MS,
+  useGentleAutoRefresh,
+} from "@/lib/useGentleAutoRefresh";
 
 type Props = {
   inviteCode: string;
@@ -35,47 +37,135 @@ type Props = {
 export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props) {
   const code = inviteCode.trim().toUpperCase();
   const [tournament, setTournament] = useState<TournamentDto | null>(null);
+  const [drawPreview, setDrawPreview] = useState<DrawPreviewDto | null>(null);
+  const [scheduleMeta, setScheduleMeta] = useState<ScheduleMetaDto | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [activeMatchId, setActiveMatchId] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const host = loadHostSession();
   const hostToken =
     host && host.inviteCode === code ? host.hostToken : undefined;
   const isOpen = tournament?.status === "OPEN";
+  const isRunning = tournament?.status === "RUNNING";
   const entryCount = tournament?.entryCount ?? 0;
   const maxEntries = tournament?.maxEntries;
   const groups = tournament?.groups ?? [];
   const rounds = tournament?.rounds ?? [];
 
-  const refresh = useCallback(async () => {
-    if (!code) {
-      setError("Kein Turnier-Code.");
-      return;
-    }
-    setError(null);
-    try {
-      const res = await getTournamentByInvite(code, hostToken);
+  const applyTournamentResponse = useCallback(
+    async (res: {
+      tournament: TournamentDto;
+      drawPreview?: DrawPreviewDto;
+      scheduleMeta?: ScheduleMetaDto;
+    }) => {
       setTournament(res.tournament);
-      const site =
-        process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-        "https://dicebudget.bottle-trade.de";
-      const joinUrl = `${site}/tournament/join?code=${encodeURIComponent(code)}`;
-      const dataUrl = await QRCode.toDataURL(joinUrl, {
-        margin: 1,
-        width: 420,
-        color: { dark: "#0c1a2e", light: "#ffffff" },
-      });
-      setQrDataUrl(dataUrl);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Laden fehlgeschlagen");
-    }
-  }, [code, hostToken]);
+      if (res.drawPreview) setDrawPreview(res.drawPreview);
+      if (res.scheduleMeta) setScheduleMeta(res.scheduleMeta);
+      setLastUpdated(new Date());
+
+      if (res.tournament.status === "OPEN") {
+        const site =
+          process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+          "https://dicebudget.bottle-trade.de";
+        const joinUrl = `${site}/tournament/join?code=${encodeURIComponent(code)}`;
+        const dataUrl = await QRCode.toDataURL(joinUrl, {
+          margin: 1,
+          width: 420,
+          color: { dark: "#0c1a2e", light: "#ffffff" },
+        });
+        setQrDataUrl(dataUrl);
+      } else {
+        setQrDataUrl(null);
+      }
+    },
+    [code],
+  );
+
+  const refresh = useCallback(
+    async (options?: { silent?: boolean }): Promise<boolean> => {
+      if (!code) {
+        if (!options?.silent) setError("Kein Turnier-Code.");
+        return false;
+      }
+      if (!options?.silent) setError(null);
+      try {
+        const res = await getTournamentByInvite(code, hostToken);
+        await applyTournamentResponse(res);
+        if (res.drawPreview) setDrawPreview(res.drawPreview);
+        return true;
+      } catch (e) {
+        if (!options?.silent) {
+          setError(e instanceof Error ? e.message : "Laden fehlgeschlagen");
+        }
+        return false;
+      }
+    },
+    [applyTournamentResponse, code, hostToken],
+  );
 
   useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  const autoRefreshEnabled = Boolean(
+    code && hostToken && (isOpen || isRunning || tournament?.status === "FINISHED"),
+  );
+  const { paused: autoRefreshPaused, effectiveIntervalMs } = useGentleAutoRefresh({
+    enabled: autoRefreshEnabled,
+    intervalMs: GENTLE_AUTO_REFRESH_MS,
+    onRefresh: () => refresh({ silent: true }),
+  });
+
+  async function onPrepareDraw() {
+    if (!tournament || !hostToken) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await prepareTournamentDraw(tournament.id, hostToken);
+      await applyTournamentResponse(res);
+      setDrawPreview(res.drawPreview);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Auslosung fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onShuffleDraw() {
+    if (!tournament || !hostToken) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await shuffleTournamentDraw(tournament.id, hostToken);
+      await applyTournamentResponse(res);
+      setDrawPreview(res.drawPreview);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Neu mischen fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onSwapPair(planRoundIndex: number, matchIndex: number) {
+    if (!tournament || !hostToken) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await patchTournamentDraw(tournament.id, hostToken, {
+        planRoundIndex,
+        matchIndex,
+        swapSides: true,
+      });
+      setDrawPreview(res.drawPreview);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Tausch fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function onStart() {
     if (!tournament || !hostToken) {
@@ -86,9 +176,24 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
     setError(null);
     try {
       const res = await startTournament(tournament.id, hostToken);
-      setTournament(res.tournament);
+      await applyTournamentResponse(res);
+      setDrawPreview(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Start fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onReleaseNextRound() {
+    if (!tournament || !hostToken) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await releaseNextTournamentRound(tournament.id, hostToken);
+      await applyTournamentResponse(res);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Rundenfreigabe fehlgeschlagen");
     } finally {
       setBusy(false);
     }
@@ -104,9 +209,11 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
     setError(null);
     try {
       const res = await createTournamentMatchSession(tournament.id, matchId, hostToken);
-      setTournament(res.tournament);
+      await applyTournamentResponse({ tournament: res.tournament });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Match-Session konnte nicht erstellt werden");
+      setError(
+        e instanceof Error ? e.message : "Match-Session konnte nicht erstellt werden",
+      );
     } finally {
       setBusy(false);
       setActiveMatchId(null);
@@ -129,11 +236,25 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
         </h1>
         <p className="t-meta">Drei Container — Beitritt · Feld · Leitung</p>
         <p className="t-meta">
-          {statusLabel(tournament?.status)}
+          {tournamentStatusLabel(tournament?.status)}
           {" · "}
           {entryCount}
           {maxEntries != null ? ` / ${maxEntries}` : ""} Spieler
         </p>
+        {autoRefreshEnabled && (
+          <p className="t-auto-hint">
+            {autoRefreshPaused
+              ? `Auto-Update pausiert (nächster Versuch in ${Math.round(effectiveIntervalMs / 1000)} s)`
+              : `Live · alle ${GENTLE_AUTO_REFRESH_MS / 1000} s${
+                  lastUpdated
+                    ? ` · zuletzt ${lastUpdated.toLocaleTimeString("de-DE", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}`
+                    : ""
+                }`}
+          </p>
+        )}
       </header>
 
       <div className="t-cockpit-grid">
@@ -163,23 +284,23 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
             {maxEntries != null ? ` / ${maxEntries}` : ""}
           </p>
           <div className="t-panel-body">
-                {tournament?.entries &&
-                tournament.entries.filter((e) => e.playerId != null).length > 0 ? (
+            {tournament?.entries &&
+            tournament.entries.filter((e) => e.playerId != null).length > 0 ? (
               <ul className="t-list">
-                    {tournament.entries
-                      .filter((e) => e.playerId != null)
-                      .map((entry) => (
-                  <li key={entry.id}>
-                    <span>{entry.displayName}</span>
-                    <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
-                      #{entry.orderIndex + 1}
-                    </span>
-                  </li>
-                ))}
+                {tournament.entries
+                  .filter((e) => e.playerId != null)
+                  .map((entry) => (
+                    <li key={entry.id}>
+                      <span>{entry.displayName}</span>
+                      <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
+                        #{entry.orderIndex + 1}
+                      </span>
+                    </li>
+                  ))}
               </ul>
             ) : (
               <p className="t-meta" style={{ margin: 0 }}>
-                Noch keine Anmeldungen. QR zeigen, dann „Aktualisieren“.
+                Noch keine Anmeldungen.
               </p>
             )}
           </div>
@@ -188,11 +309,13 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
         <section className="t-card t-panel" aria-label="Leitung">
           <p className="t-label">Leitung</p>
           <div className="t-panel-body">
-            <p className="t-status">{statusLabel(tournament?.status)}</p>
+            <p className="t-status">{tournamentStatusLabel(tournament?.status)}</p>
             <p className="t-meta">
               {isOpen
-                ? "Wenn das Feld steht: Ereignis starten. Danach keine neuen Anmeldungen."
-                : "Spielplan ist jetzt Datenbasis für Gruppen, Tabelle und Paarungen."}
+                ? "Auslosung vorbereiten, dann Ereignis starten."
+                : isRunning && scheduleMeta
+                  ? `Spielplan-Welle ${scheduleMeta.releasedWave}/${scheduleMeta.totalWaves} freigegeben`
+                  : "Spielplan ist Datenbasis für Gruppen, Tabelle und Paarungen."}
             </p>
             {error && (
               <p className="t-error" role="alert">
@@ -216,6 +339,38 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
             >
               Aktualisieren
             </button>
+            {isOpen && (
+              <>
+                <button
+                  type="button"
+                  className="t-btn t-btn--ghost"
+                  disabled={busy || !hostToken || entryCount < 2}
+                  onClick={() => void onPrepareDraw()}
+                >
+                  Auslosung vorbereiten
+                </button>
+                {drawPreview && (
+                  <button
+                    type="button"
+                    className="t-btn t-btn--ghost"
+                    disabled={busy || !hostToken}
+                    onClick={() => void onShuffleDraw()}
+                  >
+                    Neu mischen
+                  </button>
+                )}
+              </>
+            )}
+            {isRunning && scheduleMeta?.hasMoreRounds && (
+              <button
+                type="button"
+                className="t-btn t-btn--ghost"
+                disabled={busy || !hostToken}
+                onClick={() => void onReleaseNextRound()}
+              >
+                Nächste Runde freigeben
+              </button>
+            )}
             <button
               type="button"
               className="t-btn t-btn--accent"
@@ -240,6 +395,51 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
           </div>
         </section>
 
+        {isOpen && drawPreview && (
+          <section className="t-card t-panel" aria-label="Auslosungsvorschau">
+            <p className="t-label">Auslosungsvorschau</p>
+            <div className="t-panel-body">
+              <p className="t-meta" style={{ marginTop: 0 }}>
+                {drawPreview.totalWaves} Spielplan-Wellen · Welle 1 startet mit dem
+                Ereignis. Pro Paarung „Heim/Auswärts tauschen“.
+              </p>
+              <div style={{ display: "grid", gap: "0.85rem" }}>
+                {drawPreview.rounds.map((round) => (
+                  <div key={`${round.planRoundIndex}-${round.title}`} className="t-draw-round">
+                    <p className="t-status" style={{ marginBottom: "0.35rem" }}>
+                      {round.title}
+                    </p>
+                    <p className="t-meta" style={{ marginBottom: "0.5rem" }}>
+                      {phaseLabel(round.phase)} · Welle {round.releaseWave}
+                    </p>
+                    <ul className="t-list">
+                      {round.pairs.map((pair) => (
+                        <li key={`${round.planRoundIndex}-${pair.matchIndex}`}>
+                          <div className="t-draw-pair">
+                            <span>
+                              {pair.homeDisplayName} vs {pair.awayDisplayName}
+                            </span>
+                            <button
+                              type="button"
+                              className="t-btn t-btn--ghost"
+                              disabled={busy}
+                              onClick={() =>
+                                void onSwapPair(round.planRoundIndex, pair.matchIndex)
+                              }
+                            >
+                              Heim/Ausw. tauschen
+                            </button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
         {!isOpen && (
           <section className="t-card t-panel" aria-label="Gruppen und Tabelle">
             <p className="t-label">Gruppen und Tabelle</p>
@@ -247,14 +447,7 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
               {groups.length > 0 ? (
                 <div style={{ display: "grid", gap: "0.85rem" }}>
                   {groups.map((group) => (
-                    <div
-                      key={group.id}
-                      style={{
-                        border: "1px solid rgba(255,255,255,0.08)",
-                        borderRadius: "14px",
-                        padding: "0.8rem",
-                      }}
-                    >
+                    <div key={group.id} className="t-subpanel">
                       <p className="t-status" style={{ marginBottom: "0.5rem" }}>
                         {group.name}
                       </p>
@@ -282,7 +475,7 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
                 </div>
               ) : (
                 <p className="t-meta" style={{ margin: 0 }}>
-                  Bei Liga wird eine Gesamttabelle, bei Turnier Gruppenübersichten angezeigt.
+                  Bei Liga eine Gesamttabelle, bei Turnier Gruppenübersichten.
                 </p>
               )}
             </div>
@@ -296,14 +489,7 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
               {rounds.length > 0 ? (
                 <div style={{ display: "grid", gap: "0.85rem" }}>
                   {rounds.map((round) => (
-                    <div
-                      key={round.id}
-                      style={{
-                        border: "1px solid rgba(255,255,255,0.08)",
-                        borderRadius: "14px",
-                        padding: "0.8rem",
-                      }}
-                    >
+                    <div key={round.id} className="t-subpanel">
                       <p className="t-status" style={{ marginBottom: "0.35rem" }}>
                         {round.title}
                       </p>
@@ -311,68 +497,61 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
                         {phaseLabel(round.phase)}
                       </p>
                       <ul className="t-list">
-                        {round.matches.map((match) => (
-                          <li key={match.id}>
-                            <div style={{ display: "grid", gap: "0.3rem", width: "100%" }}>
-                              <div
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                  gap: "0.75rem",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <span>
-                                  {match.homeEntry.displayName} vs {match.awayEntry.displayName}
-                                </span>
-                                <span
-                                  style={{ color: "var(--muted)", fontSize: "0.85rem" }}
-                                >
-                                  {match.status}
-                                </span>
-                              </div>
-                              <div
-                                style={{
-                                  display: "flex",
-                                  flexWrap: "wrap",
-                                  gap: "0.5rem",
-                                  alignItems: "center",
-                                }}
-                              >
-                                {match.sessionInviteCode ? (
-                                  <span
-                                    style={{ color: "var(--muted)", fontSize: "0.85rem" }}
-                                  >
-                                    Session-Code {match.sessionInviteCode}
+                        {round.matches.map((match) => {
+                          const score = formatMatchScore(
+                            match.homeScore,
+                            match.awayScore,
+                          );
+                          const statusText = matchStatusLabel(
+                            match.status,
+                            Boolean(match.sessionInviteCode),
+                          );
+                          return (
+                            <li key={match.id}>
+                              <div className="t-match-row">
+                                <div className="t-match-main">
+                                  <span>
+                                    {match.homeEntry.displayName} vs{" "}
+                                    {match.awayEntry.displayName}
                                   </span>
-                                ) : null}
-                                {!match.sessionId ? (
-                                  <button
-                                    type="button"
-                                    className="t-btn t-btn--ghost"
-                                    disabled={
-                                      busy ||
-                                      match.homeEntry.playerId == null ||
-                                      match.awayEntry.playerId == null
-                                    }
-                                    onClick={() => void onCreateMatchSession(match.id)}
-                                  >
-                                    {busy && activeMatchId === match.id
-                                      ? "Erzeuge…"
-                                      : "Session starten"}
-                                  </button>
-                                ) : null}
+                                  <span className="t-match-meta">
+                                    {score ?? statusText}
+                                  </span>
+                                </div>
+                                <div className="t-match-actions">
+                                  {match.sessionInviteCode ? (
+                                    <span className="t-match-meta">
+                                      Code {match.sessionInviteCode}
+                                    </span>
+                                  ) : null}
+                                  {!match.sessionId ? (
+                                    <button
+                                      type="button"
+                                      className="t-btn t-btn--ghost"
+                                      disabled={
+                                        busy ||
+                                        match.homeEntry.playerId == null ||
+                                        match.awayEntry.playerId == null
+                                      }
+                                      onClick={() => void onCreateMatchSession(match.id)}
+                                    >
+                                      {busy && activeMatchId === match.id
+                                        ? "Erzeuge…"
+                                        : "Session starten"}
+                                    </button>
+                                  ) : null}
+                                </div>
                               </div>
-                            </div>
-                          </li>
-                        ))}
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
                   ))}
                 </div>
               ) : (
                 <p className="t-meta" style={{ margin: 0 }}>
-                  Nach dem Start werden hier Spieltage, Gruppenrunden und später K.O.-Paarungen angezeigt.
+                  Nach dem Start erscheinen hier freigegebene Runden.
                 </p>
               )}
             </div>

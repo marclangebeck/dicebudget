@@ -1253,3 +1253,57 @@ a {
   font-size: clamp(0.78rem, 1.1vw, 0.92rem);
   font-weight: 650;
 }
+
+.t-auto-hint {
+  margin: 0.35rem 0 0;
+  color: rgba(148, 163, 184, 0.78);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.t-subpanel {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 0.8rem;
+}
+
+.t-draw-round {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 0.8rem;
+}
+
+.t-draw-pair {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+}
+
+.t-match-row {
+  display: grid;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.t-match-main {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.t-match-meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.t-match-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}

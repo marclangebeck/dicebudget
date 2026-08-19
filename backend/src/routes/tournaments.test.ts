@@ -70,8 +70,10 @@ describe("tournaments API", () => {
     assert.equal(started.body.tournament.groups.length, 1);
     assert.equal(started.body.tournament.groups[0].name, "Liga");
     assert.equal(started.body.tournament.groups[0].standings.length, 2);
-    assert.equal(started.body.tournament.rounds.length, 3);
+    assert.equal(started.body.tournament.rounds.length, 1);
     assert.equal(started.body.tournament.rounds[0].matches.length, 1);
+    assert.equal(started.body.scheduleMeta.releasedWave, 1);
+    assert.equal(started.body.scheduleMeta.hasMoreRounds, true);
     const firstMatchId = started.body.tournament.rounds[0].matches[0].id as string;
 
     const sessionCreated = await request(app)
@@ -151,7 +153,7 @@ describe("tournaments API", () => {
 
     assert.equal(started.body.tournament.status, "RUNNING");
     assert.equal(started.body.tournament.groups.length, 2);
-    assert.equal(started.body.tournament.rounds.length, 6);
+    assert.equal(started.body.tournament.rounds.length, 2);
     assert.equal(
       started.body.tournament.groups.reduce(
         (sum: number, group: { standings: unknown[] }) => sum + group.standings.length,
@@ -165,6 +167,15 @@ describe("tournaments API", () => {
           round.phase === "GROUP" && round.matches.length === 2,
       ),
     );
+    assert.equal(started.body.scheduleMeta.hasMoreRounds, true);
+
+    const released = await request(app)
+      .post(`/tournaments/${tournamentId}/rounds`)
+      .set("X-Host-Token", hostToken)
+      .expect(200);
+
+    assert.equal(released.body.tournament.rounds.length, 4);
+    assert.equal(released.body.scheduleMeta.releasedWave, 2);
   });
 
   it("lehnt ungültige Liga-Config ab", async () => {
@@ -180,5 +191,45 @@ describe("tournaments API", () => {
       .post(`/tournaments/${created.body.tournament.id}/start`)
       .set("X-Host-Token", "wrong")
       .expect(403);
+  });
+
+  it("bereitet Auslosung vor, mischt und tauscht Heim/Auswärts", async () => {
+    const created = await request(app)
+      .post("/tournaments")
+      .send({ name: "Draw Test", modeKey: "league" })
+      .expect(201);
+
+    const code = created.body.tournament.inviteCode as string;
+    const hostToken = created.body.hostToken as string;
+    const tournamentId = created.body.tournament.id as string;
+
+    await request(app)
+      .post(`/tournaments/invite/${code}/join`)
+      .send({ displayName: "Anna", playerId: "p-anna" })
+      .expect(201);
+    await request(app)
+      .post(`/tournaments/invite/${code}/join`)
+      .send({ displayName: "Ben", playerId: "p-ben" })
+      .expect(201);
+
+    const prepared = await request(app)
+      .post(`/tournaments/${tournamentId}/draw`)
+      .set("X-Host-Token", hostToken)
+      .send({ action: "prepare" })
+      .expect(200);
+
+    assert.ok(prepared.body.drawPreview);
+    assert.equal(prepared.body.drawPreview.rounds.length, 3);
+    const beforeSwap = prepared.body.drawPreview.rounds[0].pairs[0];
+
+    const swapped = await request(app)
+      .patch(`/tournaments/${tournamentId}/draw`)
+      .set("X-Host-Token", hostToken)
+      .send({ planRoundIndex: 0, matchIndex: 1, swapSides: true })
+      .expect(200);
+
+    const afterSwap = swapped.body.drawPreview.rounds[0].pairs[0];
+    assert.equal(afterSwap.homeEntryId, beforeSwap.awayEntryId);
+    assert.equal(afterSwap.awayEntryId, beforeSwap.homeEntryId);
   });
 });

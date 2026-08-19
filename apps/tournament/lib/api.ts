@@ -125,6 +125,43 @@ export type TournamentRoundDto = {
   matches: TournamentMatchDto[];
 };
 
+export type DrawPreviewPairDto = {
+  matchIndex: number;
+  homeEntryId: string;
+  awayEntryId: string;
+  homeDisplayName: string;
+  awayDisplayName: string;
+};
+
+export type DrawPreviewRoundDto = {
+  planRoundIndex: number;
+  phase: string;
+  groupSortOrder: number;
+  roundIndex: number;
+  legIndex: number;
+  releaseWave: number;
+  title: string;
+  released: boolean;
+  pairs: DrawPreviewPairDto[];
+};
+
+export type DrawPreviewDto = {
+  groups: {
+    name: string;
+    sortOrder: number;
+    entries: Pick<TournamentEntryDto, "id" | "displayName" | "playerId">[];
+  }[];
+  rounds: DrawPreviewRoundDto[];
+  releasedWave: number;
+  totalWaves: number;
+};
+
+export type ScheduleMetaDto = {
+  releasedWave: number;
+  totalWaves: number;
+  hasMoreRounds: boolean;
+};
+
 export type CreateTournamentResponse = {
   tournament: TournamentDto;
   hostToken: string;
@@ -145,8 +182,62 @@ export function createTournament(input: {
 export function getTournamentByInvite(
   inviteCode: string,
   hostToken?: string,
-): Promise<{ tournament: TournamentDto }> {
+): Promise<{
+  tournament: TournamentDto;
+  drawPreview?: DrawPreviewDto;
+  scheduleMeta?: ScheduleMetaDto;
+}> {
   return apiFetch(`/tournaments/invite/${encodeURIComponent(inviteCode)}`, {
+    hostToken,
+  });
+}
+
+export function prepareTournamentDraw(
+  tournamentId: string,
+  hostToken: string,
+): Promise<{ tournament: TournamentDto; drawPreview: DrawPreviewDto }> {
+  return apiFetch(`/tournaments/${encodeURIComponent(tournamentId)}/draw`, {
+    method: "POST",
+    hostToken,
+    body: JSON.stringify({ action: "prepare" }),
+  });
+}
+
+export function shuffleTournamentDraw(
+  tournamentId: string,
+  hostToken: string,
+): Promise<{ tournament: TournamentDto; drawPreview: DrawPreviewDto }> {
+  return apiFetch(`/tournaments/${encodeURIComponent(tournamentId)}/draw`, {
+    method: "POST",
+    hostToken,
+    body: JSON.stringify({ action: "shuffle" }),
+  });
+}
+
+export function patchTournamentDraw(
+  tournamentId: string,
+  hostToken: string,
+  input: {
+    planRoundIndex: number;
+    matchIndex: number;
+    swapSides?: boolean;
+    homeEntryId?: string;
+    awayEntryId?: string;
+  },
+): Promise<{ tournament: TournamentDto; drawPreview: DrawPreviewDto }> {
+  return apiFetch(`/tournaments/${encodeURIComponent(tournamentId)}/draw`, {
+    method: "PATCH",
+    hostToken,
+    body: JSON.stringify(input),
+  });
+}
+
+export function releaseNextTournamentRound(
+  tournamentId: string,
+  hostToken: string,
+): Promise<{ tournament: TournamentDto; scheduleMeta?: ScheduleMetaDto }> {
+  return apiFetch(`/tournaments/${encodeURIComponent(tournamentId)}/rounds`, {
+    method: "POST",
     hostToken,
   });
 }

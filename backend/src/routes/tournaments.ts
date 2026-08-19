@@ -8,6 +8,10 @@ import {
   createTournamentMatchSession,
   getTournamentByInviteCode,
   joinTournament,
+  patchTournamentDraw,
+  prepareTournamentDraw,
+  releaseNextTournamentRound,
+  shuffleTournamentDraw,
   startTournament,
 } from "../services/tournamentService.js";
 
@@ -72,6 +76,61 @@ tournamentsRouter.post("/:tournamentId/start", async (req, res, next) => {
       return;
     }
     const result = await startTournament(
+      routeParam(req.params.tournamentId),
+      hostToken,
+    );
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+tournamentsRouter.post("/:tournamentId/draw", async (req, res, next) => {
+  try {
+    const hostToken = readHostToken(req);
+    if (!hostToken) {
+      res.status(403).json({ error: "X-Host-Token erforderlich" });
+      return;
+    }
+    const action =
+      typeof req.body?.action === "string" ? req.body.action.trim() : "prepare";
+    const tournamentId = routeParam(req.params.tournamentId);
+    const result =
+      action === "shuffle"
+        ? await shuffleTournamentDraw(tournamentId, hostToken)
+        : await prepareTournamentDraw(tournamentId, hostToken);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+tournamentsRouter.patch("/:tournamentId/draw", async (req, res, next) => {
+  try {
+    const hostToken = readHostToken(req);
+    if (!hostToken) {
+      res.status(403).json({ error: "X-Host-Token erforderlich" });
+      return;
+    }
+    const result = await patchTournamentDraw(
+      routeParam(req.params.tournamentId),
+      hostToken,
+      req.body ?? {},
+    );
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+tournamentsRouter.post("/:tournamentId/rounds", async (req, res, next) => {
+  try {
+    const hostToken = readHostToken(req);
+    if (!hostToken) {
+      res.status(403).json({ error: "X-Host-Token erforderlich" });
+      return;
+    }
+    const result = await releaseNextTournamentRound(
       routeParam(req.params.tournamentId),
       hostToken,
     );

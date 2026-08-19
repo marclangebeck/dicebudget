@@ -3,6 +3,20 @@ import { generateSecretToken } from "../lib/secretToken.js";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../db/prisma.js";
 import {
+  buildSchedulePlan,
+  mergeSchedulePlanIntoConfig,
+  nextReleaseWave,
+  parseStoredConfig,
+  persistScheduleGroups,
+  persistScheduleRoundWave,
+  readSchedulePlan,
+  shuffleSchedulePlan,
+  swapSchedulePairSides,
+  toDrawPreviewDto,
+  updateSchedulePair,
+  type TournamentSchedulePlan,
+} from "./tournamentSchedulePlan.js";
+import {
   normalizeTournamentConfig,
   type TournamentConfig,
 } from "./tournamentConfig.js";
@@ -18,7 +32,6 @@ const INVITE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const MIN_ENTRIES = 2;
 const MAX_ENTRIES_CAP = 64;
 const DEFAULT_MAX_ENTRIES = 32;
-const GROUP_LABELS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 export class TournamentNotFoundError extends Error {
   constructor() {
@@ -98,15 +111,6 @@ function normalizeDisplayName(raw: unknown): string {
   return raw.trim().slice(0, 32);
 }
 
-function parseStoredConfig(raw: string | null): unknown {
-  if (!raw) return {};
-  try {
-    return JSON.parse(raw) as unknown;
-  } catch {
-    return {};
-  }
-}
-
 function configFromRow(modeKey: string, raw: string | null): TournamentConfig {
   try {
     return normalizeTournamentConfig(modeKey, parseStoredConfig(raw));
@@ -124,49 +128,6 @@ function shuffleArray<T>(input: readonly T[]): T[] {
     arr[j] = tmp;
   }
   return arr;
-}
-
-function buildRoundRobin(entryIds: readonly string[]) {
-  if (entryIds.length < 2) return [] as { roundIndex: number; pairs: [string, string][] }[];
-  const ids = [...entryIds];
-  const isOdd = ids.length % 2 === 1;
-  if (isOdd) ids.push("__BYE__");
-  const rounds: { roundIndex: number; pairs: [string, string][] }[] = [];
-  const slots = [...ids];
-  const totalRounds = slots.length - 1;
-  const half = slots.length / 2;
-
-  for (let roundIndex = 0; roundIndex < totalRounds; roundIndex += 1) {
-    const pairs: [string, string][] = [];
-    for (let i = 0; i < half; i += 1) {
-      const a = slots[i]!;
-      const b = slots[slots.length - 1 - i]!;
-      if (a !== "__BYE__" && b !== "__BYE__") {
-        pairs.push(roundIndex % 2 === 0 ? [a, b] : [b, a]);
-      }
-    }
-    rounds.push({ roundIndex: roundIndex + 1, pairs });
-
-    const fixed = slots[0]!;
-    const rotating = slots.slice(1);
-    rotating.unshift(rotating.pop()!);
-    slots.splice(0, slots.length, fixed, ...rotating);
-  }
-  return rounds;
-}
-
-function distributeIntoGroups<T>(entries: readonly T[], groupSize: number): T[][] {
-  const groupCount = Math.max(1, Math.ceil(entries.length / groupSize));
-  const groups = Array.from({ length: groupCount }, () => [] as T[]);
-  entries.forEach((entry, index) => {
-    groups[index % groupCount]!.push(entry);
-  });
-  return groups;
-}
-
-function groupNameForIndex(index: number): string {
-  const label = GROUP_LABELS[index] ?? String(index + 1);
-  return `Gruppe ${label}`;
 }
 
 function nextPowerOfTwo(n: number): number {
@@ -405,8 +366,25 @@ export async function getTournamentByInviteCode(
     throw new TournamentForbiddenError();
   }
 
+  const schedulePlan = readSchedulePlan(tournament.config);
+  const drawPreview =
+    hostToken && tournament.status === TOURNAMENT_STATUS.OPEN && schedulePlan
+      ? toDrawPreviewDto(schedulePlan, tournament.entries)
+      : undefined;
+  const scheduleMeta =
+    hostToken && schedulePlan
+      ? {
+          releasedWave: schedulePlan.releasedWave,
+          totalWaves: [...new Set(schedulePlan.rounds.map((round) => round.releaseWave))]
+            .length,
+          hasMoreRounds: nextReleaseWave(schedulePlan) != null,
+        }
+      : undefined;
+
   return {
     tournament: toTournamentDto(tournament, { includeEntries: true }),
+    ...(drawPreview ? { drawPreview } : {}),
+    ...(scheduleMeta ? { scheduleMeta } : {}),
   };
 }
 
@@ -469,144 +447,189 @@ export async function joinTournament(
   };
 }
 
-async function createLeagueStructure(
-  tx: Prisma.TransactionClient,
-  tournament: {
-    id: string;
-    modeKey: string;
-    config: string | null;
-    entries: { id: string }[];
-  },
+async function saveSchedulePlan(
+  tournamentId: string,
+  configRaw: string | null,
+  plan: TournamentSchedulePlan,
 ) {
-  const config = configFromRow(tournament.modeKey, tournament.config);
-  if (!("rounds" in config)) {
-    throw new TournamentConflictError("Liga-Konfiguration fehlt");
-  }
-
-  const shuffledEntries = shuffleArray(tournament.entries);
-  const leagueGroup = await tx.tournamentGroup.create({
+  await prisma.tournament.update({
+    where: { id: tournamentId },
     data: {
-      tournamentId: tournament.id,
-      name: "Liga",
-      sortOrder: 0,
+      config: mergeSchedulePlanIntoConfig(configRaw, plan),
     },
   });
-
-  await tx.tournamentGroupStanding.createMany({
-    data: shuffledEntries.map((entry) => ({
-      tournamentId: tournament.id,
-      groupId: leagueGroup.id,
-      entryId: entry.id,
-    })),
-  });
-
-  const baseSchedule = buildRoundRobin(shuffledEntries.map((entry) => entry.id));
-  const roundsToCreate: { id: string; roundIndex: number; legIndex: number }[] = [];
-  for (let legIndex = 1; legIndex <= config.rounds; legIndex += 1) {
-    for (const round of baseSchedule) {
-      const createdRound = await tx.tournamentRound.create({
-        data: {
-          tournamentId: tournament.id,
-          groupId: leagueGroup.id,
-          phase: "LEAGUE",
-          roundIndex: round.roundIndex,
-          legIndex,
-          title:
-            config.rounds > 1
-              ? `Spieltag ${round.roundIndex} · Runde ${legIndex}`
-              : `Spieltag ${round.roundIndex}`,
-        },
-      });
-      roundsToCreate.push({
-        id: createdRound.id,
-        roundIndex: round.roundIndex,
-        legIndex,
-      });
-    }
-  }
-
-  for (const round of baseSchedule) {
-    for (let legIndex = 1; legIndex <= config.rounds; legIndex += 1) {
-      const createdRound = roundsToCreate.find(
-        (item) => item.roundIndex === round.roundIndex && item.legIndex === legIndex,
-      );
-      if (!createdRound) continue;
-      await tx.tournamentMatch.createMany({
-        data: round.pairs.map(([homeEntryId, awayEntryId], pairIndex) => ({
-          tournamentId: tournament.id,
-          groupId: leagueGroup.id,
-          roundId: createdRound.id,
-          phase: "LEAGUE",
-          matchIndex: pairIndex + 1,
-          homeEntryId,
-          awayEntryId,
-        })),
-      });
-    }
-  }
 }
 
-async function createTurnierStructure(
-  tx: Prisma.TransactionClient,
+async function loadHostTournament(tournamentId: string, hostToken: string) {
+  if (!hostToken) throw new TournamentForbiddenError();
+  const tournament = await prisma.tournament.findUnique({
+    where: { id: tournamentId },
+    include: { entries: { orderBy: { orderIndex: "asc" } } },
+  });
+  if (!tournament) throw new TournamentNotFoundError();
+  if (tournament.hostToken !== hostToken) throw new TournamentForbiddenError();
+  return tournament;
+}
+
+function resolveOrBuildSchedulePlan(
   tournament: {
-    id: string;
     modeKey: string;
     config: string | null;
     entries: { id: string }[];
   },
-) {
+): TournamentSchedulePlan {
+  const existing = readSchedulePlan(tournament.config);
+  if (existing) return existing;
   const config = configFromRow(tournament.modeKey, tournament.config);
-  if (!("groupSize" in config)) {
-    throw new TournamentConflictError("Turnier-Konfiguration fehlt");
+  return buildSchedulePlan(
+    tournament.modeKey,
+    tournament.entries.map((entry) => entry.id),
+    config,
+  );
+}
+
+async function fetchTournamentDtoByInvite(inviteCode: string, hostToken?: string) {
+  return getTournamentByInviteCode(inviteCode, hostToken);
+}
+
+export async function prepareTournamentDraw(tournamentId: string, hostToken: string) {
+  const tournament = await loadHostTournament(tournamentId, hostToken);
+  if (tournament.status !== TOURNAMENT_STATUS.OPEN) {
+    throw new TournamentConflictError("Auslosung nur in der Lobby möglich");
+  }
+  if (tournament.entries.length < MIN_ENTRIES) {
+    throw new TournamentConflictError(
+      `Mindestens ${MIN_ENTRIES} Spieler für die Auslosung nötig`,
+    );
   }
 
-  const shuffledEntries = shuffleArray(tournament.entries);
-  const groupedEntries = distributeIntoGroups(shuffledEntries, config.groupSize);
+  const plan = resolveOrBuildSchedulePlan(tournament);
+  await saveSchedulePlan(tournament.id, tournament.config, plan);
 
-  for (let groupIndex = 0; groupIndex < groupedEntries.length; groupIndex += 1) {
-    const groupEntries = groupedEntries[groupIndex]!;
-    const group = await tx.tournamentGroup.create({
-      data: {
-        tournamentId: tournament.id,
-        name: groupNameForIndex(groupIndex),
-        sortOrder: groupIndex,
-      },
-    });
+  const fresh = await loadHostTournament(tournamentId, hostToken);
+  return {
+    tournament: (await fetchTournamentDtoByInvite(fresh.inviteCode, hostToken)).tournament,
+    drawPreview: toDrawPreviewDto(plan, fresh.entries),
+  };
+}
 
-    await tx.tournamentGroupStanding.createMany({
-      data: groupEntries.map((entry) => ({
-        tournamentId: tournament.id,
-        groupId: group.id,
-        entryId: entry.id,
-      })),
-    });
-
-    const schedule = buildRoundRobin(groupEntries.map((entry) => entry.id));
-    for (const round of schedule) {
-      const createdRound = await tx.tournamentRound.create({
-        data: {
-          tournamentId: tournament.id,
-          groupId: group.id,
-          phase: "GROUP",
-          roundIndex: round.roundIndex,
-          legIndex: 1,
-          title: `${group.name} · Runde ${round.roundIndex}`,
-        },
-      });
-
-      await tx.tournamentMatch.createMany({
-        data: round.pairs.map(([homeEntryId, awayEntryId], pairIndex) => ({
-          tournamentId: tournament.id,
-          groupId: group.id,
-          roundId: createdRound.id,
-          phase: "GROUP",
-          matchIndex: pairIndex + 1,
-          homeEntryId,
-          awayEntryId,
-        })),
-      });
-    }
+export async function shuffleTournamentDraw(tournamentId: string, hostToken: string) {
+  const tournament = await loadHostTournament(tournamentId, hostToken);
+  if (tournament.status !== TOURNAMENT_STATUS.OPEN) {
+    throw new TournamentConflictError("Auslosung nur in der Lobby möglich");
   }
+
+  const current = readSchedulePlan(tournament.config);
+  if (!current) {
+    return prepareTournamentDraw(tournamentId, hostToken);
+  }
+
+  const plan = shuffleSchedulePlan(current);
+  await saveSchedulePlan(tournament.id, tournament.config, plan);
+
+  return {
+    tournament: (await fetchTournamentDtoByInvite(tournament.inviteCode, hostToken))
+      .tournament,
+    drawPreview: toDrawPreviewDto(plan, tournament.entries),
+  };
+}
+
+export async function patchTournamentDraw(
+  tournamentId: string,
+  hostToken: string,
+  input: {
+    planRoundIndex?: unknown;
+    matchIndex?: unknown;
+    swapSides?: unknown;
+    homeEntryId?: unknown;
+    awayEntryId?: unknown;
+  },
+) {
+  const tournament = await loadHostTournament(tournamentId, hostToken);
+  if (tournament.status !== TOURNAMENT_STATUS.OPEN) {
+    throw new TournamentConflictError("Auslosung nur in der Lobby möglich");
+  }
+
+  const current = readSchedulePlan(tournament.config);
+  if (!current) {
+    throw new TournamentConflictError("Zuerst Auslosung vorbereiten");
+  }
+
+  const planRoundIndex = Number(input.planRoundIndex);
+  const matchIndex = Number(input.matchIndex);
+  if (!Number.isInteger(planRoundIndex) || planRoundIndex < 0) {
+    throw new TournamentInputError("planRoundIndex ungültig");
+  }
+  if (!Number.isInteger(matchIndex) || matchIndex < 1) {
+    throw new TournamentInputError("matchIndex ungültig");
+  }
+
+  let plan = current;
+  if (input.swapSides === true) {
+    plan = swapSchedulePairSides(plan, planRoundIndex, matchIndex);
+  } else if (
+    typeof input.homeEntryId === "string" &&
+    typeof input.awayEntryId === "string"
+  ) {
+    plan = updateSchedulePair(
+      plan,
+      planRoundIndex,
+      matchIndex,
+      input.homeEntryId,
+      input.awayEntryId,
+    );
+  } else {
+    throw new TournamentInputError("swapSides oder homeEntryId/awayEntryId nötig");
+  }
+
+  await saveSchedulePlan(tournament.id, tournament.config, plan);
+
+  return {
+    tournament: (await fetchTournamentDtoByInvite(tournament.inviteCode, hostToken))
+      .tournament,
+    drawPreview: toDrawPreviewDto(plan, tournament.entries),
+  };
+}
+
+export async function releaseNextTournamentRound(tournamentId: string, hostToken: string) {
+  const tournament = await loadHostTournament(tournamentId, hostToken);
+  if (tournament.status !== TOURNAMENT_STATUS.RUNNING) {
+    throw new TournamentConflictError("Rundenfreigabe nur bei laufendem Ereignis");
+  }
+
+  const plan = readSchedulePlan(tournament.config);
+  if (!plan) {
+    throw new TournamentConflictError("Kein Spielplan hinterlegt");
+  }
+
+  const wave = nextReleaseWave(plan);
+  if (wave == null) {
+    throw new TournamentConflictError("Alle Runden sind bereits freigegeben");
+  }
+
+  const groupIdBySortOrder = new Map(
+    (
+      await prisma.tournamentGroup.findMany({
+        where: { tournamentId: tournament.id },
+        select: { id: true, sortOrder: true },
+      })
+    ).map((group) => [group.sortOrder, group.id] as const),
+  );
+
+  await prisma.$transaction(async (tx) => {
+    await persistScheduleRoundWave(
+      tx,
+      tournament.id,
+      plan,
+      wave,
+      groupIdBySortOrder,
+    );
+  });
+
+  const updatedPlan = { ...plan, releasedWave: wave };
+  await saveSchedulePlan(tournament.id, tournament.config, updatedPlan);
+
+  return fetchTournamentDtoByInvite(tournament.inviteCode, hostToken);
 }
 
 function mapHouseRulesToSessionFlags(config: TournamentConfig) {
@@ -1110,14 +1133,7 @@ export async function maybeGenerateKoBracketForTournament(
 }
 
 export async function startTournament(tournamentId: string, hostToken: string) {
-  if (!hostToken) throw new TournamentForbiddenError();
-
-  const tournament = await prisma.tournament.findUnique({
-    where: { id: tournamentId },
-    include: { entries: { orderBy: { orderIndex: "asc" } } },
-  });
-  if (!tournament) throw new TournamentNotFoundError();
-  if (tournament.hostToken !== hostToken) throw new TournamentForbiddenError();
+  const tournament = await loadHostTournament(tournamentId, hostToken);
   if (tournament.status !== TOURNAMENT_STATUS.OPEN) {
     throw new TournamentConflictError("Turnier ist nicht mehr in der Lobby");
   }
@@ -1127,7 +1143,13 @@ export async function startTournament(tournamentId: string, hostToken: string) {
     );
   }
 
-  const updated = await prisma.$transaction(async (tx) => {
+  let plan = resolveOrBuildSchedulePlan(tournament);
+  const firstWave = nextReleaseWave(plan);
+  if (firstWave == null) {
+    throw new TournamentConflictError("Spielplan ist leer");
+  }
+
+  await prisma.$transaction(async (tx) => {
     const existingRounds = await tx.tournamentRound.count({
       where: { tournamentId: tournament.id },
     });
@@ -1135,46 +1157,24 @@ export async function startTournament(tournamentId: string, hostToken: string) {
       throw new TournamentConflictError("Turnier-Struktur existiert bereits");
     }
 
-    if (tournament.modeKey === "turnier") {
-      await createTurnierStructure(tx, tournament);
-    } else {
-      await createLeagueStructure(tx, tournament);
-    }
+    const groupIdBySortOrder = await persistScheduleGroups(tx, tournament.id, plan);
+    await persistScheduleRoundWave(
+      tx,
+      tournament.id,
+      plan,
+      firstWave,
+      groupIdBySortOrder,
+    );
 
-    return tx.tournament.update({
+    plan = { ...plan, releasedWave: firstWave };
+    await tx.tournament.update({
       where: { id: tournamentId },
-      data: { status: TOURNAMENT_STATUS.RUNNING },
-      include: {
-        entries: { orderBy: { orderIndex: "asc" } },
-        groups: {
-          orderBy: { sortOrder: "asc" },
-          include: {
-            standings: {
-              orderBy: [{ rank: "asc" }, { points: "desc" }, { totalScoreDiff: "desc" }],
-              include: {
-                entry: { select: { id: true, displayName: true, playerId: true } },
-              },
-            },
-          },
-        },
-        rounds: {
-          orderBy: [{ phase: "asc" }, { legIndex: "asc" }, { roundIndex: "asc" }],
-          include: {
-            matches: {
-              orderBy: { matchIndex: "asc" },
-              include: {
-                homeEntry: { select: { id: true, displayName: true, playerId: true } },
-                awayEntry: { select: { id: true, displayName: true, playerId: true } },
-              session: { select: { inviteCode: true } },
-              },
-            },
-          },
-        },
+      data: {
+        status: TOURNAMENT_STATUS.RUNNING,
+        config: mergeSchedulePlanIntoConfig(tournament.config, plan),
       },
     });
   });
 
-  return {
-    tournament: toTournamentDto(updated, { includeEntries: true }),
-  };
+  return fetchTournamentDtoByInvite(tournament.inviteCode, hostToken);
 }
