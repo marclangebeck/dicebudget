@@ -158,6 +158,21 @@ export function finalizeSessionStats(
   );
 }
 
+export function submitKoTieBreak(
+  inviteCode: string,
+  rolls: [number, number, number],
+  playerSecret: string,
+) {
+  return request<{ session: SessionLobbyDto }>(
+    `/sessions/invite/${encodeURIComponent(inviteCode)}/ko-tie-break`,
+    {
+      method: "POST",
+      body: JSON.stringify({ rolls }),
+      playerSecret,
+    },
+  );
+}
+
 export function clearLastField(runId: string, fieldId: string, playerSecret?: string) {
   return request<{ run: RunDto }>(`/runs/${runId}/fields/${fieldId}/clear`, {
     method: "POST",

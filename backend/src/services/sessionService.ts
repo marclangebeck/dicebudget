@@ -199,6 +199,18 @@ function sumEnteredDiceScores(
   return sum;
 }
 
+function parseKoTieBreakRolls(raw: string | null): number[] | null {
+  if (!raw) return null;
+  const parts = raw.split(",").map((p) => Number(p));
+  if (parts.length !== 3) return null;
+  if (!parts.every((n) => Number.isInteger(n) && n >= 1 && n <= 6)) return null;
+  return parts as number[];
+}
+
+function serializeKoTieBreakRolls(rolls: readonly number[]): string {
+  return `${rolls[0]},${rolls[1]},${rolls[2]}`;
+}
+
 export async function createGameSession(
   gameCount: number,
   maxPlayers: number,
@@ -207,6 +219,7 @@ export async function createGameSession(
   showOpponentPool = false,
   poolEndgameEnabled = false,
   houseRules: SessionHouseRuleFlags = {},
+  koTieBreakEnabled = false,
 ) {
   assertValidGameCount(gameCount);
   assertValidSessionPlayers(maxPlayers);
@@ -263,6 +276,7 @@ export async function createGameSession(
           useStrategyRules && ruleYatzyTriple && ruleYatzyTripleCredit,
         ruleUpperRace: useStrategyRules && ruleUpperRace,
         ruleColumnPoolBonuses: useStrategyRules && ruleColumnPoolBonuses,
+        koTieBreakEnabled,
         status: SESSION_STATUS.OPEN,
         leagueId,
         roundNumber,
@@ -348,6 +362,13 @@ export async function getSessionLobbyByInvite(
     ruleYatzyTripleCredit: session.ruleYatzyTripleCredit,
     ruleUpperRace: session.ruleUpperRace,
     ruleColumnPoolBonuses: session.ruleColumnPoolBonuses,
+    koTieBreakEnabled: session.koTieBreakEnabled,
+    koTieBreakPending: session.koTieBreakPending,
+    koTieBreakPlayerAId: session.koTieBreakPlayerAId,
+    koTieBreakPlayerBId: session.koTieBreakPlayerBId,
+    koTieBreakPlayerARolls: parseKoTieBreakRolls(session.koTieBreakPlayerARolls),
+    koTieBreakPlayerBRolls: parseKoTieBreakRolls(session.koTieBreakPlayerBRolls),
+    koTieBreakWinnerPlayerId: session.koTieBreakWinnerPlayerId,
     status: session.status,
     createdAt: session.createdAt.toISOString(),
     leagueCode: session.league.leagueCode,
@@ -380,6 +401,26 @@ export async function getSessionRanking(inviteCode: string) {
   if (!lobby) return null;
 
   const ranked = [...lobby.players].sort((a, b) => b.totalScore - a.totalScore);
+
+  const winnerFromKoTieBreak =
+    lobby.koTieBreakEnabled && lobby.koTieBreakWinnerPlayerId
+      ? { playerId: lobby.koTieBreakWinnerPlayerId, totalScore: null }
+      : null;
+
+  // In KO-Tie-Break-Phasen: solange nicht aufgelöst, keinen Gewinner anzeigen.
+  if (lobby.koTieBreakEnabled && lobby.koTieBreakPending) {
+    return {
+      ...lobby,
+      ranking: ranked.map((p, index) => ({
+        rank: index + 1,
+        playerId: p.playerId,
+        totalScore: p.totalScore,
+        finished: p.runFinished,
+      })),
+      winner: null,
+    };
+  }
+
   return {
     ...lobby,
     ranking: ranked.map((p, index) => ({
@@ -389,9 +430,18 @@ export async function getSessionRanking(inviteCode: string) {
       finished: p.runFinished,
     })),
     winner:
-      lobby.allRunsFinished && ranked[0]
-        ? { playerId: ranked[0].playerId, totalScore: ranked[0].totalScore }
-        : null,
+      winnerFromKoTieBreak
+        ? {
+            playerId: winnerFromKoTieBreak.playerId,
+            // Ko-Tie-Break gewinnt unabhängig vom totalScore; hier nur für
+            // UI-Kompatibilität wieder totalScore setzen.
+            totalScore:
+              lobby.players.find((p) => p.playerId === winnerFromKoTieBreak.playerId)
+                ?.totalScore ?? 0,
+          }
+        : lobby.allRunsFinished && ranked[0]
+          ? { playerId: ranked[0].playerId, totalScore: ranked[0].totalScore }
+          : null,
   };
 }
 
@@ -545,7 +595,7 @@ export async function finalizeSessionStats(
     include: {
       players: {
         orderBy: { orderIndex: "asc" },
-        include: { run: { select: { status: true } } },
+        include: { run: { select: { status: true, totalScore: true } } },
       },
     },
   });
@@ -564,7 +614,43 @@ export async function finalizeSessionStats(
 
   // Paarungs-Statistik braucht mindestens zwei Spieler in der Session.
   const effectiveIncludeInPairingStats =
-    includeInPairingStats && session.players.length >= 2;
+    includeInPairingStats && session.players.length >= 2 && !session.koTieBreakEnabled;
+
+  // KO-Tie-Break Phase: Bei totalScore-Unentschieden müssen zuerst die 3 KO-Würfe
+  // eingetragen werden. Solange das nicht passiert ist, darf keine Session als
+  // „fertig gewertet“ werden.
+  if (session.koTieBreakEnabled && session.players.length === 2) {
+    const [a, b] = session.players;
+    const aScore = a.run.totalScore;
+    const bScore = b.run.totalScore;
+
+    const tie = aScore === bScore;
+    let pending = session.koTieBreakPending;
+
+    if (tie && !pending && !session.koTieBreakWinnerPlayerId) {
+      const aPublicId = publicPlayerIdFromStoredName(a.name);
+      const bPublicId = publicPlayerIdFromStoredName(b.name);
+
+      await prisma.gameSession.update({
+        where: { id: session.id },
+        data: {
+          koTieBreakPending: true,
+          koTieBreakPlayerAId: aPublicId,
+          koTieBreakPlayerBId: bPublicId,
+          koTieBreakPlayerARolls: null,
+          koTieBreakPlayerBRolls: null,
+          koTieBreakWinnerPlayerId: null,
+        },
+      });
+      pending = true;
+    }
+
+    // Falls Tie-Break noch nicht abgeschlossen ist: keine Punkte vergeben /
+    // keine Session beenden.
+    if (pending) {
+      return getSessionRanking(session.inviteCode);
+    }
+  }
 
   if (effectiveIncludeInPairingStats) {
     const awarded = await awardSessionLeaguePoints(session.id);
@@ -597,6 +683,118 @@ export async function finalizeSessionStats(
   }
 
   invalidatePairingStatsCache();
+
+  return getSessionRanking(session.inviteCode);
+}
+
+/**
+ * KO-Tie-Break (3 Würfe): Spieler reichen jeweils ihre 3 Augenzahlen ein.
+ * Danach entscheidet der Server die Gewinnerquote (höhere Augenzahl je Wurf)
+ * und beendet die Tie-Break-Phase.
+ */
+export async function submitKoTieBreakRolls(
+  inviteCode: string,
+  rolls: unknown,
+  playerSecret: string | undefined,
+) {
+  const session = await prisma.gameSession.findUnique({
+    where: { inviteCode: inviteCode.toUpperCase() },
+    include: {
+      players: { orderBy: { orderIndex: "asc" } },
+    },
+  });
+
+  if (!session) throw new SessionNotFoundError();
+
+  const token = playerSecret?.trim();
+  const player = session.players.find((p) => p.secretToken === token);
+  if (!token || !player) throw new ForbiddenRunError();
+
+  if (!session.koTieBreakEnabled) {
+    throw new Error("ko_tie_break_disabled");
+  }
+
+  // Fertig/abgebrochen → nichts mehr schreiben.
+  if (!session.koTieBreakPending || session.koTieBreakWinnerPlayerId) {
+    return getSessionRanking(session.inviteCode);
+  }
+
+  const parsedRolls = Array.isArray(rolls) ? rolls : null;
+  if (!parsedRolls) throw new Error("ko_tie_break_rolls_invalid");
+  const values = parsedRolls.map((n) => Number(n));
+  if (
+    values.length !== 3 ||
+    !values.every((n) => Number.isInteger(n) && n >= 1 && n <= 6)
+  ) {
+    throw new Error("ko_tie_break_rolls_invalid");
+  }
+
+  const publicId = publicPlayerIdFromStoredName(player.name);
+  if (
+    publicId !== session.koTieBreakPlayerAId &&
+    publicId !== session.koTieBreakPlayerBId
+  ) {
+    throw new Error("ko_tie_break_player_unknown");
+  }
+
+  const rollString = serializeKoTieBreakRolls(values);
+
+  await prisma.$transaction(async (tx) => {
+    const current = await tx.gameSession.findUnique({
+      where: { id: session.id },
+      select: {
+        koTieBreakPending: true,
+        koTieBreakWinnerPlayerId: true,
+        koTieBreakPlayerAId: true,
+        koTieBreakPlayerARolls: true,
+        koTieBreakPlayerBId: true,
+        koTieBreakPlayerBRolls: true,
+      },
+    });
+
+    if (!current) throw new Error("session_missing_during_tx");
+    if (!current.koTieBreakPending || current.koTieBreakWinnerPlayerId) return;
+
+    const nextARolls =
+      publicId === current.koTieBreakPlayerAId
+        ? rollString
+        : current.koTieBreakPlayerARolls;
+    const nextBRolls =
+      publicId === current.koTieBreakPlayerBId
+        ? rollString
+        : current.koTieBreakPlayerBRolls;
+
+    const aArr = parseKoTieBreakRolls(nextARolls);
+    const bArr = parseKoTieBreakRolls(nextBRolls);
+
+    if (!aArr || !bArr) {
+      await tx.gameSession.update({
+        where: { id: session.id },
+        data: {
+          koTieBreakPlayerARolls: nextARolls,
+          koTieBreakPlayerBRolls: nextBRolls,
+        },
+      });
+      return;
+    }
+
+    let winsA = 0;
+    for (let i = 0; i < 3; i += 1) {
+      if (aArr[i]! > bArr[i]!) winsA += 1;
+    }
+    // winsB = 3 - winsA (kann nicht unentschieden sein, da 3 Vergleiche)
+    const winnerPublicId = winsA === 2 || winsA === 3 ? current.koTieBreakPlayerAId : current.koTieBreakPlayerBId;
+
+    await tx.gameSession.update({
+      where: { id: session.id },
+      data: {
+        koTieBreakPlayerARolls: nextARolls,
+        koTieBreakPlayerBRolls: nextBRolls,
+        koTieBreakPending: false,
+        koTieBreakWinnerPlayerId: winnerPublicId,
+      },
+    });
+  });
 
   return getSessionRanking(session.inviteCode);
 }

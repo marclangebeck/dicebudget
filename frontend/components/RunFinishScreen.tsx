@@ -14,8 +14,9 @@ import {
 import { useMergedDisplayNames } from "@/lib/useMergedDisplayNames";
 import { playerLabel } from "@/lib/playerIdentity";
 import { runHasOpenFields } from "@/lib/runUtils";
-import type { SessionLobbyDto } from "@/lib/sessionTypes";
+import type { SessionLobbyDto, SessionRankingDto } from "@/lib/sessionTypes";
 import type { RunDto } from "@/lib/types";
+import { KoTieBreakOverlay } from "@/components/KoTieBreakOverlay";
 
 type Props = {
   run: RunDto;
@@ -25,7 +26,11 @@ type Props = {
   analysisLoading?: boolean;
   /** Multiplayer: Toggle „Werten“ / „Nicht werten“ vor Verlassen. */
   multiplayer?: boolean;
-  onFinalizeStats?: (includeInPairingStats: boolean) => Promise<void>;
+  onFinalizeStats?: (
+    includeInPairingStats: boolean,
+  ) => Promise<{ session: SessionRankingDto }>;
+  inviteCode?: string | null;
+  playerSecret?: string;
   /** Optional: Lobby-Stand für Runden-Ranking auf dem Abschluss-Screen. */
   lobby?: SessionLobbyDto | null;
   ownPlayerId?: string;
@@ -61,6 +66,8 @@ export function RunFinishScreen({
   analysisLoading = false,
   multiplayer,
   onFinalizeStats,
+  inviteCode = null,
+  playerSecret,
   lobby = null,
   ownPlayerId = "",
 }: Props) {
@@ -68,6 +75,7 @@ export function RunFinishScreen({
   const [includeInStats, setIncludeInStats] = useState(true);
   const [leaving, setLeaving] = useState(false);
   const [leaveError, setLeaveError] = useState<string | null>(null);
+  const [showKoTieBreakOverlay, setShowKoTieBreakOverlay] = useState(false);
 
   useEffect(() => {
     clearActiveGame();
@@ -103,6 +111,48 @@ export function RunFinishScreen({
 
   const viewerRank = roundRanking.find((entry) => entry.isViewer)?.rank ?? null;
 
+  useEffect(() => {
+    if (lobby?.koTieBreakEnabled && lobby?.koTieBreakPending) {
+      setShowKoTieBreakOverlay(true);
+    }
+  }, [lobby?.koTieBreakEnabled, lobby?.koTieBreakPending]);
+
+  const initialKoTieBreakRolls = useMemo(() => {
+    if (!lobby?.koTieBreakEnabled) return null;
+    if (!ownPlayerId) return null;
+    if (lobby.koTieBreakPlayerAId && lobby.koTieBreakPlayerAId === ownPlayerId) {
+      return lobby.koTieBreakPlayerARolls ?? null;
+    }
+    if (lobby.koTieBreakPlayerBId && lobby.koTieBreakPlayerBId === ownPlayerId) {
+      return lobby.koTieBreakPlayerBRolls ?? null;
+    }
+    return null;
+  }, [
+    lobby?.koTieBreakEnabled,
+    lobby?.koTieBreakPlayerAId,
+    lobby?.koTieBreakPlayerARolls,
+    lobby?.koTieBreakPlayerBId,
+    lobby?.koTieBreakPlayerBRolls,
+    ownPlayerId,
+  ]);
+
+  async function handleKoTieBreakResolved() {
+    if (!onFinalizeStats) return;
+    setLeaving(true);
+    setLeaveError(null);
+    try {
+      await onFinalizeStats(includeInStats);
+      router.push(APP_HOME_PATH);
+    } catch (e) {
+      setLeaveError(
+        e instanceof Error ? e.message : "KO-Tie-Break finalisieren fehlgeschlagen",
+      );
+    } finally {
+      setLeaving(false);
+      setShowKoTieBreakOverlay(false);
+    }
+  }
+
   async function handleLeaveHome() {
     if (!multiplayer || !onFinalizeStats) {
       router.push(APP_HOME_PATH);
@@ -111,7 +161,11 @@ export function RunFinishScreen({
     setLeaving(true);
     setLeaveError(null);
     try {
-      await onFinalizeStats(includeInStats);
+      const res = await onFinalizeStats(includeInStats);
+      if (res.session.koTieBreakPending) {
+        setShowKoTieBreakOverlay(true);
+        return;
+      }
       router.push(APP_HOME_PATH);
     } catch (e) {
       setLeaveError(e instanceof Error ? e.message : "Speichern fehlgeschlagen");
@@ -251,11 +305,19 @@ export function RunFinishScreen({
           {multiplayer && onFinalizeStats ? (
             <button
               type="button"
-              disabled={leaving}
+              disabled={
+                leaving ||
+                showKoTieBreakOverlay ||
+                (lobby?.koTieBreakEnabled && lobby?.koTieBreakPending)
+              }
               onClick={() => void handleLeaveHome()}
               className="btn-primary inline-flex min-h-10 w-full items-center justify-center px-6 text-sm disabled:opacity-50"
             >
-              {leaving ? "Speichere …" : "Spiel beenden und zur Startseite"}
+              {leaving
+                ? "Speichere …"
+                : showKoTieBreakOverlay || (lobby?.koTieBreakEnabled && lobby?.koTieBreakPending)
+                  ? "KO-Tie-Break läuft"
+                  : "Spiel beenden und zur Startseite"}
             </button>
           ) : (
             <Link
@@ -286,6 +348,14 @@ export function RunFinishScreen({
           )}
         </div>
       </FinishCard>
+      {showKoTieBreakOverlay && inviteCode && playerSecret && onFinalizeStats && (
+        <KoTieBreakOverlay
+          inviteCode={inviteCode}
+          playerSecret={playerSecret}
+          initialRolls={initialKoTieBreakRolls}
+          onResolved={handleKoTieBreakResolved}
+        />
+      )}
     </div>
   );
 }

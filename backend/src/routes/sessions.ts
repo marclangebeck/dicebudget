@@ -11,6 +11,7 @@ import {
   getSessionLobbyByInvite,
   getSessionRanking,
   joinSession,
+  submitKoTieBreakRolls,
   resolvePoolEndgame,
 } from "../services/sessionService.js";
 import { applyRollSale } from "../services/houseRulesService.js";
@@ -31,6 +32,7 @@ sessionsRouter.post("/", createSessionLimiter, async (req, res, next) => {
         : Boolean(req.body.useStrategyRules);
     const showOpponentPool = Boolean(req.body?.showOpponentPool);
     const poolEndgameEnabled = Boolean(req.body?.poolEndgameEnabled);
+    const koTieBreakEnabled = Boolean(req.body?.koTieBreakEnabled);
     const houseRulesBody =
       req.body?.houseRules && typeof req.body.houseRules === "object"
         ? (req.body.houseRules as Record<string, unknown>)
@@ -76,6 +78,7 @@ sessionsRouter.post("/", createSessionLimiter, async (req, res, next) => {
             ? undefined
             : Boolean(houseRulesBody.ruleColumnPoolBonuses),
       },
+      koTieBreakEnabled,
     );
     res.status(201).json({ session });
   } catch (error) {
@@ -171,6 +174,36 @@ sessionsRouter.post("/invite/:inviteCode/finalize-stats", async (req, res, next)
     next(error);
   }
 });
+
+sessionsRouter.post(
+  "/invite/:inviteCode/ko-tie-break",
+  async (req, res, next) => {
+    try {
+      const rollsBody = req.body?.rolls;
+      const rolls =
+        Array.isArray(rollsBody) ? rollsBody.map((n) => Number(n)) : null;
+
+      if (
+        !rolls ||
+        rolls.length !== 3 ||
+        !rolls.every((n) => Number.isInteger(n) && n >= 1 && n <= 6)
+      ) {
+        res.status(400).json({ error: "rolls must be [1..6, 1..6, 1..6]" });
+        return;
+      }
+
+      const data = await submitKoTieBreakRolls(
+        req.params.inviteCode,
+        rolls,
+        readPlayerSecret(req),
+      );
+
+      res.json({ session: data });
+    } catch (error) {
+      next(error);
+    }
+  },
+);
 
 sessionsRouter.get("/invite/:inviteCode/ranking", async (req, res, next) => {
   try {

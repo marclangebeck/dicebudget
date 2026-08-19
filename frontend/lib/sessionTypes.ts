@@ -32,6 +32,13 @@ export type SessionLobbyDto = {
   roundNumber: number;
   pointsAwarded: boolean;
   playerCount: number;
+  koTieBreakEnabled?: boolean;
+  koTieBreakPending?: boolean;
+  koTieBreakPlayerAId?: string | null;
+  koTieBreakPlayerARolls?: number[] | null;
+  koTieBreakPlayerBId?: string | null;
+  koTieBreakPlayerBRolls?: number[] | null;
+  koTieBreakWinnerPlayerId?: string | null;
   players: {
     id: string;
     playerId: string;

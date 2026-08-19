@@ -8,6 +8,7 @@ import { AchievementOverlay } from "@/components/AchievementOverlay";
 import { RunProgressOverlay } from "@/components/RunProgressOverlay";
 import { RuleEventOverlay } from "@/components/RuleEventOverlay";
 import { RunCompleteOverlay } from "@/components/RunCompleteOverlay";
+import { KoTieBreakOverlay } from "@/components/KoTieBreakOverlay";
 import { MatchAnalysisView } from "@/components/MatchAnalysisView";
 import { RunFinishScreen } from "@/components/RunFinishScreen";
 import { FitScoreSheet } from "@/components/FitScoreSheet";
@@ -118,6 +119,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   const [yatzyDieValue, setYatzyDieValue] = useState<number | null>(null);
   const [includeInStats, setIncludeInStats] = useState(true);
   const [leavingHome, setLeavingHome] = useState(false);
+  const [showKoTieBreakOverlay, setShowKoTieBreakOverlay] = useState(false);
   const [showMatchAnalysis, setShowMatchAnalysis] = useState(false);
   const [matchAnalysis, setMatchAnalysis] = useState<
     MatchAnalysisDto | SessionMatchAnalysisDto | null
@@ -348,9 +350,10 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
 
   const finalizeStatsIfMulti = useCallback(
     async (includeInPairingStats: boolean) => {
-      if (inviteCode && playerSecret) {
-        await finalizeSessionStats(inviteCode, includeInPairingStats, playerSecret);
+      if (!inviteCode || !playerSecret) {
+        throw new Error("Session missing");
       }
+      return finalizeSessionStats(inviteCode, includeInPairingStats, playerSecret);
     },
     [inviteCode, playerSecret],
   );
@@ -784,15 +787,27 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
           {inviteCode && playerSecret ? (
             <button
               type="button"
-              disabled={leavingHome}
+              disabled={leavingHome || showKoTieBreakOverlay}
               onClick={() => {
                 setLeavingHome(true);
-                void finalizeStatsIfMulti(includeInStats)
-                  .then(() => router.push(APP_HOME_PATH))
-                  .catch((e) =>
-                    setError(e instanceof Error ? e.message : "Statistik-Speicherung fehlgeschlagen"),
-                  )
-                  .finally(() => setLeavingHome(false));
+                void (async () => {
+                  try {
+                    const res = await finalizeStatsIfMulti(includeInStats);
+                    if (res?.session?.koTieBreakPending) {
+                      setShowKoTieBreakOverlay(true);
+                      return;
+                    }
+                    router.push(APP_HOME_PATH);
+                  } catch (e) {
+                    setError(
+                      e instanceof Error
+                        ? e.message
+                        : "Statistik-Speicherung fehlgeschlagen",
+                    );
+                  } finally {
+                    setLeavingHome(false);
+                  }
+                })();
               }}
               className="setup-host-submit flex min-h-10 shrink-0 items-center justify-center text-center disabled:opacity-50"
             >
@@ -805,6 +820,24 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
             >
               Spiel beenden und zur Startseite
             </Link>
+          )}
+          {showKoTieBreakOverlay && inviteCode && playerSecret && (
+            <KoTieBreakOverlay
+              inviteCode={inviteCode}
+              playerSecret={playerSecret}
+              initialRolls={
+                lobby?.koTieBreakPlayerAId === getOrCreatePlayerId()
+                  ? lobby?.koTieBreakPlayerARolls ?? null
+                  : lobby?.koTieBreakPlayerBId === getOrCreatePlayerId()
+                    ? lobby?.koTieBreakPlayerBRolls ?? null
+                    : null
+              }
+              onResolved={async () => {
+                setShowKoTieBreakOverlay(false);
+                await finalizeStatsIfMulti(includeInStats);
+                router.push(APP_HOME_PATH);
+              }}
+            />
           )}
         </div>
       );
@@ -919,6 +952,8 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
             analysisAvailable={analysisAvailable}
             analysisLoading={analysisLoading}
             multiplayer={!!inviteCode && !!playerSecret}
+            inviteCode={inviteCode ?? null}
+            playerSecret={playerSecret}
             onFinalizeStats={
               inviteCode && playerSecret ? finalizeStatsIfMulti : undefined
             }
