@@ -201,6 +201,14 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
             )}
           </div>
           <div className="t-panel-actions">
+            <a
+              href={`/display?code=${encodeURIComponent(code)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="t-btn t-btn--ghost"
+            >
+              Beamer-Ansicht
+            </a>
             <button
               type="button"
               className="t-btn t-btn--ghost"
