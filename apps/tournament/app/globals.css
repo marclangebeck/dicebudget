@@ -677,6 +677,378 @@ a {
   transform: translateX(0.15rem);
 }
 
+/* ── Event Studio (Setup) ─────────────────────────────────────────────── */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.t-shell--studio {
+  gap: 0.65rem;
+  min-height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+.t-studio-head {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.t-studio-head .t-brand {
+  margin: 0;
+  font-size: clamp(1.45rem, 2.6vw, 1.95rem);
+}
+
+.t-studio-head .t-meta {
+  margin: 0 0 0.15rem;
+}
+
+.t-studio-head-action {
+  flex-shrink: 0;
+  min-height: 2.65rem;
+  padding-inline: 1rem;
+  font-size: 0.92rem;
+}
+
+.t-studio-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: clamp(0.75rem, 1.6vw, 1.15rem);
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.t-studio-poster-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  min-height: 0;
+  min-width: 0;
+}
+
+.t-studio-poster {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  border-radius: 1.35rem;
+  overflow: hidden;
+}
+
+.t-studio-poster-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 8%, rgba(45, 212, 191, 0.28), transparent 42%),
+    radial-gradient(circle at 88% 12%, rgba(214, 168, 90, 0.18), transparent 38%),
+    linear-gradient(165deg, rgba(12, 28, 44, 0.95), rgba(7, 16, 28, 0.98));
+  pointer-events: none;
+}
+
+.t-studio-poster-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  height: 100%;
+  min-height: 0;
+  padding: clamp(1rem, 2vw, 1.35rem);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 1.35rem;
+  background: rgba(10, 22, 38, 0.55);
+  backdrop-filter: blur(14px);
+  box-shadow:
+    0 22px 50px -28px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.t-studio-poster-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.t-studio-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.85rem;
+  padding: 0.2rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(45, 212, 191, 0.45);
+  background: rgba(45, 212, 191, 0.14);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(153, 246, 228, 0.95);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.t-studio-badge--cup {
+  border-color: rgba(214, 168, 90, 0.45);
+  background: rgba(214, 168, 90, 0.14);
+  color: rgba(251, 230, 190, 0.95);
+}
+
+.t-studio-poster-meta {
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.t-studio-poster-name-wrap {
+  display: block;
+}
+
+.t-studio-poster-name {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: clamp(1.65rem, 3.6vw, 2.35rem);
+  font-weight: 850;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  outline: none;
+}
+
+.t-studio-poster-name::placeholder {
+  color: rgba(148, 163, 184, 0.55);
+}
+
+.t-studio-poster-name.is-empty {
+  color: rgba(148, 163, 184, 0.72);
+}
+
+.t-studio-poster-preview {
+  margin: -0.35rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.t-studio-chip-block {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.t-studio-chip-label {
+  margin: 0;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.88);
+}
+
+.t-studio-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.t-studio-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.74rem;
+  font-weight: 650;
+  color: rgba(226, 232, 240, 0.95);
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.t-studio-chip--match {
+  border-color: rgba(56, 189, 248, 0.22);
+  background: rgba(56, 189, 248, 0.08);
+}
+
+.t-studio-poster-pro {
+  margin-top: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.t-studio-poster-pro-mark {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(214, 168, 90, 0.35);
+  background: rgba(214, 168, 90, 0.12);
+  font-size: 1.1rem;
+  color: var(--gold);
+}
+
+.t-studio-poster-pro-title {
+  margin: 0 0 0.2rem;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.t-studio-poster-pro-text {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.t-studio-poster-col .t-setup-create-wrap {
+  flex: 0 0 auto;
+}
+
+.t-studio-context {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  border-radius: 1.25rem;
+  border: 1px solid var(--glass-edge);
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  box-shadow:
+    0 18px 44px -24px rgba(0, 0, 0, 0.72),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.t-studio-tabs {
+  flex-shrink: 0;
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.65rem 0.65rem 0;
+  overflow-x: auto;
+}
+
+.t-studio-tab {
+  flex: 1 1 auto;
+  min-width: 4.5rem;
+  min-height: 2.45rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 0.75rem 0.75rem 0 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.t-studio-tab:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.t-studio-tab.is-active {
+  color: var(--ink);
+  border-color: rgba(255, 255, 255, 0.12);
+  border-bottom-color: transparent;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.t-studio-context-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 1rem 1.05rem 1.1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.t-studio-pane {
+  display: grid;
+  gap: 0.65rem;
+  animation: t-studio-pane-in 0.22s ease;
+}
+
+.t-studio-pane--match {
+  gap: 0.55rem;
+}
+
+@keyframes t-studio-pane-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.t-studio-pane-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.t-studio-pane-lead {
+  margin: -0.25rem 0 0.15rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+@media (max-width: 960px) {
+  .t-studio-layout {
+    grid-template-columns: 1fr;
+    overflow: auto;
+  }
+
+  .t-shell--studio {
+    max-height: none;
+    overflow: auto;
+  }
+
+  .t-studio-poster {
+    flex: 0 0 auto;
+    min-height: 18rem;
+  }
+
+  .t-studio-context {
+    min-height: 22rem;
+  }
+}
+
 .t-cockpit-grid .t-card {
   width: 100%;
   max-width: none;

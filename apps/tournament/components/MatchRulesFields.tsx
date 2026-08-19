@@ -18,9 +18,11 @@ import {
 type Props = {
   value: MatchPrefs;
   onChange: (next: MatchPrefs) => void;
+  /** Ohne äußere Karte — für Event Studio Kontext-Panel. */
+  embedded?: boolean;
 };
 
-export function MatchRulesFields({ value, onChange }: Props) {
+export function MatchRulesFields({ value, onChange, embedded = false }: Props) {
   function toggleHouseRule(id: HouseRuleId, checked: boolean) {
     onChange({
       ...value,
@@ -28,11 +30,13 @@ export function MatchRulesFields({ value, onChange }: Props) {
     });
   }
 
-  return (
-    <section className="t-card" aria-label="Partie-Regeln">
-      <p className="t-label" style={{ marginBottom: "0.65rem" }}>
-        Partie
-      </p>
+  const body = (
+    <>
+      {!embedded && (
+        <p className="t-label" style={{ marginBottom: "0.65rem" }}>
+          Partie
+        </p>
+      )}
       <SetupSegmented
         ariaLabel="Spielmodus"
         value={value.useStrategyRules ? "strategy" : "classic"}
@@ -107,6 +111,16 @@ export function MatchRulesFields({ value, onChange }: Props) {
             ))}
         </div>
       ))}
+    </>
+  );
+
+  if (embedded) {
+    return body;
+  }
+
+  return (
+    <section className="t-card" aria-label="Partie-Regeln">
+      {body}
     </section>
   );
 }
