@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
 import { getTournamentByInvite, type TournamentDto } from "@/lib/api";
 import { APP_NAME } from "@/lib/branding";
+import { findMatchInRounds, syncMatchInUrl } from "@/lib/displayMatch";
 import {
   countLiveMatches,
   filterVisibleMatch,
@@ -16,11 +17,13 @@ import {
   tournamentStatusLabel,
 } from "@/lib/displayFormat";
 import { TOURNAMENT_MODE_OPTIONS } from "@/lib/tournamentModes";
+import { TournamentDisplayFocus } from "@/components/TournamentDisplayFocus";
 
 const REFRESH_MS = 20_000;
 
 type Props = {
   inviteCode: string;
+  initialFocusMatchId?: string | null;
 };
 
 function formatClock(date: Date): string {
@@ -30,13 +33,19 @@ function formatClock(date: Date): string {
   });
 }
 
-export function TournamentDisplayBoard({ inviteCode }: Props) {
+export function TournamentDisplayBoard({
+  inviteCode,
+  initialFocusMatchId = null,
+}: Props) {
   const code = inviteCode.trim().toUpperCase();
   const [tournament, setTournament] = useState<TournamentDto | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [clock, setClock] = useState(() => new Date());
+  const [focusMatchId, setFocusMatchId] = useState<string | null>(
+    initialFocusMatchId,
+  );
 
   const refresh = useCallback(async () => {
     if (!code) {
@@ -85,6 +94,10 @@ export function TournamentDisplayBoard({ inviteCode }: Props) {
     };
   }, [refresh]);
 
+  useEffect(() => {
+    setFocusMatchId(initialFocusMatchId);
+  }, [initialFocusMatchId]);
+
   const modeLabel =
     TOURNAMENT_MODE_OPTIONS.find((option) => option.key === tournament?.modeKey)
       ?.label ?? tournament?.modeKey;
@@ -96,12 +109,34 @@ export function TournamentDisplayBoard({ inviteCode }: Props) {
   );
   const liveMatches = useMemo(() => countLiveMatches(rounds), [rounds]);
 
+  const focused = useMemo(() => {
+    if (!focusMatchId) return null;
+    return findMatchInRounds(rounds, focusMatchId);
+  }, [focusMatchId, rounds]);
+
+  useEffect(() => {
+    if (focusMatchId && !focused && tournament) {
+      setFocusMatchId(null);
+      syncMatchInUrl(null);
+    }
+  }, [focusMatchId, focused, tournament]);
+
   const registeredPlayers =
     tournament?.entries?.filter((entry) => entry.playerId != null) ?? [];
 
   const isOpen = tournament?.status === "OPEN";
   const isRunning = tournament?.status === "RUNNING";
   const isFinished = tournament?.status === "FINISHED";
+
+  function focusMatch(matchId: string) {
+    setFocusMatchId(matchId);
+    syncMatchInUrl(matchId);
+  }
+
+  function clearFocus() {
+    setFocusMatchId(null);
+    syncMatchInUrl(null);
+  }
 
   return (
     <main className="t-shell t-shell--display">
@@ -117,6 +152,11 @@ export function TournamentDisplayBoard({ inviteCode }: Props) {
         </div>
 
         <div className="t-display-head-meta">
+          {focused ? (
+            <span className="t-display-badge t-display-badge--accent">
+              Paarung im Fokus
+            </span>
+          ) : null}
           <span
             className={`t-display-badge${
               isRunning
@@ -128,9 +168,10 @@ export function TournamentDisplayBoard({ inviteCode }: Props) {
           >
             {tournamentStatusLabel(tournament?.status)}
           </span>
-          {liveMatches > 0 ? (
+          {!focused && liveMatches > 0 ? (
             <span className="t-display-badge t-display-badge--accent">
-              {liveMatches} {liveMatches === 1 ? "Match bereit" : "Matches bereit"}
+              {liveMatches}{" "}
+              {liveMatches === 1 ? "Match bereit" : "Matches bereit"}
             </span>
           ) : null}
           <span className="t-display-clock tabular-nums">{formatClock(clock)}</span>
@@ -185,6 +226,13 @@ export function TournamentDisplayBoard({ inviteCode }: Props) {
             )}
           </div>
         </section>
+      ) : focused ? (
+        <TournamentDisplayFocus
+          match={focused.match}
+          roundTitle={focused.roundTitle}
+          roundPhase={focused.roundPhase}
+          onBack={clearFocus}
+        />
       ) : (
         <div className="t-display-grid">
           <section className="t-display-panel" aria-label="Tabellen">
@@ -248,7 +296,9 @@ export function TournamentDisplayBoard({ inviteCode }: Props) {
           </section>
 
           <section className="t-display-panel" aria-label="Spielplan">
-            <h2 className="t-display-panel-title">Spielplan</h2>
+            <h2 className="t-display-panel-title">
+              Spielplan · Tippen für Live-Fokus
+            </h2>
             <div className="t-display-rounds">
               {rounds.length > 0 ? (
                 rounds.map((round) => {
@@ -274,43 +324,50 @@ export function TournamentDisplayBoard({ inviteCode }: Props) {
                             match.status === "READY" ||
                             Boolean(match.sessionInviteCode);
                           const isDone = match.status === "FINISHED";
+                          const isFocused = focusMatchId === match.id;
 
                           return (
-                            <li
-                              key={match.id}
-                              className={`t-display-match${
-                                isLive
-                                  ? " t-display-match--live"
-                                  : isDone
-                                    ? " t-display-match--done"
-                                    : ""
-                              }`}
-                            >
-                              <div className="t-display-match-players">
-                                <span className="t-display-match-name">
-                                  {match.homeEntry.displayName}
-                                </span>
-                                <span className="t-display-match-score tabular-nums">
-                                  {score ?? "vs"}
-                                </span>
-                                <span className="t-display-match-name t-display-match-name--away">
-                                  {match.awayEntry.displayName}
-                                </span>
-                              </div>
-
-                              <div className="t-display-match-meta">
-                                <span className="t-display-match-status">
-                                  {matchStatusLabel(
-                                    match.status,
-                                    Boolean(match.sessionId),
-                                  )}
-                                </span>
-                                {match.sessionInviteCode ? (
-                                  <span className="t-display-match-code tabular-nums">
-                                    Code {match.sessionInviteCode}
+                            <li key={match.id}>
+                              <button
+                                type="button"
+                                className={`t-display-match t-display-match--pick${
+                                  isLive
+                                    ? " t-display-match--live"
+                                    : isDone
+                                      ? " t-display-match--done"
+                                      : ""
+                                }${isFocused ? " t-display-match--focused" : ""}`}
+                                onClick={() => focusMatch(match.id)}
+                              >
+                                <div className="t-display-match-players">
+                                  <span className="t-display-match-name">
+                                    {match.homeEntry.displayName}
                                   </span>
-                                ) : null}
-                              </div>
+                                  <span className="t-display-match-score tabular-nums">
+                                    {score ?? "vs"}
+                                  </span>
+                                  <span className="t-display-match-name t-display-match-name--away">
+                                    {match.awayEntry.displayName}
+                                  </span>
+                                </div>
+
+                                <div className="t-display-match-meta">
+                                  <span className="t-display-match-status">
+                                    {matchStatusLabel(
+                                      match.status,
+                                      Boolean(match.sessionId),
+                                    )}
+                                  </span>
+                                  {match.sessionInviteCode ? (
+                                    <span className="t-display-match-code tabular-nums">
+                                      Code {match.sessionInviteCode}
+                                    </span>
+                                  ) : null}
+                                  <span className="t-display-match-focus-hint">
+                                    Fokus →
+                                  </span>
+                                </div>
+                              </button>
                             </li>
                           );
                         })}
@@ -331,9 +388,11 @@ export function TournamentDisplayBoard({ inviteCode }: Props) {
       <footer className="t-display-foot">
         <span className="t-display-foot-code tabular-nums">{code}</span>
         <span>
-          {lastUpdated
-            ? `Aktualisiert ${formatClock(lastUpdated)} · alle ${REFRESH_MS / 1000}s`
-            : "Lade …"}
+          {focused
+            ? "Fokus-Modus · Live alle 4s"
+            : lastUpdated
+              ? `Aktualisiert ${formatClock(lastUpdated)} · alle ${REFRESH_MS / 1000}s`
+              : "Lade …"}
         </span>
       </footer>
     </main>

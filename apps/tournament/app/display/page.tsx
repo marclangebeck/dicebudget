@@ -9,6 +9,7 @@ function DisplayPageInner() {
   const router = useRouter();
   const params = useSearchParams();
   const fromQuery = (params.get("code") ?? "").trim().toUpperCase();
+  const focusMatchId = (params.get("match") ?? "").trim() || null;
   const saved = loadHostSession();
   const inviteCode = fromQuery || saved?.inviteCode || "";
 
@@ -23,7 +24,12 @@ function DisplayPageInner() {
     );
   }
 
-  return <TournamentDisplayBoard inviteCode={inviteCode} />;
+  return (
+    <TournamentDisplayBoard
+      inviteCode={inviteCode}
+      initialFocusMatchId={focusMatchId}
+    />
+  );
 }
 
 export default function DisplayPage() {

@@ -1,3 +1,5 @@
+import type { SessionRankingDto } from "./sessionTypes";
+
 const PROD_API = "https://dicebudget.bottle-trade.de/api";
 
 function isNativeShell(): boolean {
@@ -175,5 +177,13 @@ export function createTournamentMatchSession(
       method: "POST",
       hostToken,
     },
+  );
+}
+
+export function getSessionRanking(
+  sessionInviteCode: string,
+): Promise<{ session: SessionRankingDto }> {
+  return apiFetch(
+    `/sessions/invite/${encodeURIComponent(sessionInviteCode)}/ranking`,
   );
 }
