@@ -14,8 +14,87 @@ import {
   tournamentModeLabel,
   tournamentStatusLabel,
   type TournamentDto,
+  type TournamentGroupStandingDto,
+  type TournamentMatchDto,
+  type TournamentRoundDto,
 } from "@/lib/tournamentTypes";
 import { TournamentJoinScan } from "@/components/JoinByQrScan";
+
+type PlayerMatchView = {
+  round: TournamentRoundDto;
+  match: TournamentMatchDto;
+};
+
+function phaseLabel(phase: string): string {
+  if (phase === "LEAGUE") return "Liga";
+  if (phase === "GROUP") return "Gruppenphase";
+  if (phase === "KO") return "K.O.";
+  if (phase === "KO_THIRD") return "Platz 3";
+  return phase;
+}
+
+function roundPhaseOrder(phase: string): number {
+  if (phase === "LEAGUE") return 0;
+  if (phase === "GROUP") return 1;
+  if (phase === "KO") return 2;
+  if (phase === "KO_THIRD") return 3;
+  return 4;
+}
+
+function isPlayerMatch(match: TournamentMatchDto, entryId: string): boolean {
+  return match.homeEntry.id === entryId || match.awayEntry.id === entryId;
+}
+
+function flattenPlayerMatches(
+  rounds: TournamentRoundDto[],
+  entryId: string,
+): PlayerMatchView[] {
+  return rounds
+    .slice()
+    .sort(
+      (a, b) =>
+        roundPhaseOrder(a.phase) - roundPhaseOrder(b.phase) ||
+        a.roundIndex - b.roundIndex ||
+        a.legIndex - b.legIndex,
+    )
+    .flatMap((round) =>
+      round.matches
+        .filter((match) => isPlayerMatch(match, entryId))
+        .map((match) => ({ round, match })),
+    );
+}
+
+function formatMatchLine(match: TournamentMatchDto): string {
+  return `${match.homeEntry.displayName} vs ${match.awayEntry.displayName}`;
+}
+
+function formatResult(match: TournamentMatchDto): string | null {
+  if (match.homeScore == null || match.awayScore == null) return null;
+  return `${match.homeScore} : ${match.awayScore}`;
+}
+
+function findRelevantStanding(
+  tournament: TournamentDto,
+  entryId: string,
+): {
+  title: string;
+  standings: TournamentGroupStandingDto[];
+  mine: TournamentGroupStandingDto | null;
+} | null {
+  const groups = tournament.groups ?? [];
+  for (const group of groups) {
+    const mine = group.standings.find((standing) => standing.entry.id === entryId) ?? null;
+    if (mine) {
+      return {
+        title:
+          tournament.modeKey === "league" && groups.length === 1 ? "Tabelle" : group.name,
+        standings: group.standings,
+        mine,
+      };
+    }
+  }
+  return null;
+}
 
 function TournamentJoinInner() {
   const searchParams = useSearchParams();
@@ -127,6 +206,25 @@ function TournamentJoinInner() {
     tournament?.status === "OPEN" &&
     !alreadyJoined &&
     (tournament.entryCount ?? 0) < tournament.maxEntries;
+  const myEntry =
+    tournament?.entries?.find(
+      (entry) =>
+        entry.id === joinedEntryId ||
+        (entry.playerId != null && entry.playerId === playerId),
+    ) ?? null;
+  const myMatches = tournament && myEntry ? flattenPlayerMatches(tournament.rounds ?? [], myEntry.id) : [];
+  const liveMatch =
+    myMatches.find(
+      ({ match }) => match.status === "READY" || Boolean(match.sessionInviteCode),
+    ) ?? null;
+  const upcomingMatches = myMatches.filter(
+    ({ match }) => match.status === "PENDING",
+  );
+  const completedMatches = myMatches.filter(
+    ({ match }) => match.status === "FINISHED",
+  );
+  const standingView =
+    tournament && myEntry ? findRelevantStanding(tournament, myEntry.id) : null;
 
   return (
     <div className="join-lobby-shell">
@@ -175,10 +273,9 @@ function TournamentJoinInner() {
             <p className="join-lobby-note">
               Du bist angemeldet als{" "}
               <strong>
-                {tournament.entries?.find((e) => e.id === joinedEntryId)
-                  ?.displayName ?? displayName ?? "Spieler"}
+                {myEntry?.displayName ?? displayName ?? "Spieler"}
               </strong>
-              . Warte auf den Host — Partien folgen später.
+              . Dein Event-Status erscheint hier, sobald der Spielplan steht.
             </p>
           )}
 
@@ -251,10 +348,174 @@ function TournamentJoinInner() {
           )}
 
           {tournament.status === "RUNNING" && alreadyJoined && (
-            <p className="join-lobby-note">
-              Das Ereignis läuft. Tische und Partien kommen mit dem nächsten
-              Schritt — bitte die Liste gelegentlich aktualisieren.
-            </p>
+            <>
+              <section className="join-action-card">
+                <p className="text-secondary text-sm font-semibold">
+                  Dein Match-Fokus
+                </p>
+                {liveMatch ? (
+                  <>
+                    <p className="join-lobby-note" style={{ margin: 0 }}>
+                      <strong>{liveMatch.round.title}</strong> ·{" "}
+                      {phaseLabel(liveMatch.round.phase)}
+                    </p>
+                    <p className="join-player-match-title">
+                      {formatMatchLine(liveMatch.match)}
+                    </p>
+                    {liveMatch.match.sessionInviteCode ? (
+                      <>
+                        <p className="join-player-match-code">
+                          Session-Code {liveMatch.match.sessionInviteCode}
+                        </p>
+                        <Link
+                          href={`/multi/join?code=${encodeURIComponent(
+                            liveMatch.match.sessionInviteCode,
+                          )}`}
+                          className="btn-primary py-3 text-center"
+                        >
+                          Jetzt zur Partie
+                        </Link>
+                      </>
+                    ) : (
+                      <p className="join-lobby-note" style={{ margin: 0 }}>
+                        Deine Paarung steht fest. Warte auf den Session-Code vom Host.
+                      </p>
+                    )}
+                  </>
+                ) : upcomingMatches.length > 0 ? (
+                  <>
+                    <p className="join-lobby-note" style={{ margin: 0 }}>
+                      Deine nächste Partie ist geplant.
+                    </p>
+                    <p className="join-player-match-title">
+                      {upcomingMatches[0] ? formatMatchLine(upcomingMatches[0].match) : "—"}
+                    </p>
+                    <p className="join-player-match-meta">
+                      {upcomingMatches[0]?.round.title} ·{" "}
+                      {phaseLabel(upcomingMatches[0]?.round.phase ?? "")}
+                    </p>
+                  </>
+                ) : completedMatches.length > 0 ? (
+                  <>
+                    <p className="join-lobby-note" style={{ margin: 0 }}>
+                      Deine Partien sind aktuell beendet.
+                    </p>
+                    <p className="join-player-match-title">
+                      Letztes Ergebnis:{" "}
+                      {formatMatchLine(completedMatches[completedMatches.length - 1]!.match)}
+                    </p>
+                    <p className="join-player-match-meta">
+                      {formatResult(completedMatches[completedMatches.length - 1]!.match) ??
+                        "gewertet"}
+                    </p>
+                  </>
+                ) : (
+                  <p className="join-lobby-note" style={{ margin: 0 }}>
+                    Das Ereignis läuft. Dein erstes Match wird hier angezeigt, sobald es
+                    für dich feststeht.
+                  </p>
+                )}
+              </section>
+
+              {standingView && (
+                <section className="join-action-card">
+                  <div className="join-player-section-head">
+                    <p className="text-secondary text-sm font-semibold" style={{ margin: 0 }}>
+                      {standingView.title}
+                    </p>
+                    <p className="join-player-rank">
+                      Rang {standingView.mine?.rank || "—"}
+                    </p>
+                  </div>
+                  <ul className="space-y-2">
+                    {standingView.standings.map((standing) => {
+                      const isYou = standing.entry.id === myEntry?.id;
+                      return (
+                        <li
+                          key={standing.id}
+                          className={`join-player-row${isYou ? " join-player-row--active" : ""}`}
+                        >
+                          <span>
+                            {standing.rank > 0 ? `${standing.rank}. ` : ""}
+                            {standing.entry.displayName}
+                            {isYou ? (
+                              <span className="ml-2 text-xs text-slate-300">(du)</span>
+                            ) : null}
+                          </span>
+                          <span className="join-player-state tabular-nums">
+                            {standing.points} P · Diff {standing.totalScoreDiff}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </section>
+              )}
+
+              {myMatches.length > 0 && (
+                <section className="join-action-card">
+                  <p className="text-secondary text-sm font-semibold">
+                    Deine Paarungen
+                  </p>
+                  <ul className="space-y-2">
+                    {myMatches.map(({ round, match }) => (
+                      <li key={match.id} className="join-player-row">
+                        <span>
+                          {round.title}: {formatMatchLine(match)}
+                        </span>
+                        <span className="join-player-state tabular-nums">
+                          {match.status === "FINISHED"
+                            ? formatResult(match) ?? "Beendet"
+                            : match.sessionInviteCode
+                              ? `Code ${match.sessionInviteCode}`
+                              : tournamentStatusLabel(match.status)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+            </>
+          )}
+
+          {tournament.status === "FINISHED" && alreadyJoined && (
+            <>
+              <p className="join-lobby-note">
+                Das Ereignis ist beendet. Hier siehst du deine Abschlusstabelle und
+                alle gewerteten Paarungen.
+              </p>
+              {standingView && (
+                <section className="join-action-card">
+                  <div className="join-player-section-head">
+                    <p className="text-secondary text-sm font-semibold" style={{ margin: 0 }}>
+                      {standingView.title}
+                    </p>
+                    <p className="join-player-rank">
+                      Rang {standingView.mine?.rank || "—"}
+                    </p>
+                  </div>
+                  <ul className="space-y-2">
+                    {standingView.standings.map((standing) => {
+                      const isYou = standing.entry.id === myEntry?.id;
+                      return (
+                        <li
+                          key={standing.id}
+                          className={`join-player-row${isYou ? " join-player-row--active" : ""}`}
+                        >
+                          <span>
+                            {standing.rank > 0 ? `${standing.rank}. ` : ""}
+                            {standing.entry.displayName}
+                          </span>
+                          <span className="join-player-state tabular-nums">
+                            {standing.points} P · Diff {standing.totalScoreDiff}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </section>
+              )}
+            </>
           )}
         </>
       )}

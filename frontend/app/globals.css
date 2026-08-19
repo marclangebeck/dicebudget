@@ -9725,6 +9725,13 @@ html.zoomable-route.legal-route .legal-page-scroll {
   font-size: 0.875rem;
 }
 
+.join-player-row--active {
+  border-color: rgba(214, 168, 90, 0.4);
+  background:
+    radial-gradient(circle at 88% 18%, rgba(214, 168, 90, 0.16), transparent 30%),
+    rgba(15, 23, 42, 0.78);
+}
+
 .join-player-row .btn-chip {
   border-color: rgba(255, 255, 255, 0.16);
   background: rgba(255, 255, 255, 0.1);
@@ -9733,6 +9740,46 @@ html.zoomable-route.legal-route .legal-page-scroll {
 
 .join-player-state {
   color: rgba(255, 255, 255, 0.68);
+}
+
+.join-player-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.join-player-rank {
+  margin: 0;
+  color: #fde68a;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.join-player-match-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.join-player-match-meta {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.join-player-match-code {
+  margin: 0;
+  color: #fde68a;
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .join-action-card {
