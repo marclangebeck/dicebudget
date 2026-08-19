@@ -199,7 +199,9 @@ function TournamentJoinInner() {
                 Noch niemand — du kannst der Erste sein.
               </li>
             ) : (
-              (tournament.entries ?? []).map((entry) => {
+              (tournament.entries ?? [])
+                .filter((entry) => entry.playerId != null)
+                .map((entry) => {
                 const isYou =
                   entry.id === joinedEntryId ||
                   (entry.playerId != null && entry.playerId === playerId);

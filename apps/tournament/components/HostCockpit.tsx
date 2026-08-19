@@ -22,6 +22,7 @@ function phaseLabel(phase?: string): string {
   if (phase === "LEAGUE") return "Liga";
   if (phase === "GROUP") return "Gruppenphase";
   if (phase === "KO") return "K.O.";
+  if (phase === "KO_THIRD") return "Platz 3";
   return phase ?? "Phase";
 }
 
@@ -162,9 +163,12 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
             {maxEntries != null ? ` / ${maxEntries}` : ""}
           </p>
           <div className="t-panel-body">
-            {tournament?.entries && tournament.entries.length > 0 ? (
+                {tournament?.entries &&
+                tournament.entries.filter((e) => e.playerId != null).length > 0 ? (
               <ul className="t-list">
-                {tournament.entries.map((entry) => (
+                    {tournament.entries
+                      .filter((e) => e.playerId != null)
+                      .map((entry) => (
                   <li key={entry.id}>
                     <span>{entry.displayName}</span>
                     <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
@@ -338,7 +342,11 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
                                   <button
                                     type="button"
                                     className="t-btn t-btn--ghost"
-                                    disabled={busy}
+                                    disabled={
+                                      busy ||
+                                      match.homeEntry.playerId == null ||
+                                      match.awayEntry.playerId == null
+                                    }
                                     onClick={() => void onCreateMatchSession(match.id)}
                                   >
                                     {busy && activeMatchId === match.id

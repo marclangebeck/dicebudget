@@ -22,6 +22,7 @@ import { ForbiddenRunError } from "./runPlayerAuth.js";
 import { prisma } from "../db/prisma.js";
 import { awardSessionLeaguePoints, getLeagueStandings } from "./leaguePoints.js";
 import { invalidatePairingStatsCache } from "./pairingStats.js";
+import { normalizeTournamentConfig } from "./tournamentConfig.js";
 
 export const SESSION_STATUS = {
   OPEN: "OPEN",
@@ -699,6 +700,316 @@ export async function finalizeSessionStats(
   return getSessionRanking(session.inviteCode);
 }
 
+function mapHouseRulesToSessionFlags(config: {
+  houseRules?: {
+    houseRulesYatzyStreak?: boolean;
+    houseRulesYatzyStreakCredit?: boolean;
+    houseRulesYatzyTriple?: boolean;
+    houseRulesYatzyTripleCredit?: boolean;
+    houseRulesUpperRace?: boolean;
+    houseRulesColumnPoolBonuses?: boolean;
+  };
+}) {
+  // KO / Tournament-Session verwenden nur die vom Session-System unterstützten Flags.
+  return {
+    ruleYatzyStreak2: config.houseRules?.houseRulesYatzyStreak ?? false,
+    ruleYatzyTriple: config.houseRules?.houseRulesYatzyTriple ?? false,
+    ruleYatzyStreak2Credit: config.houseRules?.houseRulesYatzyStreakCredit ?? false,
+    ruleYatzyTripleCredit: config.houseRules?.houseRulesYatzyTripleCredit ?? false,
+    ruleUpperRace: config.houseRules?.houseRulesUpperRace ?? false,
+    ruleColumnPoolBonuses: config.houseRules?.houseRulesColumnPoolBonuses ?? false,
+  };
+}
+
+async function createKoSessionForTournamentMatch(
+  tournamentId: string,
+  matchId: string,
+) {
+  const tournament = await prisma.tournament.findUnique({
+    where: { id: tournamentId },
+    select: { modeKey: true, config: true },
+  });
+  if (!tournament) return;
+
+  const raw = tournament.config ? JSON.parse(tournament.config) : {};
+  const config = normalizeTournamentConfig(tournament.modeKey, raw);
+  const matchConfig = config as any;
+
+  const sessionResult = await createGameSession(
+    matchConfig.gameCount,
+    2,
+    matchConfig.useStrategyRules,
+    undefined,
+    matchConfig.showOpponentPool,
+    matchConfig.poolEndgameEnabled,
+    mapHouseRulesToSessionFlags(matchConfig),
+    true,
+  );
+
+  await prisma.tournamentMatch.update({
+    where: { id: matchId },
+    data: { sessionId: sessionResult.id, status: "READY" },
+  });
+}
+
+async function updateThirdPlaceForTournament(tournamentId: string) {
+  const koRounds = await prisma.tournamentRound.findMany({
+    where: { tournamentId, phase: "KO" },
+    select: { id: true, roundIndex: true },
+  });
+  if (koRounds.length < 2) return;
+
+  const numElimRounds = Math.max(...koRounds.map((r) => r.roundIndex));
+  const semifinalRoundIndex = numElimRounds - 1;
+  const thirdRoundIndex = numElimRounds + 1;
+
+  const semifinalRound = koRounds.find((r) => r.roundIndex === semifinalRoundIndex);
+  if (!semifinalRound) return;
+
+  const thirdRound = await prisma.tournamentRound.findFirst({
+    where: { tournamentId, phase: "KO_THIRD", roundIndex: thirdRoundIndex },
+    select: { id: true },
+  });
+  if (!thirdRound) return;
+
+  const semis = await prisma.tournamentMatch.findMany({
+    where: {
+      roundId: semifinalRound.id,
+      matchIndex: { in: [1, 2] },
+    },
+    orderBy: { matchIndex: "asc" },
+    include: { homeEntry: true, awayEntry: true },
+  });
+  if (semis.length !== 2) return;
+  if (semis.some((m) => m.status !== "FINISHED" || !m.winnerEntryId)) return;
+
+  const [s1, s2] = semis;
+  const loser1 =
+    s1.winnerEntryId === s1.homeEntryId ? s1.awayEntryId : s1.homeEntryId;
+  const loser2 =
+    s2.winnerEntryId === s2.homeEntryId ? s2.awayEntryId : s2.homeEntryId;
+
+  const thirdMatch = await prisma.tournamentMatch.findFirst({
+    where: { roundId: thirdRound.id, matchIndex: 1 },
+    include: { homeEntry: true, awayEntry: true },
+  });
+  if (!thirdMatch) return;
+  if (thirdMatch.status === "FINISHED") return;
+
+  await prisma.tournamentMatch.update({
+    where: { id: thirdMatch.id },
+    data: { homeEntryId: loser1, awayEntryId: loser2 },
+  });
+
+  const updatedThird = await prisma.tournamentMatch.findUnique({
+    where: { id: thirdMatch.id },
+    include: { homeEntry: true, awayEntry: true },
+  });
+  if (!updatedThird) return;
+
+  const homeIsBye = updatedThird.homeEntry.playerId == null;
+  const awayIsBye = updatedThird.awayEntry.playerId == null;
+
+  if (homeIsBye || awayIsBye) {
+    const winnerEntryId =
+      homeIsBye && awayIsBye
+        ? updatedThird.homeEntryId
+        : homeIsBye
+          ? updatedThird.awayEntryId
+          : updatedThird.homeEntryId;
+
+    const homePoints = winnerEntryId === updatedThird.homeEntryId ? 1 : 0;
+    const awayPoints = winnerEntryId === updatedThird.awayEntryId ? 1 : 0;
+
+    await prisma.tournamentMatch.update({
+      where: { id: updatedThird.id },
+      data: {
+        status: "FINISHED",
+        winnerEntryId,
+        homeScore: null,
+        awayScore: null,
+        homePointsAwarded: homePoints,
+        awayPointsAwarded: awayPoints,
+        tieBreakNeeded: false,
+      },
+    });
+
+    return;
+  }
+
+  if (!updatedThird.sessionId) {
+    await createKoSessionForTournamentMatch(tournamentId, updatedThird.id);
+  }
+}
+
+async function maybeFinishTournamentAfterKo(tournamentId: string) {
+  const tournament = await prisma.tournament.findUnique({
+    where: { id: tournamentId },
+    select: { status: true },
+  });
+  if (!tournament) return;
+  if (tournament.status === "FINISHED") return;
+
+  const koRounds = await prisma.tournamentRound.findMany({
+    where: { tournamentId, phase: "KO" },
+    select: { roundIndex: true },
+  });
+  if (!koRounds.length) return;
+
+  const numElimRounds = Math.max(...koRounds.map((r) => r.roundIndex));
+  const finalRound = await prisma.tournamentRound.findFirst({
+    where: { tournamentId, phase: "KO", roundIndex: numElimRounds },
+    select: { id: true },
+  });
+  if (!finalRound) return;
+
+  const finalMatch = await prisma.tournamentMatch.findFirst({
+    where: { roundId: finalRound.id, matchIndex: 1 },
+    select: { status: true },
+  });
+  if (!finalMatch || finalMatch.status !== "FINISHED") return;
+
+  // Bei nur 2 Teilnehmern gibt es kein echtes 3.-Platz-Spiel.
+  if (numElimRounds < 2) {
+    await prisma.tournament.update({
+      where: { id: tournamentId },
+      data: { status: "FINISHED" },
+    });
+    return;
+  }
+
+  const thirdRound = await prisma.tournamentRound.findFirst({
+    where: { tournamentId, phase: "KO_THIRD", roundIndex: numElimRounds + 1 },
+    select: { id: true },
+  });
+
+  if (!thirdRound) {
+    await prisma.tournament.update({
+      where: { id: tournamentId },
+      data: { status: "FINISHED" },
+    });
+    return;
+  }
+
+  const thirdMatch = await prisma.tournamentMatch.findFirst({
+    where: { roundId: thirdRound.id, matchIndex: 1 },
+    select: { status: true },
+  });
+
+  if (thirdMatch?.status === "FINISHED") {
+    await prisma.tournament.update({
+      where: { id: tournamentId },
+      data: { status: "FINISHED" },
+    });
+  }
+}
+
+async function propagateKoWinnerToNext(tournamentId: string, params: {
+  currentRoundIndex: number;
+  matchIndex: number;
+  winnerEntryId: string;
+}) {
+  const koRounds = await prisma.tournamentRound.findMany({
+    where: { tournamentId, phase: "KO" },
+    select: { id: true, roundIndex: true },
+  });
+  if (!koRounds.length) return;
+
+  const numElimRounds = Math.max(...koRounds.map((r) => r.roundIndex));
+  if (params.currentRoundIndex >= numElimRounds) return;
+
+  let currentRoundIndex = params.currentRoundIndex;
+  let currentMatchIndex = params.matchIndex;
+  let winnerEntryId = params.winnerEntryId;
+
+  while (currentRoundIndex < numElimRounds) {
+    const currentRound = koRounds.find((r) => r.roundIndex === currentRoundIndex);
+    if (!currentRound) return;
+
+    const nextRoundIndex = currentRoundIndex + 1;
+    const nextRound = koRounds.find((r) => r.roundIndex === nextRoundIndex);
+    if (!nextRound) return;
+
+    const nextMatchIndex = Math.ceil(currentMatchIndex / 2);
+    const nextMatch = await prisma.tournamentMatch.findFirst({
+      where: { roundId: nextRound.id, matchIndex: nextMatchIndex },
+      include: { homeEntry: true, awayEntry: true },
+    });
+    if (!nextMatch) return;
+
+    // Der „andere“ Feeder liefert den zweiten Teilnehmer in der nächsten Runde.
+    const siblingMatchIndex =
+      currentMatchIndex % 2 === 1 ? currentMatchIndex + 1 : currentMatchIndex - 1;
+    const siblingMatch = await prisma.tournamentMatch.findFirst({
+      where: { roundId: currentRound.id, matchIndex: siblingMatchIndex },
+      select: { status: true, winnerEntryId: true },
+    });
+
+    if (!siblingMatch || siblingMatch.status !== "FINISHED" || !siblingMatch.winnerEntryId) {
+      // Der nächste Match ist noch nicht entscheidbar.
+      // (Die zweite Teilnehmer-Quelle ist noch offen.)
+      return;
+    }
+
+    const siblingWinnerEntryId = siblingMatch.winnerEntryId;
+
+    // Teilnehmer in der nächsten Runde setzen (beide Slots).
+    await prisma.tournamentMatch.update({
+      where: { id: nextMatch.id },
+      data:
+        currentMatchIndex % 2 === 1
+          ? { homeEntryId: winnerEntryId, awayEntryId: siblingWinnerEntryId }
+          : { awayEntryId: winnerEntryId, homeEntryId: siblingWinnerEntryId },
+    });
+
+    const updatedNext = await prisma.tournamentMatch.findUnique({
+      where: { id: nextMatch.id },
+      include: { homeEntry: true, awayEntry: true },
+    });
+    if (!updatedNext) return;
+
+    const homeIsBye = updatedNext.homeEntry.playerId == null;
+    const awayIsBye = updatedNext.awayEntry.playerId == null;
+
+    // Wenn mindestens ein Slot ein „Bye“-Platzhalter ist, kann der Match direkt entschieden werden.
+    if (homeIsBye || awayIsBye) {
+      const winnerEntryId2 =
+        homeIsBye && awayIsBye
+          ? updatedNext.homeEntryId
+          : homeIsBye
+            ? updatedNext.awayEntryId
+            : updatedNext.homeEntryId;
+
+      const homePoints = winnerEntryId2 === updatedNext.homeEntryId ? 1 : 0;
+      const awayPoints = winnerEntryId2 === updatedNext.awayEntryId ? 1 : 0;
+
+      await prisma.tournamentMatch.update({
+        where: { id: updatedNext.id },
+        data: {
+          status: "FINISHED",
+          winnerEntryId: winnerEntryId2,
+          homeScore: null,
+          awayScore: null,
+          homePointsAwarded: homePoints,
+          awayPointsAwarded: awayPoints,
+          tieBreakNeeded: false,
+        },
+      });
+
+      currentRoundIndex = nextRoundIndex;
+      currentMatchIndex = updatedNext.matchIndex;
+      winnerEntryId = winnerEntryId2;
+      continue;
+    }
+
+    // Beide Teilnehmer real → wenn noch keine Session existiert, erstellen wir sie.
+    if (!updatedNext.sessionId) {
+      await createKoSessionForTournamentMatch(tournamentId, updatedNext.id);
+    }
+    break;
+  }
+}
+
 async function maybeFinalizeTournamentMatchFromSession(input: {
   sessionId: string;
   phaseHint?: string;
@@ -707,7 +1018,11 @@ async function maybeFinalizeTournamentMatchFromSession(input: {
 }): Promise<void> {
   const tournamentMatch = await prisma.tournamentMatch.findUnique({
     where: { sessionId: input.sessionId },
-    include: { homeEntry: true, awayEntry: true },
+    include: {
+      homeEntry: true,
+      awayEntry: true,
+      round: { select: { roundIndex: true, phase: true } },
+    },
   });
   if (!tournamentMatch) return;
   if (tournamentMatch.status === "FINISHED") return;
@@ -757,6 +1072,17 @@ async function maybeFinalizeTournamentMatchFromSession(input: {
         tieBreakNeeded: false,
       },
     });
+
+    if (typeof tournamentMatch.round?.roundIndex === "number") {
+      await propagateKoWinnerToNext(tournamentMatch.tournamentId, {
+        currentRoundIndex: tournamentMatch.round.roundIndex,
+        matchIndex: tournamentMatch.matchIndex,
+        winnerEntryId: winnerEntryId ?? homeEntryId,
+      });
+      await updateThirdPlaceForTournament(tournamentMatch.tournamentId);
+      await maybeFinishTournamentAfterKo(tournamentMatch.tournamentId);
+    }
+
     return;
   }
 
@@ -876,6 +1202,15 @@ async function maybeFinalizeTournamentMatchFromSession(input: {
       });
     }
   });
+
+  // Sobald die Gruppenphase vollständig abgeschlossen ist, erzeugen wir automatisch
+  // die K.O.-Struktur (Turnier-Modus).
+  if (phase === "GROUP") {
+    const { maybeGenerateKoBracketForTournament } = await import(
+      "./tournamentService.js"
+    );
+    await maybeGenerateKoBracketForTournament(tournamentMatch.tournamentId);
+  }
 }
 
 /**
