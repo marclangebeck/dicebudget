@@ -3,7 +3,7 @@
 **Workspace:** `/home/bottleadmin/projects/kniffel`  
 **Repository:** `marclangebeck/dicebudget`  
 **Branch:** `milestone-22-prep`  
-**HEAD:** siehe `git log -1` (Tournament Host-Cockpit)  
+**HEAD:** siehe `git log -1` (Tournament T1–T6)  
 **Sprache:** Deutsch  
 **Stand Doku:** 2026-08-19
 
@@ -29,13 +29,33 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 | Bereich | Status |
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
-| Branch | `milestone-22-prep` @ Tip (Tournament Host-Cockpit) |
+| Branch | `milestone-22-prep` @ Tip (Tournament T1–T6) |
 | Frontend-Tests | **121** grün |
-| Roadmap | **M42/M43** + **Multi-QR** umgesetzt; **M30** danach; Turnier = Planung `docs/tournament/` |
+| Roadmap | **M42/M43** + **Multi-QR** umgesetzt; **M30** danach; **Tournament T1–T6** code-fertig |
 | Entwickler-Vorschau | **InApp-Käufe (Features)** = Labs-PIN (`NEXT_PUBLIC_LABS_PIN`) — getrennt von Admin |
 | iOS/TestFlight | Version `2.0`; Deployment Target **15.0**; frischer Archive-Build 2026-08-15 (QR-Scan + Host-QR) |
 | Tournament | T1–T6 umgesetzt (Join, Auslosung, Wellen, Beamer, Live-Refresh); **T9/T10** als Nächstes; **GO** geplant |
-| Backend Prod | Migrationen inkl. Tournaments + **player_display_names** — Deploy bei Backend-Änderungen |
+| Backend Prod | Migrationen inkl. Tournaments/Matches; nach API-Änderungen: `deploy-backend-prod.sh` |
+
+## Events (Liga / Turnier) — Stand 2026-08-19
+
+**Drei Apps:** DiceBudget Pro (`frontend/`) = Mitspielen · Tournament (`apps/tournament/`) = Host · GO = geplant.
+
+| Was | Wo |
+|-----|-----|
+| Host-Cockpit, Auslosung, Wellen | `apps/tournament` — lokal Port **3022** oder iOS |
+| Beamer | `http://localhost:3022/display?code=EVENTCODE` (Host-Gerät) |
+| Teilnehmer (Web) | `https://dicebudget.bottle-trade.de/tournament/join?code=…` |
+| Teilnehmer (App) | gleiche Route im **App-Bundle** → Mac `frontend` → `build:ios` nötig |
+| API | `/api/tournaments/…` |
+
+**Ablauf:** QR → Join → Auslosung → Start → Session pro Match → Multi spielen → Tabelle/K.O.
+
+**Live-Refresh (sparsam):** Teilnehmer/Host 45 s, Beamer 20 s (4 s im Fokus). Details: `docs/tournament/README.md`.
+
+**Deploy:** Backend `sudo bash infra/scripts/deploy-backend-prod.sh`; Frontend `cd frontend && npm run build`. Host-App nicht auf Nginx — am Event-Laptop/iPad.
+
+**Als Nächstes:** T9 TestFlight Host, T10 Feld-Pilot. Vollständig: `docs/tournament/roadmap.md`.
 
 ## Multi-Beitritt (QR only) — Stand 2026-08-15
 
@@ -62,6 +82,13 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 - Nach Pull mit neuen npm-Deps: `npm install` vor `build:ios`.
 
 ## Letzte Produktänderungen
+
+### Tournament T1–T6 — 2026-08-19
+
+- **Backend:** Liga/Turnier, Auslosung, Spielplan-Wellen, Match→Session, K.O.-Bracket, Auto-Wellenfreigabe.
+- **Host** (`apps/tournament`): Cockpit, Auslosungsvorschau, Live-Refresh 45 s, Beamer `/display`.
+- **Teilnehmer** (`/tournament/join`): Auto-Refresh, Session-Alert, Tabelle, Link zur Partie.
+- Doku: `docs/tournament/README.md`, `api-sketch.md`.
 
 ### Tournament Host-Cockpit — 2026-08-18
 
@@ -139,7 +166,7 @@ Regeln: Nach Auftrag automatisch commit + push (AGENT_RULES §9). Kein sudo. Kei
 
 Hart: DiceBudget-Kern unantastbar. Drei Apps: DiceBudget (Pro), Tournament (Host), GO (nur Event-Teilnahme, geplant). Events nur additiv. Quelle: docs/tournament/products.md.
 
-Stand 2026-08-17: Spielername nach Sanduhr (Server an playerId, Overlay ohne Stats-Merge). Host-Setup (Event-Name → Liga/Turnier → Größe → Anlegen → Lobby/QR). Pro-App-Button „Turnier/Liga beitreten“ noch Demnächst. GO noch nicht im Code. M42/M43, Multi-QR erledigt. M30 App Store bleibt DiceBudget-Track.
+Stand 2026-08-19: **Tournament T1–T6** code-fertig (siehe HANDOVER § Events). Spielername nach Sanduhr. Host-Setup + Auslosung + Wellen. Pro-App: Turnier/Liga beitreten aktiv. GO noch nicht im Code. M42/M43, Multi-QR erledigt. M30 App Store = DiceBudget-Track.
 
 Antworten auf Deutsch. Kleine Inkremente, vor größeren Features Nutzer-GO einholen.
 ```

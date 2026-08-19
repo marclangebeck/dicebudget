@@ -1,7 +1,7 @@
 # DiceBudget Tournament — Roadmap
 
 **Produktname:** DiceBudget Tournament  
-**Stand:** 2026-08-17  
+**Stand:** 2026-08-19  
 **Produktprinzipien:** [`README.md`](./README.md) · Produktfamilie: [`products.md`](./products.md)
 
 **DiceBudget** (Pro) bleibt in der Kernfunktion unantastbar. **Tournament** (Host) und später **DiceBudget GO** (nur Event-Teilnahme) stehen **daneben**. Hosten nur Tournament; Mitspielen GO oder Pro.
@@ -35,10 +35,10 @@ T7/T8 können nach dem Kern parallel oder nacheinander kommen; weitere Modi dana
 
 ## Abnahme je Milestone (Minimum)
 
-- [ ] DiceBudget ohne Turnier: Smoke Solo + Multi-QR + Stats (wo relevant)
-- [ ] Bestehende Unit-Tests grün
-- [ ] CHANGELOG-Eintrag
-- [ ] Keine neuen Dauer-Polling-Schleifen
+- [x] DiceBudget ohne Turnier: Smoke Solo + Multi-QR + Stats (wo relevant)
+- [x] Bestehende Unit-Tests grün (Backend Tournament-Tests)
+- [x] CHANGELOG-Eintrag ([Unreleased])
+- [x] Kein aggressives Polling (45 s / 20 s mit Nutzer-GO dokumentiert)
 
 ## Bewusst später
 

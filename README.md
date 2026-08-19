@@ -32,6 +32,7 @@ kniffel/
 |----------|------|-----|
 | Backend  | 3020 | http://127.0.0.1:3020/health |
 | Frontend | 3021 | http://127.0.0.1:3021 |
+| **Tournament Host** | **3022** | http://127.0.0.1:3022 (Beamer: `/display?code=…`) |
 
 Lokal zeigt das Frontend auf `http://127.0.0.1:3020` (ohne `/api`-Prefix). Produktion: `NEXT_PUBLIC_API_URL=https://dicebudget.bottle-trade.de/api` (siehe `frontend/.env.production`).
 
@@ -39,8 +40,12 @@ Lokal zeigt das Frontend auf `http://127.0.0.1:3020` (ohne `/api`-Prefix). Produ
 |-----|--------|
 | `/` | Landingpage **dice.budget** |
 | `/app` | Spiel-Start (Arena: Multi vs. Solo) |
+| `/tournament/join` | **Event-Teilnehmer** (Liga/Turnier nach QR) |
+| `/multi/join` | Privates Multi (Session-Code) |
 | `/datenschutz` | Datenschutzerklärung (App Store) |
 | `/impressum` | Impressum |
+
+**Events:** Host + Beamer = `apps/tournament` (nicht auf Prod-Nginx). Siehe [`docs/tournament/README.md`](./docs/tournament/README.md).
 
 ## API (Kurzüberblick)
 

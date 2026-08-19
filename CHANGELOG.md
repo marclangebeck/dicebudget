@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Added
+- **Doku Tournament T1–T6:** `docs/tournament/README.md`, `api-sketch.md`, `HANDOVER.md`, Host-README — Rollen, Bildschirme, Deploy, iOS-Hinweise
 - **Tournament T4–T6:** Auslosungsvorschau (Neu mischen, Spieler-Dropdowns), schrittweise Rundenfreigabe (`POST /rounds`), Auto-Freigabe nach abgeschlossener Welle; Host/Teilnehmer/Beamer mit sanftem Live-Refresh; Session-Code-Hinweis für Teilnehmer
 - **QR vom Zettel:** im Multi oben neben „Zur Lobby“ erneut anzeigen, ohne den Raum zu verlassen
 - **Tournament-Setup-Einstellungen:** Liga (Runden, Partie) und Turnier (Gruppe, Quali, K.O.-Hinweis) im Host-Wizard; `config` am Tournament; Kurzcheck + Lobby zeigen Format

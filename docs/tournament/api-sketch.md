@@ -1,76 +1,98 @@
-# Tournament API-Skizze (Entwurf)
+# Tournament API — Vertrag & Ist-Stand
 
-**Stand:** 2026-08-15  
-**Status:** T1 API umgesetzt (`/tournaments`); Host-UI in `apps/tournament`; T3 Join in DiceBudget Pro (`/tournament/join`). Skizze bleibt Referenz für T4+.
+**Stand:** 2026-08-19  
+**Status:** T1–T6 **umgesetzt**. Diese Datei dokumentiert die **laufende API**; ältere Skizzen-Ressourcen sind durch die Ist-Routen ersetzt.
 
-Ziel: Vertrag zwischen **DiceBudget Tournament** (Host) und **Teilnehmer-Apps** (**DiceBudget** Pro und später **DiceBudget GO**).  
-Bestehende Multi-Session-API (`/sessions`, Invite-QR) bleibt für Partien; das Event **orchestriert** darüber. Produktrollen: [`products.md`](./products.md).
+Ziel: Vertrag zwischen **DiceBudget Tournament** (Host) und **Teilnehmer-Apps** (DiceBudget Pro, später GO). Partien laufen über **`/sessions`** (Multi); das Event **orchestriert** Matches und Tabellen.
 
 ## Begriffe
 
 | Begriff | Bedeutung |
 |---------|-----------|
-| Tournament | Container: Spieler, Status, gewählter Modus + Parameter |
-| Entry | Angemeldeter Spieler (Display-Name, Gerät/Player-Id) |
-| Round | Runde im Turnier (nicht identisch mit einer DiceBudget-Session) |
-| Pairing / Table | Geplante Begegnung an einem Tisch |
-| Match | Konkrete DiceBudget-Multi-Session, verknüpft mit einem Pairing |
-| Standing / Bracket | Modus-Ausgabe (Tabelle oder KO-Baum) |
+| Tournament | Container: Spieler, Status, Modus + Config |
+| Entry | Angemeldeter Spieler (`displayName`, `playerId`) |
+| Round | Spielplan-Runde (DB: `tournament_rounds`) |
+| Match | Paarung + optional verknüpfte `GameSession` |
+| Group / Standing | Gruppe + Tabelle (Liga oder Turnier-Gruppenphase) |
+| Release-Welle | Schrittweise Freigabe des Spielplans (`_schedulePlan` in Config) |
 
-## Grobe Ressourcen (Namen vorläufig)
+## Implementierte Routen
 
-```
-POST   /tournaments                     # Host: anlegen (Modus-Key + Config)
-GET    /tournaments/:id                 # Stand + Meta
-POST   /tournaments/:id/join            # Spieler: Join per Code/Token aus QR
-GET    /tournaments/:id/entries
-POST   /tournaments/:id/rounds          # nächste Runde / Auslosung anstoßen
-GET    /tournaments/:id/pairings
-POST   /tournaments/:id/pairings/:pid/start-match   # → erzeugt/verknüpft Session-Invite
-POST   /tournaments/:id/pairings/:pid/result        # Ergebnis übernehmen (oder aus Session lesen)
-GET    /tournaments/:id/standings       # oder /bracket — modusabhängig
-GET    /tournaments/:id/display         # Beamer-freundliches Snapshot
-```
+Basis: **`/tournaments`** (Prod: `https://dicebudget.bottle-trade.de/api/tournaments`)
 
-QR-Payload (Idee): URL auf DiceBudget-Domain, z. B.  
-`https://dicebudget.bottle-trade.de/tournament/join?code=…`  
-(analog zu Multi-Join; **neue Route**, bestehendes `/multi/join` unangetastet).
+| Methode | Pfad | Auth | Beschreibung |
+|---------|------|------|--------------|
+| POST | `/tournaments` | — | Event anlegen → `{ tournament, hostToken }` |
+| GET | `/tournaments/invite/:inviteCode` | optional `X-Host-Token` | Snapshot; Host sieht `drawPreview` (OPEN), alle sehen `scheduleMeta` |
+| POST | `/tournaments/invite/:code/join` | — | Teilnehmer beitreten |
+| POST | `/tournaments/:id/start` | `X-Host-Token` | Start: Gruppen + Welle 1 |
+| POST | `/tournaments/:id/draw` | `X-Host-Token` | Body `{ action: "prepare" \| "shuffle" }` |
+| PATCH | `/tournaments/:id/draw` | `X-Host-Token` | `swapSides`, `homeEntryId`/`awayEntryId`, oder `assignPlayer` |
+| POST | `/tournaments/:id/rounds` | `X-Host-Token` | Nächste Spielplan-Welle freigeben |
+| POST | `/tournaments/:id/matches/:matchId/session` | `X-Host-Token` | Multi-Session erzeugen → `{ sessionInviteCode, joinPath }` |
 
-## Modus als Strategie
+**Ergebnisübernahme:** kein separates `POST …/result` — Session-Finalize schreibt in `tournamentMatch` (LEAGUE/GROUP/KO).
 
-```
-modeKey: "league" | "turnier" | …   // erweiterbar (UI: Liga / Turnier)
-config:  {
-  // Partie
-  useStrategyRules, gameCount, showOpponentPool, poolEndgameEnabled
-  // Liga: rounds
-  // Turnier: groupSize, qualifyPerGroup (1|2), knockout: "single"
+**Rate-Limits:** nur auf POST (Anlegen/Join), nicht auf GET-Lesen.
+
+## QR & Join-URLs
+
+| Ziel | URL |
+|------|-----|
+| Event beitreten (Teilnehmer) | `https://dicebudget.bottle-trade.de/tournament/join?code=EVENTCODE` |
+| Partie spielen (Multi) | `https://dicebudget.bottle-trade.de/multi/join?code=SESSIONCODE` |
+
+Host-QR im Cockpit zeigt die **Event-Join-URL**.
+
+## Config & Spielplan
+
+`POST /tournaments` Body (Auszug):
+
+```json
+{
+  "name": "Freitag in der Kneipe",
+  "modeKey": "league",
+  "maxEntries": 16,
+  "config": {
+    "rounds": 3,
+    "gameCount": 1,
+    "useStrategyRules": true,
+    "houseRules": { }
+  }
 }
 ```
 
-Kern-API liefert Pairings und Standings; Modus-Plugins berechnen Auslosung und Ranking.
+Turnier (`modeKey: "turnier"`): `groupSize`, `qualifyPerGroup` (1|2), `knockout: "single"`.
 
-## Live-Updates (Prinzip)
+Intern: vollständiger Spielplan in `config._schedulePlan` (Gruppen, Runden, Paarungen, `releasedWave`). Nicht über `normalizeTournamentConfig` — nur Persistenz.
 
-- Kein aggressives Polling (AGENT_RULES).  
-- Skizze: Host/Display und Spieler holen Snapshot bei Ereignis (Runde gestartet, Ergebnis gemeldet) oder sehr sparsames Intervall nur mit ausdrücklichem GO.  
-- Optional später: Server-Sent Events — nur nach Freigabe.
+## Modus-Verhalten
+
+| Modus | Phasen | Abschluss |
+|-------|--------|-----------|
+| **league** | `LEAGUE`, Round-Robin × `config.rounds` | `FINISHED` wenn alle Liga-Matches fertig |
+| **turnier** | `GROUP` → auto **KO** (+ optional Platz 3) | KO-Finale → `FINISHED` |
+
+KO-Bracket wird erzeugt, wenn **alle Gruppen-Matches** `FINISHED` sind.
+
+## Live-Updates
+
+- GET `/tournaments/invite/:code` — kein Rate-Limit; Client-Refresh sparsam (45 s / 20 s).
+- `scheduleMeta`: `{ releasedWave, totalWaves, hasMoreRounds }` für Beamer/Host.
+- Auto-Freigabe nächste Welle, wenn alle Matches der aktuellen Welle `FINISHED`.
 
 ## Abgrenzung DiceBudget
 
-| Bleibt wie bisher | Neu / optional |
-|-------------------|----------------|
-| `/multi`, Solo, Stats, Labs in **DiceBudget** | `/tournament/…` Join nur nach QR-Scan |
-| Multi-Invite-QR | Event-QR (Liga/Turnier) |
-| Session-Finalize / Pairing-Stats | Event-Standing separat |
-| — | später: Join als Abrechnungs-Hook; **GO** nur Event-Join |
+| Unverändert | Event (additiv) |
+|-------------|-----------------|
+| `/runs`, `/sessions`, Solo, Multi-QR, Stats | `/tournaments/*` |
+| Session-Finalize, Pairing-Stats | Event-Standing + Match-Verknüpfung |
+| PlayBoard ohne Polling | `/tournament/join` mit sanftem Refresh |
 
-## Offene Fragen (später)
+## Bewusst offen (T9+)
 
-- Auth Organizer (Gerät-PIN vs. Account)  
-- Ob Ergebnis nur aus Session gelesen oder Host manuell korrigieren darf  
-- Mehrere Partien parallel vs. ein Tisch nach dem anderen  
-- Abrechnung am Join (Host zahlt je Eintrag)  
-- Gleiche Join-API für DiceBudget und GO
-
-Nächste Schärfung: ein Mini-Szenario „8 Spieler, 4 Tische, 3 Liga-Runden“ durch diese Ressourcen spielen.
+- Organizer-Accounts (PIN vs. Login)
+- Host manuelles Ergebnis-Korrigieren
+- SSE / Push statt Refresh
+- Abrechnung pro Join
+- DiceBudget GO als dritte App
