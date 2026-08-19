@@ -8,11 +8,19 @@ describe("tournaments API", () => {
   const app = createApp();
 
   before(async () => {
+    await prisma.tournamentMatch.deleteMany();
+    await prisma.tournamentRound.deleteMany();
+    await prisma.tournamentGroupStanding.deleteMany();
+    await prisma.tournamentGroup.deleteMany();
     await prisma.tournamentEntry.deleteMany();
     await prisma.tournament.deleteMany();
   });
 
   after(async () => {
+    await prisma.tournamentMatch.deleteMany();
+    await prisma.tournamentRound.deleteMany();
+    await prisma.tournamentGroupStanding.deleteMany();
+    await prisma.tournamentGroup.deleteMany();
     await prisma.tournamentEntry.deleteMany();
     await prisma.tournament.deleteMany();
   });
@@ -59,6 +67,11 @@ describe("tournaments API", () => {
       .expect(200);
 
     assert.equal(started.body.tournament.status, "RUNNING");
+    assert.equal(started.body.tournament.groups.length, 1);
+    assert.equal(started.body.tournament.groups[0].name, "Liga");
+    assert.equal(started.body.tournament.groups[0].standings.length, 2);
+    assert.equal(started.body.tournament.rounds.length, 3);
+    assert.equal(started.body.tournament.rounds[0].matches.length, 1);
 
     await request(app)
       .post(`/tournaments/invite/${code}/join`)
@@ -93,6 +106,51 @@ describe("tournaments API", () => {
     assert.equal(
       created.body.tournament.config.houseRules.houseRulesYatzyStreakCredit,
       true,
+    );
+  });
+
+  it("lost Gruppen und erzeugt Gruppenrunden beim Turnierstart", async () => {
+    const created = await request(app)
+      .post("/tournaments")
+      .send({
+        name: "Sommer-Cup",
+        modeKey: "turnier",
+        maxEntries: 8,
+        config: { groupSize: 4, qualifyPerGroup: 2 },
+      })
+      .expect(201);
+
+    const code = created.body.tournament.inviteCode as string;
+    const hostToken = created.body.hostToken as string;
+    const tournamentId = created.body.tournament.id as string;
+
+    for (const name of ["Anna", "Ben", "Carla", "Dora", "Emil", "Fritz", "Gabi", "Hugo"]) {
+      await request(app)
+        .post(`/tournaments/invite/${code}/join`)
+        .send({ displayName: name })
+        .expect(201);
+    }
+
+    const started = await request(app)
+      .post(`/tournaments/${tournamentId}/start`)
+      .set("X-Host-Token", hostToken)
+      .expect(200);
+
+    assert.equal(started.body.tournament.status, "RUNNING");
+    assert.equal(started.body.tournament.groups.length, 2);
+    assert.equal(started.body.tournament.rounds.length, 6);
+    assert.equal(
+      started.body.tournament.groups.reduce(
+        (sum: number, group: { standings: unknown[] }) => sum + group.standings.length,
+        0,
+      ),
+      8,
+    );
+    assert.ok(
+      started.body.tournament.rounds.every(
+        (round: { matches: unknown[]; phase: string }) =>
+          round.phase === "GROUP" && round.matches.length === 2,
+      ),
     );
   });
 

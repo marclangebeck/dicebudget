@@ -17,6 +17,13 @@ function statusLabel(status?: string): string {
   return status ?? "…";
 }
 
+function phaseLabel(phase?: string): string {
+  if (phase === "LEAGUE") return "Liga";
+  if (phase === "GROUP") return "Gruppenphase";
+  if (phase === "KO") return "K.O.";
+  return phase ?? "Phase";
+}
+
 type Props = {
   inviteCode: string;
   onNewEvent: () => void;
@@ -36,6 +43,8 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
   const isOpen = tournament?.status === "OPEN";
   const entryCount = tournament?.entryCount ?? 0;
   const maxEntries = tournament?.maxEntries;
+  const groups = tournament?.groups ?? [];
+  const rounds = tournament?.rounds ?? [];
 
   const refresh = useCallback(async () => {
     if (!code) {
@@ -158,7 +167,7 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
             <p className="t-meta">
               {isOpen
                 ? "Wenn das Feld steht: Ereignis starten. Danach keine neuen Anmeldungen."
-                : "Spielplan und Auslosung kommen als nächster Schritt in diesem Screen."}
+                : "Spielplan ist jetzt Datenbasis für Gruppen, Tabelle und Paarungen."}
             </p>
             {error && (
               <p className="t-error" role="alert">
@@ -197,6 +206,100 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
             </button>
           </div>
         </section>
+
+        {!isOpen && (
+          <section className="t-card t-panel" aria-label="Gruppen und Tabelle">
+            <p className="t-label">Gruppen und Tabelle</p>
+            <div className="t-panel-body">
+              {groups.length > 0 ? (
+                <div style={{ display: "grid", gap: "0.85rem" }}>
+                  {groups.map((group) => (
+                    <div
+                      key={group.id}
+                      style={{
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        borderRadius: "14px",
+                        padding: "0.8rem",
+                      }}
+                    >
+                      <p className="t-status" style={{ marginBottom: "0.5rem" }}>
+                        {group.name}
+                      </p>
+                      {group.standings.length > 0 ? (
+                        <ul className="t-list">
+                          {group.standings.map((standing) => (
+                            <li key={standing.id}>
+                              <span>
+                                {standing.rank > 0 ? `${standing.rank}. ` : ""}
+                                {standing.entry.displayName}
+                              </span>
+                              <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
+                                {standing.points} P · Diff {standing.totalScoreDiff}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="t-meta" style={{ margin: 0 }}>
+                          Tabelle startet nach dem ersten gewerteten Match.
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="t-meta" style={{ margin: 0 }}>
+                  Bei Liga wird eine Gesamttabelle, bei Turnier Gruppenübersichten angezeigt.
+                </p>
+              )}
+            </div>
+          </section>
+        )}
+
+        {!isOpen && (
+          <section className="t-card t-panel" aria-label="Spielpaarungen">
+            <p className="t-label">Spielpaarungen</p>
+            <div className="t-panel-body">
+              {rounds.length > 0 ? (
+                <div style={{ display: "grid", gap: "0.85rem" }}>
+                  {rounds.map((round) => (
+                    <div
+                      key={round.id}
+                      style={{
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        borderRadius: "14px",
+                        padding: "0.8rem",
+                      }}
+                    >
+                      <p className="t-status" style={{ marginBottom: "0.35rem" }}>
+                        {round.title}
+                      </p>
+                      <p className="t-meta" style={{ marginBottom: "0.5rem" }}>
+                        {phaseLabel(round.phase)}
+                      </p>
+                      <ul className="t-list">
+                        {round.matches.map((match) => (
+                          <li key={match.id}>
+                            <span>
+                              {match.homeEntry.displayName} vs {match.awayEntry.displayName}
+                            </span>
+                            <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
+                              {match.status}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="t-meta" style={{ margin: 0 }}>
+                  Nach dem Start werden hier Spieltage, Gruppenrunden und später K.O.-Paarungen angezeigt.
+                </p>
+              )}
+            </div>
+          </section>
+        )}
       </div>
     </main>
   );

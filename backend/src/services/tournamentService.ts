@@ -17,6 +17,7 @@ const INVITE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const MIN_ENTRIES = 2;
 const MAX_ENTRIES_CAP = 64;
 const DEFAULT_MAX_ENTRIES = 32;
+const GROUP_LABELS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 export class TournamentNotFoundError extends Error {
   constructor() {
@@ -113,6 +114,60 @@ function configFromRow(modeKey: string, raw: string | null): TournamentConfig {
   }
 }
 
+function shuffleArray<T>(input: readonly T[]): T[] {
+  const arr = [...input];
+  for (let i = arr.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = arr[i]!;
+    arr[i] = arr[j]!;
+    arr[j] = tmp;
+  }
+  return arr;
+}
+
+function buildRoundRobin(entryIds: readonly string[]) {
+  if (entryIds.length < 2) return [] as { roundIndex: number; pairs: [string, string][] }[];
+  const ids = [...entryIds];
+  const isOdd = ids.length % 2 === 1;
+  if (isOdd) ids.push("__BYE__");
+  const rounds: { roundIndex: number; pairs: [string, string][] }[] = [];
+  const slots = [...ids];
+  const totalRounds = slots.length - 1;
+  const half = slots.length / 2;
+
+  for (let roundIndex = 0; roundIndex < totalRounds; roundIndex += 1) {
+    const pairs: [string, string][] = [];
+    for (let i = 0; i < half; i += 1) {
+      const a = slots[i]!;
+      const b = slots[slots.length - 1 - i]!;
+      if (a !== "__BYE__" && b !== "__BYE__") {
+        pairs.push(roundIndex % 2 === 0 ? [a, b] : [b, a]);
+      }
+    }
+    rounds.push({ roundIndex: roundIndex + 1, pairs });
+
+    const fixed = slots[0]!;
+    const rotating = slots.slice(1);
+    rotating.unshift(rotating.pop()!);
+    slots.splice(0, slots.length, fixed, ...rotating);
+  }
+  return rounds;
+}
+
+function distributeIntoGroups<T>(entries: readonly T[], groupSize: number): T[][] {
+  const groupCount = Math.max(1, Math.ceil(entries.length / groupSize));
+  const groups = Array.from({ length: groupCount }, () => [] as T[]);
+  entries.forEach((entry, index) => {
+    groups[index % groupCount]!.push(entry);
+  });
+  return groups;
+}
+
+function groupNameForIndex(index: number): string {
+  const label = GROUP_LABELS[index] ?? String(index + 1);
+  return `Gruppe ${label}`;
+}
+
 function toTournamentDto(
   row: {
     id: string;
@@ -130,10 +185,66 @@ function toTournamentDto(
       orderIndex: number;
       joinedAt: Date;
     }[];
+    groups?: {
+      id: string;
+      name: string;
+      sortOrder: number;
+      standings?: {
+        id: string;
+        rank: number;
+        matchesPlayed: number;
+        wins: number;
+        draws: number;
+        losses: number;
+        points: number;
+        totalScoreDiff: number;
+        totalScoreFor: number;
+        totalScoreAgainst: number;
+        entry: {
+          id: string;
+          displayName: string;
+          playerId: string | null;
+        };
+      }[];
+    }[];
+    rounds?: {
+      id: string;
+      groupId: string | null;
+      phase: string;
+      roundIndex: number;
+      legIndex: number;
+      title: string;
+      matches?: {
+        id: string;
+        phase: string;
+        matchIndex: number;
+        status: string;
+        homeScore: number | null;
+        awayScore: number | null;
+        homePointsAwarded: number | null;
+        awayPointsAwarded: number | null;
+        tieBreakNeeded: boolean;
+        winnerEntryId: string | null;
+        groupId: string | null;
+        sessionId: string | null;
+        homeEntry: {
+          id: string;
+          displayName: string;
+          playerId: string | null;
+        };
+        awayEntry: {
+          id: string;
+          displayName: string;
+          playerId: string | null;
+        };
+      }[];
+    }[];
   },
   options?: { includeEntries?: boolean },
 ) {
   const entries = row.entries ?? [];
+  const groups = row.groups ?? [];
+  const rounds = row.rounds ?? [];
   return {
     id: row.id,
     inviteCode: row.inviteCode,
@@ -152,6 +263,48 @@ function toTournamentDto(
             playerId: e.playerId,
             orderIndex: e.orderIndex,
             joinedAt: e.joinedAt.toISOString(),
+          })),
+          groups: groups.map((group) => ({
+            id: group.id,
+            name: group.name,
+            sortOrder: group.sortOrder,
+            standings: (group.standings ?? []).map((standing) => ({
+              id: standing.id,
+              rank: standing.rank,
+              matchesPlayed: standing.matchesPlayed,
+              wins: standing.wins,
+              draws: standing.draws,
+              losses: standing.losses,
+              points: standing.points,
+              totalScoreDiff: standing.totalScoreDiff,
+              totalScoreFor: standing.totalScoreFor,
+              totalScoreAgainst: standing.totalScoreAgainst,
+              entry: standing.entry,
+            })),
+          })),
+          rounds: rounds.map((round) => ({
+            id: round.id,
+            groupId: round.groupId,
+            phase: round.phase,
+            roundIndex: round.roundIndex,
+            legIndex: round.legIndex,
+            title: round.title,
+            matches: (round.matches ?? []).map((match) => ({
+              id: match.id,
+              phase: match.phase,
+              matchIndex: match.matchIndex,
+              status: match.status,
+              homeScore: match.homeScore,
+              awayScore: match.awayScore,
+              homePointsAwarded: match.homePointsAwarded,
+              awayPointsAwarded: match.awayPointsAwarded,
+              tieBreakNeeded: match.tieBreakNeeded,
+              winnerEntryId: match.winnerEntryId,
+              groupId: match.groupId,
+              sessionId: match.sessionId,
+              homeEntry: match.homeEntry,
+              awayEntry: match.awayEntry,
+            })),
           })),
         }
       : {}),
@@ -208,7 +361,32 @@ export async function getTournamentByInviteCode(
 
   const tournament = await prisma.tournament.findUnique({
     where: { inviteCode: code },
-    include: { entries: { orderBy: { orderIndex: "asc" } } },
+    include: {
+      entries: { orderBy: { orderIndex: "asc" } },
+      groups: {
+        orderBy: { sortOrder: "asc" },
+        include: {
+          standings: {
+            orderBy: [{ rank: "asc" }, { points: "desc" }, { totalScoreDiff: "desc" }],
+            include: {
+              entry: { select: { id: true, displayName: true, playerId: true } },
+            },
+          },
+        },
+      },
+      rounds: {
+        orderBy: [{ phase: "asc" }, { legIndex: "asc" }, { roundIndex: "asc" }],
+        include: {
+          matches: {
+            orderBy: { matchIndex: "asc" },
+            include: {
+              homeEntry: { select: { id: true, displayName: true, playerId: true } },
+              awayEntry: { select: { id: true, displayName: true, playerId: true } },
+            },
+          },
+        },
+      },
+    },
   });
   if (!tournament) throw new TournamentNotFoundError();
 
@@ -280,6 +458,146 @@ export async function joinTournament(
   };
 }
 
+async function createLeagueStructure(
+  tx: Prisma.TransactionClient,
+  tournament: {
+    id: string;
+    modeKey: string;
+    config: string | null;
+    entries: { id: string }[];
+  },
+) {
+  const config = configFromRow(tournament.modeKey, tournament.config);
+  if (!("rounds" in config)) {
+    throw new TournamentConflictError("Liga-Konfiguration fehlt");
+  }
+
+  const shuffledEntries = shuffleArray(tournament.entries);
+  const leagueGroup = await tx.tournamentGroup.create({
+    data: {
+      tournamentId: tournament.id,
+      name: "Liga",
+      sortOrder: 0,
+    },
+  });
+
+  await tx.tournamentGroupStanding.createMany({
+    data: shuffledEntries.map((entry) => ({
+      tournamentId: tournament.id,
+      groupId: leagueGroup.id,
+      entryId: entry.id,
+    })),
+  });
+
+  const baseSchedule = buildRoundRobin(shuffledEntries.map((entry) => entry.id));
+  const roundsToCreate: { id: string; roundIndex: number; legIndex: number }[] = [];
+  for (let legIndex = 1; legIndex <= config.rounds; legIndex += 1) {
+    for (const round of baseSchedule) {
+      const createdRound = await tx.tournamentRound.create({
+        data: {
+          tournamentId: tournament.id,
+          groupId: leagueGroup.id,
+          phase: "LEAGUE",
+          roundIndex: round.roundIndex,
+          legIndex,
+          title:
+            config.rounds > 1
+              ? `Spieltag ${round.roundIndex} · Runde ${legIndex}`
+              : `Spieltag ${round.roundIndex}`,
+        },
+      });
+      roundsToCreate.push({
+        id: createdRound.id,
+        roundIndex: round.roundIndex,
+        legIndex,
+      });
+    }
+  }
+
+  for (const round of baseSchedule) {
+    for (let legIndex = 1; legIndex <= config.rounds; legIndex += 1) {
+      const createdRound = roundsToCreate.find(
+        (item) => item.roundIndex === round.roundIndex && item.legIndex === legIndex,
+      );
+      if (!createdRound) continue;
+      await tx.tournamentMatch.createMany({
+        data: round.pairs.map(([homeEntryId, awayEntryId], pairIndex) => ({
+          tournamentId: tournament.id,
+          groupId: leagueGroup.id,
+          roundId: createdRound.id,
+          phase: "LEAGUE",
+          matchIndex: pairIndex + 1,
+          homeEntryId,
+          awayEntryId,
+        })),
+      });
+    }
+  }
+}
+
+async function createTurnierStructure(
+  tx: Prisma.TransactionClient,
+  tournament: {
+    id: string;
+    modeKey: string;
+    config: string | null;
+    entries: { id: string }[];
+  },
+) {
+  const config = configFromRow(tournament.modeKey, tournament.config);
+  if (!("groupSize" in config)) {
+    throw new TournamentConflictError("Turnier-Konfiguration fehlt");
+  }
+
+  const shuffledEntries = shuffleArray(tournament.entries);
+  const groupedEntries = distributeIntoGroups(shuffledEntries, config.groupSize);
+
+  for (let groupIndex = 0; groupIndex < groupedEntries.length; groupIndex += 1) {
+    const groupEntries = groupedEntries[groupIndex]!;
+    const group = await tx.tournamentGroup.create({
+      data: {
+        tournamentId: tournament.id,
+        name: groupNameForIndex(groupIndex),
+        sortOrder: groupIndex,
+      },
+    });
+
+    await tx.tournamentGroupStanding.createMany({
+      data: groupEntries.map((entry) => ({
+        tournamentId: tournament.id,
+        groupId: group.id,
+        entryId: entry.id,
+      })),
+    });
+
+    const schedule = buildRoundRobin(groupEntries.map((entry) => entry.id));
+    for (const round of schedule) {
+      const createdRound = await tx.tournamentRound.create({
+        data: {
+          tournamentId: tournament.id,
+          groupId: group.id,
+          phase: "GROUP",
+          roundIndex: round.roundIndex,
+          legIndex: 1,
+          title: `${group.name} · Runde ${round.roundIndex}`,
+        },
+      });
+
+      await tx.tournamentMatch.createMany({
+        data: round.pairs.map(([homeEntryId, awayEntryId], pairIndex) => ({
+          tournamentId: tournament.id,
+          groupId: group.id,
+          roundId: createdRound.id,
+          phase: "GROUP",
+          matchIndex: pairIndex + 1,
+          homeEntryId,
+          awayEntryId,
+        })),
+      });
+    }
+  }
+}
+
 export async function startTournament(tournamentId: string, hostToken: string) {
   if (!hostToken) throw new TournamentForbiddenError();
 
@@ -298,10 +616,50 @@ export async function startTournament(tournamentId: string, hostToken: string) {
     );
   }
 
-  const updated = await prisma.tournament.update({
-    where: { id: tournamentId },
-    data: { status: TOURNAMENT_STATUS.RUNNING },
-    include: { entries: { orderBy: { orderIndex: "asc" } } },
+  const updated = await prisma.$transaction(async (tx) => {
+    const existingRounds = await tx.tournamentRound.count({
+      where: { tournamentId: tournament.id },
+    });
+    if (existingRounds > 0) {
+      throw new TournamentConflictError("Turnier-Struktur existiert bereits");
+    }
+
+    if (tournament.modeKey === "turnier") {
+      await createTurnierStructure(tx, tournament);
+    } else {
+      await createLeagueStructure(tx, tournament);
+    }
+
+    return tx.tournament.update({
+      where: { id: tournamentId },
+      data: { status: TOURNAMENT_STATUS.RUNNING },
+      include: {
+        entries: { orderBy: { orderIndex: "asc" } },
+        groups: {
+          orderBy: { sortOrder: "asc" },
+          include: {
+            standings: {
+              orderBy: [{ rank: "asc" }, { points: "desc" }, { totalScoreDiff: "desc" }],
+              include: {
+                entry: { select: { id: true, displayName: true, playerId: true } },
+              },
+            },
+          },
+        },
+        rounds: {
+          orderBy: [{ phase: "asc" }, { legIndex: "asc" }, { roundIndex: "asc" }],
+          include: {
+            matches: {
+              orderBy: { matchIndex: "asc" },
+              include: {
+                homeEntry: { select: { id: true, displayName: true, playerId: true } },
+                awayEntry: { select: { id: true, displayName: true, playerId: true } },
+              },
+            },
+          },
+        },
+      },
+    });
   });
 
   return {

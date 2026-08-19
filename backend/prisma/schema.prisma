@@ -108,6 +108,7 @@ model GameSession {
   includeInPairingStats Boolean @default(true) @map("include_in_pairing_stats")
   createdAt         DateTime @default(now()) @map("created_at")
   players           Player[]
+  tournamentMatch   TournamentMatch?
 
   @@index([pointsAwarded])
   @@map("game_sessions")
@@ -207,6 +208,10 @@ model Tournament {
   config      String?
   createdAt   DateTime           @default(now()) @map("created_at")
   entries     TournamentEntry[]
+  groups      TournamentGroup[]
+  rounds      TournamentRound[]
+  matches     TournamentMatch[]
+  standings   TournamentGroupStanding[]
 
   @@map("tournaments")
 }
@@ -219,7 +224,96 @@ model TournamentEntry {
   playerId     String?    @map("player_id")
   orderIndex   Int        @map("order_index")
   joinedAt     DateTime   @default(now()) @map("joined_at")
+  homeMatches  TournamentMatch[] @relation("TournamentMatchHomeEntry")
+  awayMatches  TournamentMatch[] @relation("TournamentMatchAwayEntry")
+  standings    TournamentGroupStanding[]
 
   @@index([tournamentId])
   @@map("tournament_entries")
+}
+
+model TournamentGroup {
+  id           String     @id @default(cuid())
+  tournamentId String     @map("tournament_id")
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  name         String
+  sortOrder    Int        @map("sort_order")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  rounds       TournamentRound[]
+  matches      TournamentMatch[]
+  standings    TournamentGroupStanding[]
+
+  @@unique([tournamentId, sortOrder])
+  @@map("tournament_groups")
+}
+
+model TournamentGroupStanding {
+  id           String          @id @default(cuid())
+  tournamentId String          @map("tournament_id")
+  tournament   Tournament      @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  groupId      String          @map("group_id")
+  group        TournamentGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  entryId      String          @map("entry_id")
+  entry        TournamentEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  rank         Int             @default(0)
+  matchesPlayed Int            @default(0) @map("matches_played")
+  wins         Int             @default(0)
+  draws        Float           @default(0)
+  losses       Int             @default(0)
+  points       Float           @default(0)
+  totalScoreDiff Int           @default(0) @map("total_score_diff")
+  totalScoreFor  Int           @default(0) @map("total_score_for")
+  totalScoreAgainst Int        @default(0) @map("total_score_against")
+
+  @@unique([groupId, entryId])
+  @@map("tournament_group_standings")
+}
+
+model TournamentRound {
+  id           String     @id @default(cuid())
+  tournamentId String     @map("tournament_id")
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  groupId      String?    @map("group_id")
+  group        TournamentGroup? @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  phase        String
+  roundIndex   Int        @map("round_index")
+  legIndex     Int        @default(1) @map("leg_index")
+  title        String
+  createdAt    DateTime   @default(now()) @map("created_at")
+  matches      TournamentMatch[]
+
+  @@index([tournamentId, phase, roundIndex])
+  @@map("tournament_rounds")
+}
+
+model TournamentMatch {
+  id              String           @id @default(cuid())
+  tournamentId    String           @map("tournament_id")
+  tournament      Tournament       @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  groupId         String?          @map("group_id")
+  group           TournamentGroup? @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  roundId         String?          @map("round_id")
+  round           TournamentRound? @relation(fields: [roundId], references: [id], onDelete: SetNull)
+  phase           String
+  bracketSlot     Int?             @map("bracket_slot")
+  matchIndex      Int              @map("match_index")
+  homeEntryId     String           @map("home_entry_id")
+  homeEntry       TournamentEntry  @relation("TournamentMatchHomeEntry", fields: [homeEntryId], references: [id], onDelete: Cascade)
+  awayEntryId     String           @map("away_entry_id")
+  awayEntry       TournamentEntry  @relation("TournamentMatchAwayEntry", fields: [awayEntryId], references: [id], onDelete: Cascade)
+  sessionId       String?          @unique @map("session_id")
+  session         GameSession?     @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  status          String           @default("PENDING")
+  homeScore       Int?             @map("home_score")
+  awayScore       Int?             @map("away_score")
+  homePointsAwarded Float?         @map("home_points_awarded")
+  awayPointsAwarded Float?         @map("away_points_awarded")
+  winnerEntryId   String?          @map("winner_entry_id")
+  tieBreakNeeded  Boolean          @default(false) @map("tie_break_needed")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  @@index([tournamentId, phase, status])
+  @@index([roundId, matchIndex])
+  @@map("tournament_matches")
 }
