@@ -725,6 +725,19 @@ async function createKoSessionForTournamentMatch(
   tournamentId: string,
   matchId: string,
 ) {
+  const existingMatch = await prisma.tournamentMatch.findUnique({
+    where: { id: matchId },
+    select: {
+      sessionId: true,
+      status: true,
+      homeEntry: { select: { playerId: true } },
+      awayEntry: { select: { playerId: true } },
+    },
+  });
+  if (!existingMatch) return;
+  if (existingMatch.sessionId) return;
+  if (!existingMatch.homeEntry.playerId || !existingMatch.awayEntry.playerId) return;
+
   const tournament = await prisma.tournament.findUnique({
     where: { id: tournamentId },
     select: { modeKey: true, config: true },
@@ -749,6 +762,28 @@ async function createKoSessionForTournamentMatch(
   await prisma.tournamentMatch.update({
     where: { id: matchId },
     data: { sessionId: sessionResult.id, status: "READY" },
+  });
+}
+
+async function maybeFinishLeagueTournament(tournamentId: string) {
+  const tournament = await prisma.tournament.findUnique({
+    where: { id: tournamentId },
+    select: { modeKey: true, status: true },
+  });
+  if (!tournament) return;
+  if (tournament.modeKey !== "league") return;
+  if (tournament.status === "FINISHED") return;
+
+  const leagueMatches = await prisma.tournamentMatch.findMany({
+    where: { tournamentId, phase: "LEAGUE" },
+    select: { status: true },
+  });
+  if (leagueMatches.length === 0) return;
+  if (leagueMatches.some((match) => match.status !== "FINISHED")) return;
+
+  await prisma.tournament.update({
+    where: { id: tournamentId },
+    data: { status: "FINISHED" },
   });
 }
 
@@ -1210,6 +1245,10 @@ async function maybeFinalizeTournamentMatchFromSession(input: {
       "./tournamentService.js"
     );
     await maybeGenerateKoBracketForTournament(tournamentMatch.tournamentId);
+  }
+
+  if (phase === "LEAGUE") {
+    await maybeFinishLeagueTournament(tournamentMatch.tournamentId);
   }
 }
 

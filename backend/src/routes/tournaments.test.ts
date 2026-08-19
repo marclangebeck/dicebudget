@@ -88,7 +88,7 @@ describe("tournaments API", () => {
 
     await request(app)
       .post(`/tournaments/invite/${code}/join`)
-      .send({ displayName: "Carla" })
+      .send({ displayName: "Carla", playerId: "p-carla" })
       .expect(409);
   });
 
@@ -140,7 +140,7 @@ describe("tournaments API", () => {
     for (const name of ["Anna", "Ben", "Carla", "Dora", "Emil", "Fritz", "Gabi", "Hugo"]) {
       await request(app)
         .post(`/tournaments/invite/${code}/join`)
-        .send({ displayName: name })
+        .send({ displayName: name, playerId: `pid-${name.toLowerCase()}` })
         .expect(201);
     }
 

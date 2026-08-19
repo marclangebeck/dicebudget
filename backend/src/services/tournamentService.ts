@@ -956,10 +956,15 @@ async function ensureKoBracketForTournament(tournamentId: string) {
       if (homeIsBye || awayIsBye) {
         const winnerEntryId =
           homeIsBye && awayIsBye
-            ? match.homeEntryId
+            ? feederHome.winnerEntryId
             : homeIsBye
               ? feederAway.winnerEntryId!
               : feederHome.winnerEntryId!;
+
+        const homePoints =
+          winnerEntryId != null && winnerEntryId === feederHome.winnerEntryId ? 1 : 0;
+        const awayPoints =
+          winnerEntryId != null && winnerEntryId === feederAway.winnerEntryId ? 1 : 0;
 
         await prisma.tournamentMatch.update({
           where: { id: match.id },
@@ -968,10 +973,8 @@ async function ensureKoBracketForTournament(tournamentId: string) {
             winnerEntryId,
             homeScore: null,
             awayScore: null,
-            homePointsAwarded:
-              winnerEntryId === match.homeEntryId ? 1 : 0,
-            awayPointsAwarded:
-              winnerEntryId === match.awayEntryId ? 1 : 0,
+            homePointsAwarded: homePoints,
+            awayPointsAwarded: awayPoints,
             tieBreakNeeded: false,
           },
         });
