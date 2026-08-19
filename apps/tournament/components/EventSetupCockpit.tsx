@@ -5,7 +5,7 @@ import { MatchRulesFields } from "@/components/MatchRulesFields";
 import { SetupSegmented } from "@/components/SetupSegmented";
 import { SetupToggleRow } from "@/components/SetupToggleRow";
 import { createTournament } from "@/lib/api";
-import { APP_NAME } from "@/lib/branding";
+import { APP_NAME, PARTICIPANT_APP_HINT, PARTICIPANT_APP_NAME } from "@/lib/branding";
 import {
   DEFAULT_LEAGUE_SETTINGS,
   DEFAULT_MATCH_PREFS,
@@ -207,79 +207,125 @@ export function EventSetupCockpit({ onCreated, onCancel }: Props) {
           </div>
         </section>
 
-        <section className="t-card t-panel" aria-label="Struktur">
-          <p className="t-label">{modeKey === "turnier" ? "Turnier" : "Liga"}</p>
-          <div className="t-panel-body">
-            {modeKey === "league" ? (
-              <>
-                <SetupToggleRow
-                  title="Hin- und Rückspiel"
-                  hint="Aus: einmal gegen jeden · An: zweimal gegen denselben Gegner"
-                  checked={league.homeAndAway}
-                  onChange={(homeAndAway) => setLeague({ homeAndAway })}
-                />
-                <p className="t-setting-hint">Wertung fest: Sieg +1.</p>
-              </>
-            ) : (
-              <>
-                <p className="t-setting-title">Gruppengröße</p>
-                <div className="t-choice-grid">
-                  {GROUP_PRESETS.map((preset) => (
-                    <button
-                      key={preset}
-                      type="button"
-                      className={`t-choice t-choice--compact${turnier.groupSize === preset ? " t-choice--selected" : ""}`}
-                      aria-pressed={turnier.groupSize === preset}
-                      onClick={() =>
-                        setTurnier({
-                          groupSize: preset,
-                          qualifyPerGroup:
-                            turnier.qualifyPerGroup >= preset
-                              ? 1
-                              : turnier.qualifyPerGroup,
-                        })
-                      }
-                    >
-                      <span className="t-choice-title">{preset}</span>
-                    </button>
-                  ))}
-                </div>
-                <p className="t-setting-hint">
-                  {formatGroupPreview(clampMaxEntries(maxEntries), turnier.groupSize)}
-                </p>
-                <p className="t-setting-title" style={{ marginTop: "0.75rem" }}>
-                  Quali pro Gruppe
-                </p>
-                <SetupSegmented
-                  ariaLabel="Qualifikation pro Gruppe"
-                  value={String(qualify)}
-                  options={[
-                    { value: "1", label: "Top 1" },
-                    ...(turnier.groupSize > 2 ? [{ value: "2", label: "Top 2" }] : []),
-                  ]}
-                  onChange={(value) =>
-                    setTurnier({
-                      ...turnier,
-                      qualifyPerGroup: value === "2" ? 2 : 1,
-                    })
-                  }
-                />
-                <p className="t-setting-hint">Danach einfaches K.O.</p>
-              </>
+        <div className="t-cockpit-center">
+          <section
+            className="t-card t-panel t-panel--compact"
+            aria-label="Struktur"
+          >
+            <p className="t-label">{modeKey === "turnier" ? "Turnier" : "Liga"}</p>
+            <div className="t-panel-body t-panel-body--compact">
+              {modeKey === "league" ? (
+                <>
+                  <SetupToggleRow
+                    title="Hin- und Rückspiel"
+                    hint="Aus: einmal gegen jeden · An: zweimal gegen denselben Gegner"
+                    checked={league.homeAndAway}
+                    onChange={(homeAndAway) => setLeague({ homeAndAway })}
+                  />
+                  <p className="t-setting-hint">Wertung fest: Sieg +1.</p>
+                </>
+              ) : (
+                <>
+                  <p className="t-setting-title">Gruppengröße</p>
+                  <div className="t-choice-grid">
+                    {GROUP_PRESETS.map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        className={`t-choice t-choice--compact${turnier.groupSize === preset ? " t-choice--selected" : ""}`}
+                        aria-pressed={turnier.groupSize === preset}
+                        onClick={() =>
+                          setTurnier({
+                            groupSize: preset,
+                            qualifyPerGroup:
+                              turnier.qualifyPerGroup >= preset
+                                ? 1
+                                : turnier.qualifyPerGroup,
+                          })
+                        }
+                      >
+                        <span className="t-choice-title">{preset}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="t-setting-hint">
+                    {formatGroupPreview(clampMaxEntries(maxEntries), turnier.groupSize)}
+                  </p>
+                  <p className="t-setting-title" style={{ marginTop: "0.75rem" }}>
+                    Quali pro Gruppe
+                  </p>
+                  <SetupSegmented
+                    ariaLabel="Qualifikation pro Gruppe"
+                    value={String(qualify)}
+                    options={[
+                      { value: "1", label: "Top 1" },
+                      ...(turnier.groupSize > 2 ? [{ value: "2", label: "Top 2" }] : []),
+                    ]}
+                    onChange={(value) =>
+                      setTurnier({
+                        ...turnier,
+                        qualifyPerGroup: value === "2" ? 2 : 1,
+                      })
+                    }
+                  />
+                  <p className="t-setting-hint">Danach einfaches K.O.</p>
+                </>
+              )}
+            </div>
+          </section>
+
+          <aside className="t-card t-pro-promo" aria-label={PARTICIPANT_APP_NAME}>
+            <div className="t-pro-promo-mark" aria-hidden>
+              <span className="t-pro-promo-dice">⚀</span>
+              <span className="t-pro-promo-dice">⚁</span>
+            </div>
+            <div className="t-pro-promo-copy">
+              <p className="t-pro-promo-eyebrow">Für alle Spieler</p>
+              <p className="t-pro-promo-title">{PARTICIPANT_APP_NAME}</p>
+              <p className="t-pro-promo-text">{PARTICIPANT_APP_HINT}</p>
+            </div>
+          </aside>
+
+          <div className="t-cockpit-center-spacer" aria-hidden />
+
+          <div className="t-setup-create-wrap">
+            {error && (
+              <p className="t-error t-setup-create-error" role="alert">
+                {error}
+              </p>
             )}
+            <button
+              type="button"
+              className="t-btn-create-event"
+              disabled={busy}
+              onClick={() => void onCreate()}
+            >
+              <span className="t-btn-create-event__shine" aria-hidden />
+              <span className="t-btn-create-event__inner">
+                <span className="t-btn-create-event__icon" aria-hidden>
+                  +
+                </span>
+                <span className="t-btn-create-event__copy">
+                  <span className="t-btn-create-event__label">
+                    {busy ? "Wird angelegt …" : "Event anlegen"}
+                  </span>
+                  <span className="t-btn-create-event__sub">
+                    {busy ? "Einen Moment" : "Turnier starten"}
+                  </span>
+                </span>
+                <span className="t-btn-create-event__arrow" aria-hidden>
+                  →
+                </span>
+              </span>
+            </button>
           </div>
-        </section>
+        </div>
 
         <section className="t-card t-panel t-panel--setup-match" aria-label="Partie">
           <div className="t-panel-body">
             <MatchRulesFields value={match} onChange={setMatch} />
           </div>
           <div className="t-panel-actions">
-            {error && (
-              <p className="t-error" role="alert">
-                {error}
-              </p>
-            )}
             {onCancel && (
               <button type="button" className="t-btn t-btn--ghost" onClick={onCancel}>
                 Zur Lobby
@@ -288,17 +334,6 @@ export function EventSetupCockpit({ onCreated, onCancel }: Props) {
           </div>
         </section>
       </div>
-
-      <footer className="t-setup-create-bar">
-        <button
-          type="button"
-          className="t-btn t-btn--accent t-btn--create-square"
-          disabled={busy}
-          onClick={() => void onCreate()}
-        >
-          {busy ? "…" : "Event anlegen"}
-        </button>
-      </footer>
     </main>
   );
 }
