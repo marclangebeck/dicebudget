@@ -6,6 +6,7 @@ import {
   normalizeTournamentConfig,
   type TournamentConfig,
 } from "./tournamentConfig.js";
+import { createGameSession } from "./sessionService.js";
 
 export const TOURNAMENT_STATUS = {
   OPEN: "OPEN",
@@ -227,6 +228,8 @@ function toTournamentDto(
         winnerEntryId: string | null;
         groupId: string | null;
         sessionId: string | null;
+        sessionInviteCode?: string | null;
+        session?: { inviteCode: string } | null;
         homeEntry: {
           id: string;
           displayName: string;
@@ -302,6 +305,7 @@ function toTournamentDto(
               winnerEntryId: match.winnerEntryId,
               groupId: match.groupId,
               sessionId: match.sessionId,
+              sessionInviteCode: match.session?.inviteCode ?? null,
               homeEntry: match.homeEntry,
               awayEntry: match.awayEntry,
             })),
@@ -382,6 +386,7 @@ export async function getTournamentByInviteCode(
             include: {
               homeEntry: { select: { id: true, displayName: true, playerId: true } },
               awayEntry: { select: { id: true, displayName: true, playerId: true } },
+              session: { select: { inviteCode: true } },
             },
           },
         },
@@ -598,6 +603,109 @@ async function createTurnierStructure(
   }
 }
 
+function mapHouseRulesToSessionFlags(config: TournamentConfig) {
+  return {
+    ruleYatzyStreak2: config.houseRules.houseRulesYatzyStreak,
+    ruleYatzyTriple: config.houseRules.houseRulesYatzyTriple,
+    ruleYatzyStreak2Credit: config.houseRules.houseRulesYatzyStreakCredit,
+    ruleYatzyTripleCredit: config.houseRules.houseRulesYatzyTripleCredit,
+    ruleUpperRace: config.houseRules.houseRulesUpperRace,
+    ruleColumnPoolBonuses: config.houseRules.houseRulesColumnPoolBonuses,
+  };
+}
+
+export async function createTournamentMatchSession(
+  tournamentId: string,
+  matchId: string,
+  hostToken: string,
+) {
+  if (!hostToken) throw new TournamentForbiddenError();
+
+  const tournament = await prisma.tournament.findUnique({
+    where: { id: tournamentId },
+    include: {
+      entries: { orderBy: { orderIndex: "asc" } },
+      matches: {
+        where: { id: matchId },
+        include: {
+          session: { select: { inviteCode: true } },
+          homeEntry: { select: { id: true, displayName: true, playerId: true } },
+          awayEntry: { select: { id: true, displayName: true, playerId: true } },
+        },
+      },
+      groups: {
+        orderBy: { sortOrder: "asc" },
+        include: {
+          standings: {
+            orderBy: [{ rank: "asc" }, { points: "desc" }, { totalScoreDiff: "desc" }],
+            include: {
+              entry: { select: { id: true, displayName: true, playerId: true } },
+            },
+          },
+        },
+      },
+      rounds: {
+        orderBy: [{ phase: "asc" }, { legIndex: "asc" }, { roundIndex: "asc" }],
+        include: {
+          matches: {
+            orderBy: { matchIndex: "asc" },
+            include: {
+              session: { select: { inviteCode: true } },
+              homeEntry: { select: { id: true, displayName: true, playerId: true } },
+              awayEntry: { select: { id: true, displayName: true, playerId: true } },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!tournament) throw new TournamentNotFoundError();
+  if (tournament.hostToken !== hostToken) throw new TournamentForbiddenError();
+  if (tournament.status !== TOURNAMENT_STATUS.RUNNING) {
+    throw new TournamentConflictError("Turnier läuft noch nicht");
+  }
+
+  const match = tournament.matches[0];
+  if (!match) throw new TournamentNotFoundError();
+  if (match.sessionId || match.session) {
+    return {
+      tournament: toTournamentDto(tournament, { includeEntries: true }),
+      matchId: match.id,
+      sessionInviteCode: match.session.inviteCode,
+      joinPath: `/multi/join?code=${match.session.inviteCode}`,
+    };
+  }
+
+  const config = configFromRow(tournament.modeKey, tournament.config);
+  const sessionResult = await createGameSession(
+    config.gameCount,
+    2,
+    config.useStrategyRules,
+    undefined,
+    config.showOpponentPool,
+    config.poolEndgameEnabled,
+    mapHouseRulesToSessionFlags(config),
+    match.phase === "KO",
+  );
+
+  await prisma.tournamentMatch.update({
+    where: { id: match.id },
+    data: {
+      sessionId: sessionResult.id,
+      status: "READY",
+    },
+  });
+
+  const updated = await getTournamentByInviteCode(tournament.inviteCode, hostToken);
+  return {
+    ...updated,
+    matchId: match.id,
+    sessionInviteCode: sessionResult.inviteCode,
+    joinPath: `/multi/join?code=${sessionResult.inviteCode}`,
+  };
+}
+
 export async function startTournament(tournamentId: string, hostToken: string) {
   if (!hostToken) throw new TournamentForbiddenError();
 
@@ -654,6 +762,7 @@ export async function startTournament(tournamentId: string, hostToken: string) {
               include: {
                 homeEntry: { select: { id: true, displayName: true, playerId: true } },
                 awayEntry: { select: { id: true, displayName: true, playerId: true } },
+              session: { select: { inviteCode: true } },
               },
             },
           },

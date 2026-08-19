@@ -72,6 +72,19 @@ describe("tournaments API", () => {
     assert.equal(started.body.tournament.groups[0].standings.length, 2);
     assert.equal(started.body.tournament.rounds.length, 3);
     assert.equal(started.body.tournament.rounds[0].matches.length, 1);
+    const firstMatchId = started.body.tournament.rounds[0].matches[0].id as string;
+
+    const sessionCreated = await request(app)
+      .post(`/tournaments/${tournamentId}/matches/${firstMatchId}/session`)
+      .set("X-Host-Token", hostToken)
+      .expect(201);
+
+    assert.ok(sessionCreated.body.sessionInviteCode);
+    assert.match(sessionCreated.body.joinPath, /\/multi\/join\?code=/);
+    assert.equal(
+      sessionCreated.body.tournament.rounds[0].matches[0].sessionInviteCode.length,
+      8,
+    );
 
     await request(app)
       .post(`/tournaments/invite/${code}/join`)

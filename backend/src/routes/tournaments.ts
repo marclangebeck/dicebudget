@@ -5,6 +5,7 @@ import {
 } from "../middleware/rateLimits.js";
 import {
   createTournament,
+  createTournamentMatchSession,
   getTournamentByInviteCode,
   joinTournament,
   startTournament,
@@ -79,3 +80,24 @@ tournamentsRouter.post("/:tournamentId/start", async (req, res, next) => {
     next(error);
   }
 });
+
+tournamentsRouter.post(
+  "/:tournamentId/matches/:matchId/session",
+  async (req, res, next) => {
+    try {
+      const hostToken = readHostToken(req);
+      if (!hostToken) {
+        res.status(403).json({ error: "X-Host-Token erforderlich" });
+        return;
+      }
+      const result = await createTournamentMatchSession(
+        routeParam(req.params.tournamentId),
+        routeParam(req.params.matchId),
+        hostToken,
+      );
+      res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  },
+);

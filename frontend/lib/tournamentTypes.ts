@@ -55,6 +55,7 @@ export type TournamentMatchDto = {
   winnerEntryId: string | null;
   groupId: string | null;
   sessionId: string | null;
+  sessionInviteCode?: string | null;
   homeEntry: Pick<TournamentEntryDto, "id" | "displayName" | "playerId">;
   awayEntry: Pick<TournamentEntryDto, "id" | "displayName" | "playerId">;
 };

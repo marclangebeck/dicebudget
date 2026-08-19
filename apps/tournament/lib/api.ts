@@ -108,6 +108,7 @@ export type TournamentMatchDto = {
   winnerEntryId: string | null;
   groupId: string | null;
   sessionId: string | null;
+  sessionInviteCode?: string | null;
   homeEntry: Pick<TournamentEntryDto, "id" | "displayName" | "playerId">;
   awayEntry: Pick<TournamentEntryDto, "id" | "displayName" | "playerId">;
 };
@@ -156,4 +157,23 @@ export function startTournament(
     method: "POST",
     hostToken,
   });
+}
+
+export function createTournamentMatchSession(
+  tournamentId: string,
+  matchId: string,
+  hostToken: string,
+): Promise<{
+  tournament: TournamentDto;
+  matchId: string;
+  sessionInviteCode: string;
+  joinPath: string;
+}> {
+  return apiFetch(
+    `/tournaments/${encodeURIComponent(tournamentId)}/matches/${encodeURIComponent(matchId)}/session`,
+    {
+      method: "POST",
+      hostToken,
+    },
+  );
 }

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import QRCode from "qrcode";
 import {
+  createTournamentMatchSession,
   getTournamentByInvite,
   startTournament,
   type TournamentDto,
@@ -36,6 +37,7 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [activeMatchId, setActiveMatchId] = useState<string | null>(null);
 
   const host = loadHostSession();
   const hostToken =
@@ -88,6 +90,25 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
       setError(e instanceof Error ? e.message : "Start fehlgeschlagen");
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function onCreateMatchSession(matchId: string) {
+    if (!tournament || !hostToken) {
+      setError("Nur der Host dieses Geräts kann Matches starten.");
+      return;
+    }
+    setBusy(true);
+    setActiveMatchId(matchId);
+    setError(null);
+    try {
+      const res = await createTournamentMatchSession(tournament.id, matchId, hostToken);
+      setTournament(res.tournament);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Match-Session konnte nicht erstellt werden");
+    } finally {
+      setBusy(false);
+      setActiveMatchId(null);
     }
   }
 
@@ -280,12 +301,53 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
                       <ul className="t-list">
                         {round.matches.map((match) => (
                           <li key={match.id}>
-                            <span>
-                              {match.homeEntry.displayName} vs {match.awayEntry.displayName}
-                            </span>
-                            <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
-                              {match.status}
-                            </span>
+                            <div style={{ display: "grid", gap: "0.3rem", width: "100%" }}>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  gap: "0.75rem",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <span>
+                                  {match.homeEntry.displayName} vs {match.awayEntry.displayName}
+                                </span>
+                                <span
+                                  style={{ color: "var(--muted)", fontSize: "0.85rem" }}
+                                >
+                                  {match.status}
+                                </span>
+                              </div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexWrap: "wrap",
+                                  gap: "0.5rem",
+                                  alignItems: "center",
+                                }}
+                              >
+                                {match.sessionInviteCode ? (
+                                  <span
+                                    style={{ color: "var(--muted)", fontSize: "0.85rem" }}
+                                  >
+                                    Session-Code {match.sessionInviteCode}
+                                  </span>
+                                ) : null}
+                                {!match.sessionId ? (
+                                  <button
+                                    type="button"
+                                    className="t-btn t-btn--ghost"
+                                    disabled={busy}
+                                    onClick={() => void onCreateMatchSession(match.id)}
+                                  >
+                                    {busy && activeMatchId === match.id
+                                      ? "Erzeuge…"
+                                      : "Session starten"}
+                                  </button>
+                                ) : null}
+                              </div>
+                            </div>
                           </li>
                         ))}
                       </ul>
