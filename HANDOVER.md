@@ -5,7 +5,7 @@
 **Branch:** `milestone-22-prep`  
 **HEAD:** siehe `git log -1` (Tournament Host-Cockpit)  
 **Sprache:** Deutsch  
-**Stand Doku:** 2026-08-18
+**Stand Doku:** 2026-08-19
 
 Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Aktiver Stand: `docs/milestones_active.md`. iOS/TestFlight: `docs/ios_current.md`. Architektur/Betrieb: `docs/decisions.md` nur bei Bedarf. **Produktfamilie (3 Apps):** `docs/tournament/products.md`. Event-Host: `docs/tournament/` — DiceBudget-Kern unantastbar.
 
@@ -34,7 +34,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 | Roadmap | **M42/M43** + **Multi-QR** umgesetzt; **M30** danach; Turnier = Planung `docs/tournament/` |
 | Entwickler-Vorschau | **InApp-Käufe (Features)** = Labs-PIN (`NEXT_PUBLIC_LABS_PIN`) — getrennt von Admin |
 | iOS/TestFlight | Version `2.0`; Deployment Target **15.0**; frischer Archive-Build 2026-08-15 (QR-Scan + Host-QR) |
-| Tournament | T2 Host `apps/tournament` + T1 API; Setup-Wizard; Join in Pro-App = T3; Lobby = 3-Container-Cockpit; **GO** geplant (`docs/tournament/products.md`) |
+| Tournament | T1–T6 umgesetzt (Join, Auslosung, Wellen, Beamer, Live-Refresh); **T9/T10** als Nächstes; **GO** geplant |
 | Backend Prod | Migrationen inkl. Tournaments + **player_display_names** — Deploy bei Backend-Änderungen |
 
 ## Multi-Beitritt (QR only) — Stand 2026-08-15

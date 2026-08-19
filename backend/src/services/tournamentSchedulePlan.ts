@@ -311,6 +311,100 @@ export function updateSchedulePair(
   return { ...plan, rounds };
 }
 
+export function assignPlayerToRoundSlot(
+  plan: TournamentSchedulePlan,
+  planRoundIndex: number,
+  matchIndex: number,
+  side: "home" | "away",
+  entryId: string,
+): TournamentSchedulePlan {
+  const round = plan.rounds[planRoundIndex];
+  if (!round) throw new Error("Runde nicht gefunden");
+  const pair = round.pairs[matchIndex - 1];
+  if (!pair) throw new Error("Paarung nicht gefunden");
+
+  const group = plan.groups.find((item) => item.sortOrder === round.groupSortOrder);
+  if (!group) throw new Error("Gruppe nicht gefunden");
+  if (!group.entryIds.includes(entryId)) {
+    throw new Error("Spieler gehört nicht zur Gruppe");
+  }
+
+  let fromMatchIndex = -1;
+  let fromSide: "home" | "away" | null = null;
+  round.pairs.forEach((current, pairIndex) => {
+    if (current.homeEntryId === entryId) {
+      fromMatchIndex = pairIndex + 1;
+      fromSide = "home";
+    }
+    if (current.awayEntryId === entryId) {
+      fromMatchIndex = pairIndex + 1;
+      fromSide = "away";
+    }
+  });
+
+  const displacedEntryId = side === "home" ? pair.homeEntryId : pair.awayEntryId;
+  if (fromMatchIndex === matchIndex && fromSide === side) {
+    return plan;
+  }
+
+  const rounds = plan.rounds.map((item, roundIndex) => {
+    if (roundIndex !== planRoundIndex) return item;
+    return {
+      ...item,
+      pairs: item.pairs.map((current, pairIndex) => {
+        const currentMatchIndex = pairIndex + 1;
+        let homeEntryId = current.homeEntryId;
+        let awayEntryId = current.awayEntryId;
+
+        if (currentMatchIndex === matchIndex && side === "home") {
+          homeEntryId = entryId;
+        }
+        if (currentMatchIndex === matchIndex && side === "away") {
+          awayEntryId = entryId;
+        }
+
+        if (
+          fromMatchIndex > 0 &&
+          fromSide &&
+          currentMatchIndex === fromMatchIndex &&
+          fromSide === "home"
+        ) {
+          homeEntryId = displacedEntryId;
+        }
+        if (
+          fromMatchIndex > 0 &&
+          fromSide &&
+          currentMatchIndex === fromMatchIndex &&
+          fromSide === "away"
+        ) {
+          awayEntryId = displacedEntryId;
+        }
+
+        return { homeEntryId, awayEntryId };
+      }),
+    };
+  });
+
+  return { ...plan, rounds };
+}
+
+export function releaseWaveForRoundPlan(
+  plan: TournamentSchedulePlan,
+  groupSortOrder: number,
+  phase: string,
+  roundIndex: number,
+  legIndex: number,
+): number | null {
+  const match = plan.rounds.find(
+    (round) =>
+      round.groupSortOrder === groupSortOrder &&
+      round.phase === phase &&
+      round.roundIndex === roundIndex &&
+      round.legIndex === legIndex,
+  );
+  return match?.releaseWave ?? null;
+}
+
 export function nextReleaseWave(plan: TournamentSchedulePlan): number | null {
   const waves = [...new Set(plan.rounds.map((round) => round.releaseWave))].sort(
     (a, b) => a - b,

@@ -10,7 +10,11 @@ import type { SessionLobbyDto, SessionRankingDto } from "./sessionTypes";
 import type { HouseRuleAutoEventDto } from "@/lib/ruleEventFeedback";
 import { getApiBase } from "@/lib/apiBase";
 import { resolveAdminApiKeyForRequest } from "@/lib/adminAccess";
-import type { TournamentDto, TournamentEntryDto } from "./tournamentTypes";
+import type {
+  ScheduleMetaDto,
+  TournamentDto,
+  TournamentEntryDto,
+} from "./tournamentTypes";
 
 type ApiRequestInit = Omit<RequestInit, "headers"> & {
   headers?: HeadersInit;
@@ -435,9 +439,10 @@ export function deletePlayerDisplayName(playerId: string, nameToken: string) {
 }
 
 export function getTournamentByInvite(inviteCode: string) {
-  return request<{ tournament: TournamentDto }>(
-    `/tournaments/invite/${encodeURIComponent(inviteCode)}`,
-  );
+  return request<{
+    tournament: TournamentDto;
+    scheduleMeta?: ScheduleMetaDto;
+  }>(`/tournaments/invite/${encodeURIComponent(inviteCode)}`);
 }
 
 export function joinTournament(

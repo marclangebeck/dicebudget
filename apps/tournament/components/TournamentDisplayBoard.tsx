@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
-import { getTournamentByInvite, type TournamentDto } from "@/lib/api";
+import { getTournamentByInvite, type ScheduleMetaDto, type TournamentDto } from "@/lib/api";
 import { APP_NAME } from "@/lib/branding";
 import { findMatchInRounds, syncMatchInUrl } from "@/lib/displayMatch";
 import {
@@ -39,6 +39,7 @@ export function TournamentDisplayBoard({
 }: Props) {
   const code = inviteCode.trim().toUpperCase();
   const [tournament, setTournament] = useState<TournamentDto | null>(null);
+  const [scheduleMeta, setScheduleMeta] = useState<ScheduleMetaDto | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -56,6 +57,7 @@ export function TournamentDisplayBoard({
     try {
       const res = await getTournamentByInvite(code);
       setTournament(res.tournament);
+      setScheduleMeta(res.scheduleMeta ?? null);
       setLastUpdated(new Date());
 
       if (res.tournament.status === "OPEN") {
@@ -174,6 +176,11 @@ export function TournamentDisplayBoard({
               {liveMatches === 1 ? "Match bereit" : "Matches bereit"}
             </span>
           ) : null}
+          {isRunning && scheduleMeta ? (
+            <span className="t-display-badge">
+              Welle {scheduleMeta.releasedWave}/{scheduleMeta.totalWaves}
+            </span>
+          ) : null}
           <span className="t-display-clock tabular-nums">{formatClock(clock)}</span>
         </div>
       </header>
@@ -235,6 +242,12 @@ export function TournamentDisplayBoard({
         />
       ) : (
         <div className="t-display-grid">
+          {isRunning && scheduleMeta?.hasMoreRounds ? (
+            <p className="t-display-wave-hint">
+              Spielplan-Welle {scheduleMeta.releasedWave} von {scheduleMeta.totalWaves}{" "}
+              — weitere Paarungen folgen nach Freigabe durch den Host.
+            </p>
+          ) : null}
           <section className="t-display-panel" aria-label="Tabellen">
             <h2 className="t-display-panel-title">Tabellen</h2>
             <div className="t-display-standings-wrap">

@@ -122,6 +122,7 @@ export type TournamentRoundDto = {
   roundIndex: number;
   legIndex: number;
   title: string;
+  releaseWave?: number | null;
   matches: TournamentMatchDto[];
 };
 
@@ -223,6 +224,12 @@ export function patchTournamentDraw(
     swapSides?: boolean;
     homeEntryId?: string;
     awayEntryId?: string;
+    assignPlayer?: {
+      planRoundIndex: number;
+      matchIndex: number;
+      side: "home" | "away";
+      entryId: string;
+    };
   },
 ): Promise<{ tournament: TournamentDto; drawPreview: DrawPreviewDto }> {
   return apiFetch(`/tournaments/${encodeURIComponent(tournamentId)}/draw`, {

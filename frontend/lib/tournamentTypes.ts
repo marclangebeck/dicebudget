@@ -67,7 +67,14 @@ export type TournamentRoundDto = {
   roundIndex: number;
   legIndex: number;
   title: string;
+  releaseWave?: number | null;
   matches: TournamentMatchDto[];
+};
+
+export type ScheduleMetaDto = {
+  releasedWave: number;
+  totalWaves: number;
+  hasMoreRounds: boolean;
 };
 
 export function tournamentModeLabel(modeKey: string): string {

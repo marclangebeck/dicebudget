@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { getTournamentByInvite, joinTournament } from "@/lib/api";
@@ -112,6 +112,8 @@ function TournamentJoinInner() {
   const [error, setError] = useState<string | null>(null);
   const [joinedEntryId, setJoinedEntryId] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [sessionCodeAlert, setSessionCodeAlert] = useState<string | null>(null);
+  const knownSessionCodeRef = useRef<string | null>(null);
 
   useEffect(() => {
     setPlayerId(getOrCreatePlayerId());
@@ -144,6 +146,28 @@ function TournamentJoinInner() {
           if (saved) setJoinedEntryId(saved.entryId);
         }
         setLastUpdated(new Date());
+
+        const entryId =
+          mine?.id ??
+          loadActiveTournament(code)?.entryId ??
+          joinedEntryId;
+        if (entryId && next.status === "RUNNING") {
+          const myMatches = flattenPlayerMatches(next.rounds ?? [], entryId);
+          const active = myMatches.find(
+            ({ match }) =>
+              match.status === "READY" || Boolean(match.sessionInviteCode),
+          );
+          const sessionCode = active?.match.sessionInviteCode ?? null;
+          if (
+            options?.silent &&
+            sessionCode &&
+            sessionCode !== knownSessionCodeRef.current
+          ) {
+            setSessionCodeAlert(sessionCode);
+          }
+          knownSessionCodeRef.current = sessionCode;
+        }
+
         return true;
       } catch (e) {
         if (!options?.silent) {
@@ -152,7 +176,7 @@ function TournamentJoinInner() {
         return false;
       }
     },
-    [code, playerId],
+    [code, playerId, joinedEntryId],
   );
 
   useEffect(() => {
@@ -393,6 +417,37 @@ function TournamentJoinInner() {
 
           {tournament.status === "RUNNING" && alreadyJoined && (
             <>
+              {sessionCodeAlert && liveMatch?.match.sessionInviteCode && (
+                <section
+                  className="join-session-alert"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <p className="join-session-alert-title">Deine Partie ist bereit</p>
+                  <p className="join-session-alert-code">
+                    Session-Code {liveMatch.match.sessionInviteCode}
+                  </p>
+                  <div className="join-session-alert-actions">
+                    <Link
+                      href={`/multi/join?code=${encodeURIComponent(
+                        liveMatch.match.sessionInviteCode,
+                      )}`}
+                      className="btn-primary py-3 text-center"
+                      onClick={() => setSessionCodeAlert(null)}
+                    >
+                      Jetzt spielen
+                    </Link>
+                    <button
+                      type="button"
+                      className="join-lobby-refresh"
+                      onClick={() => setSessionCodeAlert(null)}
+                    >
+                      Später
+                    </button>
+                  </div>
+                </section>
+              )}
+
               <section className="join-action-card">
                 <p className="text-secondary text-sm font-semibold">
                   Dein Match-Fokus

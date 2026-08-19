@@ -1307,3 +1307,65 @@ a {
   gap: 0.5rem;
   align-items: center;
 }
+
+.t-subpanel--current {
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.18);
+}
+
+.t-wave-head {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.65rem;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 0;
+}
+
+.t-round-block + .t-round-block {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.t-draw-slot-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.t-draw-vs {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.t-draw-select {
+  min-width: 7rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(15, 23, 42, 0.72);
+  color: #fff;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.82rem;
+}
+
+.t-display-wave-hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  border-radius: 0.85rem;
+  border: 1px dashed rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.42);
+  padding: 0.65rem 0.85rem;
+  color: rgba(148, 163, 184, 0.92);
+  font-size: 0.88rem;
+  font-weight: 650;
+}

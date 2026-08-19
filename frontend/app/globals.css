@@ -9634,6 +9634,41 @@ html.zoomable-route.legal-route .legal-page-scroll {
   line-height: 1.35;
 }
 
+.join-session-alert {
+  margin-bottom: 0.75rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(74, 222, 128, 0.45);
+  background: linear-gradient(
+    135deg,
+    rgba(20, 83, 45, 0.55),
+    rgba(15, 23, 42, 0.82)
+  );
+  padding: 0.85rem 0.95rem;
+  box-shadow: 0 12px 28px -18px rgba(74, 222, 128, 0.55);
+}
+
+.join-session-alert-title {
+  margin: 0;
+  color: #bbf7d0;
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.join-session-alert-code {
+  margin: 0.35rem 0 0.65rem;
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.join-session-alert-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .join-lobby-status {
   position: relative;
   isolation: isolate;

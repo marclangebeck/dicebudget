@@ -3,6 +3,7 @@ import { generateSecretToken } from "../lib/secretToken.js";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../db/prisma.js";
 import {
+  assignPlayerToRoundSlot,
   buildSchedulePlan,
   mergeSchedulePlanIntoConfig,
   nextReleaseWave,
@@ -10,6 +11,8 @@ import {
   persistScheduleGroups,
   persistScheduleRoundWave,
   readSchedulePlan,
+  releaseWaveForRoundPlan,
+  roundsForReleaseWave,
   shuffleSchedulePlan,
   swapSchedulePairSides,
   toDrawPreviewDto,
@@ -136,6 +139,36 @@ function nextPowerOfTwo(n: number): number {
   return size;
 }
 
+function buildScheduleMeta(plan: TournamentSchedulePlan) {
+  return {
+    releasedWave: plan.releasedWave,
+    totalWaves: [...new Set(plan.rounds.map((round) => round.releaseWave))].length,
+    hasMoreRounds: nextReleaseWave(plan) != null,
+  };
+}
+
+function enrichRoundReleaseWave(
+  round: {
+    groupId: string | null;
+    phase: string;
+    roundIndex: number;
+    legIndex: number;
+  },
+  groupSortById: Map<string, number>,
+  plan: TournamentSchedulePlan | null,
+): number | null {
+  if (!plan || !round.groupId) return null;
+  const groupSortOrder = groupSortById.get(round.groupId);
+  if (groupSortOrder == null) return null;
+  return releaseWaveForRoundPlan(
+    plan,
+    groupSortOrder,
+    round.phase,
+    round.roundIndex,
+    round.legIndex,
+  );
+}
+
 function toTournamentDto(
   row: {
     id: string;
@@ -210,11 +243,13 @@ function toTournamentDto(
       }[];
     }[];
   },
-  options?: { includeEntries?: boolean },
+  options?: { includeEntries?: boolean; schedulePlan?: TournamentSchedulePlan | null },
 ) {
   const entries = row.entries ?? [];
   const groups = row.groups ?? [];
   const rounds = row.rounds ?? [];
+  const groupSortById = new Map(groups.map((group) => [group.id, group.sortOrder]));
+  const schedulePlan = options?.schedulePlan ?? null;
   return {
     id: row.id,
     inviteCode: row.inviteCode,
@@ -259,6 +294,7 @@ function toTournamentDto(
             roundIndex: round.roundIndex,
             legIndex: round.legIndex,
             title: round.title,
+            releaseWave: enrichRoundReleaseWave(round, groupSortById, schedulePlan),
             matches: (round.matches ?? []).map((match) => ({
               id: match.id,
               phase: match.phase,
@@ -371,18 +407,13 @@ export async function getTournamentByInviteCode(
     hostToken && tournament.status === TOURNAMENT_STATUS.OPEN && schedulePlan
       ? toDrawPreviewDto(schedulePlan, tournament.entries)
       : undefined;
-  const scheduleMeta =
-    hostToken && schedulePlan
-      ? {
-          releasedWave: schedulePlan.releasedWave,
-          totalWaves: [...new Set(schedulePlan.rounds.map((round) => round.releaseWave))]
-            .length,
-          hasMoreRounds: nextReleaseWave(schedulePlan) != null,
-        }
-      : undefined;
+  const scheduleMeta = schedulePlan ? buildScheduleMeta(schedulePlan) : undefined;
 
   return {
-    tournament: toTournamentDto(tournament, { includeEntries: true }),
+    tournament: toTournamentDto(tournament, {
+      includeEntries: true,
+      schedulePlan,
+    }),
     ...(drawPreview ? { drawPreview } : {}),
     ...(scheduleMeta ? { scheduleMeta } : {}),
   };
@@ -543,6 +574,12 @@ export async function patchTournamentDraw(
     swapSides?: unknown;
     homeEntryId?: unknown;
     awayEntryId?: unknown;
+    assignPlayer?: {
+      planRoundIndex?: unknown;
+      matchIndex?: unknown;
+      side?: unknown;
+      entryId?: unknown;
+    };
   },
 ) {
   const tournament = await loadHostTournament(tournamentId, hostToken);
@@ -555,31 +592,51 @@ export async function patchTournamentDraw(
     throw new TournamentConflictError("Zuerst Auslosung vorbereiten");
   }
 
-  const planRoundIndex = Number(input.planRoundIndex);
-  const matchIndex = Number(input.matchIndex);
-  if (!Number.isInteger(planRoundIndex) || planRoundIndex < 0) {
-    throw new TournamentInputError("planRoundIndex ungültig");
-  }
-  if (!Number.isInteger(matchIndex) || matchIndex < 1) {
-    throw new TournamentInputError("matchIndex ungültig");
-  }
-
   let plan = current;
-  if (input.swapSides === true) {
-    plan = swapSchedulePairSides(plan, planRoundIndex, matchIndex);
-  } else if (
-    typeof input.homeEntryId === "string" &&
-    typeof input.awayEntryId === "string"
-  ) {
-    plan = updateSchedulePair(
-      plan,
-      planRoundIndex,
-      matchIndex,
-      input.homeEntryId,
-      input.awayEntryId,
-    );
+  const assign = input.assignPlayer;
+  if (assign && typeof assign === "object") {
+    const planRoundIndex = Number(assign.planRoundIndex);
+    const matchIndex = Number(assign.matchIndex);
+    const side = assign.side === "away" ? "away" : assign.side === "home" ? "home" : null;
+    const entryId = typeof assign.entryId === "string" ? assign.entryId : null;
+    if (!Number.isInteger(planRoundIndex) || planRoundIndex < 0) {
+      throw new TournamentInputError("planRoundIndex ungültig");
+    }
+    if (!Number.isInteger(matchIndex) || matchIndex < 1) {
+      throw new TournamentInputError("matchIndex ungültig");
+    }
+    if (!side || !entryId) {
+      throw new TournamentInputError("assignPlayer.side und entryId nötig");
+    }
+    plan = assignPlayerToRoundSlot(plan, planRoundIndex, matchIndex, side, entryId);
   } else {
-    throw new TournamentInputError("swapSides oder homeEntryId/awayEntryId nötig");
+    const planRoundIndex = Number(input.planRoundIndex);
+    const matchIndex = Number(input.matchIndex);
+    if (!Number.isInteger(planRoundIndex) || planRoundIndex < 0) {
+      throw new TournamentInputError("planRoundIndex ungültig");
+    }
+    if (!Number.isInteger(matchIndex) || matchIndex < 1) {
+      throw new TournamentInputError("matchIndex ungültig");
+    }
+
+    if (input.swapSides === true) {
+      plan = swapSchedulePairSides(plan, planRoundIndex, matchIndex);
+    } else if (
+      typeof input.homeEntryId === "string" &&
+      typeof input.awayEntryId === "string"
+    ) {
+      plan = updateSchedulePair(
+        plan,
+        planRoundIndex,
+        matchIndex,
+        input.homeEntryId,
+        input.awayEntryId,
+      );
+    } else {
+      throw new TournamentInputError(
+        "swapSides, homeEntryId/awayEntryId oder assignPlayer nötig",
+      );
+    }
   }
 
   await saveSchedulePlan(tournament.id, tournament.config, plan);
@@ -589,6 +646,97 @@ export async function patchTournamentDraw(
       .tournament,
     drawPreview: toDrawPreviewDto(plan, tournament.entries),
   };
+}
+
+async function isReleaseWaveComplete(
+  tournamentId: string,
+  plan: TournamentSchedulePlan,
+  wave: number,
+): Promise<boolean> {
+  const groups = await prisma.tournamentGroup.findMany({
+    where: { tournamentId },
+    select: { id: true, sortOrder: true },
+  });
+  const groupIdBySortOrder = new Map(groups.map((group) => [group.sortOrder, group.id]));
+  const roundPlans = roundsForReleaseWave(plan, wave);
+  if (roundPlans.length === 0) return false;
+
+  for (const roundPlan of roundPlans) {
+    const groupId = groupIdBySortOrder.get(roundPlan.groupSortOrder);
+    if (!groupId) return false;
+
+    const dbRound = await prisma.tournamentRound.findFirst({
+      where: {
+        tournamentId,
+        groupId,
+        phase: roundPlan.phase,
+        roundIndex: roundPlan.roundIndex,
+        legIndex: roundPlan.legIndex,
+      },
+      include: {
+        matches: { select: { status: true } },
+      },
+    });
+
+    if (!dbRound || dbRound.matches.length === 0) return false;
+    if (dbRound.matches.some((match) => match.status !== "FINISHED")) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+async function releaseScheduleWave(
+  tournamentId: string,
+  configRaw: string | null,
+  plan: TournamentSchedulePlan,
+  wave: number,
+) {
+  const groupIdBySortOrder = new Map(
+    (
+      await prisma.tournamentGroup.findMany({
+        where: { tournamentId },
+        select: { id: true, sortOrder: true },
+      })
+    ).map((group) => [group.sortOrder, group.id] as const),
+  );
+
+  await prisma.$transaction(async (tx) => {
+    await persistScheduleRoundWave(tx, tournamentId, plan, wave, groupIdBySortOrder);
+  });
+
+  const updatedPlan = { ...plan, releasedWave: wave };
+  await saveSchedulePlan(tournamentId, configRaw, updatedPlan);
+  return updatedPlan;
+}
+
+export async function maybeAutoReleaseNextScheduleWave(
+  tournamentId: string,
+): Promise<boolean> {
+  const tournament = await prisma.tournament.findUnique({
+    where: { id: tournamentId },
+    select: { id: true, status: true, config: true },
+  });
+  if (!tournament || tournament.status !== TOURNAMENT_STATUS.RUNNING) {
+    return false;
+  }
+
+  const plan = readSchedulePlan(tournament.config);
+  if (!plan || plan.releasedWave <= 0) return false;
+
+  const complete = await isReleaseWaveComplete(
+    tournamentId,
+    plan,
+    plan.releasedWave,
+  );
+  if (!complete) return false;
+
+  const wave = nextReleaseWave(plan);
+  if (wave == null) return false;
+
+  await releaseScheduleWave(tournament.id, tournament.config, plan, wave);
+  return true;
 }
 
 export async function releaseNextTournamentRound(tournamentId: string, hostToken: string) {
@@ -607,27 +755,7 @@ export async function releaseNextTournamentRound(tournamentId: string, hostToken
     throw new TournamentConflictError("Alle Runden sind bereits freigegeben");
   }
 
-  const groupIdBySortOrder = new Map(
-    (
-      await prisma.tournamentGroup.findMany({
-        where: { tournamentId: tournament.id },
-        select: { id: true, sortOrder: true },
-      })
-    ).map((group) => [group.sortOrder, group.id] as const),
-  );
-
-  await prisma.$transaction(async (tx) => {
-    await persistScheduleRoundWave(
-      tx,
-      tournament.id,
-      plan,
-      wave,
-      groupIdBySortOrder,
-    );
-  });
-
-  const updatedPlan = { ...plan, releasedWave: wave };
-  await saveSchedulePlan(tournament.id, tournament.config, updatedPlan);
+  await releaseScheduleWave(tournament.id, tournament.config, plan, wave);
 
   return fetchTournamentDtoByInvite(tournament.inviteCode, hostToken);
 }

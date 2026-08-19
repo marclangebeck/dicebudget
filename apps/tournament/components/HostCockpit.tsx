@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
 import {
   createTournamentMatchSession,
@@ -39,6 +39,7 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
   const [tournament, setTournament] = useState<TournamentDto | null>(null);
   const [drawPreview, setDrawPreview] = useState<DrawPreviewDto | null>(null);
   const [scheduleMeta, setScheduleMeta] = useState<ScheduleMetaDto | null>(null);
+  const [collapsedWaves, setCollapsedWaves] = useState<Set<number>>(() => new Set());
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -54,6 +55,61 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
   const maxEntries = tournament?.maxEntries;
   const groups = tournament?.groups ?? [];
   const rounds = tournament?.rounds ?? [];
+
+  const roundsByWave = useMemo(() => {
+    const map = new Map<number, typeof rounds>();
+    for (const round of rounds) {
+      const wave = round.releaseWave ?? 0;
+      const bucket = map.get(wave) ?? [];
+      bucket.push(round);
+      map.set(wave, bucket);
+    }
+    return [...map.entries()].sort(([a], [b]) => a - b);
+  }, [rounds]);
+
+  useEffect(() => {
+    if (!scheduleMeta || rounds.length === 0) return;
+    const next = new Set<number>();
+    for (const [wave, waveRounds] of roundsByWave) {
+      if (wave >= scheduleMeta.releasedWave) continue;
+      if (waveRounds.every((round) => round.matches.every((m) => m.status === "FINISHED"))) {
+        next.add(wave);
+      }
+    }
+    setCollapsedWaves(next);
+  }, [scheduleMeta, rounds, roundsByWave]);
+
+  async function onAssignPlayer(
+    planRoundIndex: number,
+    matchIndex: number,
+    side: "home" | "away",
+    entryId: string,
+  ) {
+    if (!tournament || !hostToken) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await patchTournamentDraw(tournament.id, hostToken, {
+        planRoundIndex,
+        matchIndex,
+        assignPlayer: { planRoundIndex, matchIndex, side, entryId },
+      });
+      setDrawPreview(res.drawPreview);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Spielerwechsel fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function toggleWaveCollapse(wave: number) {
+    setCollapsedWaves((prev) => {
+      const next = new Set(prev);
+      if (next.has(wave)) next.delete(wave);
+      else next.add(wave);
+      return next;
+    });
+  }
 
   const applyTournamentResponse = useCallback(
     async (res: {
@@ -401,10 +457,15 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
             <div className="t-panel-body">
               <p className="t-meta" style={{ marginTop: 0 }}>
                 {drawPreview.totalWaves} Spielplan-Wellen · Welle 1 startet mit dem
-                Ereignis. Pro Paarung „Heim/Auswärts tauschen“.
+                Ereignis. Spieler per Dropdown tauschen oder Heim/Auswärts tauschen.
               </p>
               <div style={{ display: "grid", gap: "0.85rem" }}>
-                {drawPreview.rounds.map((round) => (
+                {drawPreview.rounds.map((round) => {
+                  const entries =
+                    drawPreview.groups.find(
+                      (group) => group.sortOrder === round.groupSortOrder,
+                    )?.entries ?? [];
+                  return (
                   <div key={`${round.planRoundIndex}-${round.title}`} className="t-draw-round">
                     <p className="t-status" style={{ marginBottom: "0.35rem" }}>
                       {round.title}
@@ -416,9 +477,47 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
                       {round.pairs.map((pair) => (
                         <li key={`${round.planRoundIndex}-${pair.matchIndex}`}>
                           <div className="t-draw-pair">
-                            <span>
-                              {pair.homeDisplayName} vs {pair.awayDisplayName}
-                            </span>
+                            <div className="t-draw-slot-row">
+                              <select
+                                className="t-draw-select"
+                                value={pair.homeEntryId}
+                                disabled={busy}
+                                onChange={(event) =>
+                                  void onAssignPlayer(
+                                    round.planRoundIndex,
+                                    pair.matchIndex,
+                                    "home",
+                                    event.target.value,
+                                  )
+                                }
+                              >
+                                {entries.map((entry) => (
+                                  <option key={entry.id} value={entry.id}>
+                                    {entry.displayName}
+                                  </option>
+                                ))}
+                              </select>
+                              <span className="t-draw-vs">vs</span>
+                              <select
+                                className="t-draw-select"
+                                value={pair.awayEntryId}
+                                disabled={busy}
+                                onChange={(event) =>
+                                  void onAssignPlayer(
+                                    round.planRoundIndex,
+                                    pair.matchIndex,
+                                    "away",
+                                    event.target.value,
+                                  )
+                                }
+                              >
+                                {entries.map((entry) => (
+                                  <option key={entry.id} value={entry.id}>
+                                    {entry.displayName}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
                             <button
                               type="button"
                               className="t-btn t-btn--ghost"
@@ -434,7 +533,8 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
                       ))}
                     </ul>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </section>
@@ -486,68 +586,99 @@ export function HostCockpit({ inviteCode, onNewEvent, onSessionCleared }: Props)
           <section className="t-card t-panel" aria-label="Spielpaarungen">
             <p className="t-label">Spielpaarungen</p>
             <div className="t-panel-body">
-              {rounds.length > 0 ? (
+              {roundsByWave.length > 0 ? (
                 <div style={{ display: "grid", gap: "0.85rem" }}>
-                  {rounds.map((round) => (
-                    <div key={round.id} className="t-subpanel">
-                      <p className="t-status" style={{ marginBottom: "0.35rem" }}>
-                        {round.title}
-                      </p>
-                      <p className="t-meta" style={{ marginBottom: "0.5rem" }}>
-                        {phaseLabel(round.phase)}
-                      </p>
-                      <ul className="t-list">
-                        {round.matches.map((match) => {
-                          const score = formatMatchScore(
-                            match.homeScore,
-                            match.awayScore,
-                          );
-                          const statusText = matchStatusLabel(
-                            match.status,
-                            Boolean(match.sessionInviteCode),
-                          );
-                          return (
-                            <li key={match.id}>
-                              <div className="t-match-row">
-                                <div className="t-match-main">
-                                  <span>
-                                    {match.homeEntry.displayName} vs{" "}
-                                    {match.awayEntry.displayName}
-                                  </span>
-                                  <span className="t-match-meta">
-                                    {score ?? statusText}
-                                  </span>
-                                </div>
-                                <div className="t-match-actions">
-                                  {match.sessionInviteCode ? (
-                                    <span className="t-match-meta">
-                                      Code {match.sessionInviteCode}
-                                    </span>
-                                  ) : null}
-                                  {!match.sessionId ? (
-                                    <button
-                                      type="button"
-                                      className="t-btn t-btn--ghost"
-                                      disabled={
-                                        busy ||
-                                        match.homeEntry.playerId == null ||
-                                        match.awayEntry.playerId == null
-                                      }
-                                      onClick={() => void onCreateMatchSession(match.id)}
-                                    >
-                                      {busy && activeMatchId === match.id
-                                        ? "Erzeuge…"
-                                        : "Session starten"}
-                                    </button>
-                                  ) : null}
-                                </div>
-                              </div>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-                  ))}
+                  {roundsByWave.map(([wave, waveRounds]) => {
+                    const isCurrent = scheduleMeta?.releasedWave === wave;
+                    const isCollapsed = collapsedWaves.has(wave);
+                    const waveDone = waveRounds.every((round) =>
+                      round.matches.every((match) => match.status === "FINISHED"),
+                    );
+                    return (
+                      <div
+                        key={`wave-${wave}`}
+                        className={`t-subpanel${isCurrent ? " t-subpanel--current" : ""}`}
+                      >
+                        <button
+                          type="button"
+                          className="t-wave-head"
+                          onClick={() => toggleWaveCollapse(wave)}
+                        >
+                          <span>
+                            Welle {wave}
+                            {isCurrent ? " · aktuell" : ""}
+                            {waveDone ? " · abgeschlossen" : ""}
+                          </span>
+                          <span className="t-match-meta">
+                            {isCollapsed ? "einblenden" : "einklappen"}
+                          </span>
+                        </button>
+                        {!isCollapsed &&
+                          waveRounds.map((round) => (
+                            <div key={round.id} className="t-round-block">
+                              <p className="t-status" style={{ marginBottom: "0.35rem" }}>
+                                {round.title}
+                              </p>
+                              <p className="t-meta" style={{ marginBottom: "0.5rem" }}>
+                                {phaseLabel(round.phase)}
+                              </p>
+                              <ul className="t-list">
+                                {round.matches.map((match) => {
+                                  const score = formatMatchScore(
+                                    match.homeScore,
+                                    match.awayScore,
+                                  );
+                                  const statusText = matchStatusLabel(
+                                    match.status,
+                                    Boolean(match.sessionInviteCode),
+                                  );
+                                  return (
+                                    <li key={match.id}>
+                                      <div className="t-match-row">
+                                        <div className="t-match-main">
+                                          <span>
+                                            {match.homeEntry.displayName} vs{" "}
+                                            {match.awayEntry.displayName}
+                                          </span>
+                                          <span className="t-match-meta">
+                                            {score ?? statusText}
+                                          </span>
+                                        </div>
+                                        <div className="t-match-actions">
+                                          {match.sessionInviteCode ? (
+                                            <span className="t-match-meta">
+                                              Code {match.sessionInviteCode}
+                                            </span>
+                                          ) : null}
+                                          {!match.sessionId ? (
+                                            <button
+                                              type="button"
+                                              className="t-btn t-btn--ghost"
+                                              disabled={
+                                                busy ||
+                                                match.homeEntry.playerId == null ||
+                                                match.awayEntry.playerId == null
+                                              }
+                                              onClick={() =>
+                                                void onCreateMatchSession(match.id)
+                                              }
+                                            >
+                                              {busy && activeMatchId === match.id
+                                                ? "Erzeuge…"
+                                                : "Session starten"}
+                                            </button>
+                                          ) : null}
+                                        </div>
+                                      </div>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            </div>
+                          ))}
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <p className="t-meta" style={{ margin: 0 }}>

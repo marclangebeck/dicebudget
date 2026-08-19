@@ -232,4 +232,54 @@ describe("tournaments API", () => {
     assert.equal(afterSwap.homeEntryId, beforeSwap.awayEntryId);
     assert.equal(afterSwap.awayEntryId, beforeSwap.homeEntryId);
   });
+
+  it("tauscht Spieler zwischen Paarungen in einer Runde", async () => {
+    const created = await request(app)
+      .post("/tournaments")
+      .send({ name: "Draw Swap", modeKey: "league", config: { rounds: 1 } })
+      .expect(201);
+
+    const code = created.body.tournament.inviteCode as string;
+    const hostToken = created.body.hostToken as string;
+    const tournamentId = created.body.tournament.id as string;
+
+    for (const [name, pid] of [
+      ["Anna", "p-a"],
+      ["Ben", "p-b"],
+      ["Carla", "p-c"],
+      ["Dora", "p-d"],
+    ]) {
+      await request(app)
+        .post(`/tournaments/invite/${code}/join`)
+        .send({ displayName: name, playerId: pid })
+        .expect(201);
+    }
+
+    const prepared = await request(app)
+      .post(`/tournaments/${tournamentId}/draw`)
+      .set("X-Host-Token", hostToken)
+      .send({ action: "prepare" })
+      .expect(200);
+
+    const round = prepared.body.drawPreview.rounds[0];
+    const first = round.pairs[0];
+    const second = round.pairs[1];
+
+    const swapped = await request(app)
+      .patch(`/tournaments/${tournamentId}/draw`)
+      .set("X-Host-Token", hostToken)
+      .send({
+        assignPlayer: {
+          planRoundIndex: 0,
+          matchIndex: 1,
+          side: "home",
+          entryId: second.homeEntryId,
+        },
+      })
+      .expect(200);
+
+    const after = swapped.body.drawPreview.rounds[0].pairs;
+    assert.equal(after[0].homeEntryId, second.homeEntryId);
+    assert.equal(after[1].homeEntryId, first.homeEntryId);
+  });
 });

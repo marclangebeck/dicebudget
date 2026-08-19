@@ -1250,6 +1250,11 @@ async function maybeFinalizeTournamentMatchFromSession(input: {
   if (phase === "LEAGUE") {
     await maybeFinishLeagueTournament(tournamentMatch.tournamentId);
   }
+
+  const { maybeAutoReleaseNextScheduleWave } = await import(
+    "./tournamentService.js"
+  );
+  await maybeAutoReleaseNextScheduleWave(tournamentMatch.tournamentId);
 }
 
 /**
