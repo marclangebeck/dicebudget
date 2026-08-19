@@ -3,7 +3,7 @@ import { DEFAULT_HOUSE_RULES, parseHouseRules, type HouseRulePrefs } from "./hou
 export const MATCH_GAME_COUNT_MIN = 1;
 export const MATCH_GAME_COUNT_MAX = 6;
 export const LEAGUE_ROUNDS_MIN = 1;
-export const LEAGUE_ROUNDS_MAX = 10;
+export const LEAGUE_ROUNDS_MAX = 2;
 export const GROUP_SIZE_MIN = 3;
 export const GROUP_SIZE_MAX = 6;
 
@@ -16,7 +16,8 @@ export type MatchPrefs = {
 };
 
 export type LeagueSettings = {
-  rounds: number;
+  /** true = Hin- und Rückspiel (2× gegen denselben Gegner) */
+  homeAndAway: boolean;
 };
 
 export type TurnierSettings = {
@@ -33,8 +34,12 @@ export const DEFAULT_MATCH_PREFS: MatchPrefs = {
 };
 
 export const DEFAULT_LEAGUE_SETTINGS: LeagueSettings = {
-  rounds: 3,
+  homeAndAway: false,
 };
+
+export function leagueRoundsFromSettings(league: LeagueSettings): 1 | 2 {
+  return league.homeAndAway ? 2 : 1;
+}
 
 export const DEFAULT_TURNIER_SETTINGS: TurnierSettings = {
   groupSize: 4,
@@ -90,6 +95,6 @@ export function buildEventConfigPayload(
   }
   return {
     ...prefs,
-    rounds: league.rounds,
+    rounds: leagueRoundsFromSettings(league),
   };
 }

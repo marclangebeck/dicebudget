@@ -34,7 +34,7 @@ describe("tournaments API", () => {
     assert.equal(created.body.tournament.status, "OPEN");
     assert.ok(created.body.tournament.inviteCode);
     assert.ok(created.body.hostToken);
-    assert.equal(created.body.tournament.config.rounds, 3);
+    assert.equal(created.body.tournament.config.rounds, 1);
     assert.equal(created.body.tournament.config.gameCount, 1);
 
     const code = created.body.tournament.inviteCode as string;
@@ -73,7 +73,7 @@ describe("tournaments API", () => {
     assert.equal(started.body.tournament.rounds.length, 1);
     assert.equal(started.body.tournament.rounds[0].matches.length, 1);
     assert.equal(started.body.scheduleMeta.releasedWave, 1);
-    assert.equal(started.body.scheduleMeta.hasMoreRounds, true);
+    assert.equal(started.body.scheduleMeta.hasMoreRounds, false);
     const firstMatchId = started.body.tournament.rounds[0].matches[0].id as string;
 
     const sessionCreated = await request(app)
@@ -183,6 +183,10 @@ describe("tournaments API", () => {
       .post("/tournaments")
       .send({ modeKey: "league", config: { rounds: 99 } })
       .expect(400);
+    await request(app)
+      .post("/tournaments")
+      .send({ modeKey: "league", config: { rounds: 3 } })
+      .expect(400);
   });
 
   it("lehnt Start mit falschem Host-Token ab", async () => {
@@ -196,7 +200,7 @@ describe("tournaments API", () => {
   it("bereitet Auslosung vor, mischt und tauscht Heim/Auswärts", async () => {
     const created = await request(app)
       .post("/tournaments")
-      .send({ name: "Draw Test", modeKey: "league" })
+      .send({ name: "Draw Test", modeKey: "league", config: { rounds: 2 } })
       .expect(201);
 
     const code = created.body.tournament.inviteCode as string;
@@ -219,7 +223,7 @@ describe("tournaments API", () => {
       .expect(200);
 
     assert.ok(prepared.body.drawPreview);
-    assert.equal(prepared.body.drawPreview.rounds.length, 3);
+    assert.equal(prepared.body.drawPreview.rounds.length, 2);
     const beforeSwap = prepared.body.drawPreview.rounds[0].pairs[0];
 
     const swapped = await request(app)

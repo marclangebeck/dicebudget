@@ -3,15 +3,13 @@
 import { useEffect, useState } from "react";
 import { MatchRulesFields } from "@/components/MatchRulesFields";
 import { SetupSegmented } from "@/components/SetupSegmented";
-import { SetupStepperRow } from "@/components/SetupStepperRow";
+import { SetupToggleRow } from "@/components/SetupToggleRow";
 import { createTournament } from "@/lib/api";
 import { APP_NAME } from "@/lib/branding";
 import {
   DEFAULT_LEAGUE_SETTINGS,
   DEFAULT_MATCH_PREFS,
   DEFAULT_TURNIER_SETTINGS,
-  LEAGUE_ROUNDS_MAX,
-  LEAGUE_ROUNDS_MIN,
   buildEventConfigPayload,
   formatGroupPreview,
   type LeagueSettings,
@@ -214,13 +212,11 @@ export function EventSetupCockpit({ onCreated, onCancel }: Props) {
           <div className="t-panel-body">
             {modeKey === "league" ? (
               <>
-                <SetupStepperRow
-                  title="Runden"
-                  hint="Wie oft die Liga-Runde gespielt wird"
-                  value={league.rounds}
-                  min={LEAGUE_ROUNDS_MIN}
-                  max={LEAGUE_ROUNDS_MAX}
-                  onChange={(rounds) => setLeague({ rounds })}
+                <SetupToggleRow
+                  title="Hin- und Rückspiel"
+                  hint="Aus: einmal gegen jeden · An: zweimal gegen denselben Gegner"
+                  checked={league.homeAndAway}
+                  onChange={(homeAndAway) => setLeague({ homeAndAway })}
                 />
                 <p className="t-setting-hint">Wertung fest: Sieg +1.</p>
               </>
@@ -289,17 +285,20 @@ export function EventSetupCockpit({ onCreated, onCancel }: Props) {
                 Zur Lobby
               </button>
             )}
-            <button
-              type="button"
-              className="t-btn t-btn--accent"
-              disabled={busy}
-              onClick={() => void onCreate()}
-            >
-              {busy ? "Wird angelegt…" : "Event anlegen"}
-            </button>
           </div>
         </section>
       </div>
+
+      <footer className="t-setup-create-bar">
+        <button
+          type="button"
+          className="t-btn t-btn--accent t-btn--create-square"
+          disabled={busy}
+          onClick={() => void onCreate()}
+        >
+          {busy ? "…" : "Event anlegen"}
+        </button>
+      </footer>
     </main>
   );
 }

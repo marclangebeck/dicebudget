@@ -454,6 +454,30 @@ a {
   flex: 1;
   min-height: 0;
   align-items: stretch;
+  padding-bottom: 0.25rem;
+}
+
+.t-setup-create-bar {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding:
+    0.65rem 0
+    max(0.85rem, env(safe-area-inset-bottom));
+}
+
+.t-btn--create-square {
+  width: clamp(5.75rem, 20vw, 7.25rem);
+  height: clamp(5.75rem, 20vw, 7.25rem);
+  min-height: 0;
+  aspect-ratio: 1;
+  border-radius: 1.15rem;
+  padding: 0.55rem;
+  font-size: clamp(0.78rem, 2.2vw, 0.92rem);
+  font-weight: 750;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
 }
 
 .t-cockpit-grid .t-card {

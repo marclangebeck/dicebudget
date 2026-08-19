@@ -5,8 +5,6 @@ import {
   DEFAULT_TURNIER_SETTINGS,
   GROUP_SIZE_MAX,
   GROUP_SIZE_MIN,
-  LEAGUE_ROUNDS_MAX,
-  LEAGUE_ROUNDS_MIN,
   MATCH_GAME_COUNT_MAX,
   MATCH_GAME_COUNT_MIN,
   type LeagueSettings,
@@ -67,11 +65,13 @@ function parseMatch(raw: unknown): MatchPrefs {
 
 function parseLeague(raw: unknown): LeagueSettings {
   const obj = asRecord(raw);
-  const rounds =
-    typeof obj.rounds === "number"
-      ? clampInt(obj.rounds, LEAGUE_ROUNDS_MIN, LEAGUE_ROUNDS_MAX)
-      : DEFAULT_LEAGUE_SETTINGS.rounds;
-  return { rounds };
+  if (typeof obj.homeAndAway === "boolean") {
+    return { homeAndAway: obj.homeAndAway };
+  }
+  if (typeof obj.rounds === "number") {
+    return { homeAndAway: obj.rounds >= 2 };
+  }
+  return DEFAULT_LEAGUE_SETTINGS;
 }
 
 function parseTurnier(raw: unknown): TurnierSettings {

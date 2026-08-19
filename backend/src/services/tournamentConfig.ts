@@ -1,7 +1,7 @@
 export const MATCH_GAME_COUNT_MIN = 1;
 export const MATCH_GAME_COUNT_MAX = 6;
 export const LEAGUE_ROUNDS_MIN = 1;
-export const LEAGUE_ROUNDS_MAX = 10;
+export const LEAGUE_ROUNDS_MAX = 2;
 export const GROUP_SIZE_MIN = 3;
 export const GROUP_SIZE_MAX = 6;
 
@@ -55,7 +55,7 @@ export const DEFAULT_MATCH_CONFIG: TournamentMatchConfig = {
   houseRules: { ...DEFAULT_HOUSE_RULES },
 };
 
-export const DEFAULT_LEAGUE_ROUNDS = 3;
+export const DEFAULT_LEAGUE_ROUNDS = 1;
 export const DEFAULT_GROUP_SIZE = 4;
 export const DEFAULT_QUALIFY_PER_GROUP = 2 as const;
 

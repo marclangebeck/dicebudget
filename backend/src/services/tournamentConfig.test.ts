@@ -10,7 +10,7 @@ describe("normalizeTournamentConfig", () => {
     const config = normalizeTournamentConfig("league", {});
     assert.ok("rounds" in config);
     if ("rounds" in config) {
-      assert.equal(config.rounds, 3);
+      assert.equal(config.rounds, 1);
     }
     assert.equal(config.useStrategyRules, true);
     assert.equal(config.gameCount, 1);
