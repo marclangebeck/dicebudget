@@ -1,6 +1,5 @@
 "use client";
 
-import { PARTICIPANT_APP_HINT, PARTICIPANT_APP_NAME } from "@/lib/branding";
 import {
   formatGroupPreview,
   matchModeLabel,
@@ -110,16 +109,6 @@ export function EventStudioPoster({
             ))}
           </div>
         </div>
-
-        <footer className="t-studio-poster-pro">
-          <span className="t-studio-poster-pro-mark" aria-hidden>
-            ⚀
-          </span>
-          <div>
-            <p className="t-studio-poster-pro-title">{PARTICIPANT_APP_NAME}</p>
-            <p className="t-studio-poster-pro-text">{PARTICIPANT_APP_HINT}</p>
-          </div>
-        </footer>
       </div>
     </article>
   );

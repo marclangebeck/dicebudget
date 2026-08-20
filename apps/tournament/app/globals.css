@@ -496,59 +496,165 @@ a {
   overflow: visible;
 }
 
-.t-pro-promo {
+.t-pro-banner {
+  position: relative;
   flex: 0 0 auto;
-  display: flex;
-  align-items: flex-start;
-  gap: 0.85rem;
-  padding: 0.95rem 1rem;
-  border-color: rgba(232, 195, 122, 0.4);
-  background: rgba(232, 195, 122, 0.1);
+  border-radius: 1.2rem;
+  overflow: hidden;
 }
 
-.t-pro-promo-mark {
-  flex-shrink: 0;
+.t-pro-banner-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 0% 50%, rgba(232, 195, 122, 0.22), transparent 52%),
+    radial-gradient(circle at 100% 0%, rgba(76, 201, 240, 0.12), transparent 48%);
+  pointer-events: none;
+}
+
+.t-pro-banner-inner {
+  position: relative;
+  z-index: 1;
   display: grid;
-  gap: 0.15rem;
-  padding: 0.45rem 0.5rem;
-  border-radius: 0.75rem;
-  border: 1px solid rgba(214, 168, 90, 0.35);
-  background: rgba(7, 16, 28, 0.55);
-  line-height: 1;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.85rem 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(232, 195, 122, 0.42);
+  border-radius: 1.2rem;
+  background: linear-gradient(
+    135deg,
+    rgba(232, 195, 122, 0.14),
+    var(--glass) 38%,
+    var(--glass)
+  );
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+  box-shadow: var(--glass-shadow);
 }
 
-.t-pro-promo-dice {
-  font-size: 1.15rem;
-  color: var(--gold);
-  filter: drop-shadow(0 0 6px rgba(214, 168, 90, 0.35));
+.t-pro-banner-icon-wrap {
+  flex-shrink: 0;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--glass-edge);
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.45);
 }
 
-.t-pro-promo-copy {
+.t-pro-banner-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.t-pro-banner-copy {
   min-width: 0;
 }
 
-.t-pro-promo-eyebrow {
-  margin: 0 0 0.2rem;
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(214, 168, 90, 0.88);
+.t-pro-banner-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.35rem;
 }
 
-.t-pro-promo-title {
-  margin: 0 0 0.35rem;
+.t-pro-banner-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.45rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--glass-edge);
+  background: var(--glass-fill);
+  font-size: 0.58rem;
+  font-weight: 750;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.t-pro-banner-badge--feature {
+  border-color: rgba(232, 195, 122, 0.55);
+  background: rgba(232, 195, 122, 0.16);
+  color: #fde68a;
+}
+
+.t-pro-banner-title {
+  margin: 0;
   font-size: 1.05rem;
-  font-weight: 800;
-  letter-spacing: 0.01em;
+  font-weight: 850;
+  letter-spacing: -0.01em;
   color: var(--ink);
 }
 
-.t-pro-promo-text {
-  margin: 0;
+.t-pro-banner-subtitle {
+  margin: 0.1rem 0 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(232, 195, 122, 0.95);
+}
+
+.t-pro-banner-text {
+  margin: 0.35rem 0 0;
   font-size: 0.78rem;
   line-height: 1.45;
   color: var(--muted);
+}
+
+.t-pro-banner-cta {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 2.65rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.92);
+  color: #0c1420;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    transform 0.12s ease,
+    filter 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.t-pro-banner-cta:hover {
+  filter: brightness(1.04);
+  box-shadow: 0 8px 24px -10px rgba(255, 255, 255, 0.35);
+}
+
+.t-pro-banner-cta:active {
+  transform: scale(0.985);
+}
+
+.t-pro-banner-cta-arrow {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+@media (max-width: 720px) {
+  .t-pro-banner-inner {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .t-pro-banner-cta {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
 }
 
 .t-setup-create-wrap {
@@ -901,42 +1007,6 @@ a {
 .t-studio-chip--match {
   border-color: rgba(56, 189, 248, 0.22);
   background: rgba(56, 189, 248, 0.08);
-}
-
-.t-studio-poster-pro {
-  margin-top: auto;
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding-top: 0.85rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.t-studio-poster-pro-mark {
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  width: 2.1rem;
-  height: 2.1rem;
-  border-radius: 0.65rem;
-  border: 1px solid rgba(214, 168, 90, 0.35);
-  background: rgba(214, 168, 90, 0.12);
-  font-size: 1.1rem;
-  color: var(--gold);
-}
-
-.t-studio-poster-pro-title {
-  margin: 0 0 0.2rem;
-  font-size: 0.88rem;
-  font-weight: 800;
-  color: var(--ink);
-}
-
-.t-studio-poster-pro-text {
-  margin: 0;
-  font-size: 0.72rem;
-  line-height: 1.45;
-  color: var(--muted);
 }
 
 .t-studio-poster-col .t-setup-create-wrap {

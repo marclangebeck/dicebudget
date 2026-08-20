@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { DiceBudgetProPromoBanner } from "@/components/DiceBudgetProPromoBanner";
 import { EventCreateButton } from "@/components/EventCreateButton";
 import {
   EventStudioContext,
@@ -135,6 +136,7 @@ export function EventSetupCockpit({ onCreated, onCancel }: Props) {
             turnier={turnier}
             match={match}
           />
+          <DiceBudgetProPromoBanner />
           <div className="t-setup-create-wrap">
             {error && (
               <p className="t-error t-setup-create-error" role="alert">
