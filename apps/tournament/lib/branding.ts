@@ -3,7 +3,7 @@ export const APP_SHORT = "Tournament";
 export const PARTICIPANT_APP_NAME = "DiceBudget Pro";
 export const PARTICIPANT_APP_SUBTITLE = "Strategy Edition · iOS";
 export const PARTICIPANT_APP_TAGLINE =
-  "Kniffel mit Wurf-Pool, Multiplayer und Turnier-Modus — die App für alle Spieler.";
+  "Strategisches Würfelspiel mit Wurf-Pool, Multiplayer und Turnier-Modus — die App für alle Spieler.";
 export const PARTICIPANT_APP_BADGE = "Für iPhone & iPad";
 export const PARTICIPANT_APP_FEATURE_BADGE = "Turnier-Modus";
 export const PARTICIPANT_APP_CTA_STORE = "Im App Store";
