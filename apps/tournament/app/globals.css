@@ -1,19 +1,31 @@
 :root {
-  /* An DiceBudget Startscreen angelehnt: kühles Navy/Slate, Teal/Sky, Gold nur Akzent */
-  --bg0: #07101c;
-  --bg1: #102033;
-  --bg2: #1a2332;
-  --ink: #f1f5f9;
-  --muted: #94a3b8;
-  --accent: #38bdf8;
-  --accent-soft: rgba(56, 189, 248, 0.28);
-  --gold: #d6a85a;
-  --teal: #2dd4bf;
-  --line: rgba(255, 255, 255, 0.14);
-  --glass: rgba(15, 23, 42, 0.55);
-  --glass-edge: rgba(255, 255, 255, 0.16);
-  --danger: #fca5a5;
+  /* Glasmorph: dunkle Fläche, Milchglas, helle Schrift, Akzent nur sparsam */
+  --bg0: #06090f;
+  --bg1: #0c1420;
+  --bg2: #151e2c;
+  --ink: #ffffff;
+  --muted: rgba(255, 255, 255, 0.62);
+  --accent: #4cc9f0;
+  --accent-soft: rgba(76, 201, 240, 0.28);
+  --gold: #e8c37a;
+  --teal: #3ee0c4;
+  --line: rgba(255, 255, 255, 0.22);
+  --glass: rgba(255, 255, 255, 0.09);
+  --glass-fill: rgba(255, 255, 255, 0.06);
+  --glass-edge: rgba(255, 255, 255, 0.28);
+  --glass-blur: 28px;
+  --glass-shadow:
+    0 18px 48px -22px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  --danger: #ffb4b4;
   --font: var(--font-tournament), "Avenir Next", "Segoe UI", sans-serif;
+}
+
+@supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
+  :root {
+    --glass: rgba(18, 28, 42, 0.86);
+    --glass-fill: rgba(18, 28, 42, 0.72);
+  }
 }
 
 * {
@@ -27,9 +39,10 @@ body {
   font-family: var(--font);
   color: var(--ink);
   background:
-    radial-gradient(circle at 18% 12%, rgba(30, 93, 116, 0.34), transparent 34%),
-    radial-gradient(circle at 88% 10%, rgba(214, 168, 90, 0.1), transparent 38%),
-    linear-gradient(145deg, var(--bg0) 0%, var(--bg1) 58%, var(--bg2) 100%);
+    radial-gradient(ellipse at 12% 0%, rgba(62, 224, 196, 0.16), transparent 42%),
+    radial-gradient(ellipse at 88% 8%, rgba(76, 201, 240, 0.14), transparent 40%),
+    radial-gradient(ellipse at 70% 100%, rgba(232, 195, 122, 0.08), transparent 46%),
+    linear-gradient(165deg, var(--bg0) 0%, var(--bg1) 52%, var(--bg2) 100%);
   background-attachment: fixed;
 }
 
@@ -57,7 +70,7 @@ a {
   font-size: clamp(1.75rem, 4vw, 2.35rem);
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #f8fafc;
+  color: var(--ink);
 }
 
 .t-tagline {
@@ -79,10 +92,13 @@ a {
   min-height: 3.4rem;
   align-items: center;
   justify-content: center;
-  border-radius: 0.9rem;
-  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 1.05rem;
+  border: 1px solid var(--glass-edge);
   padding: 0.85rem 1.1rem;
-  background: linear-gradient(155deg, rgba(56, 189, 248, 0.22), rgba(12, 26, 46, 0.95));
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+  box-shadow: var(--glass-shadow);
   color: var(--ink);
   font: inherit;
   font-size: 1.05rem;
@@ -91,7 +107,7 @@ a {
   cursor: pointer;
   text-decoration: none;
   text-align: center;
-  transition: transform 0.12s ease, filter 0.12s ease, border-color 0.12s ease;
+  transition: transform 0.12s ease, filter 0.12s ease, border-color 0.12s ease, background 0.12s ease;
 }
 
 .t-btn:hover {
@@ -110,7 +126,7 @@ a {
 }
 
 .t-btn--ghost {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--glass-fill);
   border-color: var(--glass-edge);
 }
 
@@ -122,7 +138,9 @@ a {
   border-radius: 0.9rem;
   border: 1px solid var(--glass-edge);
   padding: 0.85rem 1rem;
-  background: rgba(2, 6, 23, 0.35);
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
   color: var(--ink);
   font: inherit;
   cursor: pointer;
@@ -135,8 +153,8 @@ a {
 }
 
 .t-choice--selected {
-  border-color: rgba(56, 189, 248, 0.55);
-  background: rgba(56, 189, 248, 0.14);
+  border-color: rgba(76, 201, 240, 0.7);
+  background: rgba(76, 201, 240, 0.18);
 }
 
 .t-choice-title {
@@ -164,20 +182,19 @@ a {
 }
 
 .t-btn--accent {
-  border-color: rgba(45, 212, 191, 0.4);
-  background: linear-gradient(155deg, rgba(45, 212, 191, 0.28), rgba(7, 31, 34, 0.95));
+  border-color: rgba(62, 224, 196, 0.55);
+  background: rgba(62, 224, 196, 0.16);
 }
 
 .t-card {
   width: min(100%, 36rem);
-  border-radius: 1.15rem;
+  border-radius: 1.35rem;
   border: 1px solid var(--glass-edge);
   padding: 1.15rem 1.2rem;
   background: var(--glass);
-  backdrop-filter: blur(12px);
-  box-shadow:
-    0 18px 44px -24px rgba(0, 0, 0, 0.72),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  box-shadow: var(--glass-shadow);
 }
 
 .t-label {
@@ -195,9 +212,9 @@ a {
   width: 100%;
   min-height: 2.85rem;
   border-radius: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--glass-edge);
   padding: 0.65rem 0.8rem;
-  background: rgba(2, 6, 23, 0.45);
+  background: var(--glass-fill);
   color: var(--ink);
   font: inherit;
   font-size: 1rem;
@@ -207,12 +224,12 @@ a {
 }
 
 .t-input::placeholder {
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.42);
   font-weight: 500;
 }
 
 .t-input:focus {
-  outline: 2px solid rgba(56, 189, 248, 0.45);
+  outline: 2px solid rgba(76, 201, 240, 0.45);
   outline-offset: 1px;
 }
 
@@ -250,9 +267,9 @@ a {
   align-items: center;
   justify-content: space-between;
   border-radius: 0.7rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-edge);
   padding: 0.55rem 0.75rem;
-  background: rgba(2, 6, 23, 0.35);
+  background: var(--glass-fill);
   font-weight: 650;
 }
 
@@ -312,8 +329,8 @@ a {
   gap: 0.3rem;
   padding: 0.22rem;
   border-radius: 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(2, 6, 23, 0.4);
+  border: 1px solid var(--glass-edge);
+  background: var(--glass-fill);
 }
 
 .t-segmented-option {
@@ -329,7 +346,7 @@ a {
 }
 
 .t-segmented-option.is-selected {
-  background: rgba(56, 189, 248, 0.16);
+  background: rgba(255, 255, 255, 0.16);
   color: var(--ink);
 }
 
@@ -380,8 +397,8 @@ a {
   width: 2.85rem;
   height: 1.7rem;
   border-radius: 999px;
-  border: 2px solid rgba(255, 255, 255, 0.16);
-  background: rgba(2, 6, 23, 0.55);
+  border: 1px solid var(--glass-edge);
+  background: var(--glass-fill);
   cursor: pointer;
 }
 
@@ -391,8 +408,8 @@ a {
 }
 
 .t-switch.is-on {
-  border-color: rgba(56, 189, 248, 0.5);
-  background: rgba(56, 189, 248, 0.35);
+  border-color: rgba(62, 224, 196, 0.7);
+  background: rgba(62, 224, 196, 0.42);
 }
 
 .t-switch-knob {
@@ -416,7 +433,7 @@ a {
   bottom: 0.4rem;
   z-index: 20;
   margin: 0;
-  color: rgba(148, 163, 184, 0.55);
+  color: rgba(255, 255, 255, 0.32);
   font-size: 0.62rem;
   font-weight: 650;
   letter-spacing: 0.04em;
@@ -485,10 +502,8 @@ a {
   align-items: flex-start;
   gap: 0.85rem;
   padding: 0.95rem 1rem;
-  border-color: rgba(214, 168, 90, 0.28);
-  background:
-    linear-gradient(145deg, rgba(214, 168, 90, 0.12), rgba(15, 23, 42, 0.72)),
-    var(--glass);
+  border-color: rgba(232, 195, 122, 0.4);
+  background: rgba(232, 195, 122, 0.1);
 }
 
 .t-pro-promo-mark {
@@ -551,18 +566,16 @@ a {
   position: relative;
   width: 100%;
   min-height: 4.15rem;
-  padding: 2px;
+  padding: 1px;
   border: none;
-  border-radius: 1.15rem;
+  border-radius: 1.25rem;
   background: linear-gradient(
     120deg,
-    rgba(45, 212, 191, 0.95),
-    rgba(56, 189, 248, 0.85) 42%,
-    rgba(214, 168, 90, 0.75)
+    rgba(62, 224, 196, 0.85),
+    rgba(76, 201, 240, 0.65) 48%,
+    rgba(255, 255, 255, 0.35)
   );
-  box-shadow:
-    0 14px 36px -14px rgba(45, 212, 191, 0.55),
-    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  box-shadow: var(--glass-shadow);
   cursor: pointer;
   overflow: hidden;
   transition:
@@ -621,10 +634,12 @@ a {
   width: 100%;
   min-height: calc(4.15rem - 4px);
   padding: 0.75rem 1rem 0.75rem 0.85rem;
-  border-radius: calc(1.15rem - 2px);
+  border-radius: calc(1.25rem - 1px);
   background:
-    radial-gradient(circle at 12% 20%, rgba(45, 212, 191, 0.22), transparent 42%),
-    linear-gradient(155deg, rgba(8, 28, 36, 0.98), rgba(10, 22, 38, 0.94));
+    radial-gradient(circle at 12% 20%, rgba(62, 224, 196, 0.18), transparent 46%),
+    var(--glass);
+  -webkit-backdrop-filter: blur(22px) saturate(1.3);
+  backdrop-filter: blur(22px) saturate(1.3);
 }
 
 .t-btn-create-event__icon {
@@ -662,7 +677,7 @@ a {
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba(148, 163, 184, 0.95);
+  color: var(--muted);
 }
 
 .t-btn-create-event__arrow {
@@ -751,9 +766,9 @@ a {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 18% 8%, rgba(45, 212, 191, 0.28), transparent 42%),
-    radial-gradient(circle at 88% 12%, rgba(214, 168, 90, 0.18), transparent 38%),
-    linear-gradient(165deg, rgba(12, 28, 44, 0.95), rgba(7, 16, 28, 0.98));
+    radial-gradient(circle at 18% 8%, rgba(62, 224, 196, 0.22), transparent 44%),
+    radial-gradient(circle at 88% 12%, rgba(76, 201, 240, 0.16), transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(255, 255, 255, 0.05), transparent 48%);
   pointer-events: none;
 }
 
@@ -766,13 +781,12 @@ a {
   height: 100%;
   min-height: 0;
   padding: clamp(1rem, 2vw, 1.35rem);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--glass-edge);
   border-radius: 1.35rem;
-  background: rgba(10, 22, 38, 0.55);
-  backdrop-filter: blur(14px);
-  box-shadow:
-    0 22px 50px -28px rgba(0, 0, 0, 0.85),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.45);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.45);
+  box-shadow: var(--glass-shadow);
 }
 
 .t-studio-poster-top {
@@ -834,11 +848,11 @@ a {
 }
 
 .t-studio-poster-name::placeholder {
-  color: rgba(148, 163, 184, 0.55);
+  color: rgba(255, 255, 255, 0.38);
 }
 
 .t-studio-poster-name.is-empty {
-  color: rgba(148, 163, 184, 0.72);
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .t-studio-poster-preview {
@@ -859,7 +873,7 @@ a {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(148, 163, 184, 0.88);
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .t-studio-chips {
@@ -874,11 +888,11 @@ a {
   min-height: 1.75rem;
   padding: 0.2rem 0.65rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-edge);
+  background: var(--glass-fill);
   font-size: 0.74rem;
   font-weight: 650;
-  color: rgba(226, 232, 240, 0.95);
+  color: var(--ink);
   transition:
     background 0.18s ease,
     border-color 0.18s ease;
@@ -934,13 +948,12 @@ a {
   flex-direction: column;
   min-height: 0;
   min-width: 0;
-  border-radius: 1.25rem;
+  border-radius: 1.35rem;
   border: 1px solid var(--glass-edge);
   background: var(--glass);
-  backdrop-filter: blur(12px);
-  box-shadow:
-    0 18px 44px -24px rgba(0, 0, 0, 0.72),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  box-shadow: var(--glass-shadow);
   overflow: hidden;
 }
 
@@ -1159,7 +1172,7 @@ a {
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.05;
-  color: #f8fafc;
+  color: var(--ink);
 }
 
 .t-display-head-meta {
@@ -1175,8 +1188,10 @@ a {
   min-height: 2.4rem;
   padding: 0.35rem 0.9rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-edge);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
   color: var(--ink);
   font-size: clamp(0.95rem, 1.6vw, 1.2rem);
   font-weight: 750;
@@ -1235,10 +1250,12 @@ a {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  border-radius: 1.1rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(2, 6, 23, 0.42);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-radius: 1.35rem;
+  border: 1px solid var(--glass-edge);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+  box-shadow: var(--glass-shadow);
   overflow: hidden;
 }
 
@@ -1270,9 +1287,9 @@ a {
 
 .t-display-standings-card,
 .t-display-round {
-  border-radius: 0.95rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(15, 23, 42, 0.55);
+  border-radius: 1.05rem;
+  border: 1px solid var(--glass-edge);
+  background: var(--glass-fill);
   overflow: hidden;
 }
 
@@ -1351,9 +1368,9 @@ a {
 }
 
 .t-display-match {
-  border-radius: 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(2, 6, 23, 0.45);
+  border-radius: 0.95rem;
+  border: 1px solid var(--glass-edge);
+  background: var(--glass-fill);
   padding: clamp(0.65rem, 1.1vh, 0.9rem) clamp(0.85rem, 1.4vw, 1.1rem);
 }
 
@@ -1387,7 +1404,7 @@ a {
 
 .t-display-match-focus-hint {
   margin-left: auto;
-  color: rgba(148, 163, 184, 0.85);
+  color: var(--muted);
   font-size: clamp(0.78rem, 1.1vw, 0.92rem);
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -1398,13 +1415,13 @@ a {
 }
 
 .t-display-match--live {
-  border-color: rgba(45, 212, 191, 0.45);
+  border-color: rgba(62, 224, 196, 0.55);
   background: linear-gradient(
     135deg,
-    rgba(45, 212, 191, 0.14),
-    rgba(2, 6, 23, 0.55)
+    rgba(62, 224, 196, 0.18),
+    var(--glass-fill)
   );
-  box-shadow: 0 0 28px rgba(45, 212, 191, 0.12);
+  box-shadow: 0 0 28px rgba(62, 224, 196, 0.12);
 }
 
 .t-display-match--done {
@@ -1540,8 +1557,8 @@ a {
   min-height: 2.75rem;
   padding: 0.45rem 1rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-edge);
+  background: var(--glass);
   font-size: clamp(1rem, 1.8vw, 1.25rem);
   font-weight: 750;
 }
@@ -1554,7 +1571,7 @@ a {
   gap: 0.5rem 1rem;
   flex-shrink: 0;
   padding-top: 0.35rem;
-  color: rgba(148, 163, 184, 0.75);
+  color: var(--muted);
   font-size: clamp(0.78rem, 1.1vw, 0.92rem);
   font-weight: 650;
 }
@@ -1669,13 +1686,15 @@ a {
   justify-content: center;
   gap: clamp(1rem, 2vh, 1.5rem);
   border-radius: 1.2rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-edge);
   background:
-    radial-gradient(circle at 20% 20%, rgba(45, 212, 191, 0.08), transparent 42%),
-    radial-gradient(circle at 80% 80%, rgba(56, 189, 248, 0.08), transparent 42%),
-    rgba(2, 6, 23, 0.55);
+    radial-gradient(circle at 20% 20%, rgba(62, 224, 196, 0.12), transparent 42%),
+    radial-gradient(circle at 80% 80%, rgba(76, 201, 240, 0.1), transparent 42%),
+    var(--glass);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
   padding: clamp(1.25rem, 2.5vh, 2rem) clamp(1rem, 2vw, 2rem);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: var(--glass-shadow);
 }
 
 .t-display-focus-live-badge {
@@ -1730,8 +1749,8 @@ a {
   gap: 0.35rem;
   padding: clamp(0.85rem, 1.5vh, 1.15rem);
   border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid var(--glass-edge);
+  background: var(--glass-fill);
 }
 
 .t-display-focus-player--away {
@@ -1742,8 +1761,8 @@ a {
   border-color: rgba(214, 168, 90, 0.45);
   background: linear-gradient(
     135deg,
-    rgba(214, 168, 90, 0.12),
-    rgba(15, 23, 42, 0.55)
+    rgba(232, 195, 122, 0.16),
+    var(--glass-fill)
   );
   box-shadow: 0 0 32px rgba(214, 168, 90, 0.1);
 }
@@ -1842,28 +1861,30 @@ a {
 .t-display-focus-live-meta {
   margin: 0;
   text-align: center;
-  color: rgba(148, 163, 184, 0.8);
+  color: var(--muted);
   font-size: clamp(0.78rem, 1.1vw, 0.92rem);
   font-weight: 650;
 }
 
 .t-auto-hint {
   margin: 0.35rem 0 0;
-  color: rgba(148, 163, 184, 0.78);
+  color: var(--muted);
   font-size: 0.72rem;
   line-height: 1.35;
 }
 
 .t-subpanel {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 1.05rem;
   padding: 0.8rem;
+  background: var(--glass-fill);
 }
 
 .t-draw-round {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 1.05rem;
   padding: 0.8rem;
+  background: var(--glass-fill);
 }
 
 .t-draw-pair {
@@ -1944,9 +1965,9 @@ a {
 .t-draw-select {
   min-width: 7rem;
   border-radius: 0.65rem;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(15, 23, 42, 0.72);
-  color: #fff;
+  border: 1px solid var(--glass-edge);
+  background: var(--glass);
+  color: var(--ink);
   padding: 0.35rem 0.5rem;
   font-size: 0.82rem;
 }
@@ -1955,10 +1976,10 @@ a {
   grid-column: 1 / -1;
   margin: 0;
   border-radius: 0.85rem;
-  border: 1px dashed rgba(148, 163, 184, 0.35);
-  background: rgba(15, 23, 42, 0.42);
+  border: 1px dashed var(--glass-edge);
+  background: var(--glass-fill);
   padding: 0.65rem 0.85rem;
-  color: rgba(148, 163, 184, 0.92);
+  color: var(--muted);
   font-size: 0.88rem;
   font-weight: 650;
 }
