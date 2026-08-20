@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
+import { NativeOnlyGate } from "@/components/NativeOnlyGate";
 import { APP_NAME, APP_TAGLINE } from "@/lib/branding";
 import "./globals.css";
 
@@ -35,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="de">
       <body className={`${outfit.variable} antialiased`}>
-        {children}
+        <NativeOnlyGate>{children}</NativeOnlyGate>
         {build ? <p className="t-build-id">{build}</p> : null}
       </body>
     </html>

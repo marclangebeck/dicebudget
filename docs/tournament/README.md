@@ -15,7 +15,7 @@ Organisation = Host-App. Mitspielen = DiceBudget Pro (oder später GO). **Kein P
 
 | Rolle | App / URL | Aufgabe |
 |-------|-----------|---------|
-| **Host** | `apps/tournament` (Port **3022**, iOS-Bundle `de.bottletrade.dicebudget.tournament`) | Event anlegen, Auslosung, Lobby, Wellen freigeben, Match-Sessions starten |
+| **Host** | `apps/tournament` — **nur iOS-App** (`de.bottletrade.dicebudget.tournament`) | Event anlegen, Auslosung, Lobby, Wellen freigeben, Match-Sessions starten |
 | **Teilnehmer** | **DiceBudget Pro** (`frontend/`) — Route `/tournament/join` | QR scannen, Match-Fokus, Link zur Partie (`/multi/join`) |
 | **Beamer / Wand** | Host-App **`/display?code=EVENTCODE`** | Tabellen, Paarungen, Fokus auf eine laufende Partie |
 | **Zuschauer** | Beamer (read-only) | — |
@@ -28,9 +28,10 @@ Organisation = Host-App. Mitspielen = DiceBudget Pro (oder später GO). **Kein P
 |------------|------------|-----------|
 | **API** | `https://dicebudget.bottle-trade.de/api/` | `http://127.0.0.1:3020` |
 | **Teilnehmer-Web** | `https://dicebudget.bottle-trade.de/tournament/join?code=…` (Nginx → `frontend/out/`) | Frontend Port 3021 |
-| **Host + Beamer** | **Nicht** auf der Prod-Domain — Laptop/Tablet mit `apps/tournament` (`npm run dev` oder iOS) | Port **3022** |
+| **Host + Beamer** | **Nicht** auf der Prod-Domain — **installierte Tournament-iOS-App** auf dem Host-iPad | Kein öffentlicher Browser-Zugang |
+| **Host dev (Mac)** | `npm run dev` Port **3022** — nur Entwicklung | Browser erlaubt nur im Dev-Modus |
 
-Teilnehmer im **Browser** nutzen die Prod-Website. Teilnehmer in der **installierten App** brauchen zusätzlich **`frontend` → `npm run build:ios`** (Mac), weil das UI aus dem App-Bundle kommt.
+Teilnehmer im **Browser** nutzen die Prod-Website. Teilnehmer in der **installierten Pro-App** brauchen zusätzlich **`frontend` → `npm run build:ios`** (Mac).
 
 ## Bildschirme während eines Events
 

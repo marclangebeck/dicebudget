@@ -1,15 +1,7 @@
 import type { SessionRankingDto } from "./sessionTypes";
+import { isNativeShell } from "./nativeShell";
 
 const PROD_API = "https://dicebudget.bottle-trade.de/api";
-
-function isNativeShell(): boolean {
-  if (typeof window === "undefined") return false;
-  const cap = (window as Window & { Capacitor?: { isNativePlatform?: () => boolean } })
-    .Capacitor;
-  if (cap?.isNativePlatform?.()) return true;
-  const protocol = window.location.protocol;
-  return protocol === "capacitor:" || protocol === "ionic:";
-}
 
 function apiBase(): string {
   const fromEnv = process.env.NEXT_PUBLIC_API_URL?.trim().replace(/\/$/, "");

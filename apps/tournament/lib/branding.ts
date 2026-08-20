@@ -37,3 +37,9 @@ export function participantAppPromoCtaLabel(): string {
 
 export const APP_TAGLINE =
   "Turniere orchestrieren — Auslosung, Live-Stand, Anzeige für alle.";
+
+/** iOS App Store / TestFlight — sobald Tournament live ist. */
+export const TOURNAMENT_APP_STORE_URL =
+  (typeof process !== "undefined" &&
+    process.env.NEXT_PUBLIC_TOURNAMENT_APP_STORE_URL?.trim()) ||
+  "";
