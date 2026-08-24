@@ -49,6 +49,8 @@ export type SessionLobbyDto = {
     diceScore?: number;
     /** Wurf-Pool des Spielers; nur gesetzt, wenn der Host es erlaubt hat. */
     rollsInPool: number | null;
+    /** Offene Felder oben; nur gesetzt, wenn der Host Gegner-Pool erlaubt hat. */
+    openUpperFields?: number | null;
   }[];
   allRunsFinished: boolean;
   leagueStandings: LeagueStandingDto[];

@@ -111,7 +111,7 @@ export const APP_TOUR_STEPS_STRATEGY: AppTourStep[] = [
     id: "opponent-pool",
     chapter: "strategy",
     title: "Gegner-Pool (optional)",
-    body: "In den Einstellungen kannst du den Pool der Gegner sichtbar machen — nützlich fürs Timing, kein Muss.",
+    body: "In den Einstellungen kannst du Pool und offene Felder oben der Gegner sichtbar machen — nützlich fürs Timing, kein Muss.",
   },
   {
     id: "pool-endgame",

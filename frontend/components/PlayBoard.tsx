@@ -113,6 +113,9 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   } = useQueuedFeedbackOverlays();
   const shownProgressRef = useRef<Set<number>>(new Set());
   const [opponentPool, setOpponentPool] = useState<number | null>(null);
+  const [opponentOpenUpperFields, setOpponentOpenUpperFields] = useState<
+    number | null
+  >(null);
   const [lobby, setLobby] = useState<SessionLobbyDto | null>(null);
   const [endgameFieldId, setEndgameFieldId] = useState<string | null>(null);
   const [endgameScoreInput, setEndgameScoreInput] = useState("");
@@ -186,8 +189,14 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
           (p) => normalizePublicPlayerId(p.playerId) !== myId,
         );
         setOpponentPool(opponent?.rollsInPool ?? null);
+        setOpponentOpenUpperFields(
+          typeof opponent?.openUpperFields === "number"
+            ? opponent.openUpperFields
+            : null,
+        );
       } else {
         setOpponentPool(null);
+        setOpponentOpenUpperFields(null);
       }
       return session;
     } catch {
@@ -973,6 +982,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         rollsInPool={run.rollsInPool}
         rollsRemaining={run.rollsRemaining}
         opponentPool={opponentPool}
+        opponentOpenUpperFields={opponentOpenUpperFields}
         showOpponentPoolControl={!!lobby?.showOpponentPool}
         onRefreshOpponentPool={() => void refreshLobby()}
         showAbandon

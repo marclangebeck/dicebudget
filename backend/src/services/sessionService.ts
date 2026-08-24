@@ -23,6 +23,7 @@ import { prisma } from "../db/prisma.js";
 import { awardSessionLeaguePoints, getLeagueStandings } from "./leaguePoints.js";
 import { invalidatePairingStatsCache } from "./pairingStats.js";
 import { normalizeTournamentConfig } from "./tournamentConfig.js";
+import { countOpenUpperFields } from "../domain/houseRules.js";
 
 export const SESSION_STATUS = {
   OPEN: "OPEN",
@@ -327,7 +328,11 @@ export async function getSessionLobbyByInvite(
               status: true,
               totalScore: true,
               rollsInPool: true,
-              games: { select: { fields: { select: { score: true } } } },
+              games: {
+                select: {
+                  fields: { select: { score: true, fieldType: true } },
+                },
+              },
             },
           },
         },
@@ -386,6 +391,10 @@ export async function getSessionLobbyByInvite(
       diceScore: sumEnteredDiceScores(p.run.games),
       /** Pool nur offenlegen, wenn der Host es für die Partie erlaubt hat. */
       rollsInPool: session.showOpponentPool ? p.run.rollsInPool : null,
+      /** Offene Felder oben — nur mit Gegner-Pool-Anzeige. */
+      openUpperFields: session.showOpponentPool
+        ? countOpenUpperFields(p.run.games)
+        : null,
     })),
     allRunsFinished:
       session.players.length > 0 &&

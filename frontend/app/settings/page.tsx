@@ -192,7 +192,7 @@ function SettingsPageInner() {
             <>
               <SettingsToggleRow
                 title="Gegner-Pool"
-                hint="Pool im Spiel anzeigen"
+                hint="Pool und offene Felder oben im Spiel anzeigen"
                 checked={settings.showOpponentPool}
                 onChange={(value) => updateSettings({ showOpponentPool: value })}
               />

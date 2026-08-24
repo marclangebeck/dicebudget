@@ -70,7 +70,7 @@ export function MatchRulesFields({ value, onChange, embedded = false }: Props) {
         <>
           <SetupToggleRow
             title="Gegner-Pool"
-            hint="Pool der Mitspieler anzeigen"
+            hint="Pool und offene Felder oben der Mitspieler anzeigen"
             checked={value.showOpponentPool}
             onChange={(showOpponentPool) => onChange({ ...value, showOpponentPool })}
           />

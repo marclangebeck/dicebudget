@@ -12,6 +12,8 @@ type Props = {
   rollsRemaining: number | null;
   /** Wurf-Pool des Gegners (nur 2 Spieler + Host hat es erlaubt); sonst null. */
   opponentPool?: number | null;
+  /** Offene Felder oben beim Gegner; 0 = nur Pool anzeigen. */
+  opponentOpenUpperFields?: number | null;
   /** Host hat „Gegner-Pool sichtbar" aktiviert → Aktualisieren-Tap anzeigen. */
   showOpponentPoolControl?: boolean;
   /** Einzelner Lobby-Request auf Tippen (kein Polling). */
@@ -27,6 +29,7 @@ export function PlayTopBar({
   rollsInPool,
   rollsRemaining,
   opponentPool,
+  opponentOpenUpperFields,
   showOpponentPoolControl,
   onRefreshOpponentPool,
   showAbandon,
@@ -71,8 +74,20 @@ export function PlayTopBar({
               Pool <strong className="tabular-nums play-pool-num">{rollsInPool}</strong>
             </span>
             {opponentPool !== null && opponentPool !== undefined && (
-              <span className="play-chip play-chip--sky">
-                Gegner <strong className="tabular-nums play-pool-num">{opponentPool}</strong>
+              <span
+                className="play-chip play-chip--sky"
+                title={
+                  opponentOpenUpperFields != null && opponentOpenUpperFields > 0
+                    ? `Gegner-Pool ${opponentPool} · ${opponentOpenUpperFields} Felder oben offen`
+                    : `Gegner-Pool ${opponentPool}`
+                }
+              >
+                Gegner{" "}
+                <strong className="tabular-nums play-pool-num">
+                  {opponentOpenUpperFields != null && opponentOpenUpperFields > 0
+                    ? `${opponentPool} / ${opponentOpenUpperFields}`
+                    : opponentPool}
+                </strong>
               </span>
             )}
             {showOpponentPoolControl && onRefreshOpponentPool && (
@@ -80,8 +95,8 @@ export function PlayTopBar({
                 type="button"
                 onClick={onRefreshOpponentPool}
                 className="play-chip-refresh"
-                aria-label="Gegner-Pool aktualisieren"
-                title="Gegner-Pool aktualisieren"
+                aria-label="Gegner-Pool und offene Felder oben aktualisieren"
+                title="Gegner aktualisieren"
               >
                 <svg
                   viewBox="0 0 24 24"
