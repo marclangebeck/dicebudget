@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { StatsRatingToggle } from "@/components/StatsRatingToggle";
 import { AchievementOverlay } from "@/components/AchievementOverlay";
 import { RunProgressOverlay } from "@/components/RunProgressOverlay";
@@ -35,7 +35,7 @@ import {
 } from "@/lib/api";
 import type { SessionLobbyDto } from "@/lib/sessionTypes";
 import { poolDeltaForComplete } from "@/lib/gameRules";
-import { canBurnHouseRule, type BurnMode } from "@/lib/houseRules";
+import { canBurnHouseRule, countOpenUpperFields, type BurnMode } from "@/lib/houseRules";
 import { isFeatureEnabled } from "@/lib/featureFlags";
 import { buildAchievementAfterField } from "@/lib/achievementFeedback";
 import { useQueuedFeedbackOverlays } from "@/lib/feedbackOverlayQueue";
@@ -229,6 +229,11 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   const ownPlayerDbId = lobby?.players.find(
     (p) => normalizePublicPlayerId(p.playerId) === normalizePublicPlayerId(getOrCreatePlayerId()),
   )?.id;
+
+  const ownOpenUpperFields = useMemo(
+    () => (run ? countOpenUpperFields(run.games) : 0),
+    [run],
+  );
 
   const waitingPoolEndgame =
     poolEndgamePending && !amPoolEndgameImprover && !!inviteCode;
@@ -982,6 +987,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         rollsInPool={run.rollsInPool}
         rollsRemaining={run.rollsRemaining}
         opponentPool={opponentPool}
+        ownOpenUpperFields={ownOpenUpperFields}
         opponentOpenUpperFields={opponentOpenUpperFields}
         showOpponentPoolControl={!!lobby?.showOpponentPool}
         onRefreshOpponentPool={() => void refreshLobby()}

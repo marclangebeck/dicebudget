@@ -10,13 +10,10 @@ type Props = {
   useStrategyRules: boolean;
   rollsInPool: number;
   rollsRemaining: number | null;
-  /** Wurf-Pool des Gegners (nur 2 Spieler + Host hat es erlaubt); sonst null. */
+  ownOpenUpperFields?: number;
   opponentPool?: number | null;
-  /** Offene Felder oben beim Gegner; 0 = nur Pool anzeigen. */
   opponentOpenUpperFields?: number | null;
-  /** Host hat „Gegner-Pool sichtbar" aktiviert → Aktualisieren-Tap anzeigen. */
   showOpponentPoolControl?: boolean;
-  /** Einzelner Lobby-Request auf Tippen (kein Polling). */
   onRefreshOpponentPool?: () => void;
   showAbandon?: boolean;
   abandonBusy?: boolean;
@@ -28,6 +25,7 @@ export function PlayTopBar({
   useStrategyRules,
   rollsInPool,
   rollsRemaining,
+  ownOpenUpperFields = 0,
   opponentPool,
   opponentOpenUpperFields,
   showOpponentPoolControl,
@@ -39,109 +37,124 @@ export function PlayTopBar({
   const [showQr, setShowQr] = useState(false);
   const joinUrl = inviteCode ? buildInviteJoinUrl(inviteCode) : null;
 
+  const showOpponentStats =
+    useStrategyRules &&
+    rollsRemaining !== null &&
+    !!showOpponentPoolControl &&
+    opponentPool !== null &&
+    opponentPool !== undefined;
+
+  const showOpenUpperStats =
+    showOpponentStats &&
+    ownOpenUpperFields > 0 &&
+    opponentOpenUpperFields != null &&
+    opponentOpenUpperFields > 0;
+
   return (
     <div className="play-top-bar shrink-0">
-      <div className="play-top-bar-start">
-        {inviteCode && (
-          <>
-            <Link
-              href={`/multi/join?code=${encodeURIComponent(inviteCode)}`}
-              className="app-nav-btn"
-            >
-              <span aria-hidden className="app-nav-btn-icon">
-                ←
-              </span>
-              <span>Zur Lobby</span>
-            </Link>
-            <button
-              type="button"
-              className="play-qr-btn"
-              onClick={() => setShowQr(true)}
-              aria-label="QR-Code zum Beitreten zeigen"
-              title="QR-Code erneut zeigen"
-            >
-              <QrIcon />
-              <span>QR</span>
-            </button>
-          </>
-        )}
-      </div>
-
-      <div className="play-top-bar-end">
-        {useStrategyRules && rollsRemaining !== null && (
-          <div className="play-top-chips">
-            <span className="play-chip">
-              Pool <strong className="tabular-nums play-pool-num">{rollsInPool}</strong>
+      {inviteCode ? (
+        <>
+          <Link
+            href={`/multi/join?code=${encodeURIComponent(inviteCode)}`}
+            className="app-nav-btn play-top-bar-lobby"
+          >
+            <span aria-hidden className="app-nav-btn-icon">
+              ←
             </span>
-            {opponentPool !== null && opponentPool !== undefined && (
-              <span
-                className="play-chip play-chip--sky"
-                title={
-                  opponentOpenUpperFields != null && opponentOpenUpperFields > 0
-                    ? `Gegner-Pool ${opponentPool} · ${opponentOpenUpperFields} Felder oben offen`
-                    : `Gegner-Pool ${opponentPool}`
-                }
-              >
-                Gegner{" "}
-                <strong className="tabular-nums play-pool-num">
-                  {opponentOpenUpperFields != null && opponentOpenUpperFields > 0
-                    ? `${opponentPool}\u00a0/\u00a0${opponentOpenUpperFields}`
-                    : opponentPool}
-                </strong>
-              </span>
-            )}
-            {showOpponentPoolControl && onRefreshOpponentPool && (
-              <button
-                type="button"
-                onClick={onRefreshOpponentPool}
-                className="play-chip-refresh"
-                aria-label="Gegner-Pool und offene Felder oben aktualisieren"
-                title="Gegner aktualisieren"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  className="play-chip-refresh-icon"
-                  aria-hidden
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4 12a8 8 0 0 1 13.66-5.66L20 8M20 4v4h-4M20 12a8 8 0 0 1-13.66 5.66L4 16M4 20v-4h4"
-                  />
-                </svg>
-              </button>
-            )}
-          </div>
-        )}
-        {showAbandon && onAbandon && (
+            <span className="play-top-bar-lobby-text">Zur Lobby</span>
+          </Link>
           <button
             type="button"
-            disabled={abandonBusy}
-            onClick={onAbandon}
-            className="play-abandon-btn disabled:opacity-50"
-            title="Spiel beenden"
-            aria-label="Spiel beenden"
+            className="play-qr-btn play-top-bar-qr"
+            onClick={() => setShowQr(true)}
+            aria-label="QR-Code zum Beitreten zeigen"
+            title="QR-Code erneut zeigen"
           >
-            <svg
-              viewBox="0 0 24 24"
-              className="play-abandon-icon"
-              aria-hidden
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 6l12 12M18 6L6 18"
-              />
-            </svg>
+            <QrIcon />
+            <span>QR</span>
           </button>
-        )}
-      </div>
+        </>
+      ) : (
+        <>
+          <span className="play-top-bar-lobby" aria-hidden />
+          <span className="play-top-bar-qr" aria-hidden />
+        </>
+      )}
+
+      <span className="play-top-bar-spacer" aria-hidden />
+
+      {showOpponentStats && (
+        <>
+          <span
+            className="play-top-stat play-top-stat--pool tabular-nums"
+            title={`Pool ${rollsInPool} / ${opponentPool}`}
+            aria-label={`Pool ${rollsInPool} zu ${opponentPool}`}
+          >
+            {rollsInPool} / {opponentPool}
+          </span>
+          {showOpenUpperStats && (
+            <span
+              className="play-top-stat play-top-stat--upper tabular-nums"
+              title={`Oben offen ${ownOpenUpperFields} / ${opponentOpenUpperFields}`}
+              aria-label={`Oben offen ${ownOpenUpperFields} zu ${opponentOpenUpperFields}`}
+            >
+              {ownOpenUpperFields} / {opponentOpenUpperFields}
+            </span>
+          )}
+          {onRefreshOpponentPool && (
+            <button
+              type="button"
+              onClick={onRefreshOpponentPool}
+              className="play-top-refresh"
+              aria-label="Gegner-Pool und offene Felder oben aktualisieren"
+              title="Aktualisieren"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="play-top-refresh-icon"
+                aria-hidden
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 12a8 8 0 0 1 13.66-5.66L20 8M20 4v4h-4M20 12a8 8 0 0 1-13.66 5.66L4 16M4 20v-4h4"
+                />
+              </svg>
+            </button>
+          )}
+        </>
+      )}
+
+      {showAbandon && onAbandon ? (
+        <button
+          type="button"
+          disabled={abandonBusy}
+          onClick={onAbandon}
+          className="play-abandon-btn play-top-bar-abandon disabled:opacity-50"
+          title="Spiel beenden"
+          aria-label="Spiel beenden"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            className="play-abandon-icon"
+            aria-hidden
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 6l12 12M18 6L6 18"
+            />
+          </svg>
+        </button>
+      ) : (
+        <span className="play-top-bar-abandon" aria-hidden />
+      )}
 
       {showQr && inviteCode && joinUrl && (
         <div
