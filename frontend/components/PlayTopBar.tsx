@@ -85,7 +85,7 @@ export function PlayTopBar({
                 Gegner{" "}
                 <strong className="tabular-nums play-pool-num">
                   {opponentOpenUpperFields != null && opponentOpenUpperFields > 0
-                    ? `${opponentPool} / ${opponentOpenUpperFields}`
+                    ? `${opponentPool}\u00a0/\u00a0${opponentOpenUpperFields}`
                     : opponentPool}
                 </strong>
               </span>
