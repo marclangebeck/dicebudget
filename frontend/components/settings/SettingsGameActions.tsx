@@ -1,13 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { InviteQrCode } from "@/components/InviteQrCode";
+import { HostInviteQrPanel } from "@/components/HostInviteQrPanel";
 import { createGameSession, joinSession } from "@/lib/api";
 import { saveActiveGame } from "@/lib/activeGame";
 import { sessionHouseRuleFlagsFromPrefs } from "@/lib/featureFlags";
-import { buildInviteJoinUrl } from "@/lib/inviteJoinUrl";
 import { createLocalSoloRun } from "@/lib/localSoloRun";
 import { upsertRivalName } from "@/lib/rivalProfiles";
 import {
@@ -127,22 +125,10 @@ export function SettingsGameActions({ settings }: Props) {
           </button>
         </div>
       ) : (
-        <div className="setup-host-success setup-host-success--invite-qr">
-          <p className="setup-host-invite-title">Spiel beitreten</p>
-          <div className="setup-host-qr-frame">
-            <InviteQrCode
-              value={buildInviteJoinUrl(inviteCode)}
-              label="QR-Code zum Beitreten"
-              size={228}
-            />
-          </div>
-          <Link
-            href={`/multi/join?code=${encodeURIComponent(inviteCode)}`}
-            className="setup-host-submit mt-2 flex w-full items-center justify-center no-underline"
-          >
-            Zur Lobby (auch als Host)
-          </Link>
-        </div>
+        <HostInviteQrPanel
+          inviteCode={inviteCode}
+          lobbyLinkClassName="setup-host-submit mt-2 flex w-full items-center justify-center no-underline"
+        />
       )}
     </section>
   );

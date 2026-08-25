@@ -3600,6 +3600,14 @@ html.zoomable-route.legal-route .legal-page-scroll {
   color: #f8fafc;
 }
 
+.play-invite-qr-head {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
 .play-invite-qr-hint {
   margin: 0;
   text-align: center;
@@ -9577,20 +9585,73 @@ html.zoomable-route.legal-route .legal-page-scroll {
 
 .setup-host-invite-title {
   margin: 0;
-  text-align: center;
+  text-align: left;
   font-size: 1.2rem;
   font-weight: 850;
   letter-spacing: -0.02em;
   color: #f8fafc;
 }
 
+.setup-host-invite-head {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.setup-host-share-code-btn {
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(214, 168, 90, 0.45);
+  background: linear-gradient(180deg, rgba(214, 168, 90, 0.28), rgba(180, 120, 40, 0.22));
+  padding: 0.42rem 0.78rem;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #fef3c7;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.setup-host-share-code-btn:active {
+  transform: scale(0.97);
+}
+
+.setup-host-code-block {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.28rem;
+}
+
 .setup-host-code-label {
+  margin: 0;
   font-size: 0.625rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: rgba(255, 255, 255, 0.68);
   text-align: center;
+}
+
+.setup-host-code-hint {
+  margin: 0;
+  max-width: 18rem;
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: rgba(203, 213, 225, 0.88);
+}
+
+.setup-host-share-status {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #86efac;
 }
 
 .setup-host-qr-block {

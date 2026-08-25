@@ -4,12 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
+import { HostInviteQrPanel } from "@/components/HostInviteQrPanel";
 import { createGameSession, joinSession } from "@/lib/api";
 import { saveActiveGame } from "@/lib/activeGame";
 import { sessionHouseRuleFlagsFromPrefs } from "@/lib/featureFlags";
 import { upsertRivalName } from "@/lib/rivalProfiles";
-import { buildInviteJoinUrl } from "@/lib/inviteJoinUrl";
-import { InviteQrCode } from "@/components/InviteQrCode";
 import { settingsHrefWithReturn } from "@/lib/settingsReturn";
 import { DEFAULT_APP_SETTINGS, getAppSettings, type AppSettings } from "@/lib/uiPrefs";
 import {
@@ -145,22 +144,7 @@ export default function MultiHostPage() {
                 : "Raum anlegen"}
           </button>
         ) : (
-          <div className="setup-host-success setup-host-success--invite-qr">
-            <p className="setup-host-invite-title">Spiel beitreten</p>
-            <div className="setup-host-qr-frame">
-              <InviteQrCode
-                value={buildInviteJoinUrl(inviteCode)}
-                label="QR-Code zum Beitreten"
-                size={228}
-              />
-            </div>
-            <Link
-              href={`/multi/join?code=${encodeURIComponent(inviteCode)}`}
-              className="setup-host-submit flex w-full items-center justify-center no-underline"
-            >
-              Zur Lobby (auch als Host)
-            </Link>
-          </div>
+          <HostInviteQrPanel inviteCode={inviteCode} />
         )}
       </form>
     </div>

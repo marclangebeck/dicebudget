@@ -43,13 +43,15 @@ export function appendSiteLink(body: string): string {
   return `${body}\n\nJetzt spielen: ${SITE_URL}`;
 }
 
-/** Einladungs-Link (Join-URL) teilen — gleicher Inhalt wie der QR. */
+/** Raumcode teilen (Remote-Beitritt); Fallback: Code + Join-URL in die Zwischenablage. */
 export async function shareInviteCode(code: string): Promise<"shared" | "copied" | "aborted"> {
   const { buildInviteJoinUrl } = await import("@/lib/inviteJoinUrl");
-  const text = buildInviteJoinUrl(code);
+  const normalized = code.trim().toUpperCase();
+  const joinUrl = buildInviteJoinUrl(normalized);
+  const text = `DiceBudget Raumcode: ${normalized}\nBeitreten: ${joinUrl}`;
   if (canUseWebShare()) {
     try {
-      await navigator.share({ text });
+      await navigator.share({ title: "DiceBudget beitreten", text });
       return "shared";
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return "aborted";

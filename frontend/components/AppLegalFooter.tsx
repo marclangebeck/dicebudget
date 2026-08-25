@@ -2,15 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { AppFooterMenu } from "@/components/AppFooterMenu";
-import { AppToast } from "@/components/AppToast";
-import { ScreenshotCaptureFlash } from "@/components/ScreenshotCaptureFlash";
-import { ScreenshotPreviewDialog } from "@/components/ScreenshotPreviewDialog";
 import { APP_HOME_PATH } from "@/lib/branding";
-import { captureVisibleScreen } from "@/lib/screenCapture";
-import { flashDelay, waitForScreenPaint } from "@/lib/screenshotFlow";
-import { shareCardTitle, shareImageAndText } from "@/lib/shareSocial";
 
 function HomeIcon() {
   return (
@@ -41,15 +35,6 @@ function SettingsIcon() {
   );
 }
 
-function ScreenshotIcon() {
-  return (
-    <svg className="app-legal-icon" viewBox="0 0 24 24" aria-hidden fill="none">
-      <path d="M5 8.5h2.2l1.2-1.6a1.2 1.2 0 0 1 .96-.5h5.24a1.2 1.2 0 0 1 .96.5L16.8 8.5H19a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2Z" />
-      <circle cx="12" cy="13" r="3.2" />
-    </svg>
-  );
-}
-
 function MenuIcon({ open }: { open: boolean }) {
   return (
     <svg
@@ -68,13 +53,6 @@ function MenuIcon({ open }: { open: boolean }) {
 export function AppLegalFooter() {
   const pathname = usePathname() ?? "";
   const [menuOpen, setMenuOpen] = useState(false);
-  const [screenshotBusy, setScreenshotBusy] = useState(false);
-  const [sharing, setSharing] = useState(false);
-  const [flashActive, setFlashActive] = useState(false);
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const previewBlobRef = useRef<Blob | null>(null);
 
   const homeActive =
     pathname === APP_HOME_PATH ||
@@ -84,72 +62,9 @@ export function AppLegalFooter() {
   const settingsActive =
     pathname === "/settings" || pathname.startsWith("/settings/");
 
-  const clearPreview = useCallback(() => {
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    previewBlobRef.current = null;
-    setPreviewUrl(null);
-    setPreviewOpen(false);
-  }, [previewUrl]);
-
-  useEffect(() => {
-    return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-    };
-  }, [previewUrl]);
-
-  const handleScreenshot = useCallback(async () => {
-    if (screenshotBusy || previewOpen) return;
-    setScreenshotBusy(true);
-    setToastMessage(null);
-    setMenuOpen(false);
-
-    try {
-      await waitForScreenPaint();
-      setFlashActive(true);
-      await flashDelay();
-      setFlashActive(false);
-
-      const blob = await captureVisibleScreen();
-      const url = URL.createObjectURL(blob);
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-      previewBlobRef.current = blob;
-      setPreviewUrl(url);
-      setPreviewOpen(true);
-    } catch {
-      setToastMessage("Screenshot fehlgeschlagen");
-    } finally {
-      setScreenshotBusy(false);
-      setFlashActive(false);
-    }
-  }, [previewOpen, previewUrl, screenshotBusy]);
-
-  const handleShare = useCallback(async () => {
-    const blob = previewBlobRef.current;
-    if (!blob || sharing) return;
-    setSharing(true);
-    try {
-      const result = await shareImageAndText({
-        blob,
-        filename: "dicebudget-screenshot.png",
-        title: shareCardTitle("Screenshot"),
-        text: shareCardTitle("Screenshot"),
-      });
-      clearPreview();
-      if (result === "shared") {
-        setToastMessage("Screenshot geteilt");
-      } else if (result === "downloaded") {
-        setToastMessage("Screenshot gespeichert");
-      }
-    } catch {
-      setToastMessage("Teilen fehlgeschlagen");
-    } finally {
-      setSharing(false);
-    }
-  }, [clearPreview, sharing]);
-
   return (
     <>
-      <footer className="app-legal-footer app-legal-footer--5">
+      <footer className="app-legal-footer">
         <Link
           href={APP_HOME_PATH}
           className={`app-legal-link${homeActive ? " app-legal-link--active" : ""}`}
@@ -176,16 +91,6 @@ export function AppLegalFooter() {
         </Link>
         <button
           type="button"
-          className="app-legal-link app-legal-link--screenshot"
-          aria-label="Screenshot erstellen"
-          disabled={screenshotBusy}
-          onClick={() => void handleScreenshot()}
-        >
-          <ScreenshotIcon />
-          <span>{screenshotBusy ? "…" : "Bild"}</span>
-        </button>
-        <button
-          type="button"
           className={`app-legal-link app-legal-link--menu ${menuOpen ? "app-legal-link--menu-open" : ""}`}
           aria-expanded={menuOpen}
           aria-haspopup="dialog"
@@ -198,16 +103,6 @@ export function AppLegalFooter() {
       </footer>
 
       <AppFooterMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
-
-      <ScreenshotCaptureFlash active={flashActive} />
-      <ScreenshotPreviewDialog
-        open={previewOpen}
-        previewUrl={previewUrl}
-        sharing={sharing}
-        onShare={() => void handleShare()}
-        onDiscard={clearPreview}
-      />
-      <AppToast message={toastMessage} onDismiss={() => setToastMessage(null)} />
     </>
   );
 }

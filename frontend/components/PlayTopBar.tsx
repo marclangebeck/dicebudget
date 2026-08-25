@@ -5,6 +5,7 @@ import Link from "next/link";
 import { InviteQrCode } from "@/components/InviteQrCode";
 import { RollSaleOverlay } from "@/components/RollSaleOverlay";
 import { buildInviteJoinUrl } from "@/lib/inviteJoinUrl";
+import { shareInviteCode } from "@/lib/shareSocial";
 import type { SessionLobbyDto } from "@/lib/sessionTypes";
 
 type Props = {
@@ -52,6 +53,7 @@ export function PlayTopBar({
   const [menuOpen, setMenuOpen] = useState(false);
   const [showQr, setShowQr] = useState(false);
   const [rollSaleOpen, setRollSaleOpen] = useState(false);
+  const [shareStatus, setShareStatus] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
   const joinUrl = inviteCode ? buildInviteJoinUrl(inviteCode) : null;
@@ -240,11 +242,31 @@ export function PlayTopBar({
           />
           <div className="play-invite-qr-card">
             <p className="play-invite-qr-kicker">Multiplayer</p>
-            <h2 id="play-invite-qr-title" className="play-invite-qr-title">
-              Spiel beitreten
-            </h2>
+            <div className="play-invite-qr-head">
+              <h2 id="play-invite-qr-title" className="play-invite-qr-title">
+                Spiel beitreten
+              </h2>
+              <button
+                type="button"
+                className="setup-host-share-code-btn"
+                onClick={() => {
+                  void (async () => {
+                    setShareStatus(null);
+                    try {
+                      const result = await shareInviteCode(inviteCode);
+                      if (result === "shared") setShareStatus("Code geteilt");
+                      else if (result === "copied") setShareStatus("Code kopiert");
+                    } catch {
+                      setShareStatus("Teilen fehlgeschlagen");
+                    }
+                  })();
+                }}
+              >
+                Code teilen
+              </button>
+            </div>
             <p className="play-invite-qr-hint">
-              Späterer Mitspieler scannt denselben QR wie beim Anlegen.
+              Vor Ort: QR scannen. Remote: Code teilen oder abtippen.
             </p>
             <div className="play-invite-qr-frame">
               <InviteQrCode
@@ -252,6 +274,17 @@ export function PlayTopBar({
                 label={`QR-Code zum Beitreten, Raum ${inviteCode}`}
                 size={228}
               />
+            </div>
+            <div className="setup-host-code-block">
+              <p className="setup-host-code-label">Raumcode</p>
+              <p className="setup-host-code" aria-label={`Raumcode ${inviteCode}`}>
+                {inviteCode}
+              </p>
+              {shareStatus && (
+                <p className="setup-host-share-status" role="status">
+                  {shareStatus}
+                </p>
+              )}
             </div>
             <button
               type="button"
