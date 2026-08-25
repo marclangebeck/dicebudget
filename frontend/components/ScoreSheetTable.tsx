@@ -79,13 +79,12 @@ function rowBgClass(row: SheetRow): string {
   return "";
 }
 
-function summaryLabelClass(row: Extract<SheetRow, { kind: "summary" }>): string {
-  const base = "play-row-label--summary-match";
-  if (row.key === "lowerSum") return `${base} play-row-label--summary-standard`;
+function summaryChipClass(row: Extract<SheetRow, { kind: "summary" }>): string {
+  if (row.key === "lowerSum") return "play-summary";
   if (row.key === "ergebnis1") {
-    return `${base} play-row-label--summary-highlight play-row-label--summary-ergebnis1`;
+    return "play-summary play-summary--highlight play-summary--ergebnis1";
   }
-  return `${base} play-row-label--summary-highlight`;
+  return "play-summary play-summary--highlight";
 }
 
 function YatzyRowLabel({
@@ -394,7 +393,7 @@ export function ScoreSheetTable({
         <thead>
           <tr className="play-table-head-row">
             <th className="play-table-head-label text-left">
-              Feld
+              <span className="play-head-chip">Feld</span>
             </th>
             {games.map((game) => (
               <th
@@ -421,11 +420,13 @@ export function ScoreSheetTable({
                   scope="row"
                   title={rowLabel(row)}
                   className={`play-row-label text-left font-normal ${
-                    isSummary ? summaryLabelClass(row) : ""
+                    isSummary ? "play-row-label--summary-cell" : ""
                   } ${isLowerField ? "play-row-label--lower" : ""}`}
                 >
                   {isSummary ? (
-                    SUMMARY_LABELS[row.key]
+                    <span className={`play-summary-label-chip ${summaryChipClass(row)}`}>
+                      {SUMMARY_LABELS[row.key]}
+                    </span>
                   ) : (
                     <FieldRowLabel
                       row={row}
