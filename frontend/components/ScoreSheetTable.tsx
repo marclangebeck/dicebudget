@@ -373,7 +373,7 @@ export function ScoreSheetTable({
   const games = run.games;
   const yatzyMarkCounts = buildYatzyMarkCounts(run);
   const gameColCount = games.length;
-  const labelColPct = gameColCount <= 2 ? 32 : gameColCount <= 4 ? 28 : 24;
+  const labelColPct = gameColCount <= 2 ? 34 : gameColCount <= 4 ? 30 : 26;
   const gameColPct = (100 - labelColPct) / gameColCount;
   const sheetTheme = getAppSettings().scoreSheetTheme;
 
