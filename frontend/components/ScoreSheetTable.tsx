@@ -392,15 +392,15 @@ export function ScoreSheetTable({
         </colgroup>
         <thead>
           <tr className="play-table-head-row">
-            <th className="play-table-head-label px-1 py-1 text-left font-semibold">
+            <th className="play-table-head-label text-left">
               Feld
             </th>
             {games.map((game) => (
               <th
                 key={game.id}
-                className="play-table-head-game px-0 py-1 text-center font-bold"
+                className="play-table-head-game text-center"
               >
-                Sp{game.index}
+                <span className="play-head-chip">Sp{game.index}</span>
               </th>
             ))}
           </tr>
@@ -417,7 +417,7 @@ export function ScoreSheetTable({
                 <th
                   scope="row"
                   title={rowLabel(row)}
-                  className={`play-row-label px-1 py-0.5 text-left font-normal ${
+                  className={`play-row-label text-left font-normal ${
                     isSummary ? summaryLabelClass(row) : ""
                   }`}
                 >
@@ -438,7 +438,7 @@ export function ScoreSheetTable({
                   )}
                 </th>
                 {games.map((game) => (
-                  <td key={game.id} className="px-0.5 py-px">
+                  <td key={game.id} className="play-score-cell">
                     {row.kind === "field" ? (
                       (() => {
                         const field = fieldForGame(game, row.fieldType);

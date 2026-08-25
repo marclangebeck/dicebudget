@@ -3674,16 +3674,10 @@ html.zoomable-route.legal-route .legal-page-scroll {
 
 .play-sheet-card {
   border-radius: 1rem;
-  border: 1px solid var(--glass-border);
-  background: linear-gradient(
-    180deg,
-    var(--app-bg-top) 0%,
-    var(--app-bg-mid) 48%,
-    var(--app-bg-bottom) 100%
-  );
-  box-shadow:
-    0 2px 14px -4px rgba(15, 23, 42, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  padding: 0.15rem;
 }
 
 /* Hausregeln am Spielzettel — Zusatzregeln dezent rechts; Zettel-Felder unverändert */
@@ -3994,49 +3988,60 @@ html.zoomable-route.legal-route .legal-page-scroll {
 }
 
 .play-score-board {
+  --play-radius: 0.4rem;
+  --play-gap: 0.28rem;
   position: relative;
   box-sizing: border-box;
-  border-radius: 0.75rem;
-  border: 1.5px solid rgba(15, 23, 42, 0.28);
-  padding: 0.28rem 0.32rem;
+  border-radius: 0.85rem;
+  border: 1.5px solid rgba(15, 23, 42, 0.26);
+  padding: 0.5rem 0.48rem 0.45rem;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(248, 250, 252, 0.96) 100%
+  );
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.75) inset,
+    0 8px 24px -16px rgba(15, 23, 42, 0.35);
+}
+
+/* Heller Spielzettel (nur Zettel, Rest der App unverändert). */
+.play-score-board--light {
+  border-color: rgba(15, 23, 42, 0.28);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 55%, #f1f5f9 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 8px 24px -16px rgba(15, 23, 42, 0.28);
+}
+
+.play-score-board--dark {
+  border-color: rgba(255, 255, 255, 0.22);
   background: linear-gradient(
     180deg,
     var(--app-bg-top) 0%,
     var(--app-bg-mid) 48%,
     var(--app-bg-bottom) 100%
   );
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.55) inset;
-}
-
-/* Heller Spielzettel (nur Zettel, Rest der App unverändert). */
-.play-score-board--light {
-  border-color: rgba(15, 23, 42, 0.32);
-  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 52%, #e2e8f0 100%);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 0 0 1px rgba(15, 23, 42, 0.04);
-}
-
-.play-score-board--dark {
-  border-color: rgba(255, 255, 255, 0.28);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset;
+    0 1px 0 rgba(255, 255, 255, 0.1) inset,
+    0 8px 24px -16px rgba(0, 0, 0, 0.45);
 }
 
 .play-score-board--light .play-table-head-row {
-  background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
-  border-bottom-color: rgba(15, 23, 42, 0.1);
+  background: transparent;
+  border-bottom-color: rgba(15, 23, 42, 0.08);
 }
 
 .play-score-board--light .play-table-head-label {
-  color: #0f172a;
+  color: #64748b;
 }
 
 .play-score-board--light .play-table-head-game {
-  color: #047857;
+  color: inherit;
 }
 
 .play-score-board--light .play-row-label {
-  background: #ffffff;
+  background: transparent;
   color: #1e293b;
   border-right-color: rgba(15, 23, 42, 0.08);
 }
@@ -4132,33 +4137,62 @@ html.zoomable-route.legal-route .legal-page-scroll {
 }
 
 .play-table-head-row {
-  border-bottom: 1px solid rgba(15, 23, 42, 0.12);
-  background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  background: transparent;
 }
 
 .play-table-head-label {
-  border-right: 1px solid rgba(15, 23, 42, 0.1);
-  color: #334155;
-  font-size: 0.86rem;
+  border-right: 1px solid rgba(15, 23, 42, 0.08);
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.45rem 0.45rem 0.35rem !important;
 }
 
 .play-table-head-game {
+  color: inherit;
+  font-size: inherit;
+  padding: var(--play-gap, 0.22rem) !important;
+  vertical-align: middle;
+}
+
+.play-head-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 1.55rem;
+  border-radius: var(--play-radius, 0.4rem);
+  border: 1px solid rgba(4, 120, 87, 0.22);
+  background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
   color: #065f46;
-  font-size: 0.86rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.play-score-board--dark .play-head-chip {
+  border-color: rgba(110, 231, 183, 0.28);
+  background: linear-gradient(180deg, rgba(6, 95, 70, 0.55) 0%, rgba(6, 78, 59, 0.72) 100%);
+  color: #d1fae5;
 }
 
 .play-row-label {
   position: relative;
   border-right: 1px solid rgba(15, 23, 42, 0.08);
-  background: #f8fafc;
+  background: transparent;
   color: #334155;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 650;
   line-height: 1.1;
   overflow: hidden;
   vertical-align: middle;
   container-type: inline-size;
   container-name: play-row-label;
+  padding: 0.28rem 0.45rem 0.28rem 0.35rem !important;
 }
 
 .play-field-label-text {
@@ -4168,29 +4202,29 @@ html.zoomable-route.legal-route .legal-page-scroll {
   white-space: nowrap;
   text-overflow: clip;
   line-height: 1.1;
-  font-size: clamp(0.62rem, 11cqi, 0.82rem);
+  font-size: clamp(0.62rem, 11cqi, 0.8rem);
 }
 
 .play-row-label--summary-match {
-  border-radius: 0.35rem;
+  border-radius: var(--play-radius, 0.4rem);
 }
 
 .play-row-label--summary-standard {
   border: 1px solid rgba(148, 163, 184, 0.28);
-  background: rgba(15, 23, 42, 0.42);
-  color: #e2e8f0;
-  font-weight: 500;
+  background: #334155;
+  color: #f1f5f9;
+  font-weight: 600;
 }
 
 .play-row-label--summary-highlight {
-  border: 1px solid rgba(52, 211, 153, 0.45);
-  background: rgba(6, 78, 59, 0.38);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  background: #065f46;
   color: #d1fae5;
   font-weight: 700;
 }
 
 .play-row-label--summary-ergebnis1 {
-  font-size: 0.875rem;
+  font-size: 0.82rem;
   font-weight: 800;
 }
 
@@ -4198,14 +4232,19 @@ html.zoomable-route.legal-route .legal-page-scroll {
   background: transparent;
 }
 
+.play-score-cell {
+  padding: var(--play-gap, 0.22rem) !important;
+  vertical-align: middle;
+}
+
 .play-cell {
   container-type: size;
-  border-radius: 0.35rem;
-  border: 1.5px solid #cbd5e1;
+  border-radius: var(--play-radius, 0.4rem);
+  border: 1px solid #cbd5e1;
   background: #ffffff;
   color: #0f172a;
-  font-size: clamp(0.95rem, 2.6vh, 1.4rem);
-  font-weight: 700;
+  font-size: clamp(0.98rem, 2.7vh, 1.45rem);
+  font-weight: 750;
   line-height: 1;
   transition:
     border-color 0.12s ease,
@@ -4215,7 +4254,7 @@ html.zoomable-route.legal-route .legal-page-scroll {
 
 @supports (font-size: 1cqh) {
   .play-cell {
-    font-size: clamp(0.95rem, min(62cqh, 46cqw), 1.5rem);
+    font-size: clamp(0.98rem, min(64cqh, 48cqw), 1.55rem);
   }
 }
 
@@ -4223,22 +4262,22 @@ html.zoomable-route.legal-route .legal-page-scroll {
   border-color: #0f172a;
   background: #ffffff;
   color: #0f172a;
-  font-weight: 700;
-  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.18);
+  font-weight: 800;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.16);
 }
 
 .play-cell--done {
   border-color: #94a3b8;
   background: #e2e8f0;
-  font-weight: 700;
+  font-weight: 750;
 }
 
 .play-cell--preview-option {
   border-color: #fca5a5;
   background: #fee2e2;
   color: #0f172a;
-  font-weight: 700;
-  box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.35);
+  font-weight: 750;
+  box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.28);
 }
 
 .play-cell--preview-zero {
@@ -4250,22 +4289,22 @@ html.zoomable-route.legal-route .legal-page-scroll {
 
 .play-summary {
   container-type: size;
-  border-radius: 0.35rem;
-  border: 1px solid rgba(148, 163, 184, 0.28);
-  background: rgba(15, 23, 42, 0.42);
-  color: #e2e8f0;
-  font-weight: 500;
+  border-radius: var(--play-radius, 0.4rem);
+  border: 1px solid rgba(100, 116, 139, 0.35);
+  background: #334155;
+  color: #f1f5f9;
+  font-weight: 600;
 }
 
 .play-summary-value {
-  font-size: clamp(0.85rem, 2.1vh, 1.15rem);
-  font-weight: 700;
+  font-size: clamp(0.9rem, 2.2vh, 1.2rem);
+  font-weight: 750;
   line-height: 1;
 }
 
 @supports (font-size: 1cqh) {
   .play-summary-value {
-    font-size: clamp(0.85rem, min(48cqh, 40cqw), 1.2rem);
+    font-size: clamp(0.9rem, min(50cqh, 42cqw), 1.25rem);
   }
 }
 
@@ -4276,13 +4315,13 @@ html.zoomable-route.legal-route .legal-page-scroll {
 }
 
 .play-summary--ergebnis1 .play-summary-value {
-  font-size: clamp(0.95rem, 2.3vh, 1.25rem);
+  font-size: clamp(0.98rem, 2.4vh, 1.3rem);
   font-weight: 800;
 }
 
 @supports (font-size: 1cqh) {
   .play-summary--ergebnis1 .play-summary-value {
-    font-size: clamp(0.95rem, min(56cqh, 44cqw), 1.3rem);
+    font-size: clamp(0.98rem, min(58cqh, 46cqw), 1.35rem);
   }
 }
 
@@ -4293,10 +4332,10 @@ html.zoomable-route.legal-route .legal-page-scroll {
 }
 
 .play-summary--highlight {
-  border-color: rgba(52, 211, 153, 0.45);
-  background: rgba(6, 78, 59, 0.38);
+  border-color: rgba(16, 185, 129, 0.42);
+  background: #065f46;
   color: #d1fae5;
-  font-weight: 700;
+  font-weight: 750;
 }
 
 .play-summary--ergebnis1 .play-summary-bonus-delta.text-emerald-700 {
