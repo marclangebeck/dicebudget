@@ -4161,9 +4161,11 @@ html.zoomable-route.legal-route .legal-page-scroll {
 
 .play-field-label-text {
   display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow: visible;
+  white-space: normal;
+  line-height: 1.1;
+  word-break: normal;
+  overflow-wrap: normal;
 }
 
 .play-row-label--summary-match {
@@ -4346,10 +4348,10 @@ html.zoomable-route.legal-route .legal-page-scroll {
 
 .play-kniffel-label-text {
   min-width: 0;
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  flex: 1 1 auto;
+  overflow: visible;
+  white-space: normal;
+  line-height: 1.1;
 }
 
 .play-kniffel-label-extras {
