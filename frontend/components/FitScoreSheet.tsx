@@ -8,12 +8,13 @@ type Props = {
   layoutKey: string | number;
 };
 
+/** Obere Grenze beim Hochskalieren (Tablets/hohe Displays). */
+const MAX_SCALE_UP = 1.28;
+
 /**
  * Spielzettel an die verfügbare Fläche anpassen:
- * - Passt der Zettel in seiner Mindesthöhe hinein, **füllt** er die volle Höhe
- *   (die Zeilen wachsen; siehe `.play-score-table` in `globals.css`).
- * - Ist er zu groß (sehr kleine/quere Screens), wird **herunterskaliert**, damit
- *   nichts scrollt (Milestone-20-Garantie „ohne Seiten-Scroll").
+ * - Zu groß → herunterskalieren (kein Seiten-Scroll).
+ * - Platz übrig → proportional hochskalieren (Schrift + Zellen wachsen mit).
  */
 export function FitScoreSheet({ children, layoutKey }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -25,7 +26,6 @@ export function FitScoreSheet({ children, layoutKey }: Props) {
     if (!host || !inner) return;
 
     const fit = () => {
-      // Auf natürliche Mindestgröße zurücksetzen, um auszumessen.
       inner.style.transform = "none";
       inner.style.width = "100%";
       inner.style.height = "auto";
@@ -38,14 +38,21 @@ export function FitScoreSheet({ children, layoutKey }: Props) {
       const th = inner.scrollHeight;
       if (tw <= 0 || th <= 0) return;
 
-      if (th > ch || tw > cw) {
-        // Zu groß → herunterskalieren (kein Scroll).
-        const s = Math.min(1, cw / tw, ch / th);
-        inner.style.transform = s < 1 ? `scale(${s})` : "none";
-        inner.style.width = s < 1 ? `${100 / s}%` : "100%";
+      const raw = Math.min(cw / tw, ch / th);
+      const s = Math.min(raw, MAX_SCALE_UP);
+
+      if (s < 0.995) {
+        // Zu groß → herunterskalieren.
+        inner.style.transform = `scale(${s})`;
+        inner.style.width = `${100 / s}%`;
+        inner.style.height = "auto";
+      } else if (s > 1.01) {
+        // Platz übrig → proportional vergrößern (inkl. Schrift).
+        inner.style.transform = `scale(${s})`;
+        inner.style.width = `${100 / s}%`;
         inner.style.height = "auto";
       } else {
-        // Platz übrig → volle Höhe füllen, Zeilen wachsen lassen.
+        // Fast 1:1 → volle Höhe füllen, Zeilen wachsen lassen.
         inner.style.transform = "none";
         inner.style.width = "100%";
         inner.style.height = "100%";

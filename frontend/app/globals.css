@@ -4140,7 +4140,7 @@ html.zoomable-route.legal-route .legal-page-scroll {
   border-right: 1px solid rgba(15, 23, 42, 0.08);
   background: #f8fafc;
   color: #334155;
-  font-size: 0.8125rem;
+  font-size: 0.9rem;
   font-weight: 650;
   line-height: 1.15;
   overflow: hidden;
@@ -4187,7 +4187,7 @@ html.zoomable-route.legal-route .legal-page-scroll {
   border: 1.5px solid #cbd5e1;
   background: #ffffff;
   color: #0f172a;
-  font-size: clamp(0.9rem, 2.4vh, 1.25rem);
+  font-size: clamp(0.95rem, 2.6vh, 1.4rem);
   font-weight: 700;
   line-height: 1;
   transition:
@@ -4198,7 +4198,7 @@ html.zoomable-route.legal-route .legal-page-scroll {
 
 @supports (font-size: 1cqh) {
   .play-cell {
-    font-size: clamp(0.9rem, min(58cqh, 42cqw), 1.35rem);
+    font-size: clamp(0.95rem, min(62cqh, 46cqw), 1.5rem);
   }
 }
 
