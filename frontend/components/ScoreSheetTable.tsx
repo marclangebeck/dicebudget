@@ -373,7 +373,7 @@ export function ScoreSheetTable({
   const games = run.games;
   const yatzyMarkCounts = buildYatzyMarkCounts(run);
   const gameColCount = games.length;
-  const labelColPct = gameColCount <= 2 ? 34 : gameColCount <= 4 ? 30 : 26;
+  const labelColPct = gameColCount <= 2 ? 36 : gameColCount <= 4 ? 32 : 28;
   const gameColPct = (100 - labelColPct) / gameColCount;
   const sheetTheme = getAppSettings().scoreSheetTheme;
 
@@ -424,7 +424,11 @@ export function ScoreSheetTable({
                   } ${isLowerField ? "play-row-label--lower" : ""}`}
                 >
                   {isSummary ? (
-                    <span className={`play-summary-label-chip ${summaryChipClass(row)}`}>
+                    <span
+                      className={`play-summary-label-chip ${summaryChipClass(row)}${
+                        row.key === "gameTotal" ? " play-summary-label-chip--long" : ""
+                      }`}
+                    >
                       {SUMMARY_LABELS[row.key]}
                     </span>
                   ) : (
