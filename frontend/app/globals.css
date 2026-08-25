@@ -3378,34 +3378,103 @@ html.zoomable-route.legal-route .legal-page-scroll {
 .play-top-bar {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
   min-height: 2.45rem;
   flex-wrap: nowrap;
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
+  z-index: 20;
 }
 
-.play-top-bar-lobby {
+.play-hh-wrap {
+  position: relative;
   flex-shrink: 0;
-  white-space: nowrap;
 }
 
-.play-top-bar-lobby-text {
-  white-space: nowrap;
+.play-hh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(16, 32, 51, 0.14);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(245, 241, 232, 0.78)),
+    rgba(255, 255, 255, 0.72);
+  color: #102033;
+  cursor: pointer;
 }
 
-.play-top-bar-qr {
-  flex-shrink: 0;
+.play-hh-btn:active {
+  transform: scale(0.96);
+}
+
+.play-hh-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.22rem;
+  width: 1.05rem;
+}
+
+.play-hh-icon > span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.play-hh-menu {
+  position: absolute;
+  top: calc(100% + 0.3rem);
+  left: 0;
+  z-index: 30;
+  display: flex;
+  min-width: 11.5rem;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.4rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 0 12px 28px -10px rgba(15, 23, 42, 0.35);
+}
+
+.play-hh-item {
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: 0.55rem;
+  background: transparent;
+  padding: 0.62rem 0.75rem;
+  text-align: left;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 650;
+  color: #0f172a;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.play-hh-item:hover:not(:disabled),
+.play-hh-item:focus-visible:not(:disabled) {
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.play-hh-item:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.play-hh-item--danger {
+  color: #991b1b;
 }
 
 .play-top-bar-spacer {
   flex: 1 1 auto;
   min-width: 0.25rem;
-}
-
-.play-top-bar-abandon {
-  flex-shrink: 0;
-  width: 2rem;
-  height: 2rem;
 }
 
 .play-top-stat {
@@ -3415,8 +3484,8 @@ html.zoomable-route.legal-route .legal-page-scroll {
   justify-content: center;
   min-width: 4.75rem;
   border-radius: 999px;
-  padding: 0.22rem 0.55rem;
-  font-size: 0.72rem;
+  padding: 0.28rem 0.62rem;
+  font-size: 0.78rem;
   font-weight: 750;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
@@ -3434,30 +3503,16 @@ html.zoomable-route.legal-route .legal-page-scroll {
   color: #991b1b;
 }
 
-.play-top-refresh {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  height: 1.65rem;
-  width: 1.65rem;
-  border-radius: 999px;
-  border: 1px solid rgba(16, 32, 51, 0.14);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(245, 241, 232, 0.72)),
-    rgba(255, 255, 255, 0.68);
-  color: #102033;
-  cursor: pointer;
-  transition: background 120ms ease, transform 120ms ease;
-}
-
-.play-top-refresh:active {
-  transform: scale(0.92);
-}
-
-.play-top-refresh-icon {
-  height: 0.85rem;
-  width: 0.85rem;
+.play-roll-sale-banner {
+  margin: 0;
+  border-radius: 0.55rem;
+  border: 1px solid rgba(214, 168, 90, 0.35);
+  background: rgba(254, 243, 199, 0.92);
+  padding: 0.35rem 0.65rem;
+  font-size: 0.7rem;
+  font-weight: 650;
+  line-height: 1.3;
+  color: #78350f;
 }
 
 .play-top-bar-start {

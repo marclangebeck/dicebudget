@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { InviteQrCode } from "@/components/InviteQrCode";
+import { RollSaleOverlay } from "@/components/RollSaleOverlay";
 import { buildInviteJoinUrl } from "@/lib/inviteJoinUrl";
+import type { SessionLobbyDto } from "@/lib/sessionTypes";
 
 type Props = {
   inviteCode?: string | null;
@@ -18,6 +20,13 @@ type Props = {
   showAbandon?: boolean;
   abandonBusy?: boolean;
   onAbandon?: () => void;
+  /** B1: Wurf verkaufen im HH-Menü statt Zusatzregeln-Zeile */
+  showRollSale?: boolean;
+  canRollSale?: boolean;
+  rollSaleFreeFillActive?: boolean;
+  lobby?: SessionLobbyDto | null;
+  ownPlayerDbId?: string;
+  onRollSale?: (sellerPlayerId: string, buyerPlayerId: string, pools: number) => void;
 };
 
 export function PlayTopBar({
@@ -33,8 +42,18 @@ export function PlayTopBar({
   showAbandon,
   abandonBusy,
   onAbandon,
+  showRollSale,
+  canRollSale,
+  rollSaleFreeFillActive,
+  lobby,
+  ownPlayerDbId,
+  onRollSale,
 }: Props) {
+  const [menuOpen, setMenuOpen] = useState(false);
   const [showQr, setShowQr] = useState(false);
+  const [rollSaleOpen, setRollSaleOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const menuId = useId();
   const joinUrl = inviteCode ? buildInviteJoinUrl(inviteCode) : null;
 
   const showOpponentStats =
@@ -50,110 +69,160 @@ export function PlayTopBar({
     opponentOpenUpperFields != null &&
     opponentOpenUpperFields > 0;
 
+  const showRefresh = !!onRefreshOpponentPool && !!showOpponentPoolControl && useStrategyRules;
+  const showLobby = !!inviteCode;
+  const showQrItem = !!inviteCode && !!joinUrl;
+  const showRollSaleItem = !!showRollSale && !!onRollSale && !!lobby;
+  const showAbandonItem = !!showAbandon && !!onAbandon;
+  const hasMenu =
+    showLobby || showQrItem || showRefresh || showRollSaleItem || showAbandonItem;
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    const onPointer = (e: MouseEvent | TouchEvent) => {
+      const el = menuRef.current;
+      if (!el) return;
+      if (e.target instanceof Node && !el.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("touchstart", onPointer);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("touchstart", onPointer);
+    };
+  }, [menuOpen]);
+
+  function closeMenu() {
+    setMenuOpen(false);
+  }
+
   return (
-    <div className="play-top-bar shrink-0">
-      {inviteCode ? (
-        <>
-          <Link
-            href={`/multi/join?code=${encodeURIComponent(inviteCode)}`}
-            className="app-nav-btn play-top-bar-lobby"
-          >
-            <span aria-hidden className="app-nav-btn-icon">
-              ←
-            </span>
-            <span className="play-top-bar-lobby-text">Zur Lobby</span>
-          </Link>
-          <button
-            type="button"
-            className="play-qr-btn play-top-bar-qr"
-            onClick={() => setShowQr(true)}
-            aria-label="QR-Code zum Beitreten zeigen"
-            title="QR-Code erneut zeigen"
-          >
-            <QrIcon />
-            <span>QR</span>
-          </button>
-        </>
-      ) : (
-        <>
-          <span className="play-top-bar-lobby" aria-hidden />
-          <span className="play-top-bar-qr" aria-hidden />
-        </>
-      )}
-
-      <span className="play-top-bar-spacer" aria-hidden />
-
-      {showOpponentStats && (
-        <>
-          <span
-            className="play-top-stat play-top-stat--pool tabular-nums"
-            title={`Pool ${rollsInPool} / ${opponentPool}`}
-            aria-label={`Pool ${rollsInPool} zu ${opponentPool}`}
-          >
-            {rollsInPool} / {opponentPool}
-          </span>
-          {showOpenUpperStats && (
-            <span
-              className="play-top-stat play-top-stat--upper tabular-nums"
-              title={`Oben offen ${ownOpenUpperFields} / ${opponentOpenUpperFields}`}
-              aria-label={`Oben offen ${ownOpenUpperFields} zu ${opponentOpenUpperFields}`}
-            >
-              {ownOpenUpperFields} / {opponentOpenUpperFields}
-            </span>
-          )}
-          {onRefreshOpponentPool && (
+    <>
+      <div className="play-top-bar shrink-0">
+        {hasMenu && (
+          <div className="play-hh-wrap" ref={menuRef}>
             <button
               type="button"
-              onClick={onRefreshOpponentPool}
-              className="play-top-refresh"
-              aria-label="Gegner-Pool und offene Felder oben aktualisieren"
-              title="Aktualisieren"
+              className="play-hh-btn"
+              aria-label="Spielmenü"
+              aria-expanded={menuOpen}
+              aria-controls={menuId}
+              onClick={() => setMenuOpen((v) => !v)}
             >
-              <svg
-                viewBox="0 0 24 24"
-                className="play-top-refresh-icon"
-                aria-hidden
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 12a8 8 0 0 1 13.66-5.66L20 8M20 4v4h-4M20 12a8 8 0 0 1-13.66 5.66L4 16M4 20v-4h4"
-                />
-              </svg>
+              <span className="play-hh-icon" aria-hidden>
+                <span />
+                <span />
+                <span />
+              </span>
             </button>
-          )}
-        </>
-      )}
 
-      {showAbandon && onAbandon ? (
-        <button
-          type="button"
-          disabled={abandonBusy}
-          onClick={onAbandon}
-          className="play-abandon-btn play-top-bar-abandon disabled:opacity-50"
-          title="Spiel beenden"
-          aria-label="Spiel beenden"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            className="play-abandon-icon"
-            aria-hidden
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 6l12 12M18 6L6 18"
-            />
-          </svg>
-        </button>
-      ) : (
-        <span className="play-top-bar-abandon" aria-hidden />
+            {menuOpen && (
+              <div id={menuId} className="play-hh-menu" role="menu">
+                {showLobby && (
+                  <Link
+                    href={`/multi/join?code=${encodeURIComponent(inviteCode!)}`}
+                    className="play-hh-item"
+                    role="menuitem"
+                    onClick={closeMenu}
+                  >
+                    Zur Lobby
+                  </Link>
+                )}
+                {showQrItem && (
+                  <button
+                    type="button"
+                    className="play-hh-item"
+                    role="menuitem"
+                    onClick={() => {
+                      closeMenu();
+                      setShowQr(true);
+                    }}
+                  >
+                    QR-Code anzeigen
+                  </button>
+                )}
+                {showRefresh && (
+                  <button
+                    type="button"
+                    className="play-hh-item"
+                    role="menuitem"
+                    onClick={() => {
+                      closeMenu();
+                      onRefreshOpponentPool?.();
+                    }}
+                  >
+                    Aktualisieren
+                  </button>
+                )}
+                {showRollSaleItem && (
+                  <button
+                    type="button"
+                    className="play-hh-item"
+                    role="menuitem"
+                    disabled={abandonBusy || !canRollSale}
+                    onClick={() => {
+                      if (!canRollSale) return;
+                      closeMenu();
+                      setRollSaleOpen(true);
+                    }}
+                  >
+                    Wurf verkaufen
+                  </button>
+                )}
+                {showAbandonItem && (
+                  <button
+                    type="button"
+                    className="play-hh-item play-hh-item--danger"
+                    role="menuitem"
+                    disabled={abandonBusy}
+                    onClick={() => {
+                      closeMenu();
+                      onAbandon?.();
+                    }}
+                  >
+                    Beenden
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {showOpponentStats && (
+          <>
+            <span
+              className="play-top-stat play-top-stat--pool tabular-nums"
+              title={`Pool ${rollsInPool} / ${opponentPool}`}
+              aria-label={`Pool ${rollsInPool} zu ${opponentPool}`}
+            >
+              {rollsInPool} / {opponentPool}
+            </span>
+            {showOpenUpperStats && (
+              <span
+                className="play-top-stat play-top-stat--upper tabular-nums"
+                title={`Oben offen ${ownOpenUpperFields} / ${opponentOpenUpperFields}`}
+                aria-label={`Oben offen ${ownOpenUpperFields} zu ${opponentOpenUpperFields}`}
+              >
+                {ownOpenUpperFields} / {opponentOpenUpperFields}
+              </span>
+            )}
+          </>
+        )}
+
+        <span className="play-top-bar-spacer" aria-hidden />
+      </div>
+
+      {rollSaleFreeFillActive && (
+        <p className="play-roll-sale-banner shrink-0" role="status">
+          Verkaufs-Freifeld aktiv: Feld wählen und erlaubten Wert eintragen (0 Würfe).
+        </p>
       )}
 
       {showQr && inviteCode && joinUrl && (
@@ -194,20 +263,21 @@ export function PlayTopBar({
           </div>
         </div>
       )}
-    </div>
-  );
-}
 
-function QrIcon() {
-  return (
-    <svg className="play-qr-btn-icon" viewBox="0 0 24 24" aria-hidden fill="none">
-      <path
-        d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <path d="M7 12h10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
+      {lobby && onRollSale && (
+        <RollSaleOverlay
+          open={rollSaleOpen}
+          lobby={lobby}
+          defaultSellerId={ownPlayerDbId}
+          maxPools={Math.max(...lobby.players.map((p) => p.rollsInPool ?? 0), 1)}
+          busy={abandonBusy}
+          onClose={() => setRollSaleOpen(false)}
+          onConfirm={(seller, buyer, pools) => {
+            onRollSale(seller, buyer, pools);
+            setRollSaleOpen(false);
+          }}
+        />
+      )}
+    </>
   );
 }

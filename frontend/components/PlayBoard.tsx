@@ -15,7 +15,7 @@ import { FitScoreSheet } from "@/components/FitScoreSheet";
 import { PlayTopBar } from "@/components/PlayTopBar";
 import { PoolEndgamePanel } from "@/components/PoolEndgamePanel";
 import { ScoreEntryPanel } from "@/components/ScoreEntryPanel";
-import { HouseRulesPanel } from "@/components/HouseRulesPanel";
+import { isExtraHouseRulesUiAvailable } from "@/components/HouseRulesTableActions";
 import { ScoreSheetTable } from "@/components/ScoreSheetTable";
 import { clearActiveGame, saveActiveGame } from "@/lib/activeGame";
 import {
@@ -994,23 +994,22 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         showAbandon
         abandonBusy={busy}
         onAbandon={() => void handleAbandon()}
+        showRollSale={
+          isExtraHouseRulesUiAvailable(isLocalSolo, run.useStrategyRules) &&
+          isFeatureEnabled("houseRulesRollSale") &&
+          !!inviteCode &&
+          !!lobby &&
+          lobby.playerCount >= 2
+        }
+        canRollSale={run.status === "ACTIVE" && !run.rollSaleFreeFillActive}
+        rollSaleFreeFillActive={!!run.rollSaleFreeFillActive}
+        lobby={lobby}
+        ownPlayerDbId={ownPlayerDbId}
+        onRollSale={(seller, buyer, pools) => void handleRollSale(seller, buyer, pools)}
       />
 
       {error && (
         <p className="glass-alert-error shrink-0 px-3 py-2 text-sm">{error}</p>
-      )}
-
-      {!showEntryPanel && (
-        <HouseRulesPanel
-          run={run}
-          inviteCode={inviteCode ?? undefined}
-          lobby={lobby}
-          isLocalSolo={isLocalSolo}
-          ownPlayerDbId={ownPlayerDbId}
-          busy={busy}
-          onRollSale={(seller, buyer, pools) => void handleRollSale(seller, buyer, pools)}
-          onYatzyStreak={(victimId) => void handleYatzyStreak(victimId)}
-        />
       )}
 
       {sheetReviewAfterComplete && allScored && !showCompleteOverlay && (
