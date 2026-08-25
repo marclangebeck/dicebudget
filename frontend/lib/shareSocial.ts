@@ -43,15 +43,14 @@ export function appendSiteLink(body: string): string {
   return `${body}\n\nJetzt spielen: ${SITE_URL}`;
 }
 
-/** Raumcode teilen (Remote-Beitritt); Fallback: Code + Join-URL in die Zwischenablage. */
+/** Nur den Raumcode teilen (ohne Link). */
 export async function shareInviteCode(code: string): Promise<"shared" | "copied" | "aborted"> {
-  const { buildInviteJoinUrl } = await import("@/lib/inviteJoinUrl");
-  const normalized = code.trim().toUpperCase();
-  const joinUrl = buildInviteJoinUrl(normalized);
-  const text = `DiceBudget Raumcode: ${normalized}\nBeitreten: ${joinUrl}`;
+  const text = code.trim().toUpperCase();
+  if (!text) return "copied";
+
   if (canUseWebShare()) {
     try {
-      await navigator.share({ title: "DiceBudget beitreten", text });
+      await navigator.share({ text });
       return "shared";
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return "aborted";
