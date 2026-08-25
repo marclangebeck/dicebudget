@@ -7,6 +7,7 @@ import { upperBonusDelta } from "@/lib/gameScoring";
 import {
   diceValueForField,
   FIELD_LABELS,
+  LOWER_FIELD_TYPES,
   SHEET_ROWS,
   SUMMARY_LABELS,
   UPPER_FIELD_TYPES,
@@ -408,6 +409,8 @@ export function ScoreSheetTable({
         <tbody>
           {SHEET_ROWS.map((row) => {
             const isSummary = row.kind === "summary";
+            const isLowerField =
+              row.kind === "field" && LOWER_FIELD_TYPES.includes(row.fieldType);
 
             return (
               <tr
@@ -419,7 +422,7 @@ export function ScoreSheetTable({
                   title={rowLabel(row)}
                   className={`play-row-label text-left font-normal ${
                     isSummary ? summaryLabelClass(row) : ""
-                  }`}
+                  } ${isLowerField ? "play-row-label--lower" : ""}`}
                 >
                   {isSummary ? (
                     SUMMARY_LABELS[row.key]
