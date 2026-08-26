@@ -234,18 +234,9 @@ export function JoinByQrScan({ variant = "home", kind = "multi" }: Props) {
           ) : (
             <>
               <p className="qr-scan-overlay-title">QR anvisieren</p>
-              <div className="qr-scan-stage">
-                <div className="qr-scan-frame">
-                  <video ref={videoRef} className="qr-scan-video" playsInline muted autoPlay />
-                  <div className="qr-scan-reticle" aria-hidden />
-                </div>
-                <button
-                  type="button"
-                  className="qr-scan-code-side-btn"
-                  onClick={showCodeEntryBesideCamera}
-                >
-                  Code eingeben
-                </button>
+              <div className="qr-scan-frame">
+                <video ref={videoRef} className="qr-scan-video" playsInline muted autoPlay />
+                <div className="qr-scan-reticle" aria-hidden />
               </div>
               <p className="qr-scan-overlay-hint">
                 Vor Ort: QR scannen. Remote: „Code eingeben“ nutzen.
@@ -257,6 +248,13 @@ export function JoinByQrScan({ variant = "home", kind = "multi" }: Props) {
               )}
               <button type="button" className="qr-scan-cancel" onClick={closeOverlay}>
                 Abbrechen
+              </button>
+              <button
+                type="button"
+                className="qr-scan-code-below-btn"
+                onClick={showCodeEntryBesideCamera}
+              >
+                Code eingeben
               </button>
             </>
           )}
