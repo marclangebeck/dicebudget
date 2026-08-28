@@ -4,6 +4,9 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 
 ## [Unreleased]
 
+### Changed
+- **Oberer Bereich zuerst + Gegner-Pool für 3+:** Upper Race gilt ab 2 Spielern (Pool = Summe offener Oberfelder aller Mitspieler). Gegner-Pool-Anzeige in der Topbar auch bei 3–6 (`ich / A · B · …`). 2× Alle Fünfe bleibt 1/n.
+
 ### Added
 - **Doku Tournament T1–T6:** `docs/tournament/README.md`, `api-sketch.md`, `HANDOVER.md`, Host-README — Rollen, Bildschirme, Deploy, iOS-Hinweise
 - **Tournament T4–T6:** Auslosungsvorschau (Neu mischen, Spieler-Dropdowns), schrittweise Rundenfreigabe (`POST /rounds`), Auto-Freigabe nach abgeschlossener Welle; Host/Teilnehmer/Beamer mit sanftem Live-Refresh; Session-Code-Hinweis für Teilnehmer

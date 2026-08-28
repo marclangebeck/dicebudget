@@ -3562,15 +3562,18 @@ html.zoomable-route.legal-route .legal-page-scroll {
 
 .play-top-stat {
   display: inline-flex;
-  flex-shrink: 0;
+  flex-shrink: 1;
   align-items: center;
   justify-content: center;
   min-width: 4.75rem;
+  max-width: min(58vw, 14rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   border-radius: 999px;
   padding: 0.28rem 0.62rem;
   font-size: 0.78rem;
   font-weight: 750;
-  white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 

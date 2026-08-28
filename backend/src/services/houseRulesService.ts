@@ -322,8 +322,8 @@ type SessionPlayerWithRun = {
 
 /**
  * Nach Feldeintrag: automatische Hausregeln (Strategy + Session).
- * Multi (≥2 Spieler): 2×/3× Alle Fünfe (1/n bzw. voll; optional Gutschrift).
- * Duell (2 Spieler): zusätzlich Oberer-Bereich-Race.
+ * Multi (≥2 Spieler): 2×/3× Alle Fünfe (1/n bzw. voll; optional Gutschrift),
+ * Oberer-Bereich-Race (Summe offener Oberfelder aller Mitspieler).
  * Beliebige Spielerzahl: Spalten-Pool-Boni (M40), nur Erster in der Session.
  */
 export async function applyAutoHouseRulesAfterComplete(
@@ -472,28 +472,28 @@ export async function applyAutoHouseRulesAfterComplete(
       }
     }
 
-    if (session.ruleUpperRace && playerCount === 2) {
-      const opponent = opponents[0];
-      if (opponent) {
-        const upperBefore = isRunUpperComplete(before.games);
-        const upperAfter = isRunUpperComplete(afterRun.games);
-        if (!upperBefore && upperAfter && !before.upperRacePoolCredited) {
-          const openUpper = countOpenUpperFields(opponent.run.games);
-          if (openUpper > 0) {
-            await prisma.run.update({
-              where: { id: runId },
-              data: {
-                rollsInPool: { increment: openUpper },
-                upperRacePoolCredited: true,
-              },
-            });
-            events.push({ type: "upper_race_pool", poolsGained: openUpper });
-          } else {
-            await prisma.run.update({
-              where: { id: runId },
-              data: { upperRacePoolCredited: true },
-            });
-          }
+    if (session.ruleUpperRace && playerCount >= 2 && opponents.length > 0) {
+      const upperBefore = isRunUpperComplete(before.games);
+      const upperAfter = isRunUpperComplete(afterRun.games);
+      if (!upperBefore && upperAfter && !before.upperRacePoolCredited) {
+        const openUpper = opponents.reduce(
+          (sum, opponent) => sum + countOpenUpperFields(opponent.run.games),
+          0,
+        );
+        if (openUpper > 0) {
+          await prisma.run.update({
+            where: { id: runId },
+            data: {
+              rollsInPool: { increment: openUpper },
+              upperRacePoolCredited: true,
+            },
+          });
+          events.push({ type: "upper_race_pool", poolsGained: openUpper });
+        } else {
+          await prisma.run.update({
+            where: { id: runId },
+            data: { upperRacePoolCredited: true },
+          });
         }
       }
     }

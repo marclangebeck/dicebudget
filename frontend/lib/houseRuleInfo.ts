@@ -55,7 +55,7 @@ export const HOUSE_RULE_INFO: Record<HouseRuleInfoKey, HouseRuleInfo> = {
     key: "upperRace",
     title: "Oberer Bereich zuerst",
     body:
-      "Wer zuerst alle oberen Felder über alle Spiele voll hat (Anzahl Spiele × 6), erhält so viele Pool-Würfe, wie der Rivale oben noch offen hat. Nur Duell, nur einmal pro Partie.",
+      "Wer zuerst alle oberen Felder über alle Spiele voll hat (Anzahl Spiele × 6), erhält so viele Pool-Würfe, wie die Mitspieler oben zusammen noch offen haben (zu zweit: der eine Rivale). Nur einmal pro Partie.",
   },
   columnPoolBonuses: {
     key: "columnPoolBonuses",

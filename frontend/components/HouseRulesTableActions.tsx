@@ -160,11 +160,11 @@ export function HouseRulesTableActions({
           </div>
         )}
 
-        {upperRaceEnabled && lobby && lobby.playerCount === 2 && (
+        {upperRaceEnabled && lobby && lobby.playerCount >= 2 && (
           <div className="house-rules-subpanel rounded-lg border p-2">
             <RuleTitle title="Oberer Bereich zuerst" infoKey="upperRace" onInfo={setRuleInfo} />
             <p className="house-rules-action-hint mt-0.5 text-[0.65rem]">
-              Offene obere Felder des Rivalen als Pool (automatisch).
+              Offene obere Felder der Mitspieler als Pool (automatisch).
             </p>
           </div>
         )}

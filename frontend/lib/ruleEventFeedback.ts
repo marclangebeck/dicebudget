@@ -105,8 +105,8 @@ export function ruleEventFromDto(event: HouseRuleAutoEventDto): RuleEventOverlay
       title: "Oberer Bereich zuerst voll",
       subtitle:
         event.poolsGained === 1
-          ? "1 offenes Feld des Rivalen → +1 Pool"
-          : `${event.poolsGained} offene Felder des Rivalen → +${event.poolsGained} Pool`,
+          ? "1 offenes Feld oben bei Mitspielern → +1 Pool"
+          : `${event.poolsGained} offene Felder oben bei Mitspielern → +${event.poolsGained} Pool`,
       badge: `+${event.poolsGained}`,
     };
   }

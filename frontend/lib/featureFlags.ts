@@ -88,7 +88,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
     id: "houseRulesUpperRace",
     title: "Oberer Bereich zuerst",
     description:
-      "Wer zuerst alle oberen Felder (Spiele × 6) voll hat, erhält die offenen oberen Felder des Rivalen als Pool.",
+      "Wer zuerst alle oberen Felder (Spiele × 6) voll hat, erhält die offenen oberen Felder der Mitspieler als Pool.",
     stage: "labs",
     defaultLabsOn: true,
     infoKey: "upperRace",

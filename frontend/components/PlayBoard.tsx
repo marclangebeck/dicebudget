@@ -112,10 +112,9 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     clearAllFeedbackOverlays,
   } = useQueuedFeedbackOverlays();
   const shownProgressRef = useRef<Set<number>>(new Set());
-  const [opponentPool, setOpponentPool] = useState<number | null>(null);
-  const [opponentOpenUpperFields, setOpponentOpenUpperFields] = useState<
-    number | null
-  >(null);
+  const [opponentPools, setOpponentPools] = useState<number[] | null>(null);
+  const [opponentOpenUpperFieldsList, setOpponentOpenUpperFieldsList] =
+    useState<number[] | null>(null);
   const [lobby, setLobby] = useState<SessionLobbyDto | null>(null);
   const [endgameFieldId, setEndgameFieldId] = useState<string | null>(null);
   const [endgameScoreInput, setEndgameScoreInput] = useState("");
@@ -183,20 +182,20 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     try {
       const { session } = await getSessionLobby(inviteCode, options);
       setLobby(session);
-      if (session.showOpponentPool && session.players.length === 2) {
+      if (session.showOpponentPool && session.players.length >= 2) {
         const myId = normalizePublicPlayerId(getOrCreatePlayerId());
-        const opponent = session.players.find(
+        const opponents = session.players.filter(
           (p) => normalizePublicPlayerId(p.playerId) !== myId,
         );
-        setOpponentPool(opponent?.rollsInPool ?? null);
-        setOpponentOpenUpperFields(
-          typeof opponent?.openUpperFields === "number"
-            ? opponent.openUpperFields
-            : null,
+        setOpponentPools(opponents.map((p) => p.rollsInPool ?? 0));
+        setOpponentOpenUpperFieldsList(
+          opponents.map((p) =>
+            typeof p.openUpperFields === "number" ? p.openUpperFields : 0,
+          ),
         );
       } else {
-        setOpponentPool(null);
-        setOpponentOpenUpperFields(null);
+        setOpponentPools(null);
+        setOpponentOpenUpperFieldsList(null);
       }
       return session;
     } catch {
@@ -986,9 +985,9 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
         useStrategyRules={run.useStrategyRules}
         rollsInPool={run.rollsInPool}
         rollsRemaining={run.rollsRemaining}
-        opponentPool={opponentPool}
+        opponentPools={opponentPools}
         ownOpenUpperFields={ownOpenUpperFields}
-        opponentOpenUpperFields={opponentOpenUpperFields}
+        opponentOpenUpperFieldsList={opponentOpenUpperFieldsList}
         showOpponentPoolControl={!!lobby?.showOpponentPool}
         onRefreshOpponentPool={() => void refreshLobby()}
         showAbandon

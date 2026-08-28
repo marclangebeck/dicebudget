@@ -14,8 +14,10 @@ type Props = {
   rollsInPool: number;
   rollsRemaining: number | null;
   ownOpenUpperFields?: number;
-  opponentPool?: number | null;
-  opponentOpenUpperFields?: number | null;
+  /** Pools der Mitspieler (Reihenfolge wie in der Lobby, ohne dich). */
+  opponentPools?: number[] | null;
+  /** Offene Oberfelder der Mitspieler — parallel zu opponentPools. */
+  opponentOpenUpperFieldsList?: number[] | null;
   showOpponentPoolControl?: boolean;
   onRefreshOpponentPool?: () => void;
   showAbandon?: boolean;
@@ -30,14 +32,18 @@ type Props = {
   onRollSale?: (sellerPlayerId: string, buyerPlayerId: string, pools: number) => void;
 };
 
+function formatOpponentStats(values: number[]): string {
+  return values.join(" · ");
+}
+
 export function PlayTopBar({
   inviteCode,
   useStrategyRules,
   rollsInPool,
   rollsRemaining,
   ownOpenUpperFields = 0,
-  opponentPool,
-  opponentOpenUpperFields,
+  opponentPools,
+  opponentOpenUpperFieldsList,
   showOpponentPoolControl,
   onRefreshOpponentPool,
   showAbandon,
@@ -58,18 +64,28 @@ export function PlayTopBar({
   const menuId = useId();
   const joinUrl = inviteCode ? buildInviteJoinUrl(inviteCode) : null;
 
+  const opponentPoolLabel =
+    opponentPools && opponentPools.length > 0
+      ? formatOpponentStats(opponentPools)
+      : null;
+  const opponentOpenUpperLabel =
+    opponentOpenUpperFieldsList && opponentOpenUpperFieldsList.length > 0
+      ? formatOpponentStats(opponentOpenUpperFieldsList)
+      : null;
+  const opponentOpenUpperTotal =
+    opponentOpenUpperFieldsList?.reduce((sum, n) => sum + n, 0) ?? 0;
+
   const showOpponentStats =
     useStrategyRules &&
     rollsRemaining !== null &&
     !!showOpponentPoolControl &&
-    opponentPool !== null &&
-    opponentPool !== undefined;
+    opponentPoolLabel != null;
 
   const showOpenUpperStats =
     showOpponentStats &&
     ownOpenUpperFields > 0 &&
-    opponentOpenUpperFields != null &&
-    opponentOpenUpperFields > 0;
+    opponentOpenUpperLabel != null &&
+    opponentOpenUpperTotal > 0;
 
   const showRefresh = !!onRefreshOpponentPool && !!showOpponentPoolControl && useStrategyRules;
   const showLobby = !!inviteCode;
@@ -201,18 +217,18 @@ export function PlayTopBar({
           <>
             <span
               className="play-top-stat play-top-stat--pool tabular-nums"
-              title={`Pool ${rollsInPool} / ${opponentPool}`}
-              aria-label={`Pool ${rollsInPool} zu ${opponentPool}`}
+              title={`Pool ${rollsInPool} / ${opponentPoolLabel}`}
+              aria-label={`Pool ${rollsInPool} zu ${opponentPoolLabel}`}
             >
-              {rollsInPool} / {opponentPool}
+              {rollsInPool} / {opponentPoolLabel}
             </span>
             {showOpenUpperStats && (
               <span
                 className="play-top-stat play-top-stat--upper tabular-nums"
-                title={`Oben offen ${ownOpenUpperFields} / ${opponentOpenUpperFields}`}
-                aria-label={`Oben offen ${ownOpenUpperFields} zu ${opponentOpenUpperFields}`}
+                title={`Oben offen ${ownOpenUpperFields} / ${opponentOpenUpperLabel}`}
+                aria-label={`Oben offen ${ownOpenUpperFields} zu ${opponentOpenUpperLabel}`}
               >
-                {ownOpenUpperFields} / {opponentOpenUpperFields}
+                {ownOpenUpperFields} / {opponentOpenUpperLabel}
               </span>
             )}
           </>
