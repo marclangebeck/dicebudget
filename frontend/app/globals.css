@@ -9668,7 +9668,8 @@ html.zoomable-route.legal-route .legal-page-scroll {
   gap: 0.45rem;
 }
 
-.settings-summary-grid span {
+.settings-summary-grid span,
+.settings-summary-grid .settings-summary-chip {
   display: flex;
   min-width: 0;
   flex-direction: column;
@@ -9679,10 +9680,35 @@ html.zoomable-route.legal-route .legal-page-scroll {
   background: rgba(255, 255, 255, 0.08);
   padding: 0.46rem 0.4rem;
   color: rgba(255, 255, 255, 0.66);
+  font-family: inherit;
   font-size: 0.58rem;
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+
+.settings-summary-grid .settings-summary-chip {
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background 140ms ease,
+    transform 140ms ease;
+}
+
+.settings-summary-grid .settings-summary-chip:hover:not(:disabled),
+.settings-summary-grid .settings-summary-chip:focus-visible {
+  border-color: rgba(214, 168, 90, 0.55);
+  background: rgba(214, 168, 90, 0.14);
+  outline: none;
+}
+
+.settings-summary-grid .settings-summary-chip:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.settings-summary-grid .settings-summary-chip:disabled {
+  cursor: default;
+  opacity: 0.72;
 }
 
 .settings-summary-grid strong {
@@ -9694,6 +9720,81 @@ html.zoomable-route.legal-route .legal-page-scroll {
   text-overflow: ellipsis;
   text-transform: none;
   white-space: nowrap;
+}
+
+.host-setup-pick-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: end center;
+  padding: 1rem;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.host-setup-pick-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(2, 6, 23, 0.62);
+  cursor: pointer;
+}
+
+.host-setup-pick-panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 22rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  border-radius: 1.15rem;
+  border: 1px solid rgba(186, 230, 253, 0.28);
+  background: linear-gradient(165deg, #1e293b 0%, #0f172a 100%);
+  box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.65);
+  padding: 1rem 1rem 0.9rem;
+}
+
+.host-setup-pick-title {
+  margin: 0;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.host-setup-pick-grid {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.host-setup-pick-option {
+  min-height: 2.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(15, 23, 42, 0.72);
+  color: #e2e8f0;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.host-setup-pick-option.is-selected {
+  border-color: rgba(214, 168, 90, 0.65);
+  background: linear-gradient(180deg, rgba(214, 168, 90, 0.34), rgba(180, 120, 40, 0.22));
+  color: #fef3c7;
+}
+
+.host-setup-pick-cancel {
+  min-height: 2.5rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #94a3b8;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .settings-inline-link {

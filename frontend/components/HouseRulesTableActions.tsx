@@ -164,7 +164,7 @@ export function HouseRulesTableActions({
           <div className="house-rules-subpanel rounded-lg border p-2">
             <RuleTitle title="Oberer Bereich zuerst" infoKey="upperRace" onInfo={setRuleInfo} />
             <p className="house-rules-action-hint mt-0.5 text-[0.65rem]">
-              Offene obere Felder der Mitspieler als Pool (automatisch).
+              Summe offener Oberfelder aller Mitspieler als Pool (automatisch).
             </p>
           </div>
         )}

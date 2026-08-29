@@ -5,17 +5,25 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { HostInviteQrPanel } from "@/components/HostInviteQrPanel";
+import { HostSetupQuickPick } from "@/components/HostSetupQuickPick";
 import { createGameSession, joinSession } from "@/lib/api";
 import { saveActiveGame } from "@/lib/activeGame";
 import { sessionHouseRuleFlagsFromPrefs } from "@/lib/featureFlags";
 import { upsertRivalName } from "@/lib/rivalProfiles";
 import { settingsHrefWithReturn } from "@/lib/settingsReturn";
-import { DEFAULT_APP_SETTINGS, getAppSettings, type AppSettings } from "@/lib/uiPrefs";
+import {
+  DEFAULT_APP_SETTINGS,
+  getAppSettings,
+  updateAppSettings,
+  type AppSettings,
+} from "@/lib/uiPrefs";
 import {
   createTableModePlayerId,
   saveTableModeSession,
   type TableModePlayer,
 } from "@/lib/tableMode";
+
+type QuickPickKind = "games" | "seats" | "mode" | null;
 
 export default function MultiHostPage() {
   const router = useRouter();
@@ -23,10 +31,15 @@ export default function MultiHostPage() {
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [quickPick, setQuickPick] = useState<QuickPickKind>(null);
 
   useEffect(() => {
     setSettings(getAppSettings());
   }, []);
+
+  function patchSettings(update: Partial<AppSettings>) {
+    setSettings(updateAppSettings(update));
+  }
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -83,6 +96,10 @@ export default function MultiHostPage() {
     }
   }
 
+  const seatsLocked = settings.tableModeEnabled;
+  const picksLocked = !!inviteCode;
+  const seatValue = String(seatsLocked ? 2 : settings.multiplayerMaxPlayers);
+
   return (
     <div className="setup-host-screen pb-2">
       <AppScreenHeader
@@ -95,23 +112,53 @@ export default function MultiHostPage() {
         <section className="setup-host-success">
           <p className="text-strong text-center text-sm font-semibold">Raum erstellen</p>
           <div className="settings-summary-grid">
-            <span>
+            <button
+              type="button"
+              className="settings-summary-chip"
+              disabled={picksLocked}
+              aria-label={`Spiele: ${settings.multiplayerGameCount}. Tippen zum Ändern.`}
+              onClick={() => setQuickPick("games")}
+            >
               <strong>{settings.multiplayerGameCount}</strong>
               Spiele
-            </span>
-            <span>
-              <strong>{settings.tableModeEnabled ? 2 : settings.multiplayerMaxPlayers}</strong>
+            </button>
+            <button
+              type="button"
+              className="settings-summary-chip"
+              disabled={picksLocked || seatsLocked}
+              aria-label={
+                seatsLocked
+                  ? "Plätze: 2 (Tischmodus)"
+                  : `Plätze: ${settings.multiplayerMaxPlayers}. Tippen zum Ändern.`
+              }
+              onClick={() => {
+                if (!seatsLocked) setQuickPick("seats");
+              }}
+            >
+              <strong>{seatsLocked ? 2 : settings.multiplayerMaxPlayers}</strong>
               Plätze
-            </span>
-            <span>
+            </button>
+            <button
+              type="button"
+              className="settings-summary-chip"
+              disabled={picksLocked}
+              aria-label={`Modus: ${settings.useStrategyRules ? "Strategy" : "Klassisch"}. Tippen zum Ändern.`}
+              onClick={() => setQuickPick("mode")}
+            >
               <strong>{settings.useStrategyRules ? "Strategy" : "Klassisch"}</strong>
               Modus
-            </span>
+            </button>
             <span>
               <strong>{settings.tableModeEnabled ? "iPad" : "Online"}</strong>
               Tisch
             </span>
           </div>
+          {!picksLocked && (
+            <p className="setup-host-success-hint">
+              Spiele, Plätze und Modus antippen zum Ändern
+              {seatsLocked ? " (Plätze im Tischmodus fest 2)" : ""}.
+            </p>
+          )}
           {settings.useStrategyRules && (
             <p className="setup-host-success-hint">
               Gegner-Pool {settings.showOpponentPool ? "sichtbar" : "aus"} · Pool-Endspiel{" "}
@@ -125,7 +172,7 @@ export default function MultiHostPage() {
             </p>
           )}
           <Link href={settingsHrefWithReturn("multi")} className="settings-inline-link">
-            Einstellungen ändern
+            Weitere Einstellungen
           </Link>
         </section>
 
@@ -147,6 +194,40 @@ export default function MultiHostPage() {
           <HostInviteQrPanel inviteCode={inviteCode} />
         )}
       </form>
+
+      <HostSetupQuickPick
+        open={quickPick === "games"}
+        title="Anzahl Spiele"
+        value={String(settings.multiplayerGameCount)}
+        options={[1, 2, 3, 4, 5, 6].map((n) => ({
+          value: String(n),
+          label: String(n),
+        }))}
+        onChange={(value) => patchSettings({ multiplayerGameCount: Number(value) })}
+        onClose={() => setQuickPick(null)}
+      />
+      <HostSetupQuickPick
+        open={quickPick === "seats"}
+        title="Plätze im Raum"
+        value={seatValue}
+        options={[2, 3, 4, 5, 6].map((n) => ({
+          value: String(n),
+          label: String(n),
+        }))}
+        onChange={(value) => patchSettings({ multiplayerMaxPlayers: Number(value) })}
+        onClose={() => setQuickPick(null)}
+      />
+      <HostSetupQuickPick
+        open={quickPick === "mode"}
+        title="Spielmodus"
+        value={settings.useStrategyRules ? "strategy" : "classic"}
+        options={[
+          { value: "classic", label: "Klassisch" },
+          { value: "strategy", label: "Strategy" },
+        ]}
+        onChange={(value) => patchSettings({ useStrategyRules: value === "strategy" })}
+        onClose={() => setQuickPick(null)}
+      />
     </div>
   );
 }

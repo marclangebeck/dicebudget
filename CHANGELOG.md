@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
+- **Multi-Host Schnellwahl:** Spiele (1–6), Plätze (2–6) und Modus (Klassisch/Strategy) per Tap auf dem Multi-Screen; Werte werden in App-Einstellungen gespeichert
 - **Spielstatistik Fokus Verlauf:** Ergebniszeile + großer Chart (alle Spieler); Tipps/Zusammenfassungen entfernt; Vorsprung-Band; Landscape-Vollbild; Finger-Scrubber für Zwischenstand
 - **Oberer Bereich zuerst + Gegner-Pool für 3+:** Upper Race gilt ab 2 Spielern (Pool = Summe offener Oberfelder aller Mitspieler). Gegner-Pool-Anzeige in der Topbar auch bei 3–6 (`ich / A · B · …`). 2× Alle Fünfe bleibt 1/n.
 
