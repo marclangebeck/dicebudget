@@ -110,20 +110,22 @@ export type MatchCoachingDto = {
   fieldComparison: FieldComparisonCellDto[];
 };
 
+export type ScoreProgressionPlayerDto = {
+  id: string;
+  name: string;
+};
+
 export type ScoreProgressionPointDto = {
   turn: number;
-  playerAScore: number;
-  playerBScore: number;
-  leader: "a" | "b" | "tie";
+  scores: number[];
+  leaderIndex: number | null;
+  leadMargin: number;
 };
 
 export type ScoreProgressionDto = {
-  playerAId: string;
-  playerAName: string;
-  playerBId: string;
-  playerBName: string;
+  players: ScoreProgressionPlayerDto[];
   points: ScoreProgressionPointDto[];
-  finalLeader: "a" | "b" | "tie";
+  finalLeaderIndex: number | null;
   leadChanges: number;
 };
 

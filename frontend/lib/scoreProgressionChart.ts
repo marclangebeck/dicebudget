@@ -22,3 +22,16 @@ export function downsampleScoreProgressionPoints(
     };
   });
 }
+
+export const SCORE_PROGRESSION_COLORS = [
+  "#34d399",
+  "#fbbf24",
+  "#60a5fa",
+  "#f472b6",
+  "#a78bfa",
+  "#fb923c",
+] as const;
+
+export function scoreProgressionColor(index: number): string {
+  return SCORE_PROGRESSION_COLORS[index % SCORE_PROGRESSION_COLORS.length]!;
+}

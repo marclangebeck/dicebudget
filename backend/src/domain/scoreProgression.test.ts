@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { computeGameBreakdown } from "./gameScoring.js";
 import { FIELD_TYPES_PER_GAME } from "./fieldTypes.js";
-import { buildHeadToHeadScoreProgression } from "./scoreProgression.js";
+import {
+  buildHeadToHeadScoreProgression,
+  buildMultiPlayerScoreProgression,
+} from "./scoreProgression.js";
 import type { AnalysisRun } from "./matchAnalysis.js";
 
 function field(
@@ -50,17 +53,41 @@ describe("buildHeadToHeadScoreProgression", () => {
 
     const chart = buildHeadToHeadScoreProgression(runA, runB, "a", "Alice", "b", "Bob");
     assert.ok(chart);
-    assert.equal(chart!.points[0]!.playerAScore, 0);
-    assert.equal(chart!.points[1]!.playerAScore, 3);
-    assert.equal(chart!.points[2]!.playerBScore, 5);
+    assert.equal(chart!.players.length, 2);
+    assert.equal(chart!.points[0]!.scores[0], 0);
+    assert.equal(chart!.points[1]!.scores[0], 3);
+    assert.equal(chart!.points[2]!.scores[1], 5);
     assert.ok(chart!.points.length >= 3);
-    assert.equal(chart!.playerAName, "Alice");
-    assert.equal(chart!.playerBName, "Bob");
+    assert.equal(chart!.players[0]!.name, "Alice");
+    assert.equal(chart!.players[1]!.name, "Bob");
   });
 
   it("gibt null zurück ohne Einträge", () => {
     const empty = runWithScores([]);
     const chart = buildHeadToHeadScoreProgression(empty, empty, "a", "A", "b", "B");
     assert.equal(chart, null);
+  });
+});
+
+describe("buildMultiPlayerScoreProgression", () => {
+  it("liefert Linien für drei Spieler inkl. Vorsprung", () => {
+    const runA = runWithScores([{ fieldType: "ONES", score: 5, scoredSequence: 1 }]);
+    const runB = runWithScores([{ fieldType: "ONES", score: 2, scoredSequence: 2 }]);
+    const runC = runWithScores([{ fieldType: "ONES", score: 4, scoredSequence: 3 }]);
+
+    const chart = buildMultiPlayerScoreProgression([
+      { playerId: "a", playerName: "A", run: runA },
+      { playerId: "b", playerName: "B", run: runB },
+      { playerId: "c", playerName: "C", run: runC },
+    ]);
+
+    assert.ok(chart);
+    assert.equal(chart!.players.length, 3);
+    const last = chart!.points[chart!.points.length - 1]!;
+    assert.equal(last.scores[0], 5);
+    assert.equal(last.scores[1], 2);
+    assert.equal(last.scores[2], 4);
+    assert.equal(last.leaderIndex, 0);
+    assert.equal(last.leadMargin, 1);
   });
 });

@@ -6,7 +6,7 @@ import {
 import { FIELD_TYPES_PER_GAME, type FieldTypeId } from "./fieldTypes.js";
 import { buildMatchCoaching, type MatchCoachingReport } from "./matchCoaching.js";
 import {
-  buildHeadToHeadScoreProgression,
+  buildMultiPlayerScoreProgression,
   type ScoreProgression,
 } from "./scoreProgression.js";
 
@@ -514,16 +514,13 @@ function buildSessionScoreProgression(
   participants: AnalysisParticipant[],
 ): ScoreProgression | null {
   const ordered = [...participants].sort((a, b) => a.orderIndex - b.orderIndex);
-  const playerA = ordered[0];
-  const playerB = ordered[1];
-  if (!playerA || !playerB) return null;
-  return buildHeadToHeadScoreProgression(
-    playerA.run,
-    playerB.run,
-    playerA.playerId,
-    playerA.playerName,
-    playerB.playerId,
-    playerB.playerName,
+  if (ordered.length < 2) return null;
+  return buildMultiPlayerScoreProgression(
+    ordered.map((p) => ({
+      playerId: p.playerId,
+      playerName: p.playerName,
+      run: p.run,
+    })),
   );
 }
 

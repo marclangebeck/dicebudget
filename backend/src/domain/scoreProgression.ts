@@ -1,25 +1,37 @@
 import { computeGameBreakdown } from "./gameScoring.js";
 import type { AnalysisRun } from "./matchAnalysis.js";
 
+export type ScoreProgressionPlayer = {
+  id: string;
+  name: string;
+};
+
 export type ScoreProgressionPoint = {
+  /** Eintragsindex 0…n (0 = Start). */
   turn: number;
-  playerAScore: number;
-  playerBScore: number;
-  leader: "a" | "b" | "tie";
+  /** Gesamtpunkte je Spieler (Reihenfolge = players[]). */
+  scores: number[];
+  /** Index des Führenden; null bei Gleichstand an der Spitze. */
+  leaderIndex: number | null;
+  /** Vorsprung des Führenden vor Platz 2 (0 bei Gleichstand). */
+  leadMargin: number;
 };
 
 export type ScoreProgression = {
-  playerAId: string;
-  playerAName: string;
-  playerBId: string;
-  playerBName: string;
+  players: ScoreProgressionPlayer[];
   points: ScoreProgressionPoint[];
-  finalLeader: "a" | "b" | "tie";
+  finalLeaderIndex: number | null;
   leadChanges: number;
 };
 
 type TimelineEntry = {
   scoredSequence: number;
+  totalScore: number;
+};
+
+type ProgressEvent = {
+  scoredSequence: number;
+  playerIndex: number;
   totalScore: number;
 };
 
@@ -89,13 +101,119 @@ function runningTotalForRun(run: AnalysisRun): TimelineEntry[] {
   return timeline;
 }
 
-function leaderFor(a: number, b: number): ScoreProgressionPoint["leader"] {
-  if (a > b) return "a";
-  if (b > a) return "b";
-  return "tie";
+function leadState(scores: number[]): {
+  leaderIndex: number | null;
+  leadMargin: number;
+} {
+  if (scores.length === 0) return { leaderIndex: null, leadMargin: 0 };
+  let best = -Infinity;
+  let second = -Infinity;
+  let bestIndex = -1;
+  let bestCount = 0;
+  for (let i = 0; i < scores.length; i += 1) {
+    const score = scores[i]!;
+    if (score > best) {
+      second = best;
+      best = score;
+      bestIndex = i;
+      bestCount = 1;
+    } else if (score === best) {
+      bestCount += 1;
+    } else if (score > second) {
+      second = score;
+    }
+  }
+  if (bestCount !== 1 || bestIndex < 0) {
+    return { leaderIndex: null, leadMargin: 0 };
+  }
+  const runnerUp = second === -Infinity ? best : second;
+  return { leaderIndex: bestIndex, leadMargin: Math.max(0, best - runnerUp) };
 }
 
-/** Verlauf der Gesamtpunkte (Spieler 1 vs. Spieler 2), abwechselnd nach Eintragsreihenfolge. */
+/**
+ * Punkteverlauf für 2–n Spieler.
+ * Einträge werden nach scoredSequence (dann Spielerindex) gemischt —
+ * entspricht dem Fortschritt, auch wenn Zettel asynchron gefüllt werden.
+ */
+export function buildMultiPlayerScoreProgression(
+  participants: Array<{
+    playerId: string;
+    playerName: string;
+    run: AnalysisRun;
+  }>,
+): ScoreProgression | null {
+  if (participants.length < 2) return null;
+
+  const players: ScoreProgressionPlayer[] = participants.map((p) => ({
+    id: p.playerId,
+    name: p.playerName,
+  }));
+
+  const events: ProgressEvent[] = [];
+  participants.forEach((participant, playerIndex) => {
+    for (const entry of runningTotalForRun(participant.run)) {
+      events.push({
+        scoredSequence: entry.scoredSequence,
+        playerIndex,
+        totalScore: entry.totalScore,
+      });
+    }
+  });
+
+  if (events.length === 0) return null;
+
+  events.sort(
+    (a, b) =>
+      a.scoredSequence - b.scoredSequence || a.playerIndex - b.playerIndex,
+  );
+
+  const scores = participants.map(() => 0);
+  const start = leadState(scores);
+  const points: ScoreProgressionPoint[] = [
+    {
+      turn: 0,
+      scores: [...scores],
+      leaderIndex: start.leaderIndex,
+      leadMargin: start.leadMargin,
+    },
+  ];
+
+  let previousLeader: number | null = null;
+  let leadChanges = 0;
+  let turn = 0;
+
+  for (const event of events) {
+    scores[event.playerIndex] = event.totalScore;
+    turn += 1;
+    const { leaderIndex, leadMargin } = leadState(scores);
+    if (
+      turn > 0 &&
+      leaderIndex != null &&
+      previousLeader != null &&
+      leaderIndex !== previousLeader
+    ) {
+      leadChanges += 1;
+    }
+    if (leaderIndex != null) previousLeader = leaderIndex;
+
+    points.push({
+      turn,
+      scores: [...scores],
+      leaderIndex,
+      leadMargin,
+    });
+  }
+
+  const final = points[points.length - 1]!;
+  return {
+    players,
+    points,
+    finalLeaderIndex: final.leaderIndex,
+    leadChanges,
+  };
+}
+
+/** Abwärtskompatibel: Zwei-Spieler-Verlauf. */
 export function buildHeadToHeadScoreProgression(
   runA: AnalysisRun,
   runB: AnalysisRun,
@@ -104,54 +222,8 @@ export function buildHeadToHeadScoreProgression(
   playerBId: string,
   playerBName: string,
 ): ScoreProgression | null {
-  const timelineA = runningTotalForRun(runA);
-  const timelineB = runningTotalForRun(runB);
-  if (timelineA.length === 0 && timelineB.length === 0) return null;
-
-  const points: ScoreProgressionPoint[] = [{ turn: 0, playerAScore: 0, playerBScore: 0, leader: "tie" }];
-  let idxA = 0;
-  let idxB = 0;
-  let totalA = 0;
-  let totalB = 0;
-  let turn = 0;
-  let previousLeader: ScoreProgressionPoint["leader"] = "tie";
-  let leadChanges = 0;
-
-  while (idxA < timelineA.length || idxB < timelineB.length) {
-    if (turn % 2 === 0 && idxA < timelineA.length) {
-      totalA = timelineA[idxA]!.totalScore;
-      idxA += 1;
-    } else if (idxB < timelineB.length) {
-      totalB = timelineB[idxB]!.totalScore;
-      idxB += 1;
-    } else if (idxA < timelineA.length) {
-      totalA = timelineA[idxA]!.totalScore;
-      idxA += 1;
-    }
-
-    turn += 1;
-    const leader = leaderFor(totalA, totalB);
-    if (turn > 0 && leader !== previousLeader && leader !== "tie" && previousLeader !== "tie") {
-      leadChanges += 1;
-    }
-    if (leader !== "tie") previousLeader = leader;
-
-    points.push({
-      turn,
-      playerAScore: totalA,
-      playerBScore: totalB,
-      leader,
-    });
-  }
-
-  const final = points[points.length - 1]!;
-  return {
-    playerAId,
-    playerAName,
-    playerBId,
-    playerBName,
-    points,
-    finalLeader: final.leader,
-    leadChanges,
-  };
+  return buildMultiPlayerScoreProgression([
+    { playerId: playerAId, playerName: playerAName, run: runA },
+    { playerId: playerBId, playerName: playerBName, run: runB },
+  ]);
 }
