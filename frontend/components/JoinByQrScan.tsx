@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import jsQR from "jsqr";
 import { normalizeInviteCode } from "@/lib/activeGame";
@@ -187,7 +188,7 @@ export function JoinByQrScan({ variant = "home", kind = "multi" }: Props) {
     setScanning(true);
   }
 
-  const overlay =
+  const overlayNode =
     scanning || codeEntry ? (
       <div
         className="qr-scan-overlay"
@@ -261,6 +262,11 @@ export function JoinByQrScan({ variant = "home", kind = "multi" }: Props) {
         </div>
       </div>
     ) : null;
+
+  const overlay =
+    overlayNode && typeof document !== "undefined"
+      ? createPortal(overlayNode, document.body)
+      : null;
 
   if (kind === "tournament" && variant === "home") {
     return (
