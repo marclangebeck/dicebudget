@@ -276,10 +276,10 @@ export function JoinByQrScan({ variant = "home", kind = "multi" }: Props) {
             >
               <span className="home-cinematic-join-copy">
                 <span className="home-cinematic-join-kicker">Ereignis</span>
-                <span className="home-cinematic-join-title">Turnier/Liga beitreten</span>
+                <span className="home-cinematic-join-title">Turnier</span>
                 <span className="home-cinematic-join-cta">
                   <ScanIcon />
-                  <span>QR-Code scannen</span>
+                  <span>QR scannen</span>
                 </span>
               </span>
             </button>
@@ -361,11 +361,11 @@ export function JoinByQrScan({ variant = "home", kind = "multi" }: Props) {
               onClick={() => void startScanner()}
             >
               <span className="home-cinematic-join-copy">
-                <span className="home-cinematic-join-kicker">Multi-Spiel</span>
-                <span className="home-cinematic-join-title">Gegner-Raum beitreten</span>
+                <span className="home-cinematic-join-kicker">Multi</span>
+                <span className="home-cinematic-join-title">Beitreten</span>
                 <span className="home-cinematic-join-cta">
                   <ScanIcon />
-                  <span>QR-Code scannen</span>
+                  <span>QR scannen</span>
                 </span>
               </span>
             </button>
