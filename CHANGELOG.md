@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
+- **UI-Kontrast app-weit:** Action-Tokens; `glass-button`/`--primary` endlich definiert; Primär-CTAs gold-teal; Sekundär klar abgesetzt; Panels dunkler mit stärkerem Rand; Summary-Chips tippbarer
 - **Multi-Host Schnellwahl:** Spiele (1–6), Plätze (2–6) und Modus (Klassisch/Strategy) per Tap — iOS-Walzen-Picker (wie Timer) mit Abbrechen/Fertig; Werte in App-Einstellungen
 - **Spielstatistik Fokus Verlauf:** Ergebniszeile + großer Chart (alle Spieler); Tipps/Zusammenfassungen entfernt; Vorsprung-Band; Landscape-Vollbild; Finger-Scrubber für Zwischenstand
 - **Oberer Bereich zuerst + Gegner-Pool für 3+:** Upper Race gilt ab 2 Spielern (Pool = Summe offener Oberfelder aller Mitspieler). Gegner-Pool-Anzeige in der Topbar auch bei 3–6 (`ich / A · B · …`). 2× Alle Fünfe bleibt 1/n.
