@@ -155,7 +155,7 @@ export default function MultiHostPage() {
           </div>
           {!picksLocked && (
             <p className="setup-host-success-hint">
-              Spiele, Plätze und Modus antippen zum Ändern
+              Spiele, Plätze und Modus antippen — wie beim iPhone-Timer drehen
               {seatsLocked ? " (Plätze im Tischmodus fest 2)" : ""}.
             </p>
           )}
