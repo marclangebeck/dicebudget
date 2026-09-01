@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { ScoreProgressionChart } from "@/components/ScoreProgressionChart";
 import {
   type MatchAnalysisDto,
@@ -8,6 +8,7 @@ import {
 } from "@/lib/matchAnalysisTypes";
 import { playerLabel } from "@/lib/playerIdentity";
 import type { PlayerAliasMap } from "@/lib/playerAliases";
+import { normalizeScoreProgression } from "@/lib/scoreProgressionChart";
 
 type Props = {
   analysis: MatchAnalysisDto | SessionMatchAnalysisDto;
@@ -58,15 +59,10 @@ export function MatchAnalysisView({
   onBack,
   backLabel = "Zurück",
 }: Props) {
-  const [landscape, setLandscape] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(orientation: landscape) and (max-height: 520px)");
-    const apply = () => setLandscape(mq.matches);
-    apply();
-    mq.addEventListener("change", apply);
-    return () => mq.removeEventListener("change", apply);
-  }, []);
+  const scoreProgression = useMemo(
+    () => normalizeScoreProgression(analysis.scoreProgression),
+    [analysis.scoreProgression],
+  );
 
   if (!analysis.ready) {
     return (
@@ -119,20 +115,11 @@ export function MatchAnalysisView({
           .join(" · ")
       : null;
 
-  const hasChart = analysis.mode === "multi" && !!analysis.scoreProgression;
-  const showLandscapeHint = hasChart && !landscape;
+  const hasChart = analysis.mode === "multi" && scoreProgression != null;
 
   return (
-    <div
-      className={`match-analysis-screen match-analysis-screen--chart-focus${
-        landscape ? " match-analysis-screen--landscape" : ""
-      }`}
-    >
-      <section
-        className={`match-analysis-hero match-analysis-hero--result${
-          landscape ? " match-analysis-hero--landscape-slim" : ""
-        }`}
-      >
+    <div className="match-analysis-screen match-analysis-screen--chart-focus">
+      <section className="match-analysis-hero match-analysis-hero--result">
         <div className="match-analysis-result-row">
           <span className={`match-analysis-outcome match-analysis-outcome--${badge.tone}`}>
             {badge.label}
@@ -140,32 +127,24 @@ export function MatchAnalysisView({
           <p className="match-analysis-hero-score tabular-nums">{heroScore}</p>
           <p className="match-analysis-hero-caption">{heroCaption}</p>
         </div>
-        {!landscape && rankingLine && (
-          <p className="match-analysis-ranking-inline">{rankingLine}</p>
-        )}
-        {!landscape && subtitle && <p className="match-analysis-hero-meta">{subtitle}</p>}
-        {!landscape && sessionMeta && (
+        {rankingLine && <p className="match-analysis-ranking-inline">{rankingLine}</p>}
+        {subtitle && <p className="match-analysis-hero-meta">{subtitle}</p>}
+        {sessionMeta && (
           <p className="match-analysis-hero-meta">
             Serie {sessionMeta.leagueCode} · Runde {sessionMeta.roundNumber}
           </p>
-        )}
-        {showLandscapeHint && (
-          <p className="match-analysis-rotate-hint">Quer drehen für großen Verlauf</p>
         )}
       </section>
 
       {hasChart ? (
         <section className="match-analysis-chart-stage">
-          {!landscape && (
-            <header className="match-analysis-chart-head">
-              <p className="match-analysis-card-kicker">Verlauf</p>
-              <h3 className="match-analysis-card-title">Führung & Vorsprung</h3>
-            </header>
-          )}
+          <header className="match-analysis-chart-head">
+            <p className="match-analysis-card-kicker">Verlauf</p>
+            <h3 className="match-analysis-card-title">Führung & Vorsprung</h3>
+          </header>
           <ScoreProgressionChart
-            progression={analysis.scoreProgression!}
+            progression={scoreProgression}
             highlightPlayerId={sessionMeta?.viewerPlayerId}
-            expansive={landscape}
           />
         </section>
       ) : (
@@ -187,13 +166,7 @@ export function MatchAnalysisView({
       )}
 
       {onBack && (
-        <button
-          type="button"
-          onClick={onBack}
-          className={`btn-secondary match-analysis-back-btn${
-            landscape ? " match-analysis-back-btn--slim" : ""
-          }`}
-        >
+        <button type="button" onClick={onBack} className="btn-secondary match-analysis-back-btn">
           {backLabel}
         </button>
       )}

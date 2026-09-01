@@ -4,14 +4,13 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import type { ScoreProgressionDto } from "@/lib/matchAnalysisTypes";
 import {
   downsampleScoreProgressionPoints,
+  normalizeScoreProgression,
   scoreProgressionColor,
 } from "@/lib/scoreProgressionChart";
 
 type Props = {
   progression: ScoreProgressionDto;
   highlightPlayerId?: string;
-  /** Volle Höhe für Landscape-Vollbild. */
-  expansive?: boolean;
 };
 
 const CHART_WIDTH = 640;
@@ -52,15 +51,23 @@ function buildLeadPath(
 export function ScoreProgressionChart({
   progression,
   highlightPlayerId,
-  expansive = false,
 }: Props) {
-  const { players, leadChanges, finalLeaderIndex } = progression;
-  const points = downsampleScoreProgressionPoints(progression.points);
+  const chartData = useMemo(
+    () => normalizeScoreProgression(progression),
+    [progression],
+  );
+  const players = chartData?.players ?? [];
+  const leadChanges = chartData?.leadChanges ?? 0;
+  const finalLeaderIndex = chartData?.finalLeaderIndex ?? null;
+  const points = useMemo(
+    () => downsampleScoreProgressionPoints(chartData?.points),
+    [chartData?.points],
+  );
   const chartRef = useRef<HTMLDivElement>(null);
   const [cursorIndex, setCursorIndex] = useState<number | null>(null);
 
   const maxScore = useMemo(
-    () => Math.max(...points.flatMap((p) => p.scores), 1),
+    () => Math.max(...points.flatMap((p) => p.scores ?? []), 1),
     [points],
   );
   const maxLead = useMemo(
@@ -119,7 +126,7 @@ export function ScoreProgressionChart({
     if (index != null) setCursorIndex(index);
   }
 
-  if (points.length < 2 || players.length < 2) return null;
+  if (!chartData || points.length < 2 || players.length < 2) return null;
 
   const leaderAtCursor = activePoint.leaderIndex;
   const leaderNameAtCursor =
@@ -132,7 +139,7 @@ export function ScoreProgressionChart({
   return (
     <div
       ref={chartRef}
-      className={`score-progression-chart${expansive ? " score-progression-chart--expansive" : ""}`}
+      className="score-progression-chart"
       onPointerDown={onPointer}
       onPointerMove={onPointer}
       onPointerLeave={() => setCursorIndex(null)}
