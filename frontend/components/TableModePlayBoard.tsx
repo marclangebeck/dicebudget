@@ -567,6 +567,22 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     }
   }
 
+  function handleLeaveHomeFromFinished() {
+    const stored = loadTableModeSession(inviteCode);
+    if (!stored) {
+      router.push(APP_HOME_PATH);
+      return;
+    }
+    setLeavingHome(true);
+    setError(null);
+    void finalizeSessionStats(inviteCode, includeInStats, stored.players[0].playerSecret)
+      .then(() => router.push(APP_HOME_PATH))
+      .catch((e) =>
+        setError(e instanceof Error ? e.message : "Statistik-Speicherung fehlgeschlagen"),
+      )
+      .finally(() => setLeavingHome(false));
+  }
+
   if (!players) {
     return (
       <div className="play-message-card">
@@ -605,8 +621,8 @@ export function TableModePlayBoard({ inviteCode }: Props) {
             analysis={matchAnalysis}
             ownPlayerId={players[0].playerId}
             aliases={loadDisplayNames()}
-            onBack={() => setShowMatchAnalysis(false)}
-            backLabel="Zurück zum Duell"
+            onFinish={() => handleLeaveHomeFromFinished()}
+            finishing={leavingHome}
           />
         </div>
       </div>
@@ -766,24 +782,7 @@ export function TableModePlayBoard({ inviteCode }: Props) {
           <button
             type="button"
             disabled={leavingHome}
-            onClick={() => {
-              const stored = loadTableModeSession(inviteCode);
-              if (!stored) {
-                router.push(APP_HOME_PATH);
-                return;
-              }
-              setLeavingHome(true);
-              void finalizeSessionStats(
-                inviteCode,
-                includeInStats,
-                stored.players[0].playerSecret,
-              )
-                .then(() => router.push(APP_HOME_PATH))
-                .catch((e) =>
-                  setError(e instanceof Error ? e.message : "Statistik-Speicherung fehlgeschlagen"),
-                )
-                .finally(() => setLeavingHome(false));
-            }}
+            onClick={() => handleLeaveHomeFromFinished()}
             className="play-table-ranking-link mt-3 disabled:opacity-50"
           >
             {leavingHome ? "Speichere …" : "Spiel beenden und zur Startseite"}

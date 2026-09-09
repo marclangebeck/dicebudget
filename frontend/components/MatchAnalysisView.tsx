@@ -17,8 +17,10 @@ type Props = {
   viewerLabel?: string;
   opponentLabel?: string;
   subtitle?: string | null;
-  onBack?: () => void;
-  backLabel?: string;
+  /** Primäraktion unten (z. B. Spiel beenden → Startseite). */
+  onFinish?: () => void;
+  finishLabel?: string;
+  finishing?: boolean;
 };
 
 function formatSigned(n: number): string {
@@ -56,13 +58,25 @@ export function MatchAnalysisView({
   viewerLabel = "Du",
   opponentLabel = "Gegner",
   subtitle,
-  onBack,
-  backLabel = "Zurück",
+  onFinish,
+  finishLabel = "Spiel beenden und zur Startseite",
+  finishing = false,
 }: Props) {
   const scoreProgression = useMemo(
     () => normalizeScoreProgression(analysis.scoreProgression),
     [analysis.scoreProgression],
   );
+
+  const finishButton = onFinish ? (
+    <button
+      type="button"
+      disabled={finishing}
+      onClick={onFinish}
+      className="btn-primary match-analysis-back-btn disabled:opacity-50"
+    >
+      {finishing ? "Speichere …" : finishLabel}
+    </button>
+  ) : null;
 
   if (!analysis.ready) {
     return (
@@ -70,11 +84,7 @@ export function MatchAnalysisView({
         <p className="match-analysis-empty">
           {analysis.unavailableReason ?? "Analyse noch nicht verfügbar."}
         </p>
-        {onBack && (
-          <button type="button" onClick={onBack} className="btn-secondary mt-4 w-full">
-            {backLabel}
-          </button>
-        )}
+        {finishButton}
       </section>
     );
   }
@@ -165,11 +175,7 @@ export function MatchAnalysisView({
         </section>
       )}
 
-      {onBack && (
-        <button type="button" onClick={onBack} className="btn-secondary match-analysis-back-btn">
-          {backLabel}
-        </button>
-      )}
+      {finishButton}
     </div>
   );
 }

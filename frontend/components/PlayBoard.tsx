@@ -397,6 +397,30 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     }
   }
 
+  async function handleLeaveHomeFromFinished() {
+    if (!inviteCode || !playerSecret) {
+      router.push(APP_HOME_PATH);
+      return;
+    }
+    setLeavingHome(true);
+    setError(null);
+    try {
+      const res = await finalizeStatsIfMulti(includeInStats);
+      if (res?.session?.koTieBreakPending) {
+        setShowMatchAnalysis(false);
+        setShowKoTieBreakOverlay(true);
+        return;
+      }
+      router.push(APP_HOME_PATH);
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "Statistik-Speicherung fehlgeschlagen",
+      );
+    } finally {
+      setLeavingHome(false);
+    }
+  }
+
   async function handleSubmit() {
     if (!activeFieldId || !run || scoreInput === "") return;
     unlockAchievementAudio();
@@ -753,10 +777,28 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
             <MatchAnalysisView
               analysis={matchAnalysis}
               ownPlayerId={getOrCreatePlayerId()}
-              onBack={() => setShowMatchAnalysis(false)}
-              backLabel="Zurück zum Ergebnis"
+              onFinish={() => void handleLeaveHomeFromFinished()}
+              finishing={leavingHome}
             />
           </div>
+          {showKoTieBreakOverlay && inviteCode && playerSecret && (
+            <KoTieBreakOverlay
+              inviteCode={inviteCode}
+              playerSecret={playerSecret}
+              initialRolls={
+                lobby?.koTieBreakPlayerAId === getOrCreatePlayerId()
+                  ? lobby?.koTieBreakPlayerARolls ?? null
+                  : lobby?.koTieBreakPlayerBId === getOrCreatePlayerId()
+                    ? lobby?.koTieBreakPlayerBRolls ?? null
+                    : null
+              }
+              onResolved={async () => {
+                setShowKoTieBreakOverlay(false);
+                await finalizeStatsIfMulti(includeInStats);
+                router.push(APP_HOME_PATH);
+              }}
+            />
+          )}
         </div>
       );
     }
@@ -801,27 +843,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
             <button
               type="button"
               disabled={leavingHome || showKoTieBreakOverlay}
-              onClick={() => {
-                setLeavingHome(true);
-                void (async () => {
-                  try {
-                    const res = await finalizeStatsIfMulti(includeInStats);
-                    if (res?.session?.koTieBreakPending) {
-                      setShowKoTieBreakOverlay(true);
-                      return;
-                    }
-                    router.push(APP_HOME_PATH);
-                  } catch (e) {
-                    setError(
-                      e instanceof Error
-                        ? e.message
-                        : "Statistik-Speicherung fehlgeschlagen",
-                    );
-                  } finally {
-                    setLeavingHome(false);
-                  }
-                })();
-              }}
+              onClick={() => void handleLeaveHomeFromFinished()}
               className="setup-host-submit flex min-h-10 shrink-0 items-center justify-center text-center disabled:opacity-50"
             >
               {leavingHome ? "Speichere …" : "Spiel beenden und zur Startseite"}
