@@ -332,6 +332,7 @@ export function createGameSession(
     ruleYatzyTripleCredit?: boolean;
     ruleUpperRace?: boolean;
     ruleColumnPoolBonuses?: boolean;
+    ruleYatzyEfficiency?: boolean;
   },
 ) {
   return request<{ session: SessionLobbyDto }>("/sessions", {

@@ -6,7 +6,8 @@ export type HouseRuleInfoKey =
   | "yatzyStreak3"
   | "yatzyStreak3Credit"
   | "upperRace"
-  | "columnPoolBonuses";
+  | "columnPoolBonuses"
+  | "yatzyEfficiency";
 
 export type HouseRuleInfo = {
   key: HouseRuleInfoKey;
@@ -62,6 +63,12 @@ export const HOUSE_RULE_INFO: Record<HouseRuleInfoKey, HouseRuleInfo> = {
     title: "Spalten-Pool-Boni",
     body:
       "Nur Strategy. Der erste Spieler in der Session erhält je einmalig +2 Pool: (A) eine Spalte 1–6 voll mit Bonus (+35), (B) eine Spalte unten komplett (7 Felder), (C) beides in derselben Spalte. Maximum 6 Pool. Unabhängig von „Oberer Bereich zuerst“.",
+  },
+  yatzyEfficiency: {
+    key: "yatzyEfficiency",
+    title: "Alle Fünfe: Effizienz",
+    body:
+      "Nur Strategy. Bei Alle Fünfe zählen die Würfe auf diesem Feld: bis einschließlich Wurf 7 gibt es volle 50 Punkte. Ab Wurf 8 sinkt der Trefferwert alle 3 Würfe um 5 Punkte (10 % vom Ausgangswert 50), z. B. 8–10 → 45, 11–13 → 40. Ohne Treffer weiterhin 0. Toggle aus = wie bisher immer 50. Zusatz-Alle-Fünfe (+100) und 2×/3×-Strafen (nur echte 50 mit ≤3 Würfen) bleiben unverändert.",
   },
 };
 

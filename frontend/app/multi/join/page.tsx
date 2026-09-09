@@ -77,6 +77,7 @@ function MultiJoinInner() {
           ruleYatzyTripleCredit: lobby.ruleYatzyTripleCredit,
           ruleUpperRace: lobby.ruleUpperRace,
           ruleColumnPoolBonuses: lobby.ruleColumnPoolBonuses,
+          ruleYatzyEfficiency: lobby.ruleYatzyEfficiency,
         },
       );
       router.push(`/multi/join?code=${encodeURIComponent(session.inviteCode)}`);

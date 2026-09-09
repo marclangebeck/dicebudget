@@ -16,6 +16,10 @@ import {
 import { FIELD_LABELS, fieldScoreChoices } from "@/lib/labels";
 import type { FieldDto, RunDto } from "@/lib/types";
 import type { SessionLobbyDto } from "@/lib/sessionTypes";
+import {
+  yatzyEfficiencyHitScore,
+  yatzyEfficiencyScoreChoices,
+} from "@/lib/yatzyEfficiency";
 
 type Props = {
   id?: string;
@@ -37,6 +41,8 @@ type Props = {
   lobby?: SessionLobbyDto | null;
   isLocalSolo?: boolean;
   ownPlayerDbId?: string;
+  /** Session/Labs: Alle Fünfe Punkte abhängig von Würfen. */
+  yatzyEfficiencyEnabled?: boolean;
   onRollSale?: (sellerPlayerId: string, buyerPlayerId: string, pools: number) => void;
   onYatzyStreak?: (victimPlayerId: string) => void;
   onPickScoreValue: (value: number) => void;
@@ -67,6 +73,7 @@ export function ScoreEntryPanel({
   lobby,
   isLocalSolo = false,
   ownPlayerDbId,
+  yatzyEfficiencyEnabled = false,
   onRollSale,
   onYatzyStreak,
   onPickScoreValue,
@@ -76,11 +83,18 @@ export function ScoreEntryPanel({
   onClearLast,
   onCancel,
 }: Props) {
+  const strategy = run.useStrategyRules && !rollSaleMode;
+  const efficiencyActive =
+    yatzyEfficiencyEnabled &&
+    strategy &&
+    field.fieldType === "KNIFFEL";
+
   const scoreChoices = rollSaleMode
     ? [...rollSaleAllowedScores(field.fieldType)]
-    : fieldScoreChoices(field.fieldType);
+    : efficiencyActive && rollsUsed != null
+      ? [...yatzyEfficiencyScoreChoices(rollsUsed)]
+      : fieldScoreChoices(field.fieldType);
 
-  const strategy = run.useStrategyRules && !rollSaleMode;
   const maxExtraRolls = rollsInPoolOverride ?? run.rollsInPool;
   // Strategy: nur Pool begrenzt die Würfe (Pool 0 → 1–3; sonst 1…3+Pool).
   const rollOptions = strategy
@@ -94,7 +108,7 @@ export function ScoreEntryPanel({
     Number.isInteger(parsedScore) &&
     scoreChoices.includes(parsedScore);
 
-  const needsYatzyDie = field.fieldType === "KNIFFEL" && parsedScore === 50;
+  const needsYatzyDie = field.fieldType === "KNIFFEL" && parsedScore !== null && parsedScore > 0;
   const yatzyDieOk = !needsYatzyDie || (yatzyDieValue !== null && yatzyDieValue !== undefined);
 
   const canSubmit = rollSaleMode
@@ -110,13 +124,22 @@ export function ScoreEntryPanel({
       ? !scoreOk
         ? rollSaleMode
           ? "Bitte einen erlaubten Verkaufs-Wert wählen."
-          : "Bitte einen gültigen Punktwert wählen."
+          : efficiencyActive && rollsUsed == null
+            ? "Bitte zuerst die Würfe wählen (Punkte hängen davon ab)."
+            : "Bitte einen gültigen Punktwert wählen."
         : needsYatzyDie && !yatzyDieOk
-          ? "Bitte den Würfel für Alle Fünfe (50 Punkte) wählen."
+          ? "Bitte den Würfel für Alle Fünfe wählen."
           : strategy && rollsUsed === null
             ? "Bitte die Anzahl Würfe für dieses Feld wählen."
             : null
       : null;
+
+  function handleRollsUsed(n: number) {
+    onRollsUsed(n);
+    if (efficiencyActive && parsedScore !== null && parsedScore > 0) {
+      onPickScoreValue(yatzyEfficiencyHitScore(n));
+    }
+  }
 
   const showExtraRules =
     !rollSaleMode &&
@@ -208,7 +231,7 @@ export function ScoreEntryPanel({
                     key={n}
                     type="button"
                     disabled={run.status !== "ACTIVE" || busy}
-                    onClick={() => onRollsUsed(n)}
+                    onClick={() => handleRollsUsed(n)}
                     className={`play-roll-chip play-roll-chip--large tabular-nums ${
                       rollsUsed === n ? "play-roll-chip--selected" : ""
                     } disabled:opacity-40`}
@@ -222,6 +245,9 @@ export function ScoreEntryPanel({
               </div>
               <p className="play-entry-hint">
                 Anzahl Würfe auf diesem Feld · 1–3 bei leerem Pool · ab 4. aus dem Pool
+                {efficiencyActive
+                  ? " · Alle Fünfe: bis 7 Würfe = 50, danach −5 je 3 Würfe"
+                  : ""}
               </p>
             </div>
           )}

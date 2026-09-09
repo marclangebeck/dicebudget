@@ -28,7 +28,7 @@ export function detectAchievements(
 ): AchievementType[] {
   const achieved: AchievementType[] = [];
 
-  if (fieldType === "KNIFFEL" && score === 50) {
+  if (fieldType === "KNIFFEL" && score > 0) {
     achieved.push("yatzy");
   }
   if (fieldType === "LARGE_STRAIGHT" && score >= 40) {

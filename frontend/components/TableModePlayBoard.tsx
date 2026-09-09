@@ -271,9 +271,9 @@ export function TableModePlayBoard({ inviteCode }: Props) {
     const activeFieldType = activeRun.games
       .flatMap((g) => g.fields)
       .find((f) => f.id === activeFieldId)?.fieldType;
-    const needsYatzyDie = !rollSaleEntry && activeFieldType === "KNIFFEL" && score === 50;
+    const needsYatzyDie = !rollSaleEntry && activeFieldType === "KNIFFEL" && score > 0;
     if (needsYatzyDie && yatzyDieValue === null) {
-      setError("Bitte den Würfel für Alle Fünfe (50 Punkte) wählen.");
+      setError("Bitte den Würfel für Alle Fünfe wählen.");
       return;
     }
     const yatzyArg = needsYatzyDie ? yatzyDieValue! : undefined;
@@ -837,11 +837,14 @@ export function TableModePlayBoard({ inviteCode }: Props) {
           lobby={lobby}
           isLocalSolo={false}
           ownPlayerDbId={houseRulesPlayerDbId}
+          yatzyEfficiencyEnabled={
+            !!activeRun.useStrategyRules && lobby?.ruleYatzyEfficiency === true
+          }
           onRollSale={(seller, buyer, pools) => void handleRollSale(seller, buyer, pools)}
           onYatzyStreak={(victimId) => void handleYatzyStreak(victimId)}
           onPickScoreValue={(v) => {
             setScoreInput(String(v));
-            if (v !== 50) setYatzyDieValue(null);
+            if (v <= 0) setYatzyDieValue(null);
           }}
           yatzyDieValue={yatzyDieValue}
           onYatzyDieValue={setYatzyDieValue}

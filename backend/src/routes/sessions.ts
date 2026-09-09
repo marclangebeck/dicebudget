@@ -77,6 +77,10 @@ sessionsRouter.post("/", createSessionLimiter, async (req, res, next) => {
           houseRulesBody.ruleColumnPoolBonuses === undefined
             ? undefined
             : Boolean(houseRulesBody.ruleColumnPoolBonuses),
+        ruleYatzyEfficiency:
+          houseRulesBody.ruleYatzyEfficiency === undefined
+            ? undefined
+            : Boolean(houseRulesBody.ruleYatzyEfficiency),
       },
       koTieBreakEnabled,
     );

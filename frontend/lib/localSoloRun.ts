@@ -1,8 +1,10 @@
 import { computeGameBreakdown, gameIndexForExtraYatzyClick } from "@/lib/gameScoring";
 import { poolDeltaForComplete } from "@/lib/gameRules";
+import { isFeatureEnabled } from "@/lib/featureFlags";
 import { burnPoolCost, isValidRollSaleScore } from "@/lib/houseRules";
 import { SHEET_ROWS } from "@/lib/labels";
 import type { FieldDto, FieldTypeId, GameDto, RunDto } from "@/lib/types";
+import { isValidYatzyEfficiencyScore } from "@/lib/yatzyEfficiency";
 
 const STORAGE_KEY = "dicebudget.localSoloRuns.v1";
 const LOCAL_RUN_PREFIX = "local-run-";
@@ -219,7 +221,7 @@ export function completeLocalSoloField(
     return saveState(state);
   }
 
-  if (field.fieldType === "KNIFFEL" && score === 50) {
+  if (field.fieldType === "KNIFFEL" && score > 0) {
     if (
       yatzyDieValue === undefined ||
       !Number.isInteger(yatzyDieValue) ||
@@ -229,12 +231,19 @@ export function completeLocalSoloField(
       throw new Error("yatzyDieValue must be between 1 and 6 for Alle Fünfe");
     }
   } else if (yatzyDieValue !== undefined) {
-    throw new Error("yatzyDieValue is only allowed for Alle Fünfe (50 points)");
+    throw new Error("yatzyDieValue is only allowed for Alle Fünfe (Treffer)");
   }
 
   if (run.useStrategyRules) {
     if (!Number.isInteger(rollsUsed) || rollsUsed < 1) {
       throw new Error("rollsUsed must be a positive integer");
+    }
+    if (
+      field.fieldType === "KNIFFEL" &&
+      isFeatureEnabled("houseRulesYatzyEfficiency") &&
+      !isValidYatzyEfficiencyScore(score, rollsUsed)
+    ) {
+      throw new Error("Punktwert passt nicht zur Wurfzahl (Alle Fünfe Effizienz)");
     }
     const currentPoolBeforeCorrection = field.score === null
       ? run.rollsInPool
@@ -266,7 +275,7 @@ export function completeLocalSoloField(
   field.rollsUsed = rollsUsed;
   field.scoredSequence = state.scoredSequenceByFieldId[field.id] ?? null;
   field.yatzyDieValue =
-    field.fieldType === "KNIFFEL" && score === 50 ? yatzyDieValue ?? null : null;
+    field.fieldType === "KNIFFEL" && score > 0 ? yatzyDieValue ?? null : null;
   run.totalRollsUsed += rollsUsed;
   recomputeRun(run);
   return saveState(state);

@@ -102,6 +102,15 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
     defaultLabsOn: true,
     infoKey: "columnPoolBonuses",
   },
+  houseRulesYatzyEfficiency: {
+    id: "houseRulesYatzyEfficiency",
+    title: "Alle Fünfe: Effizienz",
+    description:
+      "Nur Strategy. Bis Wurf 7 volle 50; danach alle 3 Würfe −5 Punkte (10 % vom Ausgangswert). Aus = wie bisher immer 50.",
+    stage: "labs",
+    defaultLabsOn: false,
+    infoKey: "yatzyEfficiency",
+  },
 };
 
 export type FeatureId = keyof typeof FEATURE_REGISTRY;
@@ -172,6 +181,7 @@ export function sessionHouseRuleFlagsFromPrefs(): {
   ruleYatzyTripleCredit: boolean;
   ruleUpperRace: boolean;
   ruleColumnPoolBonuses: boolean;
+  ruleYatzyEfficiency: boolean;
 } {
   if (!isLabsUnlocked()) {
     return {
@@ -181,6 +191,7 @@ export function sessionHouseRuleFlagsFromPrefs(): {
       ruleYatzyTripleCredit: false,
       ruleUpperRace: true,
       ruleColumnPoolBonuses: true,
+      ruleYatzyEfficiency: false,
     };
   }
   return {
@@ -190,6 +201,7 @@ export function sessionHouseRuleFlagsFromPrefs(): {
     ruleYatzyTripleCredit: isFeatureEnabled("houseRulesYatzyTripleCredit"),
     ruleUpperRace: isFeatureEnabled("houseRulesUpperRace"),
     ruleColumnPoolBonuses: isFeatureEnabled("houseRulesColumnPoolBonuses"),
+    ruleYatzyEfficiency: isFeatureEnabled("houseRulesYatzyEfficiency"),
   };
 }
 

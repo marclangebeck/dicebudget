@@ -10,6 +10,7 @@ import {
 import { assertValidScoreForField, InvalidFieldScoreError } from "../domain/fieldScores.js";
 import { RUN_STATUS } from "../domain/fieldTypes.js";
 import type { FieldTypeId } from "../domain/fieldTypes.js";
+import { isValidYatzyEfficiencyScore } from "../domain/yatzyEfficiency.js";
 import { prisma } from "../db/prisma.js";
 import { getRunById } from "./getRun.js";
 import { assertRunPlayerAccess } from "./runPlayerAuth.js";
@@ -272,10 +273,11 @@ function assertYatzyDieValue(
   score: number,
   yatzyDieValue: number | undefined,
 ): number | null {
-  if (fieldType !== "KNIFFEL" || score !== 50) {
+  const isKniffelHit = fieldType === "KNIFFEL" && score > 0;
+  if (!isKniffelHit) {
     if (yatzyDieValue !== undefined && yatzyDieValue !== null) {
       throw new InvalidYatzyDieValueError(
-        "yatzyDieValue is only allowed for a scored Alle Fünfe (50 points)",
+        "yatzyDieValue is only allowed for a scored Alle Fünfe (Treffer)",
       );
     }
     return null;
@@ -291,6 +293,20 @@ function assertYatzyDieValue(
     );
   }
   return yatzyDieValue;
+}
+
+async function sessionYatzyEfficiencyEnabled(runId: string): Promise<boolean> {
+  const player = await prisma.player.findUnique({
+    where: { runId },
+    select: {
+      session: {
+        select: { useStrategyRules: true, ruleYatzyEfficiency: true },
+      },
+    },
+  });
+  return Boolean(
+    player?.session?.useStrategyRules && player.session.ruleYatzyEfficiency,
+  );
 }
 
 export async function completeField(
@@ -364,7 +380,17 @@ export async function completeField(
   }
 
   assertManualEntry(score, rollsUsed, run.useStrategyRules);
-  assertValidScoreForField(field.fieldType, score);
+  const efficiencyOn =
+    field.fieldType === "KNIFFEL" &&
+    run.useStrategyRules &&
+    (await sessionYatzyEfficiencyEnabled(runId));
+  if (efficiencyOn) {
+    if (!isValidYatzyEfficiencyScore(score, rollsUsed)) {
+      throw new InvalidFieldScoreError(field.fieldType as FieldTypeId, score);
+    }
+  } else {
+    assertValidScoreForField(field.fieldType, score);
+  }
   const resolvedYatzyDie = assertYatzyDieValue(field.fieldType, score, yatzyDieValue);
   if (run.status !== RUN_STATUS.ACTIVE) throw new RunNotActiveError();
 

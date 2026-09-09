@@ -26,6 +26,7 @@ export type SessionLobbyDto = {
   ruleYatzyTripleCredit?: boolean;
   ruleUpperRace?: boolean;
   ruleColumnPoolBonuses?: boolean;
+  ruleYatzyEfficiency?: boolean;
   status: string;
   createdAt: string;
   leagueCode: string;

@@ -89,6 +89,8 @@ model GameSession {
   ruleYatzyTripleCredit  Boolean @default(false) @map("rule_yatzy_triple_credit")
   // M40: Spalten-Pool-Boni (oben/unten/Kombi je +2, nur Erster)
   ruleColumnPoolBonuses Boolean @default(true) @map("rule_column_pool_bonuses")
+  // Alle Fünfe Effizienz: bis Wurf 7 = 50, danach −5 je 3 Würfe (Default aus)
+  ruleYatzyEfficiency Boolean @default(false) @map("rule_yatzy_efficiency")
   columnPoolUpperCredited Boolean @default(false) @map("column_pool_upper_credited")
   columnPoolLowerCredited Boolean @default(false) @map("column_pool_lower_credited")
   columnPoolComboCredited Boolean @default(false) @map("column_pool_combo_credited")

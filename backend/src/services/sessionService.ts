@@ -187,6 +187,7 @@ export type SessionHouseRuleFlags = {
   ruleYatzyTripleCredit?: boolean;
   ruleUpperRace?: boolean;
   ruleColumnPoolBonuses?: boolean;
+  ruleYatzyEfficiency?: boolean;
 };
 
 function sumEnteredDiceScores(
@@ -233,6 +234,7 @@ export async function createGameSession(
   const ruleYatzyTripleCredit = houseRules.ruleYatzyTripleCredit === true;
   const ruleUpperRace = houseRules.ruleUpperRace !== false;
   const ruleColumnPoolBonuses = houseRules.ruleColumnPoolBonuses !== false;
+  const ruleYatzyEfficiency = houseRules.ruleYatzyEfficiency === true;
 
   const session = await prisma.$transaction(async (tx) => {
     const inviteCode = await generateUniqueInviteCode(tx);
@@ -278,6 +280,7 @@ export async function createGameSession(
           useStrategyRules && ruleYatzyTriple && ruleYatzyTripleCredit,
         ruleUpperRace: useStrategyRules && ruleUpperRace,
         ruleColumnPoolBonuses: useStrategyRules && ruleColumnPoolBonuses,
+        ruleYatzyEfficiency: useStrategyRules && ruleYatzyEfficiency,
         koTieBreakEnabled,
         status: SESSION_STATUS.OPEN,
         leagueId,
@@ -303,6 +306,7 @@ export async function createGameSession(
     ruleYatzyTripleCredit: session.ruleYatzyTripleCredit,
     ruleUpperRace: session.ruleUpperRace,
     ruleColumnPoolBonuses: session.ruleColumnPoolBonuses,
+    ruleYatzyEfficiency: session.ruleYatzyEfficiency,
     status: session.status,
     createdAt: session.createdAt.toISOString(),
     leagueCode: session.league.leagueCode,
@@ -368,6 +372,7 @@ export async function getSessionLobbyByInvite(
     ruleYatzyTripleCredit: session.ruleYatzyTripleCredit,
     ruleUpperRace: session.ruleUpperRace,
     ruleColumnPoolBonuses: session.ruleColumnPoolBonuses,
+    ruleYatzyEfficiency: session.ruleYatzyEfficiency,
     koTieBreakEnabled: session.koTieBreakEnabled,
     koTieBreakPending: session.koTieBreakPending,
     koTieBreakPlayerAId: session.koTieBreakPlayerAId,
