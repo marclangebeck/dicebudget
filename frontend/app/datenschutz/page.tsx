@@ -88,11 +88,16 @@ export default function DatenschutzPage() {
           <h3>4.2 Multiplayer</h3>
           <p>
             Multiplayer-Daten werden pseudonym verarbeitet. Beim ersten Start
-            erzeugt die App lokal eine zufällige Spieler-ID. Auf dem Server
-            speichern wir diese ID, Spielwerte (z. B. Punkte, Sieger,
-            Zeitstempel, Einladungscode, geheimer Spieler-Schlüssel) und
-            optional einen von dir gewählten Spielernamen (Anzeigename /
-            Nickname).
+            erzeugt die App lokal eine zufällige Spieler-ID.
+          </p>
+          <p>
+            Für gemeinsame Runden: Beitritt primär per <strong>QR-Code oder
+            Einladungslink</strong>. Alternativ per <strong>Raumcode</strong> („Code
+            teilen“ / „Code eingeben“), wenn Kamera oder QR-Scan nicht nutzbar
+            sind. Auf dem Server speichern wir u. a. die pseudonyme Spieler-ID,
+            Spielwerte (z. B. Punkte, Sieger, Zeitstempel, Einladungscode,
+            geheimer Spieler-Schlüssel) und den Raum-/Invite-Bezug sowie optional
+            einen von dir gewählten Spielernamen (Anzeigename / Nickname).
           </p>
           <p>
             Der Spielername ist kein Konto: Es gibt keine E-Mail-Adresse, kein
@@ -107,9 +112,9 @@ export default function DatenschutzPage() {
             Der geheime Schlüssel (<code>playerSecret</code>) wird in deinem
             App-WebView lokal gespeichert (technisch analog zu{" "}
             <code>sessionStorage</code>) — nicht in einem Konto auf unserer
-            Seite. Wechselst du das Gerät, musst du den Raum erneut über den
-            Code betreten. Ein neuer Name auf einem neuen Gerät gehört zu einer
-            neuen Spieler-ID.
+            Seite. Wechselst du das Gerät, musst du den Raum erneut über{" "}
+            <strong>QR/Link oder Raumcode</strong> betreten. Ein neuer Name auf
+            einem neuen Gerät gehört zu einer neuen Spieler-ID.
           </p>
 
           <h3>4.3 Statistik</h3>
