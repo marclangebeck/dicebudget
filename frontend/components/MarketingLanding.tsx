@@ -1,9 +1,12 @@
 import Link from "next/link";
-import { MARKETING_LANDING } from "@/lib/marketingLandingContent";
+import {
+  APP_DESCRIPTION,
+  APP_HOME_PATH,
+  APP_NAME,
+  PRIVACY_PATH,
+} from "@/lib/branding";
 
 export function MarketingLanding() {
-  const { hero, strategy, stammrunde, paid, faq, footer } = MARKETING_LANDING;
-
   return (
     <div className="landing-page">
       <header className="landing-header">
@@ -15,85 +18,31 @@ export function MarketingLanding() {
           className="landing-logo"
           decoding="async"
         />
-        <p className="landing-tagline">{hero.eyebrow}</p>
-        <h1 className="landing-title">{hero.headline}</h1>
+        <h1 className="landing-title">{APP_NAME}</h1>
+        <p className="landing-tagline">Strategy Edition</p>
       </header>
 
-      <p className="landing-lead">{hero.lead}</p>
-      <p className="landing-lead">{hero.supportLine}</p>
+      <p className="landing-lead">{APP_DESCRIPTION}</p>
 
-      <p className="landing-trust">
-        <strong>{hero.trustPrice}</strong>
-      </p>
-      <p className="landing-store-hint">{hero.priceNote}</p>
+      <ul className="landing-features">
+        <li>Einzelspiel oder Raum mit Einladungscode</li>
+        <li>Strategy mit Wurf-Pool oder klassischer Modus</li>
+        <li>1 bis 6 Spielblöcke pro Partie</li>
+        <li>Statistik und Multiplayer-Serien</li>
+      </ul>
 
-      <div className="landing-actions landing-cta-row">
-        <Link href={hero.primaryCta.href} className="landing-cta">
-          {hero.primaryCta.label}
+      <div className="landing-actions">
+        <Link href={APP_HOME_PATH} className="landing-cta">
+          Jetzt spielen
         </Link>
-        <a href={hero.secondaryCta.href} className="btn-secondary landing-cta-secondary">
-          {hero.secondaryCta.label}
-        </a>
+        <p className="landing-store-hint">
+          iOS-App für den App Store — in Vorbereitung
+        </p>
       </div>
-      <p className="landing-store-hint">{hero.statusLine}</p>
-
-      <section id={strategy.id} className="landing-block scroll-mt-24">
-        <h2 className="landing-block-title">{strategy.title}</h2>
-        {strategy.paragraphs.map((paragraph) => (
-          <p key={paragraph} className="landing-lead landing-block-text">
-            {paragraph}
-          </p>
-        ))}
-        <ul className="landing-features">
-          {strategy.bullets.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="landing-block">
-        <h3 className="landing-block-subtitle">{stammrunde.title}</h3>
-        {stammrunde.paragraphs.map((paragraph) => (
-          <p key={paragraph} className="landing-lead landing-block-text">
-            {paragraph}
-          </p>
-        ))}
-        <p className="landing-join-url">
-          <a href={stammrunde.joinUrl} className="landing-footer-link">
-            {stammrunde.joinLinkLabel}
-          </a>
-          <br />
-          <span className="landing-store-hint">{stammrunde.joinUrl}</span>
-        </p>
-      </section>
-
-      <section className="landing-block">
-        <h2 className="landing-block-title">{paid.title}</h2>
-        <p className="landing-trust">
-          <strong>{paid.priceLine}</strong>
-        </p>
-        <p className="landing-store-hint">{paid.note}</p>
-      </section>
-
-      <section className="landing-block">
-        <h2 className="landing-block-title">{faq.title}</h2>
-        <dl className="landing-faq">
-          {faq.items.map((item) => (
-            <div key={item.question}>
-              <dt>{item.question}</dt>
-              <dd>{item.answer}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
 
       <footer className="landing-footer">
-        <Link href={footer.privacyHref} className="landing-footer-link">
+        <Link href={PRIVACY_PATH} className="landing-footer-link">
           Datenschutzerklärung
-        </Link>
-        {" · "}
-        <Link href={footer.impressumHref} className="landing-footer-link">
-          Impressum
         </Link>
       </footer>
     </div>

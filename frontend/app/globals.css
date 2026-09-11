@@ -10663,9 +10663,9 @@ html.zoomable-route.legal-route .legal-page-scroll {
 .landing-shell {
   min-height: 100dvh;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding: 1.5rem 1.25rem 2.5rem;
+  padding: 1.5rem 1.25rem;
 }
 
 .landing-page {
@@ -10737,100 +10737,6 @@ html.zoomable-route.legal-route .legal-page-scroll {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
-}
-
-.landing-cta-row {
-  width: 100%;
-}
-
-@media (min-width: 480px) {
-  .landing-cta-row {
-    flex-direction: row;
-    align-items: stretch;
-  }
-
-  .landing-cta-row .landing-cta,
-  .landing-cta-row .landing-cta-secondary {
-    flex: 1 1 0;
-    min-width: 0;
-  }
-}
-
-.landing-cta-secondary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 3rem;
-  border-radius: 0.85rem;
-  font-size: 0.9375rem;
-  font-weight: 700;
-  text-decoration: none;
-  padding: 0 0.75rem;
-  text-align: center;
-}
-
-.landing-trust {
-  font-size: 0.875rem;
-  line-height: 1.45;
-  color: var(--text-secondary);
-  margin: 0;
-}
-
-.landing-block {
-  text-align: left;
-  padding-top: 0.25rem;
-  border-top: 1px solid rgba(15, 23, 42, 0.08);
-}
-
-.landing-block-title {
-  font-size: 1.0625rem;
-  font-weight: 700;
-  line-height: 1.35;
-  color: var(--foreground);
-  margin: 0 0 0.5rem;
-  text-align: center;
-}
-
-.landing-block-subtitle {
-  font-size: 0.9375rem;
-  font-weight: 700;
-  line-height: 1.35;
-  color: var(--foreground);
-  margin: 0 0 0.5rem;
-  text-align: center;
-}
-
-.landing-block-text {
-  text-align: left;
-  margin-top: 0.35rem;
-}
-
-.landing-join-url {
-  margin: 0.5rem 0 0;
-  text-align: center;
-  line-height: 1.5;
-}
-
-.landing-faq {
-  margin: 0;
-  text-align: left;
-  font-size: 0.8125rem;
-  line-height: 1.45;
-}
-
-.landing-faq dt {
-  font-weight: 700;
-  color: var(--foreground);
-  margin-top: 0.75rem;
-}
-
-.landing-faq dt:first-of-type {
-  margin-top: 0;
-}
-
-.landing-faq dd {
-  margin: 0.25rem 0 0;
-  color: var(--text-muted);
 }
 
 .landing-cta {

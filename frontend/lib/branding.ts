@@ -7,7 +7,7 @@ export const APP_TITLE = "DiceBudget — Strategy Edition";
 export const APP_SHORT = "DiceBudget";
 
 export const APP_DESCRIPTION =
-  "Echte Würfel am Tisch — Strategy Edition mit Wurf-Pool, Solo und Runden mit Freunden.";
+  "Strategisches Würfelspiel mit Wurf-Pool und wählbarer Spielanzahl";
 
 export const MODE_STRATEGY_LABEL = "DiceBudget Strategy Edition";
 export const MODE_CLASSIC_LABEL = "DiceBudget Klassisch";
