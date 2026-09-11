@@ -30,6 +30,7 @@ import {
   getRun,
   getSessionLobby,
   getSessionMatchAnalysis,
+  enableSessionYatzyEfficiency,
   incrementExtraYatzy,
   resolvePoolEndgame,
 } from "@/lib/api";
@@ -209,6 +210,31 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
   useEffect(() => {
     void refreshLobby();
   }, [refreshLobby]);
+
+  // Labs-Toggle an → Multi-Session-Flag setzen, damit die Regel wirklich greift.
+  useEffect(() => {
+    if (!inviteCode || !playerSecret || isLocalSolo) return;
+    if (!run?.useStrategyRules) return;
+    if (!isFeatureEnabled("houseRulesYatzyEfficiency")) return;
+    if (lobby?.ruleYatzyEfficiency === true) return;
+    let cancelled = false;
+    void enableSessionYatzyEfficiency(inviteCode, playerSecret)
+      .then(({ session }) => {
+        if (!cancelled) setLobby(session);
+      })
+      .catch(() => {
+        /* optional — Eintrag bleibt über Labs-UI + soft Backend möglich */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    inviteCode,
+    playerSecret,
+    isLocalSolo,
+    run?.useStrategyRules,
+    lobby?.ruleYatzyEfficiency,
+  ]);
 
   const poolEndgamePending =
     run && isRunEnded(run) &&
@@ -1133,10 +1159,11 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
           isLocalSolo={isLocalSolo}
           ownPlayerDbId={ownPlayerDbId}
           yatzyEfficiencyEnabled={
-            run.useStrategyRules &&
+            !!run.useStrategyRules &&
             (isLocalSolo
               ? isFeatureEnabled("houseRulesYatzyEfficiency")
-              : lobby?.ruleYatzyEfficiency === true)
+              : lobby?.ruleYatzyEfficiency === true ||
+                isFeatureEnabled("houseRulesYatzyEfficiency"))
           }
           onRollSale={(seller, buyer, pools) => void handleRollSale(seller, buyer, pools)}
           onYatzyStreak={(victimId) => void handleYatzyStreak(victimId)}

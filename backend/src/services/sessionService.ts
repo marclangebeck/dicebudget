@@ -315,6 +315,38 @@ export async function createGameSession(
   };
 }
 
+/**
+ * Labs-Toggle „Alle Fünfe: Effizienz“ → Session-Flag scharf schalten (einmalig an).
+ * Jeder Mitspieler mit gültigem Secret darf aktivieren; aus bleibt create-time/default.
+ */
+export async function enableSessionYatzyEfficiency(
+  inviteCode: string,
+  playerSecret: string | undefined,
+) {
+  const session = await prisma.gameSession.findUnique({
+    where: { inviteCode: inviteCode.toUpperCase() },
+    include: { players: { select: { secretToken: true } } },
+  });
+  if (!session) throw new SessionNotFoundError();
+
+  const token = playerSecret?.trim();
+  const player = session.players.find((p) => p.secretToken === token);
+  if (!token || !player) throw new ForbiddenRunError();
+
+  if (!session.useStrategyRules) {
+    return getSessionLobbyByInvite(session.inviteCode, { includeStandings: false });
+  }
+
+  if (!session.ruleYatzyEfficiency) {
+    await prisma.gameSession.update({
+      where: { id: session.id },
+      data: { ruleYatzyEfficiency: true },
+    });
+  }
+
+  return getSessionLobbyByInvite(session.inviteCode, { includeStandings: false });
+}
+
 export async function getSessionLobbyByInvite(
   inviteCode: string,
   options?: { includeStandings?: boolean },

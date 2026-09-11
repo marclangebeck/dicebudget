@@ -356,6 +356,14 @@ export function getSessionLobby(inviteCode: string, options?: { lite?: boolean }
   );
 }
 
+/** Labs-Toggle an → Session-Flag „Alle Fünfe: Effizienz“ scharf schalten. */
+export function enableSessionYatzyEfficiency(inviteCode: string, playerSecret?: string) {
+  return request<{ session: SessionLobbyDto }>(
+    `/sessions/invite/${encodeURIComponent(inviteCode)}/yatzy-efficiency`,
+    { method: "POST", playerSecret },
+  );
+}
+
 export function joinSession(inviteCode: string, playerId: string) {
   return request<{
     player: {

@@ -309,6 +309,27 @@ async function sessionYatzyEfficiencyEnabled(runId: string): Promise<boolean> {
   );
 }
 
+/**
+ * Strategy + Alle Fünfe: Session-Flag erzwingt Effizienz-Scores.
+ * Ohne Flag weiterhin 50/0, aber auch passende Effizienz-Treffer erlaubt
+ * (Labs-Toggle kann der Session-Latch um wenige ms voraus sein).
+ */
+function assertKniffelScoreForStrategy(
+  score: number,
+  rollsUsed: number,
+  efficiencyOn: boolean,
+): void {
+  if (efficiencyOn) {
+    if (!isValidYatzyEfficiencyScore(score, rollsUsed)) {
+      throw new InvalidFieldScoreError("KNIFFEL", score);
+    }
+    return;
+  }
+  if (score === 0 || score === 50) return;
+  if (isValidYatzyEfficiencyScore(score, rollsUsed)) return;
+  throw new InvalidFieldScoreError("KNIFFEL", score);
+}
+
 export async function completeField(
   runId: string,
   fieldId: string,
@@ -380,14 +401,9 @@ export async function completeField(
   }
 
   assertManualEntry(score, rollsUsed, run.useStrategyRules);
-  const efficiencyOn =
-    field.fieldType === "KNIFFEL" &&
-    run.useStrategyRules &&
-    (await sessionYatzyEfficiencyEnabled(runId));
-  if (efficiencyOn) {
-    if (!isValidYatzyEfficiencyScore(score, rollsUsed)) {
-      throw new InvalidFieldScoreError(field.fieldType as FieldTypeId, score);
-    }
+  if (field.fieldType === "KNIFFEL" && run.useStrategyRules) {
+    const efficiencyOn = await sessionYatzyEfficiencyEnabled(runId);
+    assertKniffelScoreForStrategy(score, rollsUsed, efficiencyOn);
   } else {
     assertValidScoreForField(field.fieldType, score);
   }

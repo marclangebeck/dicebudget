@@ -7,6 +7,7 @@ import { readPlayerSecret } from "./readPlayerSecret.js";
 import { getSessionMatchAnalysis } from "../services/matchAnalysisService.js";
 import {
   createGameSession,
+  enableSessionYatzyEfficiency,
   finalizeSessionStats,
   getSessionLobbyByInvite,
   getSessionRanking,
@@ -104,6 +105,18 @@ sessionsRouter.get("/invite/:inviteCode", async (req, res, next) => {
       return;
     }
     res.json({ session: lobby });
+  } catch (error) {
+    next(error);
+  }
+});
+
+sessionsRouter.post("/invite/:inviteCode/yatzy-efficiency", async (req, res, next) => {
+  try {
+    const session = await enableSessionYatzyEfficiency(
+      routeParam(req.params.inviteCode),
+      readPlayerSecret(req),
+    );
+    res.json({ session });
   } catch (error) {
     next(error);
   }

@@ -20,6 +20,7 @@ import {
   getRun,
   getSessionLobby,
   getSessionMatchAnalysis,
+  enableSessionYatzyEfficiency,
   incrementExtraYatzy,
   resolvePoolEndgame,
 } from "@/lib/api";
@@ -148,6 +149,22 @@ export function TableModePlayBoard({ inviteCode }: Props) {
       setError(e instanceof Error ? e.message : "Tischspiel konnte nicht geladen werden"),
     );
   }, [load]);
+
+  useEffect(() => {
+    if (!players?.[0]?.playerSecret) return;
+    if (!isFeatureEnabled("houseRulesYatzyEfficiency")) return;
+    if (lobby?.ruleYatzyEfficiency === true) return;
+    if (lobby && !lobby.useStrategyRules) return;
+    let cancelled = false;
+    void enableSessionYatzyEfficiency(inviteCode, players[0].playerSecret)
+      .then(({ session }) => {
+        if (!cancelled) setLobby(session);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [inviteCode, players, lobby?.ruleYatzyEfficiency, lobby?.useStrategyRules]);
 
   const activeRun = activeSide ? runs[activeSide] : null;
   const activePlayer = useMemo(
@@ -838,7 +855,9 @@ export function TableModePlayBoard({ inviteCode }: Props) {
           isLocalSolo={false}
           ownPlayerDbId={houseRulesPlayerDbId}
           yatzyEfficiencyEnabled={
-            !!activeRun.useStrategyRules && lobby?.ruleYatzyEfficiency === true
+            !!activeRun.useStrategyRules &&
+            (lobby?.ruleYatzyEfficiency === true ||
+              isFeatureEnabled("houseRulesYatzyEfficiency"))
           }
           onRollSale={(seller, buyer, pools) => void handleRollSale(seller, buyer, pools)}
           onYatzyStreak={(victimId) => void handleYatzyStreak(victimId)}
