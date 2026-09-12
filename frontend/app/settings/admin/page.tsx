@@ -63,7 +63,7 @@ export default function AdminSettingsPage() {
       <AppScreenHeader
         section="Admin"
         title="Admin"
-        subtitle="PIN-Freischaltung, API-Key lokal, spätere InApp-/Config-Schalter — ein App-Build."
+        subtitle="PIN-Freischaltung und API-Key lokal — ein App-Build."
         backHref="/settings"
         backLabel="Zurück zu Einstellungen"
       />
@@ -169,9 +169,10 @@ export default function AdminSettingsPage() {
             </div>
 
             <div className="settings-compact-card settings-compact-card--wide opacity-90">
-              <p className="settings-compact-title">InApp-Käufe (Mapping)</p>
+              <p className="settings-compact-title">Weitere Config</p>
               <p className="settings-compact-text">
-                Produkt-IDs und Feature-Freischaltung — folgt (Store bleibt Quelle für Preise).
+                Optionale Remote-/Store-Schalter — folgt. Strategy und Hausregeln sind Teil der App
+                (kein Kern-IAP).
               </p>
             </div>
 

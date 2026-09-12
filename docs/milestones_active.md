@@ -152,7 +152,7 @@ Details: `docs/milestone-roadmap-analysis.md` → Abschnitt **M36**.
 - Absolute Paarungs-Baseline (`isAbsolute`): Siege + Diff geräteübergreifend ohne Additiv-Drift.
 - Statistik-Admin: **Verwalten**-Menü; „Löschen · Server, alle Geräte“.
 - Footer aktiver Tab; iOS-Fokus-Zoom-Fix Stats/Settings.
-- Brennt: zwei Optionen (−1 / −2); Wording **InApp-Käufe (Features)**.
+- Brennt: zwei Optionen (−1 / −2); früheres Wording „InApp-Käufe (Features)“ — inzwischen Hausregeln unter Multi.
 - Migration: `20260807120000_pairing_baseline_absolute`.
 
 ### Hausregeln Auto, Statistik lokal, Feldeintrag-Perf 2026-07-31
