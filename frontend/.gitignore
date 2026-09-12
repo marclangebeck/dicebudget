@@ -44,7 +44,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Capacitor (ios/ committen für Xcode — Derived Data nicht)
-ios/App/App/public
+# Capacitor: ios/App/App/public WIRD commitet (Web-UI für Xcode/TestFlight).
+# Sonst bleibt auf dem Mac ein veraltetes Bundle und TestFlight ≠ Web.
+# Nicht committen: Pods / DerivedData
 ios/App/Pods
 ios/DerivedData
+ios/App/App/public/cordova.js
+ios/App/App/public/cordova_plugins.js

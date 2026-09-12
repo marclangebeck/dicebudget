@@ -1,13 +1,13 @@
 App/build
 App/Pods
 App/output
-App/App/public
 DerivedData
 xcuserdata
 
 # Cordova plugins for Capacitor
 capacitor-cordova-ios-plugins
 
-# Generated Config files
-App/App/capacitor.config.json
+# Generated Cordova stubs (empty); Web-UI unter App/App/public wird commitet
 App/App/config.xml
+App/App/public/cordova.js
+App/App/public/cordova_plugins.js

@@ -28,11 +28,12 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Capacitor iOS (generiert bei cap sync)
+# Capacitor iOS — Web-Bundle (public) WIRD commitet, sonst TestFlight ≠ Web
 frontend/ios/App/Pods/
-frontend/ios/App/App/public/
 frontend/ios/App/build/
 frontend/ios/DerivedData/
-frontend/ios/App/App/capacitor.config.json
 frontend/ios/App/App/config.xml
 frontend/ios/capacitor-cordova-ios-plugins/
+# Leere Cordova-Stubs (optional generiert)
+frontend/ios/App/App/public/cordova.js
+frontend/ios/App/App/public/cordova_plugins.js

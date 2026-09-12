@@ -2,7 +2,7 @@
 
 **Stand:** 2026-09-12  
 **Branch:** `milestone-22-prep`  
-**Release-Stand iOS:** Version **2.0**, TestFlight zuletzt **Build 98**; nächster Upload **99**  
+**Release-Stand iOS:** Version **2.0**, nächster Upload **Build 100** (nach TF 98/99 ohne UI-Update)  
 **Bundle ID:** `de.bottletrade.dicebudget`  
 **Apple Team ID (AASA):** `5QGGV8N5ZD`
 
@@ -21,7 +21,10 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 ## Aktueller Stand
 
 - App Store Connect: **Version 2.0**.
-- Nächster Upload: **Build 97** (Vorgänger in ASC laut Abnahme: **2.0 / 96**).
+- TestFlight: Builds **98/99** konnten die Hausregeln-UI verfehlen, wenn Xcode ein **veraltetes** `ios/App/App/public` gepackt hat.
+- **Ursache Web ≠ TestFlight:** Die iOS-App lädt **kein** Live-Web. Sie packt die Dateien aus `frontend/ios/App/App/public` (Capacitor `webDir: out` → sync). Nginx-Web (`frontend/out`) und TestFlight sind entkoppelt.
+- **Fix:** `ios/App/App/public` wird im Git mitgeführt und vor Releases per `npm run prepare:ios-web` / `build:ios` + `verify:ios-web` geprüft (keine „Vorschau sperren“/InApp-Features mehr).
+- Nächster Archive-Upload: **Build 100**.
 - Deployment Target: **15.0**.
 - **Web/iOS ein Build (M43):** Admin per `NEXT_PUBLIC_ADMIN_PIN`; API-Key lokal unter Einstellungen → Admin (Bundle ohne eingebetteten Admin-API-Key).
 - Optionale Hausregeln: Toggles unter **Einstellungen → Multi** (bei Strategy), **ohne Labs-PIN**.
@@ -56,20 +59,20 @@ Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
 
 Server-`frontend/.env.production`: Admin-API-Key im Bundle idealerweise leer; Backend `ADMIN_API_KEY` unverändert (nicht in Git).
 
-## iOS-Bundle (kritisch)
+## iOS-Bundle (kritisch) — warum Web ≠ TestFlight
 
 | Schritt | Reicht für neue UI in TestFlight? |
 |---------|-----------------------------------|
-| `git pull` | Nein (nur Quellcode) |
-| `npm run build` auf Server | Nein (nur Web unter `frontend/out/`) |
-| **`npm run build:ios` auf Mac** | **Ja** (`cap sync` → `ios/App/App/public/`) |
-| Xcode Archive ohne `build:ios` | Nein |
+| Nur Web-Deploy auf dem Server | **Nein** — betrifft nur den Browser |
+| `git pull` allein | **Teilweise** — ab jetzt liegt `ios/App/App/public` **im Repo** (aktuelles UI) |
+| **`npm run build:ios` auf Mac** | **Ja** — frisch bauen + Admin-PIN aus Mac-`.env` + Verify |
+| Xcode Archive ohne Pull/Verify | **Nein** — riskiert Alt-Bundle |
 
-`frontend/ios/App/App/public/` ist in `.gitignore`. Befehle nur auf dem **Mac**.
+Die App nutzt **kein** `server.url` (kein Live-Nachladen der Website). Capacitor packt `ios/App/App/public` fest ein. Deshalb blieb TestFlight auf „Vorschau sperren“, während Web schon „Hausregeln unter Multi“ zeigte.
 
-Repo-Xcode-Stand für Release: **Marketing 2.0**, **CURRENT_PROJECT_VERSION 97** in `project.pbxproj`.
+Repo: Marketing **2.0**, Build **100**. Vor Archive: `npm run verify:ios-web` muss **OK** sein.
 
-## Mac-Workflow (TestFlight / App Store Connect) — Build 97
+## Mac-Workflow (TestFlight) — Build 100
 
 ```bash
 cd ~/projects/kniffel
@@ -79,41 +82,30 @@ git pull origin milestone-22-prep
 git log -1 --oneline
 ```
 
-Bei lokalen Xcode-/Pod-Konflikten vor dem Pull ggf.:
-
-```bash
-git restore frontend/ios/App/App.xcodeproj/project.pbxproj frontend/ios/App/Podfile frontend/package-lock.json
-```
-
 ```bash
 cd ~/projects/kniffel/frontend
-grep -E 'NEXT_PUBLIC_ADMIN_PIN|NEXT_PUBLIC_ADMIN_API_KEY|NEXT_PUBLIC_APP_VERSION|NEXT_PUBLIC_APP_BUILD|NEXT_PUBLIC_SITE_URL' .env.production
-# Erwartung: VERSION=2.0, ADMIN_API_KEY leer, SITE_URL Produktion
+npm run verify:ios-web
+grep -E 'NEXT_PUBLIC_ADMIN_PIN|NEXT_PUBLIC_ADMIN_API_KEY|NEXT_PUBLIC_APP_VERSION' .env.production
 npm install
 npm run build:ios
 ```
 
-`build:ios` öffnet Xcode. Bei Upload-Problemen mit Homebrew-rsync: `brew unlink rsync`.
+`build:ios` = Web-Build → `cap sync` → Stamp → **Verify gegen InApp-Altstand** → Xcode.
 
-### In Xcode (Archive → App Store Connect)
+### In Xcode
 
-1. **Product → Clean Build Folder** (⇧⌘K)
-2. Target **App** → **General**: Marketing **2.0**, Build **97**
-3. Scheme **App**, Konfiguration **Release**, Ziel **Any iOS Device (arm64)**
-4. Signing: Automatic, Team korrekt; Bundle `de.bottletrade.dicebudget`
-5. **Product → Archive** → Organizer → **Distribute App** → **App Store Connect** → **Upload**
-6. **Nicht** „Submit for Review“ / keine Veröffentlichung — nur TestFlight
-7. TestFlight: Verarbeitung abwarten; Gruppe zuweisen falls nötig
+1. Clean Build Folder (⇧⌘K)
+2. Marketing **2.0**, Build **100**
+3. Any iOS Device (arm64) → Archive → Upload TestFlight
+4. **Kein** Submit for Review
+5. Prüfen: Spielregeln → Multi → Hausregeln, **kein** „Code eingeben“ / „Vorschau sperren“
 
-Ausführlich: `docs/testflight-app-store.md`, Einsteiger: `docs/ios-xcode-anleitung.md`.
+## TestFlight-Checkliste (2.0 / 100)
 
-## TestFlight-Checkliste (2.0 / 97)
-
-- Menü: `Version 2.0 (97)`
-- Start: Multi-QR / Turnier-Eintritt; Kamera-Permission
-- Multi: QR/Link; Raumcode-Fallback
-- Einstellungen → Multi: Hausregeln ohne Code/Sperre (Strategy)
-- Solo lokal; Multi/Stats über Prod-API
+- Menü: `Version 2.0 (100)`
+- Spielregeln → Multi: Hausregeln ohne Labs-PIN
+- Multi: QR/Link + Raumcode-Fallback
+- Solo lokal; Multi/Stats Prod-API
 - Admin nur nach PIN; kein Login; keine Werbung
 
 ## Bekannte Hinweise
