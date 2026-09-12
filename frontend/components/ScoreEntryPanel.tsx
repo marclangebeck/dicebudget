@@ -136,7 +136,9 @@ export function ScoreEntryPanel({
 
   function handleRollsUsed(n: number) {
     onRollsUsed(n);
-    if (efficiencyActive && parsedScore !== null && parsedScore > 0) {
+    if (!efficiencyActive) return;
+    // Treffer-Wert an Wurfzahl anpassen (oder Treffer vorwählen, wenn noch leer).
+    if (parsedScore === null || parsedScore > 0) {
       onPickScoreValue(yatzyEfficiencyHitScore(n));
     }
   }
@@ -196,9 +198,17 @@ export function ScoreEntryPanel({
               fieldType={field.fieldType}
               selectedScore={parsedScore}
               disabled={run.status !== "ACTIVE" || busy}
-              scoreChoicesOverride={rollSaleMode ? scoreChoices : undefined}
+              scoreChoicesOverride={
+                rollSaleMode || efficiencyActive ? scoreChoices : undefined
+              }
               onPick={onPickScoreValue}
             />
+            {efficiencyActive && rollsUsed != null && (
+              <p className="play-entry-hint mt-1.5">
+                Bei {rollsUsed} Würfen: Treffer = {yatzyEfficiencyHitScore(rollsUsed)}{" "}
+                Punkte
+              </p>
+            )}
           </div>
 
           {needsYatzyDie && onYatzyDieValue && (
