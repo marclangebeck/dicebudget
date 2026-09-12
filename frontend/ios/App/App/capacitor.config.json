@@ -4,7 +4,11 @@
 	"webDir": "out",
 	"server": {
 		"androidScheme": "https",
-		"iosScheme": "https"
+		"iosScheme": "https",
+		"url": "https://dicebudget.bottle-trade.de/app",
+		"allowNavigation": [
+			"dicebudget.bottle-trade.de"
+		]
 	},
 	"ios": {
 		"contentInset": "automatic",

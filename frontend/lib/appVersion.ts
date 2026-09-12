@@ -41,7 +41,18 @@ export function pickVersionParts(input: {
 /**
  * Label für die UI: auf iOS/Android die installierte Bundle-Version,
  * im Browser die Build-Zeit-Env (Fallback).
+ * Zusätzlich UI-Quelle: Live-Web wenn die App die Produktions-Website lädt.
  */
+export function describeUiContentSource(): string {
+  if (typeof window === "undefined") return "web";
+  const host = window.location.hostname;
+  if (host === "dicebudget.bottle-trade.de") return "Live-Web";
+  if (host === "localhost" || host === "127.0.0.1") return "Lokal";
+  // Capacitor ohne server.url: capacitor / localhost scheme host
+  if (host === "" || host === "localhost") return "Bundle";
+  return "Bundle";
+}
+
 export async function resolveAppVersionLabel(): Promise<string> {
   let native: NativeAppVersionInfo | null = null;
   try {
@@ -55,5 +66,7 @@ export async function resolveAppVersionLabel(): Promise<string> {
     native = null;
   }
   const parts = pickVersionParts({ native });
-  return formatAppVersionLabel(parts.marketing, parts.build);
+  const base = formatAppVersionLabel(parts.marketing, parts.build);
+  const source = describeUiContentSource();
+  return `${base} · ${source}`;
 }

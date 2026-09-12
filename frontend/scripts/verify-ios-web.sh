@@ -29,3 +29,12 @@ if [[ -f "$STAMP" ]]; then
 else
   echo "OK: iOS-Web-Bundle ohne InApp-Gate (Stamp optional)"
 fi
+
+CFG="$ROOT/ios/App/App/capacitor.config.json"
+if [[ -f "$CFG" ]]; then
+  if ! grep -q 'dicebudget.bottle-trade.de/app' "$CFG"; then
+    echo "FEHLER: capacitor.config.json ohne Live-Web server.url — TestFlight driftet sonst wieder." >&2
+    exit 1
+  fi
+  echo "OK: Live-Web server.url gesetzt"
+fi
