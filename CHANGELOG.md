@@ -5,6 +5,7 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
+- **TestFlight 2.0 (103):** Bundle-Modus bestätigt (Hausregeln unter Multi); Doku auf HEAD `905ff1e` / Build 103
 - **Release-Vorbereitung 2.0 (97):** Doku (HANDOVER, ios_current, milestones) auf Strategy Edition / werbefrei / keine Kern-IAP / Multi QR+Raumcode / Hausregeln unter Multi; Xcode Marketing **2.0**, Build **97**
 - **Hausregeln:** unter Einstellungen → Multi, ohne Labs-PIN; Strategy Bestandteil der App
 - **Fix QR-Scanner Startscreen:** versehentlich entfernte Overlay-Styles wiederhergestellt; Overlay per Portal auf `document.body`; Join-`transform` entfernt (fixed-Position)
