@@ -5,9 +5,10 @@
   "scripts": {
     "dev": "next dev -p 3021",
     "build": "next build",
-    "build:ios": "npm run build && npx cap sync ios && bash scripts/stamp-ios-web.sh && bash scripts/verify-ios-web.sh && bash scripts/open-xcode.sh",
+    "build:ios": "npm run build && npx cap sync ios && bash scripts/stamp-ios-web.sh && bash scripts/verify-ios-web.sh && bash scripts/verify-ios-appicon.sh && bash scripts/open-xcode.sh",
     "prepare:ios-web": "bash scripts/prepare-ios-web.sh scrubbed",
     "verify:ios-web": "bash scripts/verify-ios-web.sh",
+    "verify:ios-appicon": "bash scripts/verify-ios-appicon.sh",
     "open:ios": "bash scripts/open-xcode.sh",
     "cap:sync": "npx cap sync ios",
     "cap:open:ios": "npm run open:ios",
