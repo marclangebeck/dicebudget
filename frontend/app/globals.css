@@ -10668,6 +10668,20 @@ html.zoomable-route.legal-route .legal-page-scroll {
   padding: 1.5rem 1.25rem 2.5rem;
 }
 
+/* Marketing-LP: lesbarer Kontrast auf App-Chrome (dunkler Verlauf) */
+.landing-shell:has(.landing-page) {
+  --foreground: #ffffff;
+  --text-secondary: #f1f5f9;
+  --text-muted: #e2e8f0;
+  --text-subtle: #cbd5e1;
+  --link: #7dd3fc;
+  --link-hover: #bae6fd;
+}
+
+.landing-shell:has(.landing-page) .landing-tagline {
+  color: #6ee7b7;
+}
+
 .landing-page {
   width: 100%;
   max-width: 22rem;
@@ -10675,6 +10689,74 @@ html.zoomable-route.legal-route .legal-page-scroll {
   flex-direction: column;
   gap: 1.25rem;
   text-align: center;
+  color: var(--foreground);
+}
+
+@media (min-width: 480px) {
+  .landing-page {
+    max-width: 26rem;
+    gap: 1.35rem;
+  }
+}
+
+@media (min-width: 640px) {
+  .landing-page {
+    max-width: 32rem;
+  }
+
+  .landing-title {
+    font-size: 2.25rem;
+  }
+
+  .landing-lead {
+    font-size: 1rem;
+  }
+
+  .landing-block-title {
+    font-size: 1.125rem;
+  }
+
+  .landing-faq {
+    font-size: 0.875rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-shell:has(.landing-page) {
+    align-items: center;
+    padding: 2.75rem 1.5rem 3.5rem;
+  }
+
+  .landing-page {
+    max-width: 42rem;
+    gap: 1.5rem;
+    padding: 2rem 2.25rem 2.5rem;
+    border-radius: 1.35rem;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    background: rgba(255, 255, 255, 0.97);
+    box-shadow:
+      0 22px 50px -28px rgba(15, 23, 42, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    --foreground: #0f172a;
+    --text-secondary: #0f172a;
+    --text-muted: #1e293b;
+    --text-subtle: #334155;
+    --link: #0369a1;
+    --link-hover: #075985;
+    color: var(--foreground);
+  }
+
+  .landing-title {
+    font-size: 2.5rem;
+  }
+
+  .landing-block {
+    padding-top: 0.75rem;
+  }
+
+  .landing-shell:has(.landing-page) .landing-tagline {
+    color: #047857;
+  }
 }
 
 .landing-header {
@@ -10847,8 +10929,214 @@ html.zoomable-route.legal-route .legal-page-scroll {
 }
 
 .landing-store-hint {
-  font-size: 0.6875rem;
-  color: var(--text-subtle);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.landing-gallery-grid {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.landing-gallery-item {
+  min-width: 0;
+}
+
+.landing-gallery-figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.landing-gallery-frame {
+  overflow: hidden;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  background: #0f172a;
+  aspect-ratio: 3 / 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-gallery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: top center;
+  display: block;
+}
+
+.landing-gallery-caption {
+  margin-top: 0.45rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .landing-gallery-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .landing-gallery-caption {
+    font-size: 0.8125rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-gallery-frame {
+    border-color: rgba(15, 23, 42, 0.12);
+    background: #121820;
+  }
+}
+
+.landing-gallery-trigger {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
+  text-align: inherit;
+  font: inherit;
+  color: inherit;
+}
+
+.landing-gallery-trigger:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 3px;
+  border-radius: 0.85rem;
+}
+
+.landing-gallery-trigger .landing-gallery-frame {
+  display: flex;
+  width: 100%;
+}
+
+/* Galerie-Lightbox (gleiche Klassen wie bottle-trade-platform) */
+.gallery-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.gallery-lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgba(2, 6, 23, 0.82);
+  cursor: pointer;
+}
+
+.gallery-lightbox-panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 42rem);
+  max-height: min(92dvh, 900px);
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #0f172a;
+  box-shadow: 0 28px 80px -24px rgba(0, 0, 0, 0.65);
+  overflow: hidden;
+}
+
+.gallery-lightbox-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.gallery-lightbox-counter {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: rgba(226, 232, 240, 0.72);
+}
+
+.gallery-lightbox-close {
+  margin-left: auto;
+  min-height: 2.25rem;
+  padding: 0 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: #f8fafc;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.gallery-lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.gallery-lightbox-figure {
+  margin: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 0.85rem 0.5rem;
+}
+
+.gallery-lightbox-image {
+  display: block;
+  width: 100%;
+  max-height: min(68dvh, 720px);
+  object-fit: contain;
+  object-position: center top;
+  border-radius: 0.65rem;
+  background: #020617;
+}
+
+.gallery-lightbox-caption {
+  margin: 0.65rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: #e2e8f0;
+  text-align: center;
+}
+
+.gallery-lightbox-nav-row {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.gallery-lightbox-nav {
+  flex: 1 1 0;
+  min-height: 2.75rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  color: #f1f5f9;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.gallery-lightbox-nav:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .landing-footer {

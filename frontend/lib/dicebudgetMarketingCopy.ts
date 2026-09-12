@@ -27,6 +27,42 @@ export const DICEBUDGET_MARKETING = {
     title: "Einmal kaufen. Fertig spielen.",
     text: "1,17 €. Werbefrei. Strategy und Klassisch ohne In-App-Kauf-Zwang. Kein Account.",
   },
+  gallery: {
+    title: "Der digitale Zettel in der App",
+    lead: "Punkte eintragen, Pool im Blick — während ihr am Tisch würfelt.",
+    items: [
+      {
+        src: "/images/lp/01-wurf-pool.jpg",
+        alt: "DiceBudget Strategy Edition — Wurf-Pool im Blick",
+        caption: "Wurf-Pool im Blick",
+      },
+      {
+        src: "/images/lp/02-digitaler-zettel.jpg",
+        alt: "DiceBudget — Würfelrunde am Tisch mit digitalem Zettel",
+        caption: "Digitaler Zettel — echte Würfel",
+      },
+      {
+        src: "/images/lp/03-qr-link.jpg",
+        alt: "DiceBudget — Mitspieler per QR oder Link einladen",
+        caption: "Per QR oder Link dazu holen",
+      },
+      {
+        src: "/images/lp/04-serien-paarungen.jpg",
+        alt: "DiceBudget — Serien und Paarungsstatistik für Stammrunden",
+        caption: "Serien & Paarungen für Stammrunden",
+      },
+      {
+        src: "/images/lp/05-tischmodus-quer.jpg",
+        alt: "DiceBudget — Tischmodus mit zwei Zetteln auf dem iPad im Querformat",
+        caption: "Tischmodus: zwei Zettel, ein iPad",
+      },
+      {
+        src: "/images/lp/06-tischmodus-hoch.png",
+        alt: "DiceBudget — Tischmodus mit zwei Zetteln auf einem iPad",
+        caption: "Tischmodus im Hochformat",
+      },
+    ],
+  },
   faq: {
     title: "Häufige Fragen",
     items: [

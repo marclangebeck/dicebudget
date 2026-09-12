@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MarketingLandingGallery } from "@/components/MarketingLandingGallery";
 import {
   DICEBUDGET_BETA_MAILTO,
   DICEBUDGET_MARKETING,
@@ -60,6 +61,8 @@ export function MarketingLanding() {
         <p className="landing-lead landing-block-text">{copy.paid.text}</p>
         <p className="landing-store-hint landing-block-text">{copy.priceNote}</p>
       </section>
+
+      <MarketingLandingGallery />
 
       <section id="faq" className="landing-block scroll-mt-24">
         <h2 className="landing-block-title">{copy.faq.title}</h2>
