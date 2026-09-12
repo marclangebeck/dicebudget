@@ -2,7 +2,7 @@
 
 **Stand:** 2026-09-12  
 **Branch:** `milestone-22-prep`  
-**Release-Ziel:** iOS **2.0 (97)** — `docs/ios_current.md`  
+**Release-Ziel:** iOS **2.0 (103)** TestFlight — `docs/ios_current.md`  
 **Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de  
 **Produkt:** einmaliger Kauf, werbefrei, keine Kern-IAP; Strategy in der App; kein Login; Solo lokal; Multi/Stats Server; Multi QR/Link + Raumcode-Fallback  
 **Backend:** Migrationen u. a. Pairing-Baseline — Deploy nur bei API-Änderungen (keine DB überschreiben)
@@ -13,12 +13,12 @@ Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones s
 
 ### Milestone 21 / M30 - iOS-App / App Store Release
 
-**Status:** Release-Vorbereitung **2.0 Build 97** (TestFlight); **Submit for Review** nur nach Nutzer-GO.
+**Status:** TestFlight **2.0 (103)** (Bundle); **Submit for Review** nur nach Nutzer-GO.
 
 Technische Basis ist erledigt:
 
 - Capacitor 7, Bundle `de.bottletrade.dicebudget`, Native Start `/app`, API Prod.
-- Marketing **2.0**, Build **97** (`project.pbxproj`); Deployment Target **15.0**.
+- Marketing **2.0**, Build **103** (`project.pbxproj` / ASC); Deployment Target **15.0**.
 - iOS-UI nur aus `npm run build:ios` auf dem Mac.
 - **Admin (M43):** ein Build — `NEXT_PUBLIC_ADMIN_PIN` + lokal hinterlegter Admin-API-Key; Bundle ohne `NEXT_PUBLIC_ADMIN_API_KEY`.
 - **Hausregeln:** Einstellungen → Multi (Strategy), ohne Labs-PIN; Strategy = Bestandteil der App (kein IAP).
@@ -58,7 +58,7 @@ Offen (M30 nach Abnahme 97):
 | 2 | **M43** Admin-Shell (PIN, ein Build) | umgesetzt |
 | — | Multi-QR / Raumcode-Fallback | umgesetzt |
 | — | Hausregeln ohne Labs-PIN | umgesetzt (2026-09) |
-| — | **M30** App Store Release | Build 97; Submit = Nutzer-GO |
+| — | **M30** App Store Release | TF **103**; Submit = Nutzer-GO |
 
 ### M42 — Rivalen-Bilder nur lokal
 

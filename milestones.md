@@ -25,7 +25,7 @@ Nur bei Bedarf:
 ## Aktueller Kurzstand
 
 - Branch: `milestone-22-prep`
-- Release-Ziel: iOS **2.0 (97)** — `docs/ios_current.md` / `HANDOVER.md`
+- Release-Ziel: iOS **2.0 (103)** TestFlight — `docs/ios_current.md` / `HANDOVER.md`
 - Produkt: Strategy Edition, werbefrei, keine Kern-IAP; Hausregeln unter Multi; Multi QR/Link + Raumcode
 - Web/API live: https://dicebudget.bottle-trade.de
 - iOS: Deployment Target **15.0**; Bundle `de.bottletrade.dicebudget`

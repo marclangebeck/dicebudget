@@ -5,7 +5,7 @@
 **Branch:** `milestone-22-prep`  
 **HEAD:** siehe `git log -1`  
 **Sprache:** Deutsch  
-**Stand Doku:** 2026-09-12 — Release-Vorbereitung **Version 2.0 / Build 97**
+**Stand Doku:** 2026-09-12 — TestFlight **2.0 (103)**, Bundle-Modus, HEAD `905ff1e`
 
 Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Aktiver Stand: `docs/milestones_active.md`. iOS/TestFlight: `docs/ios_current.md`. Architektur/Betrieb: `docs/decisions.md` nur bei Bedarf. **Produktfamilie (3 Apps):** `docs/tournament/products.md`. Event-Host: `docs/tournament/` — DiceBudget-Kern unantastbar.
 
@@ -40,7 +40,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 |---------|--------|
 | Web/API | Live: https://dicebudget.bottle-trade.de |
 | Branch | `milestone-22-prep` |
-| Release-Ziel iOS | **2.0 (97)** — siehe `docs/ios_current.md` |
+| Release-Ziel iOS | **2.0 (103)** TestFlight — Bundle, siehe `docs/ios_current.md` |
 | Hausregeln | Einstellungen → **Multi** (Strategy), immer ohne Labs-PIN |
 | Admin | PIN + lokal hinterlegter API-Key (M43), getrennt von Legacy-Labs |
 | iOS | Capacitor-Bundle; Deployment Target **15.0**; Bundle `de.bottletrade.dicebudget` |
@@ -62,7 +62,7 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 ## iOS-Bundle ≠ Web-Deploy
 
 - **iOS-Bundle ≠ Web:** Capacitor packt `ios/App/App/public` ein (im Git). **Kein** `server.url`. Vor Archive: `npm run build:ios` + `verify:ios-web`.
-- Vor Archive: `git log -1`; Marketing **2.0**, Build = ASC-höchste + 1 (Repo-Vorschlag **102**); Admin-API-Key leer.
+- Vor Archive: `git log -1`; Marketing **2.0**, Build = ASC-höchste + 1 (aktuell TF **103**); Admin-API-Key leer.
 - Details: `docs/ios_current.md`.
 
 ## Events (kurz)

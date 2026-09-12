@@ -10,16 +10,16 @@ Kompatibilitäts-Index. Aktueller iOS-/TestFlight-Stand: **`docs/ios_current.md`
 - App-Store-Connect: `docs/testflight-app-store.md`
 - Turnier-Host: `docs/tournament/` · Produktfamilie: `docs/tournament/products.md`
 
-## Kurzstand (Release 2.0 / 97)
+## Kurzstand (Release 2.0 / 103)
 
 - Bundle ID: `de.bottletrade.dicebudget`
 - Marketing Version: **2.0**
-- Build-Ziel: **97**
+- TestFlight Build: **103** (Bundle-Modus, HEAD `905ff1e`)
 - Deployment Target: **15.0**
 - Strategy Edition: Bestandteil des App-Kaufs; keine Werbung; keine Kern-IAP
 - Multi: QR/Link primär, Raumcode Fallback
 - Kein Login; Solo lokal; Multi/Stats Server
-- Nächster organisatorischer Schritt nach TestFlight-Abnahme: **M30** Submit (Nutzer-GO)
+- Nächster organisatorischer Schritt: **M30** Submit (Nutzer-GO)
 - Drei Apps: Pro + Tournament + GO (geplant). `npm run build:ios` in `frontend/` = nur Pro.
 
 ## Wichtig
