@@ -2,7 +2,7 @@
 
 **Stand:** 2026-09-12  
 **Branch:** `milestone-22-prep`  
-**Release-Ziel:** Version **2.0**, Build **97** (TestFlight / App Store Connect)  
+**Release-Stand iOS:** Version **2.0**, TestFlight zuletzt **Build 98**; nächster Upload **99**  
 **Bundle ID:** `de.bottletrade.dicebudget`  
 **Apple Team ID (AASA):** `5QGGV8N5ZD`
 
