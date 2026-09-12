@@ -61,8 +61,8 @@ Kompakte Startübergabe. **Roadmap:** `docs/milestone-roadmap-analysis.md`. Akti
 
 ## iOS-Bundle ≠ Web-Deploy
 
-- **iOS-Bundle ≠ Web:** Capacitor packt `ios/App/App/public` ein (jetzt im Git). Web-Deploy allein ändert TestFlight nicht. Vor Archive: `npm run build:ios` + `verify:ios-web`.
-- Vor Archive: `git log -1`; Marketing **2.0**, Build **100**; Admin-API-Key leer.
+- **iOS-Bundle ≠ Web:** Capacitor packt `ios/App/App/public` ein (im Git). **Kein** `server.url`. Vor Archive: `npm run build:ios` + `verify:ios-web`.
+- Vor Archive: `git log -1`; Marketing **2.0**, Build = ASC-höchste + 1 (Repo-Vorschlag **102**); Admin-API-Key leer.
 - Details: `docs/ios_current.md`.
 
 ## Events (kurz)

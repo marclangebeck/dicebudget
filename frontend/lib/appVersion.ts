@@ -47,9 +47,12 @@ export function describeUiContentSource(): string {
   if (typeof window === "undefined") return "web";
   const host = window.location.hostname;
   if (host === "dicebudget.bottle-trade.de") return "Live-Web";
-  if (host === "localhost" || host === "127.0.0.1") return "Lokal";
-  // Capacitor ohne server.url: capacitor / localhost scheme host
-  if (host === "" || host === "localhost") return "Bundle";
+  if (host === "localhost" || host === "127.0.0.1") {
+    // Capacitor-Bundle nutzt oft localhost-Host im capacitor://-Scheme
+    return typeof window !== "undefined" && window.location.protocol.startsWith("http")
+      ? "Lokal"
+      : "Bundle";
+  }
   return "Bundle";
 }
 

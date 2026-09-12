@@ -2,80 +2,52 @@
 
 **Stand:** 2026-09-12  
 **Branch:** `milestone-22-prep`  
-**Release-Stand iOS:** Version **2.0**, nächster Upload **Build 100** (nach TF 98/99 ohne UI-Update)  
+**Architektur:** **Eingebettetes Capacitor-Bundle** (kein `server.url` / kein Live-Web)  
+**Repo-Xcode:** Marketing **2.0**, Build **102** (Vorschlag — in App Store Connect gegenhöchsten Upload prüfen)  
 **Bundle ID:** `de.bottletrade.dicebudget`  
 **Apple Team ID (AASA):** `5QGGV8N5ZD`
 
-Aktueller iOS-/TestFlight-/App-Store-Stand. Historie: `docs/ios_archive.md`.
+Historie: `docs/ios_archive.md`.
 
 ## Produkt (Release 2.0)
 
 - **DiceBudget Strategy Edition** — einmaliger App-Kauf; **keine Werbung**; **keine Kern-In-App-Käufe**.
-- **Strategy-Regeln** (Pool, Hausregeln unter Einstellungen → Multi) sind **Bestandteil der gekauften App**, nicht separat per IAP freizuschalten.
-- **Kein Login** / kein Account in der App.
-- **Solo** weitgehend lokal auf dem Gerät.
-- **Multiplayer + Statistiken/Paarungen** über den eigenen Server (`https://dicebudget.bottle-trade.de/api`).
-- **Multi-Einstieg:** QR oder Link primär; **Raumcode** als zusätzlicher Fallback („Code eingeben“).
+- **Strategy-/Hausregeln** unter Einstellungen → Multi; Bestandteil der App (kein IAP).
+- **Kein Login**; Solo weitgehend lokal; Multi/Stats über eigenen Server.
+- Multi: QR/Link primär, Raumcode Fallback.
 - Datenschutz: https://dicebudget.bottle-trade.de/datenschutz
 
 ## Aktueller Stand
 
 - App Store Connect: **Version 2.0**.
-- TestFlight: Builds **98/99** konnten die Hausregeln-UI verfehlen, wenn Xcode ein **veraltetes** `ios/App/App/public` gepackt hat.
-- **Ursache Web ≠ TestFlight:** Die iOS-App lädt **kein** Live-Web. Sie packt die Dateien aus `frontend/ios/App/App/public` (Capacitor `webDir: out` → sync). Nginx-Web (`frontend/out`) und TestFlight sind entkoppelt.
-- **Aktuell (ab Build 101):** Capacitor `server.url` = `https://dicebudget.bottle-trade.de/app` — die installierte App lädt **dieselbe UI wie die Website**. Web-Deploy aktualisiert damit auch TestFlight (nach einmaligem Upload mit dieser Config).
-- Menü zeigt `Version … · Live-Web` wenn die Live-Site geladen wird (Kontrolle).
-- Nächster Archive-Upload: **Build 101**.
+- Nutzer zuletzt: TestFlight **98** (99 ggf. versucht). Repo schlägt nächsten Upload **102** vor — **du prüfst in ASC**, ob 100/101 schon existieren; nächste Nummer = höchste + 1.
+- **Bundle-Modus wieder aktiv** (Live-Web-Experiment `server.url` zurückgenommen).
+- `ios/App/App/public` liegt im Git (aktuelles UI) — trotzdem vor Archive immer `build:ios` + `verify:ios-web`.
 - Deployment Target: **15.0**.
-- **Web/iOS ein Build (M43):** Admin per `NEXT_PUBLIC_ADMIN_PIN`; API-Key lokal unter Einstellungen → Admin (Bundle ohne eingebetteten Admin-API-Key).
-- Optionale Hausregeln: Toggles unter **Einstellungen → Multi** (bei Strategy), **ohne Labs-PIN**.
-- `NEXT_PUBLIC_LABS_PIN` / `labsAccess` ggf. noch im Repo (Legacy); **kein Gate** mehr für Hausregeln in der UI.
-- **Events:** drei Apps — `docs/tournament/products.md`. `frontend` `npm run build:ios` = nur **DiceBudget Pro**. Tournament: `apps/tournament`. GO: geplant.
+- Admin: `NEXT_PUBLIC_ADMIN_PIN`; API-Key lokal, nicht im Bundle.
 
-## Deployment Target
+## Warum Web ≠ TestFlight (wenn Sync fehlt)
 
-- Mindest-iOS: **15.0** (`Podfile`, Xcode `IPHONEOS_DEPLOYMENT_TARGET`)
-- Nicht in `capacitor.config.ts` als `minVersion` setzen (Capacitor 7 kennt die Property nicht)
+| Schritt | Neue UI in TestFlight? |
+|---------|------------------------|
+| Nur Web-Deploy (`frontend/out`) | Nein |
+| `git pull` (mit aktuellem `public` im Repo) | Oft ja, aber riskant ohne Verify |
+| **`npm run build:ios` + Verify** | Ja |
+| Archive ohne Sync/Verify | Nein — altes Bundle |
 
-## Universal Links / Multi-Beitritt
-
-- Host nach Raum anlegen: QR mit Join-URL + Lobby
-- QR-/Link-Inhalt: `https://dicebudget.bottle-trade.de/multi/join?code=…`
-- Gäste: In-App-QR primär; System-Kamera → Universal Link; **Raumcode-Eingabe** als Fallback
-- `NSCameraUsageDescription` in `Info.plist`
-- AASA: `/.well-known/apple-app-site-association` und `/apple-app-site-association`
-- iOS Entitlement: `applinks:dicebudget.bottle-trade.de` (`App.entitlements`)
-- App: `DeepLinkRouter` → Join-Pfad
-
-### Mac `.env.production` (kritisch vor `build:ios`)
+## Mac `.env.production`
 
 | Variable | Zweck |
 |----------|--------|
-| `NEXT_PUBLIC_ADMIN_PIN` | Admin-Oberfläche freischalten (alphanumerisch) |
-| `NEXT_PUBLIC_ADMIN_API_KEY` | **leer** lassen — Key nur lokal in der App hinterlegen |
-| `NEXT_PUBLIC_APP_VERSION` | `2.0` (Web-Fallback; iOS-Menü liest native Version) |
-| `NEXT_PUBLIC_APP_BUILD` | Web: `web`. iOS-Menü zeigt **Xcode Build** zur Laufzeit |
+| `NEXT_PUBLIC_ADMIN_PIN` | Admin freischalten |
+| `NEXT_PUBLIC_ADMIN_API_KEY` | **leer** |
+| `NEXT_PUBLIC_APP_VERSION` | `2.0` |
 | `NEXT_PUBLIC_SITE_URL` | `https://dicebudget.bottle-trade.de` |
-| `NEXT_PUBLIC_LABS_PIN` | Legacy/optional — **nicht** mehr für Hausregeln nötig |
 
-Server-`frontend/.env.production`: Admin-API-Key im Bundle idealerweise leer; Backend `ADMIN_API_KEY` unverändert (nicht in Git).
+## Mac-Workflow — Bundle-Upload
 
-## iOS-Bundle (kritisch) — warum Web ≠ TestFlight
-
-| Schritt | Reicht für neue UI in TestFlight? |
-|---------|-----------------------------------|
-| Nur Web-Deploy auf dem Server | **Nein** — betrifft nur den Browser |
-| `git pull` allein | **Teilweise** — ab jetzt liegt `ios/App/App/public` **im Repo** (aktuelles UI) |
-| **`npm run build:ios` auf Mac** | **Ja** — frisch bauen + Admin-PIN aus Mac-`.env` + Verify |
-| Xcode Archive ohne Pull/Verify | **Nein** — riskiert Alt-Bundle |
-
-Die App nutzt **kein** `server.url` (kein Live-Nachladen der Website). Capacitor packt `ios/App/App/public` fest ein. Deshalb blieb TestFlight auf „Vorschau sperren“, während Web schon „Hausregeln unter Multi“ zeigte.
-
-Repo: Marketing **2.0**, Build **100**. Vor Archive: `npm run verify:ios-web` muss **OK** sein.
-
-## Mac-Workflow (TestFlight) — Build 101 (Live-Web)
-
-Ab diesem Build lädt die App die **Produktions-Website**. Einmal hochladen — danach folgt die UI dem Server.
+**1. Build-Nummer in ASC prüfen** (TestFlight → Version 2.0 → höchste Build-Nr.).  
+**2. In Xcode dieselbe Nummer + 1 setzen** (Repo-Vorschlag: **102**, nur wenn ASC ≤ 101).
 
 ```bash
 cd ~/projects/kniffel
@@ -83,21 +55,29 @@ git pull origin milestone-22-prep
 git log -1 --oneline
 cd frontend
 npm run verify:ios-web
+# Erwartung: OK Bundle-Modus + Hausregeln, KEIN server.url
 npm install
 npm run build:ios
 ```
 
 ### In Xcode
 
-1. Clean Build Folder (⇧⌘K) + ggf. Derived Data löschen
-2. Marketing **2.0**, Build **101**
-3. Archive → TestFlight
-4. App **löschen** und aus TestFlight neu installieren (sonst Cache)
-5. Kontrolle Menü: `Version 2.0 (101) · Live-Web`
-6. Spielregeln → Multi → Hausregeln ohne Code/Sperre
+1. Clean Build Folder (⇧⌘K)
+2. Marketing **2.0**, Build = **ASC-höchste + 1**
+3. Any iOS Device → Archive → TestFlight (kein Submit for Review)
+4. App löschen und neu installieren
+5. Menü: `Version 2.0 (N) · Bundle` (nicht Live-Web)
+6. Spielregeln → Multi → Hausregeln, kein Code/Sperre
+
+## TestFlight-Checkliste
+
+- [ ] Menü endet mit **Bundle**, nicht Live-Web  
+- [ ] Hausregeln unter Multi  
+- [ ] Offline: App-UI startet (Solo)  
+- [ ] QR/Multi/Stats wie bisher  
 
 ## Bekannte Hinweise
 
-- Web-Menü zeigt `Version 2.0 (web)` — Absicht.
-- Agent hat **keinen Mac-Zugriff**; Archive/Upload nur auf dem Mac.
-- Backend muss die aktuelle Dist laufen (Effizienz-Scores u. a.); nach Deploy: `sudo systemctl restart kniffel-backend.service`.
+- Web-Menü: `Version 2.0 (web) · Live-Web` auf der Website — Absicht (Hostname).
+- Agent: kein Mac, kein ASC-Upload.
+- Nach API-Änderungen: Backend-Dienst neu starten (sudo).

@@ -1,13 +1,10 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 /**
- * Wichtig: `server.url` = Live-Website.
- * Ohne das packt TestFlight nur das lokale `ios/App/App/public` und driftet
- * sofort von Web weg (wiederholt passiert bei Build 98/99/…).
- * Nach einem Archive mit dieser Config folgt die App dem Server-Frontend.
+ * Eingebettetes Web-Bundle (wie bisher): kein server.url.
+ * UI kommt aus ios/App/App/public nach `npm run build` + `npx cap sync ios`.
+ * Vor jedem TestFlight-Archive: `npm run build:ios` und `npm run verify:ios-web`.
  */
-const LIVE_ORIGIN = "https://dicebudget.bottle-trade.de";
-
 const config: CapacitorConfig = {
   appId: "de.bottletrade.dicebudget",
   appName: "DiceBudget",
@@ -15,8 +12,6 @@ const config: CapacitorConfig = {
   server: {
     androidScheme: "https",
     iosScheme: "https",
-    url: `${LIVE_ORIGIN}/app`,
-    allowNavigation: ["dicebudget.bottle-trade.de"],
   },
   ios: {
     contentInset: "automatic",
