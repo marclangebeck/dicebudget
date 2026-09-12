@@ -211,7 +211,7 @@ export function PlayBoard({ runId, playerSecret, inviteCode }: Props) {
     void refreshLobby();
   }, [refreshLobby]);
 
-  // Labs-Toggle an → Multi-Session-Flag setzen, damit die Regel wirklich greift.
+  // Multi-Toggle an → Session-Flag „Alle Fünfe: Effizienz“ scharf schalten.
   useEffect(() => {
     if (!inviteCode || !playerSecret || isLocalSolo) return;
     if (!run?.useStrategyRules) return;

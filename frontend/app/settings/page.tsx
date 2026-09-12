@@ -4,7 +4,6 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AppScreenHeader } from "@/components/AppScreenHeader";
 import { HouseRuleInfoOverlay } from "@/components/HouseRuleInfoOverlay";
-import { LabsUnlockDialog } from "@/components/LabsUnlockDialog";
 import { PlayerNameSetup } from "@/components/PlayerNameSetup";
 import { SettingsGameActions } from "@/components/settings/SettingsGameActions";
 import { SettingsGroup } from "@/components/settings/SettingsGroup";
@@ -26,7 +25,6 @@ import {
   setGameFeedbackPrefs,
   type GameFeedbackPrefs,
 } from "@/lib/gameFeedbackPrefs";
-import { isLabsUnlocked, lockLabs, subscribeLabsAccess } from "@/lib/labsAccess";
 import { parseSettingsReturn } from "@/lib/settingsReturn";
 import {
   DEFAULT_APP_SETTINGS,
@@ -44,8 +42,6 @@ function SettingsPageInner() {
   const [feedbackPrefs, setFeedbackPrefsState] = useState<GameFeedbackPrefs>(
     DEFAULT_GAME_FEEDBACK_PREFS,
   );
-  const [labsUnlocked, setLabsUnlocked] = useState(false);
-  const [showLabsUnlock, setShowLabsUnlock] = useState(false);
   const [ruleInfo, setRuleInfo] = useState<Pick<HouseRuleInfo, "title" | "body"> | null>(
     null,
   );
@@ -54,11 +50,6 @@ function SettingsPageInner() {
   useEffect(() => {
     setSettingsState(getAppSettings());
     setFeedbackPrefsState(getGameFeedbackPrefs());
-  }, []);
-
-  useEffect(() => {
-    setLabsUnlocked(isLabsUnlocked());
-    return subscribeLabsAccess(() => setLabsUnlocked(isLabsUnlocked()));
   }, []);
 
   useEffect(() => {
@@ -78,7 +69,7 @@ function SettingsPageInner() {
   }
 
   const tableModeActive = settings.tableModeEnabled;
-  const labsFeatures = listLabsFeatures();
+  const houseRuleFeatures = listLabsFeatures();
   void featureRevision;
 
   return (
@@ -202,6 +193,49 @@ function SettingsPageInner() {
                 checked={settings.poolEndgameEnabled}
                 onChange={(value) => updateSettings({ poolEndgameEnabled: value })}
               />
+              <div className="settings-group-pad">
+                <p className="settings-group-caption">
+                  Hausregeln für Strategy-Multi (und Solo mit Strategy). Beim
+                  Raum anlegen gelten die aktiven Toggles.
+                </p>
+              </div>
+              {houseRuleFeatures.map((feature) => (
+                <div key={feature.id} className="settings-labs-feature-group">
+                  <SettingsToggleRow
+                    title={feature.title}
+                    hint={feature.description}
+                    checked={isFeatureEnabled(feature.id)}
+                    onChange={(value) => setLabsFeaturePref(feature.id, value)}
+                    onInfo={
+                      feature.infoKey
+                        ? () => {
+                            const info = getHouseRuleInfo(feature.infoKey);
+                            if (info) setRuleInfo(info);
+                          }
+                        : undefined
+                    }
+                  />
+                  {isFeatureEnabled(feature.id) &&
+                    listLabsChildFeatures(feature.id).map((child) => (
+                      <SettingsToggleRow
+                        key={child.id}
+                        title={child.title}
+                        hint={child.description}
+                        checked={isFeatureEnabled(child.id)}
+                        onChange={(value) => setLabsFeaturePref(child.id, value)}
+                        nested
+                        onInfo={
+                          child.infoKey
+                            ? () => {
+                                const info = getHouseRuleInfo(child.infoKey);
+                                if (info) setRuleInfo(info);
+                              }
+                            : undefined
+                        }
+                      />
+                    ))}
+                </div>
+              ))}
             </>
           )}
         </SettingsGroup>
@@ -254,72 +288,6 @@ function SettingsPageInner() {
           </div>
         </SettingsGroup>
 
-        <SettingsGroup title="InApp-Features" variant="labs">
-          {!labsUnlocked ? (
-            <div className="settings-group-pad">
-              <p className="settings-toggle-row-hint">
-                Code eingeben, um Brennt, Verkauf, Alle Fünfe und mehr zu testen.
-              </p>
-              <button
-                type="button"
-                onClick={() => setShowLabsUnlock(true)}
-                className="glass-button mt-2 min-h-10 w-full px-4 text-sm font-semibold"
-              >
-                Code eingeben
-              </button>
-            </div>
-          ) : (
-            <>
-              {labsFeatures.map((feature) => (
-                <div key={feature.id} className="settings-labs-feature-group">
-                  <SettingsToggleRow
-                    title={feature.title}
-                    hint={feature.description}
-                    checked={isFeatureEnabled(feature.id)}
-                    onChange={(value) => setLabsFeaturePref(feature.id, value)}
-                    onInfo={
-                      feature.infoKey
-                        ? () => {
-                            const info = getHouseRuleInfo(feature.infoKey);
-                            if (info) setRuleInfo(info);
-                          }
-                        : undefined
-                    }
-                  />
-                  {isFeatureEnabled(feature.id) &&
-                    listLabsChildFeatures(feature.id).map((child) => (
-                      <SettingsToggleRow
-                        key={child.id}
-                        title={child.title}
-                        hint={child.description}
-                        checked={isFeatureEnabled(child.id)}
-                        onChange={(value) => setLabsFeaturePref(child.id, value)}
-                        nested
-                        onInfo={
-                          child.infoKey
-                            ? () => {
-                                const info = getHouseRuleInfo(child.infoKey);
-                                if (info) setRuleInfo(info);
-                              }
-                            : undefined
-                        }
-                      />
-                    ))}
-                </div>
-              ))}
-              <div className="settings-group-pad">
-                <button
-                  type="button"
-                  onClick={() => lockLabs()}
-                  className="glass-button min-h-9 w-full px-4 text-xs font-semibold"
-                >
-                  Vorschau sperren
-                </button>
-              </div>
-            </>
-          )}
-        </SettingsGroup>
-
         <SettingsGroup title="Admin">
           <div className="settings-group-pad">
             <p className="settings-toggle-row-hint">
@@ -338,11 +306,6 @@ function SettingsPageInner() {
 
       <SettingsGameActions settings={settings} />
 
-      <LabsUnlockDialog
-        open={showLabsUnlock}
-        onClose={() => setShowLabsUnlock(false)}
-        onUnlocked={() => setLabsUnlocked(true)}
-      />
       <HouseRuleInfoOverlay info={ruleInfo} onClose={() => setRuleInfo(null)} />
     </div>
   );

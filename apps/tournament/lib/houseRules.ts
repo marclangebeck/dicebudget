@@ -18,7 +18,7 @@ export type HouseRuleOption = {
   defaultOn: boolean;
 };
 
-/** Wie DiceBudget Einstellungen → InApp-Features (Labs). */
+/** Wie DiceBudget Einstellungen → Multi (Hausregeln). */
 export const HOUSE_RULE_OPTIONS: HouseRuleOption[] = [
   {
     id: "houseRulesBurn",

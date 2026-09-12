@@ -1,22 +1,22 @@
 /**
- * Feature-Register für schrittweisen Rollout.
- * - stage "labs": nur nach Code-Freischaltung + Toggle im Labor
- * - stage "released": für alle Nutzer aktiv
+ * Feature-Register für optionale Hausregeln (Einstellungen → Multi).
+ * - stage "optional": Toggle, Default über defaultEnabled
+ * - stage "released": immer an (kein Toggle nötig)
  */
 
-import { isLabsUnlocked } from "@/lib/labsAccess";
-
-const LABS_PREFS_KEY = "dicebudget.labsFeatures.v1";
+const FEATURE_PREFS_KEY = "dicebudget.labsFeatures.v1";
 export const FEATURE_FLAGS_CHANGED_EVENT = "dicebudget:feature-flags-changed";
 
-export type FeatureStage = "labs" | "released";
+export type FeatureStage = "optional" | "released" | "labs";
 
 export type FeatureDefinition = {
   id: string;
   title: string;
   description: string;
   stage: FeatureStage;
-  /** Standard im Labor, wenn noch kein Toggle gesetzt wurde. */
+  /** Standard, wenn noch kein Toggle gesetzt wurde. */
+  defaultEnabled?: boolean;
+  /** @deprecated Alias für defaultEnabled (alte Labs-Prefs). */
   defaultLabsOn?: boolean;
   /** Key für Info-Overlay (houseRuleInfo). */
   infoKey?: string;
@@ -24,9 +24,14 @@ export type FeatureDefinition = {
   parentId?: string;
 };
 
+function defaultOn(feature: FeatureDefinition): boolean {
+  if (typeof feature.defaultEnabled === "boolean") return feature.defaultEnabled;
+  return Boolean(feature.defaultLabsOn);
+}
+
 /**
- * Neue Vorschau-Features hier registrieren.
- * Marktreif → stage auf "released" setzen und ggf. in normale Einstellungen verschieben.
+ * Optionale Multi-/Strategy-Hausregeln.
+ * Prefs bleiben unter dem bisherigen localStorage-Key (Abwärtskompatibilität).
  */
 export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
   houseRulesBurn: {
@@ -34,16 +39,16 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
     title: "Brennt",
     description:
       "Brennender Würfel: neu würfeln (−1 Pool, Rest liegen lassen) oder Augenzahl selbst (−2 Pool).",
-    stage: "labs",
-    defaultLabsOn: true,
+    stage: "optional",
+    defaultEnabled: true,
     infoKey: "burn",
   },
   houseRulesRollSale: {
     id: "houseRulesRollSale",
     title: "Wurf verkaufen",
     description: "Bei voller Feldzeile Wurf verkaufen, Freifeld ohne Würfeln.",
-    stage: "labs",
-    defaultLabsOn: true,
+    stage: "optional",
+    defaultEnabled: true,
     infoKey: "rollSale",
   },
   houseRulesYatzyStreak: {
@@ -51,8 +56,8 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
     title: "2× Alle Fünfe",
     description:
       "Zwei echte Alle Fünfe (50, ≤3 Würfe) hintereinander: Mitspieler verlieren 1/n Pool (zu zweit Hälfte).",
-    stage: "labs",
-    defaultLabsOn: true,
+    stage: "optional",
+    defaultEnabled: true,
     infoKey: "yatzyStreak2",
   },
   houseRulesYatzyStreakCredit: {
@@ -60,8 +65,8 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
     title: "Pool-Gutschrift",
     description:
       "Abgezogene Pools der Mitspieler dem Erfolgreichen gutschreiben (Transfer statt nur Strafe).",
-    stage: "labs",
-    defaultLabsOn: false,
+    stage: "optional",
+    defaultEnabled: false,
     parentId: "houseRulesYatzyStreak",
     infoKey: "yatzyStreak2Credit",
   },
@@ -70,8 +75,8 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
     title: "3× Alle Fünfe",
     description:
       "Drei echte Alle Fünfe (50, ≤3 Würfe) hintereinander: Mitspieler verlieren den gesamten Pool.",
-    stage: "labs",
-    defaultLabsOn: true,
+    stage: "optional",
+    defaultEnabled: true,
     infoKey: "yatzyStreak3",
   },
   houseRulesYatzyTripleCredit: {
@@ -79,8 +84,8 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
     title: "Pool-Gutschrift",
     description:
       "Abgezogene Pools der Mitspieler dem Erfolgreichen gutschreiben (Transfer statt nur Strafe).",
-    stage: "labs",
-    defaultLabsOn: false,
+    stage: "optional",
+    defaultEnabled: false,
     parentId: "houseRulesYatzyTriple",
     infoKey: "yatzyStreak3Credit",
   },
@@ -89,8 +94,8 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
     title: "Oberer Bereich zuerst",
     description:
       "Wer zuerst alle oberen Felder (Spiele × 6) voll hat, erhält die offenen oberen Felder der Mitspieler als Pool.",
-    stage: "labs",
-    defaultLabsOn: true,
+    stage: "optional",
+    defaultEnabled: true,
     infoKey: "upperRace",
   },
   houseRulesColumnPoolBonuses: {
@@ -98,8 +103,8 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
     title: "Spalten-Pool-Boni",
     description:
       "Erster mit Spalten-Bonus oben (+2), unten voll (+2), gleiche Spalte komplett (+2); max. 6 Pool.",
-    stage: "labs",
-    defaultLabsOn: true,
+    stage: "optional",
+    defaultEnabled: true,
     infoKey: "columnPoolBonuses",
   },
   houseRulesYatzyEfficiency: {
@@ -107,17 +112,17 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
     title: "Alle Fünfe: Effizienz",
     description:
       "Nur Strategy. Bis Wurf 7 volle 50; danach alle 3 Würfe −5 Punkte (10 % vom Ausgangswert). Aus = wie bisher immer 50.",
-    stage: "labs",
-    defaultLabsOn: false,
+    stage: "optional",
+    defaultEnabled: false,
     infoKey: "yatzyEfficiency",
   },
 };
 
 export type FeatureId = keyof typeof FEATURE_REGISTRY;
 
-function readLabsPrefs(): Record<string, boolean> {
+function readFeaturePrefs(): Record<string, boolean> {
   if (typeof window === "undefined") return {};
-  const raw = window.localStorage.getItem(LABS_PREFS_KEY);
+  const raw = window.localStorage.getItem(FEATURE_PREFS_KEY);
   if (!raw) return {};
   try {
     const parsed: unknown = JSON.parse(raw);
@@ -132,33 +137,36 @@ function readLabsPrefs(): Record<string, boolean> {
   }
 }
 
-function writeLabsPrefs(prefs: Record<string, boolean>): void {
+function writeFeaturePrefs(prefs: Record<string, boolean>): void {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(LABS_PREFS_KEY, JSON.stringify(prefs));
+  window.localStorage.setItem(FEATURE_PREFS_KEY, JSON.stringify(prefs));
   window.dispatchEvent(new Event(FEATURE_FLAGS_CHANGED_EVENT));
 }
 
 export function getLabsFeaturePref(featureId: string): boolean | undefined {
-  const prefs = readLabsPrefs();
+  const prefs = readFeaturePrefs();
   return prefs[featureId];
 }
 
 export function setLabsFeaturePref(featureId: string, enabled: boolean): void {
-  const prefs = readLabsPrefs();
+  const prefs = readFeaturePrefs();
   prefs[featureId] = enabled;
-  writeLabsPrefs(prefs);
+  writeFeaturePrefs(prefs);
 }
 
-/** Top-Level Labs-Features (ohne Unter-Toggles). */
+/** Top-Level optionale Hausregeln (ohne Unter-Toggles). */
 export function listLabsFeatures(): FeatureDefinition[] {
   return Object.values(FEATURE_REGISTRY).filter(
-    (feature) => feature.stage === "labs" && !feature.parentId,
+    (feature) =>
+      (feature.stage === "optional" || feature.stage === "labs") && !feature.parentId,
   );
 }
 
 export function listLabsChildFeatures(parentId: string): FeatureDefinition[] {
   return Object.values(FEATURE_REGISTRY).filter(
-    (feature) => feature.stage === "labs" && feature.parentId === parentId,
+    (feature) =>
+      (feature.stage === "optional" || feature.stage === "labs") &&
+      feature.parentId === parentId,
   );
 }
 
@@ -167,13 +175,12 @@ export function isFeatureEnabled(featureId: string): boolean {
   if (!feature) return false;
   if (feature.parentId && !isFeatureEnabled(feature.parentId)) return false;
   if (feature.stage === "released") return true;
-  if (!isLabsUnlocked()) return false;
   const pref = getLabsFeaturePref(featureId);
   if (typeof pref === "boolean") return pref;
-  return Boolean(feature.defaultLabsOn);
+  return defaultOn(feature);
 }
 
-/** Session-Flags für Auto-Hausregeln: ohne Labs-Unlock Standard an (wie bisher); Gutschrift aus. */
+/** Session-Flags für Auto-Hausregeln aus den Multi-Einstellungen. */
 export function sessionHouseRuleFlagsFromPrefs(): {
   ruleYatzyStreak2: boolean;
   ruleYatzyTriple: boolean;
@@ -183,17 +190,6 @@ export function sessionHouseRuleFlagsFromPrefs(): {
   ruleColumnPoolBonuses: boolean;
   ruleYatzyEfficiency: boolean;
 } {
-  if (!isLabsUnlocked()) {
-    return {
-      ruleYatzyStreak2: true,
-      ruleYatzyTriple: true,
-      ruleYatzyStreak2Credit: false,
-      ruleYatzyTripleCredit: false,
-      ruleUpperRace: true,
-      ruleColumnPoolBonuses: true,
-      ruleYatzyEfficiency: false,
-    };
-  }
   return {
     ruleYatzyStreak2: isFeatureEnabled("houseRulesYatzyStreak"),
     ruleYatzyTriple: isFeatureEnabled("houseRulesYatzyTriple"),

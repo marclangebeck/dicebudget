@@ -88,7 +88,7 @@ export function MatchRulesFields({ value, onChange, embedded = false }: Props) {
         Spielregeln
       </p>
       <p className="t-setting-hint" style={{ margin: "0 0 0.35rem" }}>
-        Wie in DiceBudget unter InApp-Features.
+        Wie in DiceBudget unter Einstellungen → Multi.
       </p>
       {listTopHouseRules().map((option) => (
         <div key={option.id}>

@@ -122,8 +122,8 @@ export const APP_TOUR_STEPS_STRATEGY: AppTourStep[] = [
   {
     id: "house-rules",
     chapter: "strategy",
-    title: "InApp-Käufe (Features)",
-    body: "Optional freischaltbar: Brennt (−1/−2 Pool), Wurf verkaufen, 2× Alle Fünfe und mehr. Weitere Features kommen später — die Vorschau hält sie testbar, bevor sie für alle verfügbar sind.",
+    title: "Hausregeln (Multi)",
+    body: "Unter Einstellungen → Multi: Brennt, Wurf verkaufen, 2×/3× Alle Fünfe, Effizienz und mehr. Toggles sind immer verfügbar — beim Raum anlegen gelten die aktiven Regeln.",
   },
 ];
 

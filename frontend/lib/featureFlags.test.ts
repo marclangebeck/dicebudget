@@ -6,7 +6,7 @@ import {
   setLabsFeaturePref,
 } from "./featureFlags.js";
 
-const TEST_FEATURE_ID = "__testLabsFeature";
+const TEST_FEATURE_ID = "__testOptionalFeature";
 
 function installBrowserMocks(): void {
   const storage: Record<string, string> = {};
@@ -39,10 +39,9 @@ describe("isFeatureEnabled", () => {
       id: TEST_FEATURE_ID,
       title: "Test",
       description: "Test",
-      stage: "labs",
-      defaultLabsOn: false,
+      stage: "optional",
+      defaultEnabled: false,
     };
-    window.localStorage.removeItem("dicebudget.labsUnlocked.v1");
     window.localStorage.removeItem("dicebudget.labsFeatures.v1");
   });
 
@@ -56,13 +55,23 @@ describe("isFeatureEnabled", () => {
     Reflect.deleteProperty(globalThis, "window");
   });
 
-  it("labs-Feature aus wenn Labor nicht freigeschaltet", () => {
+  it("optional-Feature folgt Default ohne Pref", () => {
     assert.equal(isFeatureEnabled(TEST_FEATURE_ID), false);
   });
 
-  it("labs-Feature an wenn freigeschaltet und Toggle an", () => {
-    window.localStorage.setItem("dicebudget.labsUnlocked.v1", "1");
+  it("optional-Feature an wenn Toggle an", () => {
     setLabsFeaturePref(TEST_FEATURE_ID, true);
+    assert.equal(isFeatureEnabled(TEST_FEATURE_ID), true);
+  });
+
+  it("optional-Feature mit defaultEnabled true ohne Pref an", () => {
+    (FEATURE_REGISTRY as Record<string, unknown>)[TEST_FEATURE_ID] = {
+      id: TEST_FEATURE_ID,
+      title: "Test",
+      description: "Test",
+      stage: "optional",
+      defaultEnabled: true,
+    };
     assert.equal(isFeatureEnabled(TEST_FEATURE_ID), true);
   });
 
@@ -77,21 +86,20 @@ describe("isFeatureEnabled", () => {
   });
 
   it("Unter-Toggle nur aktiv wenn Parent an", () => {
-    window.localStorage.setItem("dicebudget.labsUnlocked.v1", "1");
-    const childId = "__testLabsChild";
+    const childId = "__testOptionalChild";
     (FEATURE_REGISTRY as Record<string, unknown>)[TEST_FEATURE_ID] = {
       id: TEST_FEATURE_ID,
       title: "Parent",
       description: "Parent",
-      stage: "labs",
-      defaultLabsOn: false,
+      stage: "optional",
+      defaultEnabled: false,
     };
     (FEATURE_REGISTRY as Record<string, unknown>)[childId] = {
       id: childId,
       title: "Child",
       description: "Child",
-      stage: "labs",
-      defaultLabsOn: true,
+      stage: "optional",
+      defaultEnabled: true,
       parentId: TEST_FEATURE_ID,
     };
     setLabsFeaturePref(childId, true);
