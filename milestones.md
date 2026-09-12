@@ -25,15 +25,16 @@ Nur bei Bedarf:
 ## Aktueller Kurzstand
 
 - Branch: `milestone-22-prep`
-- Produkt: Multi-QR, M42/M43, 2×/3× Pool 1/n + optionale Gutschrift — siehe `HANDOVER.md` / `git log -1`
+- Release-Ziel: iOS **2.0 (97)** — `docs/ios_current.md` / `HANDOVER.md`
+- Produkt: Strategy Edition, werbefrei, keine Kern-IAP; Hausregeln unter Multi; Multi QR/Link + Raumcode
 - Web/API live: https://dicebudget.bottle-trade.de
-- iOS: TestFlight **2.0**, Deployment Target **15.0**
-- **Tournament / GO:** Produktmodell `docs/tournament/products.md`; Host-Code in `apps/tournament`; GO noch nicht im Repo
-- Nächstes DiceBudget: **M30** App Store (Nutzer-GO); Event-Join (T3) separat
+- iOS: Deployment Target **15.0**; Bundle `de.bottletrade.dicebudget`
+- **Tournament / GO:** `docs/tournament/products.md`; Host in `apps/tournament`; GO geplant
+- Nach TestFlight-Abnahme 97: **M30** Submit nur mit Nutzer-GO
 
 ## Offene Prioritaeten
 
-1. M42/M43 Abnahme / QR-TestFlight; dann **M30**.
+1. TestFlight **2.0 (97)** hochladen und abnehmen; dann **M30** Submit (Nutzer-GO).
 2. Optional M38 Stufe A; **M36** nach M30.
 3. `milestone-22-prep` → `main` nach Release-Freigabe.
-4. **Events:** Tournament-Host weiter (Liga/Turnier-Zweige); T3 Join in Pro-App; **GO** erst nach Doku/Store-Klarheit (`docs/tournament/products.md`).
+4. **Events:** Tournament-Host weiter; **GO** erst nach Doku/Store-Klarheit.

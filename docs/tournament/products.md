@@ -10,7 +10,7 @@ Es gibt **drei** Produkte. Events (Liga oder Turnier) werden in der **Organisati
 
 | App | Preis (Ziel) | Rolle | Bundle (Ist / Vorschlag) | Code |
 |-----|----------------|-------|--------------------------|------|
-| **DiceBudget** | 1,49 € | Pro: Solo, Multi, Stats, Labs — **und** Teilnahme an Liga/Turnier | `de.bottletrade.dicebudget` | `frontend/` |
+| **DiceBudget** | App-Kauf (Store-Preis) | Pro: Solo, Multi, Stats, Strategy/Hausregeln — **und** Teilnahme an Liga/Turnier; werbefrei, keine Kern-IAP | `de.bottletrade.dicebudget` | `frontend/` |
 | **DiceBudget Tournament** | 0 € | Organisation: Event anlegen, QR, Lobby, Auslosung, Live-Anzeige | `de.bottletrade.dicebudget.tournament` | `apps/tournament/` |
 | **DiceBudget GO** | 0 € | Nur Teilnahme an Liga/Turnier (QR-Scan). Kein Komfort, restliche Features gesperrt | Vorschlag: `de.bottletrade.dicebudget.go` | **geplant** (eigene App, möglichst gleicher Kern wie DiceBudget) |
 
@@ -45,7 +45,7 @@ Es gibt **drei** Produkte. Events (Liga oder Turnier) werden in der **Organisati
 
 ## Harte Regeln
 
-1. **DiceBudget-Kern unantastbar.** Solo, Multi, Stats, Labs, Admin bleiben voll nutzbar **ohne** Event.
+1. **DiceBudget-Kern unantastbar.** Solo, Multi, Stats, Strategy/Hausregeln, Admin bleiben voll nutzbar **ohne** Event.
 2. Events nur **additiv**. Keine Pflichtumleitung bestehender Flows.
 3. Drei getrennte Store-Produkte; Builds nicht vermischen. `npm run build:ios` in `frontend/` erzeugt **nicht** Tournament und **nicht** GO.
 4. GO möglichst **derselbe Kern** wie DiceBudget (Flags / locked Shell), keine dritte Spiel-Engine.

@@ -82,16 +82,16 @@ Für **nur TestFlight** reichen zunächst weniger Metadaten; für **öffentliche
 1. `App.xcworkspace` öffnen.  
 2. Links **App** → Target **App** → **General**:
 
-| Feld | Erster Release |
-|------|----------------|
-| Version | `1.0.0` |
-| Build | `1` |
+| Feld | Release 2.0 / 97 |
+|------|------------------|
+| Version (Marketing) | `2.0` |
+| Build | `97` |
 
 3. **Signing & Capabilities:** Team gewählt, **Automatically manage signing**, Bundle ID `de.bottletrade.dicebudget`.
 
-Bei jedem **neuen Upload** die **Build**-Nummer erhöhen (`9` → `10` → …). Version nur bei sichtbaren Releases ändern.
+Bei jedem **neuen Upload** die **Build**-Nummer erhöhen. Version nur bei sichtbaren Releases ändern.
 
-**Stand Mai 2026:** Letzter Upload **Build 18** (M29 Punktwahl-Eintrag, M30 Bonus-Delta, M31 Bonus-Einblendung, M32 Topbar/Gegner-Pool, M33 Pool-Endspiel + Würfe-Standard 3) · nächster Upload wäre **19**. Build-Nummer in Xcode setzen (Repo-`project.pbxproj` wird wegen Signing-Team nicht gepusht).
+**Stand 2026-09-12:** Release-Ziel **2.0 (97)** — siehe `docs/ios_current.md`. Repo-`project.pbxproj` trägt Marketing 2.0 / Build 97.
 
 ### Copy failed beim Upload?
 

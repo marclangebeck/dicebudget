@@ -222,7 +222,7 @@ Web separat: `sudo bash infra/scripts/deploy-frontend-prod.sh` (Server).
 
 ## 8. Noch nicht geplant (nach iOS-Release)
 
-- In-App-Käufe (nur **App-Preis** 1,19 € geplant, kein IAP)
+- Kern-In-App-Käufe (App bleibt einmaliger Kauf / werbefrei; Strategy in der App — Stand Release 2.0)
 - Push-Benachrichtigungen
 - Android / Play Store
 - Next.js Security-Upgrade (CVE-Hinweis bei `next@15.5.4`)

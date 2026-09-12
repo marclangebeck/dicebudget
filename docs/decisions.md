@@ -53,9 +53,11 @@ npm run build
 - Backend: Express + TypeScript + Prisma + SQLite.
 - Produktion: https://dicebudget.bottle-trade.de
 - API-Produktion: https://dicebudget.bottle-trade.de/api
-- iOS: Capacitor 7, Bundle `de.bottletrade.dicebudget`.
+- iOS: Capacitor 7, Bundle `de.bottletrade.dicebudget`, Marketing **2.0** (Release-Builds fortlaufend).
 - Web und iOS teilen die Frontend-Codebasis, Releases sind aber getrennt.
 - Web-Deploy aktualisiert nicht die iOS-App; iOS braucht `npm run build:ios` auf dem Mac und Xcode-Upload.
+- Monetisierung (Stand Release 2.0): einmaliger App-Kauf; keine Werbung; keine Kern-In-App-Käufe; Strategy/Hausregeln in der App; kein Login.
+- Multi-Einstieg: QR/Link primär, Raumcode Fallback; Solo weitgehend lokal; Multi/Stats über eigenen Server.
 
 ## Datenschutz- Und Identitaetsmodell
 

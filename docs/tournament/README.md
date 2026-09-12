@@ -137,7 +137,7 @@ Details: [`roadmap.md`](./roadmap.md) · [`products.md`](./products.md) · [`api
 
 ## Nicht verhandelbar
 
-1. **DiceBudget-Kern unantastbar** — Solo, Multi, Stats, Labs, Admin vollwertig ohne Event.
+1. **DiceBudget-Kern unantastbar** — Solo, Multi, Stats, Strategy/Hausregeln, Admin vollwertig ohne Event.
 2. **Events nur additiv** — keine Pflicht-Umleitung bestehender Flows.
 3. **Getrennte Produkte** — Host = Tournament; Mitspielen = Pro / GO.
 4. **Regression** — Backend-/Frontend-Tests grün; Smoke nach größeren Änderungen.

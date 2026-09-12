@@ -1,10 +1,11 @@
-# Aktive Milestones - dice.budget
+# Aktive Milestones - DiceBudget Strategy Edition
 
-**Stand:** 2026-08-15  
+**Stand:** 2026-09-12  
 **Branch:** `milestone-22-prep`  
-**HEAD:** `faf721b` (Multi-QR, Host-Einladung vereinfacht)  
-**Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de — Frontend Unit-Tests **105** grün  
-**Backend:** Migrationen u. a. `20260807120000_pairing_baseline_absolute`, `20260807140000_pairing_baseline_app_snapshot` — Deploy nach Stabilitäts-Batch
+**Release-Ziel:** iOS **2.0 (97)** — `docs/ios_current.md`  
+**Produktiv:** Web/API live unter https://dicebudget.bottle-trade.de  
+**Produkt:** einmaliger Kauf, werbefrei, keine Kern-IAP; Strategy in der App; kein Login; Solo lokal; Multi/Stats Server; Multi QR/Link + Raumcode-Fallback  
+**Backend:** Migrationen u. a. Pairing-Baseline — Deploy nur bei API-Änderungen (keine DB überschreiben)
 
 Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones stehen in `docs/milestones_archive.md`. Events / drei Apps: `docs/tournament/products.md` — DiceBudget-Kern unantastbar.
 
@@ -12,44 +13,52 @@ Dieses Dokument ist der kompakte Arbeitsstand fuer Agenten. Aeltere Milestones s
 
 ### Milestone 21 / M30 - iOS-App / App Store Release
 
-**Status:** bewusst zurückgestellt — technisch Feature-fertig; organisatorisch **nach** Abnahme Multi-QR / aktuellem TestFlight-Build.
+**Status:** Release-Vorbereitung **2.0 Build 97** (TestFlight); **Submit for Review** nur nach Nutzer-GO.
 
 Technische Basis ist erledigt:
 
 - Capacitor 7, Bundle `de.bottletrade.dicebudget`, Native Start `/app`, API Prod.
-- TestFlight **Version 2.0**; Deployment Target **15.0**; Archive 2026-08-15 enthält QR-Scan + Host-QR.
+- Marketing **2.0**, Build **97** (`project.pbxproj`); Deployment Target **15.0**.
 - iOS-UI nur aus `npm run build:ios` auf dem Mac.
-- **Admin (M43):** ein Build — `NEXT_PUBLIC_ADMIN_PIN` + lokal hinterlegter Admin-API-Key; Bundle ohne `NEXT_PUBLIC_ADMIN_API_KEY`; PIN-Feld mit voller Tastatur.
-- **Multi-QR:** Universal Links + In-App-Scan; keine Code-Eingabe mehr.
+- **Admin (M43):** ein Build — `NEXT_PUBLIC_ADMIN_PIN` + lokal hinterlegter Admin-API-Key; Bundle ohne `NEXT_PUBLIC_ADMIN_API_KEY`.
+- **Hausregeln:** Einstellungen → Multi (Strategy), ohne Labs-PIN; Strategy = Bestandteil der App (kein IAP).
+- **Multi:** QR/Link primär; Raumcode-Fallback.
 
-Offen (M30):
+Offen (M30 nach Abnahme 97):
 
-- TestFlight-Regression auf aktuellem HEAD (Checkliste `docs/ios_current.md`, inkl. Kamera/QR).
-- App Store Connect: Paid Agreement, Bank/Steuer, Preis **1,19 €**, Screenshots/Metadaten, Build wählen, Submit for Review.
+- TestFlight-Regression (Checkliste `docs/ios_current.md`).
+- App Store Connect: Paid Agreement, Bank/Steuer, Preis, Screenshots/Metadaten, Build wählen, Submit for Review.
 - Details: `docs/ios_current.md`, `docs/testflight-app-store.md` Phase 7.
 
 ## Zuletzt abgeschlossen (Produkt, nicht Milestone-Nummer)
 
-### Multi-QR + Scan-only Beitritt — 2026-08-15
+### Hausregeln unter Multi — 2026-09-12
 
-**Status:** umgesetzt (`9bbd3b3` … `faf721b`).
+**Status:** umgesetzt.
 
-- Host: QR mit Join-URL; Erfolg-UI nur Titel + QR + Lobby-Link.
-- Gast: Startscreen **QR-Code scannen** (`JoinByQrScan` / `jsqr`); alternativ System-Kamera → Universal Link.
-- `JoinByCodeForm` entfernt; Join ohne `?code=` zeigt Scanner.
+- Labs-PIN / „Vorschau sperren“ für Hausregeln entfernt.
+- Toggles unter Einstellungen → Multi (bei Strategy), immer verfügbar.
+
+### Multi-QR + Raumcode-Fallback
+
+**Status:** umgesetzt (`9bbd3b3` … fortgeschrieben).
+
+- Host: QR mit Join-URL; Erfolg-UI Titel + QR + Lobby-Link.
+- Gast: In-App-QR primär; **Raumcode** („Code eingeben“) als Fallback; System-Kamera → Universal Link.
 - AASA, Associated Domains, `DeepLinkRouter`, `NSCameraUsageDescription`.
 - iOS Minimum **15.0**.
 
 ## Aktive Feature-Milestones (vor M30)
 
-**Status:** **M42** und **M43** umgesetzt; Multi-QR umgesetzt; **M30** danach.
+**Status:** **M42** und **M43** umgesetzt; Multi-Beitritt + Hausregeln-ohne-PIN umgesetzt; **M30** = Store nach Abnahme Build 97.
 
 | Prio | Milestone | Status |
 |------|-----------|--------|
 | 1 | **M42** Rivalen-Bilder nur lokal | umgesetzt |
 | 2 | **M43** Admin-Shell (PIN, ein Build) | umgesetzt |
-| — | Multi-QR / Scan-Beitritt | umgesetzt (2026-08-15) |
-| — | **M30** App Store Release | bewusst zurückgestellt |
+| — | Multi-QR / Raumcode-Fallback | umgesetzt |
+| — | Hausregeln ohne Labs-PIN | umgesetzt (2026-09) |
+| — | **M30** App Store Release | Build 97; Submit = Nutzer-GO |
 
 ### M42 — Rivalen-Bilder nur lokal
 
@@ -68,9 +77,9 @@ Offen (M30):
 
 - `NEXT_PUBLIC_ADMIN_PIN` im Build (UX-Gate, analog Labor); alphanumerisch (volle Tastatur).
 - Nach Freischaltung: Admin-API-Key **einmal lokal** hinterlegen (nicht im öffentlichen Bundle).
-- Route `/settings/admin` (+ Menü „Admin“): Status, Key, Sperren; Platzhalter InApp-Käufe/Remote-Config.
+- Route `/settings/admin` (+ Menü „Admin“): Status, Key, Sperren; Platzhalter für spätere Store-/Config-Themen (kein aktives Kern-IAP).
 - Stats-Admin (Siege/Diff, Server-Löschen) nur wenn freigeschaltet **und** Key vorhanden.
-- **Getrennt von** Labs/`NEXT_PUBLIC_LABS_PIN` (InApp-Käufe Features testen).
+- Hausregeln nicht mehr über Labs-PIN; Legacy `NEXT_PUBLIC_LABS_PIN` optional/ungenutzt für diese Toggles.
 - Legacy: eingebetteter `NEXT_PUBLIC_ADMIN_API_KEY` weiter nutzbar, aber nur nach PIN wenn PIN gesetzt.
 
 ## Geplante / umgesetzte Nutzer-Wunschliste (M37–M41)

@@ -5,6 +5,8 @@ Alle relevanten Änderungen an diesem Projekt werden in dieser Datei dokumentier
 ## [Unreleased]
 
 ### Changed
+- **Release-Vorbereitung 2.0 (97):** Doku (HANDOVER, ios_current, milestones) auf Strategy Edition / werbefrei / keine Kern-IAP / Multi QR+Raumcode / Hausregeln unter Multi; Xcode Marketing **2.0**, Build **97**
+- **Hausregeln:** unter Einstellungen → Multi, ohne Labs-PIN; Strategy Bestandteil der App
 - **Fix QR-Scanner Startscreen:** versehentlich entfernte Overlay-Styles wiederhergestellt; Overlay per Portal auf `document.body`; Join-`transform` entfernt (fixed-Position)
 - **Startscreen app-like:** Brand-Header; Kacheln mit Motiv + Titel + Pill-CTA; Floating-Beitritt; gestaffelte Motion — Layout unverändert
 - **UI-Kontrast app-weit:** Action-Tokens; `glass-button`/`--primary` endlich definiert; Primär-CTAs gold-teal; Sekundär klar abgesetzt; Panels dunkler mit stärkerem Rand; Summary-Chips tippbarer
