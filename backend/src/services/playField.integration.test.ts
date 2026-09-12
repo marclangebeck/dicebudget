@@ -46,6 +46,44 @@ describe("completeField (integration)", () => {
     }
   });
 
+  it("accepts Alle-Fünfe efficiency hit (45 at 8 rolls) in strategy", async () => {
+    const { runId, soloSecretToken } = await createRun(1, true);
+    try {
+      await prisma.run.update({ where: { id: runId }, data: { rollsInPool: 10 } });
+      const fieldId = await fieldIdByType(runId, "KNIFFEL");
+      await completeField(
+        runId,
+        fieldId,
+        { score: 45, rollsUsed: 8, yatzyDieValue: 6 },
+        soloSecretToken,
+      );
+      const field = await prisma.field.findUniqueOrThrow({ where: { id: fieldId } });
+      assert.equal(field.score, 45);
+      assert.equal(field.rollsUsed, 8);
+    } finally {
+      await deleteRun(runId);
+    }
+  });
+
+  it("rejects Alle-Fünfe 45 in classic mode", async () => {
+    const { runId, soloSecretToken } = await createRun(1, false);
+    try {
+      const fieldId = await fieldIdByType(runId, "KNIFFEL");
+      await assert.rejects(
+        () =>
+          completeField(
+            runId,
+            fieldId,
+            { score: 45, rollsUsed: 1, yatzyDieValue: 6 },
+            soloSecretToken,
+          ),
+        (err: unknown) => err instanceof InvalidFieldScoreError,
+      );
+    } finally {
+      await deleteRun(runId);
+    }
+  });
+
   it("rejects more than three rolls in classic mode", async () => {
     const { runId, soloSecretToken } = await createRun(1, false);
     try {
