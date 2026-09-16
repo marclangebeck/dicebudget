@@ -4,7 +4,7 @@ import {
   DICEBUDGET_BETA_MAILTO,
   DICEBUDGET_MARKETING,
 } from "@/lib/dicebudgetMarketingCopy";
-import { APP_HOME_PATH, IMPRESSUM_PATH, PRIVACY_PATH } from "@/lib/branding";
+import { IMPRESSUM_PATH, PRIVACY_PATH } from "@/lib/branding";
 
 export function MarketingLanding() {
   const copy = DICEBUDGET_MARKETING;
@@ -40,9 +40,6 @@ export function MarketingLanding() {
           {copy.cta.poolLabel}
         </a>
       </div>
-      <Link href={APP_HOME_PATH} className="btn-secondary landing-cta-secondary landing-web-cta">
-        {copy.cta.webAppLabel}
-      </Link>
       <p className="landing-store-hint">{copy.statusLine}</p>
 
       <section id={copy.strategy.id} className="landing-block scroll-mt-24">

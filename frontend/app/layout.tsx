@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { DeepLinkRouter } from "@/components/DeepLinkRouter";
+import { WebPlayAccessGate } from "@/components/WebPlayAccessGate";
 import { APP_DESCRIPTION, APP_TITLE } from "@/lib/branding";
 import "./globals.css";
 
@@ -51,7 +52,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <DeepLinkRouter>{children}</DeepLinkRouter>
+        <DeepLinkRouter>
+          <WebPlayAccessGate>{children}</WebPlayAccessGate>
+        </DeepLinkRouter>
       </body>
     </html>
   );

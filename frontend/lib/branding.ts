@@ -21,6 +21,10 @@ export const BOTTLE_TRADE_URL = "https://bottle-trade.de";
 
 export const APP_HOME_PATH = "/app";
 
+/** App Store (iOS) — öffentliche Web-Spielrouten leiten hierhin um. */
+export const APP_STORE_URL =
+  "https://apps.apple.com/app/dicebudget-strategy-edition/id6773465161";
+
 export const PRIVACY_PATH = "/datenschutz";
 
 export const IMPRESSUM_PATH = "/impressum";

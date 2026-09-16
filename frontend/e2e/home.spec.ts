@@ -1,20 +1,22 @@
 import { expect, test } from "@playwright/test";
 
-test.beforeEach(async ({ page }) => {
-  await page.addInitScript(() => {
-    sessionStorage.setItem("dicebudget.introShown.v2", "1");
-  });
+test("Landingpage ohne Web-App-CTA", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(
+    "Echte Würfel. Echte Taktik. Eure Serie.",
+  );
+  await expect(page.getByRole("link", { name: "In der Web-App öffnen" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Als Beta testen" })).toBeVisible();
 });
 
-test("Startscreen /app rendert Cinematic oder Classic", async ({ page }) => {
+test("/app leitet im Browser nicht zum Spiel-Startscreen", async ({ page }) => {
   await page.goto("/app");
 
-  const cinematic = page.locator(".home-cinematic");
-  const classic = page.locator(".home-play-arena");
-  await expect(cinematic.or(classic)).toBeVisible();
+  await expect(page.locator(".home-cinematic")).toHaveCount(0);
+  await expect(page.locator(".home-play-arena")).toHaveCount(0);
 
-  const multiCta = page.getByRole("link", { name: /Lobby öffnen/i });
-  const soloCta = page.getByRole("link", { name: /Run starten/i });
-  await expect(multiCta).toBeVisible();
-  await expect(soloCta).toBeVisible();
+  await page.waitForURL(/apps\.apple\.com\/app\/dicebudget-strategy-edition\//, {
+    timeout: 15_000,
+  });
 });

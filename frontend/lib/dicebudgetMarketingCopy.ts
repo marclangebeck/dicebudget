@@ -112,7 +112,6 @@ export const DICEBUDGET_MARKETING = {
     betaLabel: "Als Beta testen",
     poolLabel: "So funktioniert der Pool",
     poolHref: "#pool",
-    webAppLabel: "In der Web-App öffnen",
   },
 } as const;
 

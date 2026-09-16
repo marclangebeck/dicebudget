@@ -6,6 +6,10 @@ const NATIVE_API = `${SITE_URL}/api`;
 /** Läuft die UI in der Capacitor-iOS/Android-Hülle? */
 export function isCapacitorNative(): boolean {
   if (typeof window === "undefined") return false;
+  const cap = (
+    window as Window & { Capacitor?: { isNativePlatform?: () => boolean } }
+  ).Capacitor;
+  if (cap?.isNativePlatform?.()) return true;
   const p = window.location.protocol;
   return p === "capacitor:" || p === "ionic:";
 }
