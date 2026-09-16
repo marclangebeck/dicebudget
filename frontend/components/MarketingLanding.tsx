@@ -1,10 +1,7 @@
 import Link from "next/link";
 import { MarketingLandingGallery } from "@/components/MarketingLandingGallery";
-import {
-  DICEBUDGET_BETA_MAILTO,
-  DICEBUDGET_MARKETING,
-} from "@/lib/dicebudgetMarketingCopy";
-import { IMPRESSUM_PATH, PRIVACY_PATH } from "@/lib/branding";
+import { DICEBUDGET_MARKETING } from "@/lib/dicebudgetMarketingCopy";
+import { APP_STORE_URL, IMPRESSUM_PATH, PRIVACY_PATH } from "@/lib/branding";
 
 export function MarketingLanding() {
   const copy = DICEBUDGET_MARKETING;
@@ -33,14 +30,18 @@ export function MarketingLanding() {
       <p className="landing-store-hint">{copy.priceNote}</p>
 
       <div className="landing-actions landing-cta-row">
-        <a href={DICEBUDGET_BETA_MAILTO} className="landing-cta">
-          {copy.cta.betaLabel}
+        <a
+          href={APP_STORE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="landing-cta"
+        >
+          {copy.cta.storeLabel}
         </a>
         <a href={copy.cta.poolHref} className="btn-secondary landing-cta-secondary">
           {copy.cta.poolLabel}
         </a>
       </div>
-      <p className="landing-store-hint">{copy.statusLine}</p>
 
       <section id={copy.strategy.id} className="landing-block scroll-mt-24">
         <h2 className="landing-block-title">{copy.strategy.title}</h2>

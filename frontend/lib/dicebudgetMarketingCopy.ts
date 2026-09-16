@@ -1,16 +1,13 @@
-import { CONTACT_EMAIL } from "@/lib/branding";
-
-/** Freigegebene Soft-Launch-Copy (Positionierung D) — LP + Meta. */
+/** Freigegebene Copy (Positionierung D) — LP + Meta. */
 export const DICEBUDGET_MARKETING = {
   eyebrow: "DiceBudget · Strategy Edition",
   headline: "Echte Würfel. Echte Taktik. Eure Serie.",
   lead:
     "Du würfelst am Tisch. Die App gibt dir ein Wurf-Budget, zählt fair und merkt sich eure Stammrunde.",
   support: "Kein Würfelspiel in der App — nur der digitale Zettel.",
-  trust: "Einmal 1,17 € · werbefrei · ohne Kern-In-App-Käufe",
+  trust: "Einmal 1,99 € · werbefrei · ohne Kern-In-App-Käufe",
   priceNote:
     "Regionale Apple-Preise können abweichen — maßgeblich ist der Preis im App Store.",
-  statusLine: "Beta / TestFlight — App Store folgt",
   strategy: {
     id: "pool",
     title: "Wurf-Pool: Mehr Taktik für deine Runde",
@@ -25,7 +22,7 @@ export const DICEBUDGET_MARKETING = {
   },
   paid: {
     title: "Einmal kaufen. Fertig spielen.",
-    text: "1,17 €. Werbefrei. Strategy und Klassisch ohne In-App-Kauf-Zwang. Kein Account.",
+    text: "1,99 €. Werbefrei. Strategy und Klassisch ohne In-App-Kauf-Zwang. Kein Account.",
   },
   gallery: {
     title: "Der digitale Zettel in der App",
@@ -104,15 +101,13 @@ export const DICEBUDGET_MARKETING = {
       {
         question: "Kostet die App etwas?",
         answer:
-          "Einmalig 1,17 €, werbefrei, ohne Kern-In-App-Käufe für Strategy und Klassisch. Regionale Apple-Preise können abweichen — maßgeblich ist der Preis im App Store.",
+          "Einmalig 1,99 €, werbefrei, ohne Kern-In-App-Käufe für Strategy und Klassisch. Regionale Apple-Preise können abweichen — maßgeblich ist der Preis im App Store.",
       },
     ],
   },
   cta: {
-    betaLabel: "Als Beta testen",
+    storeLabel: "Im App Store laden",
     poolLabel: "So funktioniert der Pool",
     poolHref: "#pool",
   },
 } as const;
-
-export const DICEBUDGET_BETA_MAILTO = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("DiceBudget Beta")}&body=${encodeURIComponent("Hallo,\n\nich möchte DiceBudget in der Beta testen.\n\nE-Mail:\n\nViele Grüße")}`;

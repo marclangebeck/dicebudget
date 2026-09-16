@@ -7,7 +7,7 @@ test("Landingpage ohne Web-App-CTA", async ({ page }) => {
     "Echte Würfel. Echte Taktik. Eure Serie.",
   );
   await expect(page.getByRole("link", { name: "In der Web-App öffnen" })).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "Als Beta testen" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Im App Store laden" })).toBeVisible();
 });
 
 test("/app leitet im Browser nicht zum Spiel-Startscreen", async ({ page }) => {
