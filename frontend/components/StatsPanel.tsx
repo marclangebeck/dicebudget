@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getStats } from "@/lib/api";
+import { getOrCreatePlayerId } from "@/lib/playerIdentity";
 import type { StatsDto } from "@/lib/statsTypes";
 
 type Props = {
@@ -13,7 +14,7 @@ export function StatsPanel({ compact = false }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    void getStats()
+    void getStats(getOrCreatePlayerId())
       .then(({ stats: data }) => setStats(data))
       .catch((e) =>
         setError(e instanceof Error ? e.message : "Statistiken nicht geladen"),

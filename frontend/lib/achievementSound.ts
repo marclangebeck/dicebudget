@@ -66,7 +66,11 @@ async function withRunningAudioContext(
     }
   }
   if (ctx.state !== "running") return;
-  play(ctx);
+  try {
+    play(ctx);
+  } catch {
+    /* iOS/WebView: Audio-Graph darf den Submit-Flow nicht killen */
+  }
 }
 
 type ToneOptions = {

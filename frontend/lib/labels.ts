@@ -133,5 +133,7 @@ export function fieldScoreChoices(fieldType: FieldTypeId): readonly number[] {
   ) {
     return SUM_DICE_SCORE_CHOICES;
   }
-  throw new Error(`No score choices for field: ${String(fieldType)}`);
+  // Unbekannter Feldtyp: Render darf nicht crashen (AppErrorBoundary).
+  console.warn(`[fieldScoreChoices] unbekannt: ${String(fieldType)}`);
+  return [0] as const;
 }

@@ -36,10 +36,12 @@ export function useHomeHeroData() {
   }, []);
 
   const refreshServerStats = useCallback(() => {
-    void getStats()
+    const playerId = getOrCreatePlayerId();
+    setOwnPlayerId(playerId);
+    void getStats(playerId)
       .then(({ stats: data }) => setStats(data))
       .catch(() => setStats(null));
-    void getPairingSummaries()
+    void getPairingSummaries(playerId)
       .then(({ pairings: data }) => {
         setPairings(data);
         setPairingsError(null);

@@ -3,10 +3,16 @@ import { describe, it } from "node:test";
 import { RUN_STATUS } from "../domain/fieldTypes.js";
 import { prisma } from "../db/prisma.js";
 import { createRun } from "./createRun.js";
-import { getStats } from "./getStats.js";
+import { getStats, getStatsGlobal } from "./getStats.js";
 
 describe("getStats", () => {
-  it("aggregiert abgeschlossene Runs per DB-Aggregation", async () => {
+  it("ohne playerId fail-closed leer", async () => {
+    const stats = await getStats();
+    assert.equal(stats.finishedRuns, 0);
+    assert.equal(stats.bestTotalScore, null);
+  });
+
+  it("aggregiert abgeschlossene Runs global (Admin)", async () => {
     const { runId: runA } = await createRun(2, false);
     const { runId: runB } = await createRun(3, false);
 
@@ -27,7 +33,7 @@ describe("getStats", () => {
       data: { score: 70 },
     });
 
-    const stats = await getStats();
+    const stats = await getStatsGlobal();
 
     assert.ok(stats.finishedRuns >= 2);
     assert.ok(stats.bestTotalScore !== null && stats.bestTotalScore >= 200);

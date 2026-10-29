@@ -262,12 +262,19 @@ export function applyRollSale(
   });
 }
 
-export function getStats() {
-  return request<{ stats: StatsDto }>("/stats");
+function statsPlayerQuery(playerId?: string): string {
+  const id = (playerId ?? "").trim();
+  return id ? `?playerId=${encodeURIComponent(id)}` : "";
 }
 
-export async function getPairingSummaries() {
-  const { pairings } = await request<{ pairings: unknown[] }>("/stats/pairings");
+export function getStats(playerId?: string) {
+  return request<{ stats: StatsDto }>(`/stats${statsPlayerQuery(playerId)}`);
+}
+
+export async function getPairingSummaries(playerId?: string) {
+  const { pairings } = await request<{ pairings: unknown[] }>(
+    `/stats/pairings${statsPlayerQuery(playerId)}`,
+  );
   return {
     pairings: (pairings ?? [])
       .map(normalizePairingSummary)
@@ -307,9 +314,12 @@ export function upsertPairingBaselines(entries: PairingBaselineEntry[]) {
   );
 }
 
-export async function getPairingDetail(key: string) {
+export async function getPairingDetail(key: string, playerId?: string) {
+  const params = new URLSearchParams({ key });
+  const id = (playerId ?? "").trim();
+  if (id) params.set("playerId", id);
   const { pairing } = await request<{ pairing: unknown }>(
-    `/stats/pairing?key=${encodeURIComponent(key)}`,
+    `/stats/pairing?${params.toString()}`,
   );
   const normalized = normalizePairingDetail(pairing);
   if (!normalized) {

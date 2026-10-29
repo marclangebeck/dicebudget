@@ -80,7 +80,9 @@ function StatsPageInner() {
     if (!opts?.quiet) setLoading(true);
     setError(null);
     try {
-      const { pairings: data } = await getPairingSummaries();
+      const playerId = getOrCreatePlayerId();
+      setOwnPlayerId(playerId);
+      const { pairings: data } = await getPairingSummaries(playerId);
       setPairings(data);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Statistik nicht geladen");
@@ -149,29 +151,40 @@ function StatsPageInner() {
   }, [mergedPairings, ownPlayerId, aliases, ownPlayerIds, selfProfileId]);
 
   /**
-   * Fremde Paarungen ausblenden, sobald wir dich erkennen (Geräte-ID, Alias
-   * oder Rivalen-Profil „Das bin ich“). Sonst alle anzeigen + Hinweis.
-   * Manuell gelöschte Paarungen bleiben lokal ausgeblendet.
+   * Fail-closed für normale Nutzer: ohne Treffer leere Liste.
+   * Admin (X-Admin-Key) sieht den serverseitig globalen Bestand.
+   * Zusätzlich Alias/„Das bin ich“ und lokal ausgeblendete Keys.
    */
   const ownPairings = useMemo(() => {
-    const scoped =
-      !ownPlayerId || !canFilterOwn
-        ? mergedPairings
-        : mergedPairings.filter(
-            (pairing) =>
-              !pairingExcludesOwnPlayer(
-                pairing,
-                ownPlayerId,
-                normalizePublicPlayerId,
-                aliases,
-                ownPlayerIds,
-              ),
-          );
-    return scoped.filter((pairing) => !pairingIsHidden(pairing, hiddenKeys));
-  }, [mergedPairings, ownPlayerId, aliases, ownPlayerIds, canFilterOwn, hiddenKeys]);
+    if (isAdmin) {
+      return mergedPairings.filter((pairing) => !pairingIsHidden(pairing, hiddenKeys));
+    }
+    if (!ownPlayerId) return [];
+    if (!canFilterOwn) return [];
+    return mergedPairings
+      .filter(
+        (pairing) =>
+          !pairingExcludesOwnPlayer(
+            pairing,
+            ownPlayerId,
+            normalizePublicPlayerId,
+            aliases,
+            ownPlayerIds,
+          ),
+      )
+      .filter((pairing) => !pairingIsHidden(pairing, hiddenKeys));
+  }, [
+    isAdmin,
+    mergedPairings,
+    ownPlayerId,
+    aliases,
+    ownPlayerIds,
+    canFilterOwn,
+    hiddenKeys,
+  ]);
 
   const foreignPairingCount = useMemo(() => {
-    if (!ownPlayerId || !canFilterOwn) return 0;
+    if (isAdmin || !ownPlayerId || !canFilterOwn) return 0;
     return mergedPairings.filter((pairing) =>
       pairingExcludesOwnPlayer(
         pairing,
@@ -181,24 +194,27 @@ function StatsPageInner() {
         ownPlayerIds,
       ),
     ).length;
-  }, [mergedPairings, ownPlayerId, aliases, ownPlayerIds, canFilterOwn]);
+  }, [isAdmin, mergedPairings, ownPlayerId, aliases, ownPlayerIds, canFilterOwn]);
 
   const manuallyHiddenCount = useMemo(() => {
-    const scoped =
-      !ownPlayerId || !canFilterOwn
-        ? mergedPairings
-        : mergedPairings.filter(
-            (pairing) =>
-              !pairingExcludesOwnPlayer(
-                pairing,
-                ownPlayerId,
-                normalizePublicPlayerId,
-                aliases,
-                ownPlayerIds,
-              ),
-          );
-    return scoped.filter((pairing) => pairingIsHidden(pairing, hiddenKeys)).length;
-  }, [mergedPairings, ownPlayerId, aliases, ownPlayerIds, canFilterOwn, hiddenKeys]);
+    if (isAdmin) {
+      return mergedPairings.filter((pairing) => pairingIsHidden(pairing, hiddenKeys))
+        .length;
+    }
+    if (!ownPlayerId || !canFilterOwn) return 0;
+    return mergedPairings
+      .filter(
+        (pairing) =>
+          !pairingExcludesOwnPlayer(
+            pairing,
+            ownPlayerId,
+            normalizePublicPlayerId,
+            aliases,
+            ownPlayerIds,
+          ),
+      )
+      .filter((pairing) => pairingIsHidden(pairing, hiddenKeys)).length;
+  }, [isAdmin, mergedPairings, ownPlayerId, aliases, ownPlayerIds, canFilterOwn, hiddenKeys]);
 
   const sortedPairings = useMemo(
     () => sortPairings(ownPairings, "recent"),
@@ -390,9 +406,6 @@ function StatsPageInner() {
                 Namen vom Server, Fotos nur auf diesem Gerät.
                 {foreignPairingCount > 0
                   ? ` ${foreignPairingCount === 1 ? "1 Paarung ohne dich ist" : `${foreignPairingCount} Paarungen ohne dich sind`} nur hier ausgeblendet.`
-                  : ""}
-                {!canFilterOwn && mergedPairings.length > 0
-                  ? " Fremde Paarungen bleiben sichtbar, bis du in einem davon mitspielst."
                   : ""}
               </p>
               <ul className="stats-pairing-list">

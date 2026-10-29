@@ -53,7 +53,7 @@ describe("pairingIncludesOwnPlayer", () => {
     );
   });
 
-  it("skips filter when own id is unknown in data", () => {
+  it("cannot filter when own id is unknown in data (fail-closed signal)", () => {
     const pairings = [{ playerA: "a", playerB: "b" }];
     assert.equal(
       canFilterPairingsByOwnPlayer(pairings, "brand-new-id", normalize, {}),

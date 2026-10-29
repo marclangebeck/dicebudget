@@ -21,8 +21,8 @@ const STRAIGHT_DICE = [2, 3, 4, 5, 6] as const;
 const UPPER_DICE = [1, 2, 3, 4, 5, 6] as const;
 const CONFETTI_SHAPES = ["rect", "star", "pip"] as const;
 
-const SCENE_SPARK_COUNT = 28;
-const ORBIT_COUNT = 14;
+const SCENE_SPARK_COUNT = 12;
+const ORBIT_COUNT = 6;
 const COIN_COUNT = 22;
 
 export function AchievementOverlay({ type, gameIndex, yatzyDieValue, onClose }: Props) {

@@ -1,5 +1,14 @@
 import type { NextFunction, Request, Response } from "express";
 
+/** True, wenn X-Admin-Key zum konfigurierten ADMIN_API_KEY passt (ohne Response). */
+export function hasValidAdminKey(req: Request): boolean {
+  const key = process.env.ADMIN_API_KEY?.trim() || "";
+  if (!key) return false;
+  const header = req.headers["x-admin-key"];
+  const provided = typeof header === "string" ? header.trim() : "";
+  return Boolean(provided && provided === key);
+}
+
 export function requireAdminKey(
   req: Request,
   res: Response,
@@ -12,9 +21,7 @@ export function requireAdminKey(
     });
     return;
   }
-  const header = req.headers["x-admin-key"];
-  const provided = typeof header === "string" ? header.trim() : "";
-  if (!provided || provided !== key) {
+  if (!hasValidAdminKey(req)) {
     res.status(401).json({
       error:
         "Admin-Schlüssel fehlt oder ist falsch. Server-Bereinigung und Siege/Diff brauchen den App-Admin-Key (nur Admin-iOS-Build / Mac-.env.production, nicht öffentliches Web).",

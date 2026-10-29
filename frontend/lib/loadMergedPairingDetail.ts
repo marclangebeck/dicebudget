@@ -19,7 +19,7 @@ export async function loadMergedPairingDetail(
   aliases: PlayerAliasMap,
   ownPlayerId: string,
 ): Promise<MergedPairingDetailResult> {
-  const { pairings } = await getPairingSummaries();
+  const { pairings } = await getPairingSummaries(ownPlayerId);
   const mergedList = mergePairingSummaries(pairings, aliases, ownPlayerId);
   const matched = isMergedPairingKey(key)
     ? mergedList.find((m) => m.key === key)
@@ -28,7 +28,9 @@ export async function loadMergedPairingDetail(
 
   const sources = pairings.filter((p) => matched.sourceKeys.includes(p.key));
   const details = await Promise.all(
-    matched.sourceKeys.map((k) => getPairingDetail(k).then((r) => r.pairing)),
+    matched.sourceKeys.map((k) =>
+      getPairingDetail(k, ownPlayerId).then((r) => r.pairing),
+    ),
   );
   const merged = mergePairingDetails(details, aliases, ownPlayerId);
   if (!merged) throw new Error("Paarung nicht gefunden");

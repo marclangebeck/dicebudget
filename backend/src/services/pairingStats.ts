@@ -416,16 +416,37 @@ function toSummary(acc: PairingAccumulator): PairingSummaryDto {
   };
 }
 
-export async function listPairingSummaries(): Promise<PairingSummaryDto[]> {
+/** Ob die Paarung die angegebene Geräte-playerId enthält (UUID oder legacy:…). */
+export function pairingIncludesPlayerId(
+  pairing: { playerA: string; playerB: string },
+  playerId: string,
+): boolean {
+  const own = normalizePlayerIdForStats(playerId);
+  if (!own) return false;
+  return (
+    normalizePlayerIdForStats(pairing.playerA) === own ||
+    normalizePlayerIdForStats(pairing.playerB) === own
+  );
+}
+
+function normalizePlayerIdForStats(raw: string): string {
+  return raw.trim().toLowerCase();
+}
+
+export async function listPairingSummaries(
+  playerId?: string | null,
+): Promise<PairingSummaryDto[]> {
   const map = await getCachedAccumulatedPairings();
-  return [...map.values()]
-    .map(toSummary)
-    .sort((a, b) => {
-      const totalWinsA = a.playerAWins + a.playerBWins;
-      const totalWinsB = b.playerAWins + b.playerBWins;
-      if (totalWinsB !== totalWinsA) return totalWinsB - totalWinsA;
-      return a.playerA.localeCompare(b.playerA, "de");
-    });
+  let list = [...map.values()].map(toSummary);
+  if (playerId) {
+    list = list.filter((p) => pairingIncludesPlayerId(p, playerId));
+  }
+  return list.sort((a, b) => {
+    const totalWinsA = a.playerAWins + a.playerBWins;
+    const totalWinsB = b.playerAWins + b.playerBWins;
+    if (totalWinsB !== totalWinsA) return totalWinsB - totalWinsA;
+    return a.playerA.localeCompare(b.playerA, "de");
+  });
 }
 
 /** Normalisiert eingehende Pairing-Keys zu einem Set kanonischer Keys. */
@@ -618,7 +639,10 @@ export async function upsertPairingBaselines(
   return { written, deleted };
 }
 
-export async function getPairingDetail(key: string): Promise<PairingDetailDto | null> {
+export async function getPairingDetail(
+  key: string,
+  playerId?: string | null,
+): Promise<PairingDetailDto | null> {
   const names = parsePairingKey(key);
   if (!names) return null;
 
@@ -626,6 +650,10 @@ export async function getPairingDetail(key: string): Promise<PairingDetailDto | 
   const map = await getCachedAccumulatedPairings();
   const acc = map.get(normalizedKey);
   if (!acc) return null;
+
+  if (playerId && !pairingIncludesPlayerId(acc, playerId)) {
+    return null;
+  }
 
   return {
     ...toSummary(acc),

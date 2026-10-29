@@ -72,11 +72,35 @@ describe("stats admin auth", () => {
     assert.ok(typeof res.body.written === "number");
   });
 
-  it("GET /stats returns aggregate payload", async () => {
+  it("GET /stats without playerId returns empty (fail-closed)", async () => {
     const app = createTestApp();
     const res = await request(app).get("/stats");
     assert.equal(res.status, 200);
+    assert.equal(res.body.stats?.finishedRuns, 0);
+    assert.equal(res.body.stats?.bestTotalScore, null);
+  });
+
+  it("GET /stats/pairings without playerId returns empty list", async () => {
+    const app = createTestApp();
+    const res = await request(app).get("/stats/pairings");
+    assert.equal(res.status, 200);
+    assert.deepEqual(res.body.pairings, []);
+  });
+
+  it("GET /stats with admin key returns aggregate payload", async () => {
+    const app = createTestApp();
+    const res = await request(app).get("/stats").set("X-Admin-Key", TEST_ADMIN_KEY);
+    assert.equal(res.status, 200);
     assert.ok(typeof res.body.stats?.finishedRuns === "number");
+  });
+
+  it("GET /stats/pairings with admin key returns array", async () => {
+    const app = createTestApp();
+    const res = await request(app)
+      .get("/stats/pairings")
+      .set("X-Admin-Key", TEST_ADMIN_KEY);
+    assert.equal(res.status, 200);
+    assert.ok(Array.isArray(res.body.pairings));
   });
 });
 

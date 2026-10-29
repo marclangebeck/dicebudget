@@ -55,7 +55,15 @@ function loadStore(): LocalSoloStore {
 
 function saveStore(store: LocalSoloStore): void {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+  } catch (err) {
+    const message =
+      err instanceof DOMException && err.name === "QuotaExceededError"
+        ? "Speicher voll — Solo-Stand konnte nicht gesichert werden."
+        : "Solo-Stand konnte nicht gespeichert werden.";
+    throw new Error(message);
+  }
 }
 
 function recomputeRun(run: RunDto): void {

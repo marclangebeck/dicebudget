@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { requireAdminKey } from "../middleware/adminAuth.js";
-import { getStats } from "../services/getStats.js";
+import { hasValidAdminKey, requireAdminKey } from "../middleware/adminAuth.js";
+import { isValidPlayerId, normalizePlayerId } from "../domain/playerIdentity.js";
+import { getStats, getStatsGlobal } from "../services/getStats.js";
 import {
   getPairingDetail,
   listPairingSummaries,
@@ -11,18 +12,41 @@ import {
 
 export const statsRouter = Router();
 
-statsRouter.get("/", async (_req, res, next) => {
+function playerIdFromQuery(req: { query: Record<string, unknown> }): string | null {
+  const raw = req.query.playerId;
+  if (typeof raw !== "string") return null;
+  const id = normalizePlayerId(raw);
+  return isValidPlayerId(id) ? id : null;
+}
+
+statsRouter.get("/", async (req, res, next) => {
   try {
-    const stats = await getStats();
+    if (hasValidAdminKey(req)) {
+      const stats = await getStatsGlobal();
+      res.json({ stats });
+      return;
+    }
+    const playerId = playerIdFromQuery(req);
+    const stats = await getStats(playerId);
     res.json({ stats });
   } catch (error) {
     next(error);
   }
 });
 
-statsRouter.get("/pairings", async (_req, res, next) => {
+statsRouter.get("/pairings", async (req, res, next) => {
   try {
-    const pairings = await listPairingSummaries();
+    if (hasValidAdminKey(req)) {
+      const pairings = await listPairingSummaries(null);
+      res.json({ pairings });
+      return;
+    }
+    const playerId = playerIdFromQuery(req);
+    if (!playerId) {
+      res.json({ pairings: [] });
+      return;
+    }
+    const pairings = await listPairingSummaries(playerId);
     res.json({ pairings });
   } catch (error) {
     next(error);
@@ -88,7 +112,21 @@ statsRouter.get("/pairing", async (req, res, next) => {
       res.status(400).json({ error: "key required" });
       return;
     }
-    const pairing = await getPairingDetail(key);
+    if (hasValidAdminKey(req)) {
+      const pairing = await getPairingDetail(key, null);
+      if (!pairing) {
+        res.status(404).json({ error: "Pairing not found" });
+        return;
+      }
+      res.json({ pairing });
+      return;
+    }
+    const playerId = playerIdFromQuery(req);
+    if (!playerId) {
+      res.status(404).json({ error: "Pairing not found" });
+      return;
+    }
+    const pairing = await getPairingDetail(key, playerId);
     if (!pairing) {
       res.status(404).json({ error: "Pairing not found" });
       return;
@@ -98,4 +136,3 @@ statsRouter.get("/pairing", async (req, res, next) => {
     next(error);
   }
 });
-

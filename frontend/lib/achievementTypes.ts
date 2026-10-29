@@ -16,11 +16,12 @@ export const ACHIEVEMENT_DURATION_MS: Record<AchievementType, number> = {
   yatzy: 4000,
 };
 
+/** Reduziert für iOS/WebView (Memory); früher bis 120 bei Yatzy. */
 export const ACHIEVEMENT_CONFETTI_COUNT: Record<AchievementType, number> = {
-  bonus: 72,
-  lower_complete: 80,
-  large_straight: 88,
-  yatzy: 120,
+  bonus: 28,
+  lower_complete: 32,
+  large_straight: 36,
+  yatzy: 40,
 };
 
 export type AchievementVisual = {
